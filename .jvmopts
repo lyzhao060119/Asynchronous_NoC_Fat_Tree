@@ -1,0 +1,4 @@
+-Xms1g
+-Xmx12g
+-XX:MaxMetaspaceSize=1g
+-Xss8m

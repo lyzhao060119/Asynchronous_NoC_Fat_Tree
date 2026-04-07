@@ -1,0 +1,67 @@
+target/
+generated/
+firrtl_black_box_resource_files.f
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea/
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Scala ###
+.bsp/
+
+### Simulation Outputs ###
+sim/work/
+.Xil/
+xsim.dir/
+*.wdb
+xelab.log
+xelab.pb
+xvlog.log
+xvlog.pb
+xsim*.jou
+xsim*.log
+webtalk*.jou
+webtalk*.log
+transcript
+modelsim.ini
+vish_stacktrace.vstf
