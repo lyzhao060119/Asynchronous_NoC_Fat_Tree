@@ -19,8 +19,9 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
       decision.output_packets(i) := DontCare
     }
 
-    val dest_x = current_Packet.flit(19, 17) //dest(5, 3)
-    val dest_y = current_Packet.flit(13, 11)
+    val treeId = current_Packet.flit(PacketLayout.TreeIdHi, PacketLayout.TreeIdLo)
+    val dest_x = treeId(1, 0)
+    val dest_y = treeId(3, 2)
     val dir = WireInit(0.U(5.W))
     when(Packet_valid) {
       when(dest_x > coordinate_x) {

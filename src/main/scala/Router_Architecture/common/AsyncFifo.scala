@@ -12,7 +12,7 @@ class AsyncFifo(val depth: Int) extends Module {
 
   val stages = Seq.fill(depth)(Module(new AsyncStage))
 
-  // 串接 stages
+  // stages
   for (k <- 0 until depth - 1) {
     val p = stages(k).io.out
     val c = stages(k + 1).io.in

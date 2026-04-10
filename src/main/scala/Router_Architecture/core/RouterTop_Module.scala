@@ -11,8 +11,8 @@ class RouterTop_Module(
   childLanes: Int,
   parentLanes: Int,
   fifoDepth: Int = 1,
-  isHead_index: Int = 21,
-  isTail_index: Int = 20
+  isHead_index: Int = PacketLayout.IsHeadIndex,
+  isTail_index: Int = PacketLayout.IsTailIndex
 ) extends RouterCoreModule(
       config = RouterModuleConfig(
         childLanes = childLanes,

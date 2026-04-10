@@ -1,13 +1,14 @@
 package Router_Architecture.common
 
+import DataStruct.PacketLayout
 import chisel3.util.log2Ceil
 
 final case class RouterModuleConfig(
   childLanes: Int,
   parentLanes: Int,
   fifoDepth: Int = 1,
-  isHeadIndex: Int = 21,
-  isTailIndex: Int = 20,
+  isHeadIndex: Int = PacketLayout.IsHeadIndex,
+  isTailIndex: Int = PacketLayout.IsTailIndex,
   nDirs: Int = 5,
   parentDir: Int = 4
 ) {

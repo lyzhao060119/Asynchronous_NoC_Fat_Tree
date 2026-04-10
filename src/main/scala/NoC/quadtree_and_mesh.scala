@@ -7,8 +7,8 @@ import chisel3._
 import chisel3.util._
 
 class quadtree_and_mesh extends Module {
-  val quad_num_x = 2
-  val quad_num_y = 2
+  val quad_num_x = 4
+  val quad_num_y = 4
   val quad_num = quad_num_y * quad_num_x
   val io = IO(new Bundle {
     val inputs = Vec(quad_num, Vec(64, new HS_Packet))
