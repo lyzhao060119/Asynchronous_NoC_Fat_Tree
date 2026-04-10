@@ -38,7 +38,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yHi := Mux(yMin <= yMax, yMax, yMin)
 
     val childMask = Wire(Vec(4, Bool()))
-    childMask := VecInit(Seq.fill(4)(false.B)) // downstream to children
+    childMask := VecInit(Seq.fill(4)(false.B)) //to children
     val toParent = WireInit(false.B)
 
     for (y <- 0 until 8) {
@@ -48,8 +48,8 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
           (y.U(3.W) >= yLo) && (y.U(3.W) <= yHi) //in the target rectangle
 
         val xGroup = (x >> level).U(2.W)
-        val yGroup = (y >> level).U(2.W)
-        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY)
+        val yGroup = (y >> level).U(2.W) //coordination of multicasting rectangle
+        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY) //within present router's children
 
         val xSel = (x >> (level - 1)) & 0x1
         val ySel = (y >> (level - 1)) & 0x1
