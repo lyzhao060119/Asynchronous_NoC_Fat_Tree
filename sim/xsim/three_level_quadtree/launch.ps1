@@ -2,7 +2,8 @@ param(
   [ValidateSet("gui", "batch")]
   [string]$Mode = "gui",
   [ValidateSet("throughput", "multicast")]
-  [string]$Test = "throughput"
+  [string]$Test = "throughput",
+  [switch]$Regenerate
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,7 +23,7 @@ New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 
 Push-Location $root
 try {
-  if (-not (Test-Path $generatedVerilog)) {
+  if ($Regenerate -or -not (Test-Path $generatedVerilog)) {
     sbt "runMain NoC.three_level_quadtree"
   }
 } finally {

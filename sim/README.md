@@ -22,6 +22,7 @@ Vivado usage:
 powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode gui
 powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode batch -Test throughput
 powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode batch -Test multicast
+powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode batch -Test throughput -Regenerate
 ```
 
 `launch.ps1` runs `xvlog/xelab/xsim` inside `sim/work/xsim/three_level_quadtree`, so Vivado outputs no longer clutter the project root.
