@@ -1,9 +1,8 @@
 package Router_Architecture.ipm
 
 import DataStruct._
-import Router_Architecture.common.{AsyncFifo, AsyncFork, RouterModuleConfig}
+import Router_Architecture.common.RouterModuleConfig
 import chisel3._
-import tool.AsyncClock
 
 class RouterInputPortModule(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
@@ -22,44 +21,24 @@ class RouterInputPortModule(config: RouterModuleConfig) extends Module {
     val nextLane = Input(Vec(config.nDirs, UInt(config.laneW.W)))
   })
 
-  private val fifo = Module(new AsyncFifo(config.fifoDepth))
-  private val fork = Module(new AsyncFork(config.totalPorts))
+  private val datapath = Module(new RouterInputDatapathModule(config))
+  private val state = Module(new RouterInputStateModule(config))
 
-  fifo.io.enq <> io.in
-  fork.io.in <> fifo.io.deq
-  fork.io.destMask := io.destMask
-  io.forkOutputs <> fork.io.out
+  datapath.io.in <> io.in
+  datapath.io.destMask := io.destMask
+  io.forkOutputs <> datapath.io.forkOutputs
 
-  private val dirReg = AsyncClock(fork.io.launch_clock, reset) {
-    RegInit(VecInit(Seq.fill(config.nDirs)(false.B)))
-  }
-  private val laneReg = AsyncClock(fork.io.launch_clock, reset) {
-    RegInit(VecInit(Seq.fill(config.nDirs)(0.U(config.laneW.W))))
-  }
+  io.inValid := datapath.io.inValid
+  io.inBits := datapath.io.inBits
+  io.isHead := datapath.io.isHead
+  io.isTail := datapath.io.isTail
 
-  io.storedDir := dirReg
-  io.storedLane := laneReg
+  state.io.launchClock := datapath.io.launchClock
+  state.io.isHead := datapath.io.isHead
+  state.io.isTail := datapath.io.isTail
+  state.io.nextDir := io.nextDir
+  state.io.nextLane := io.nextLane
 
-  io.inValid := fifo.io.deq.HS.Req ^ fifo.io.deq.HS.Ack
-  io.inBits := fifo.io.deq.Data
-  io.isHead := io.inValid && io.inBits.flit(config.isHeadIndex)
-  io.isTail := io.inValid && io.inBits.flit(config.isTailIndex)
-
-  AsyncClock(fork.io.launch_clock, reset) {
-    when(io.isHead) {
-      dirReg := io.nextDir
-      for (d <- 0 until config.nDirs) {
-        when(io.nextDir(d)) {
-          laneReg(d) := io.nextLane(d)
-        }.otherwise {
-          laneReg(d) := 0.U
-        }
-      }
-    }
-
-    when(io.isTail) {
-      dirReg := VecInit(Seq.fill(config.nDirs)(false.B))
-      laneReg := VecInit(Seq.fill(config.nDirs)(0.U(config.laneW.W)))
-    }
-  }
+  io.storedDir := state.io.storedDir
+  io.storedLane := state.io.storedLane
 }
