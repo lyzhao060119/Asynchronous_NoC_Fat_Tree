@@ -1,147 +1,106 @@
-# Asynchronous NoC Fat Tree
+# Asynchronous Fat-Tree Multicast NoC
 
-Chisel implementation of an asynchronous multicast NoC built from a three-level fat-tree and a top-layer mesh interconnect.
+Chinese version: [README.zh-CN.md](README.zh-CN.md)
 
-## Overview
+This repository contains a Chisel implementation of an asynchronous multicast NoC built from:
 
-This repository contains:
+- a three-level quadtree tile (`three_level_quadtree`)
+- a top mesh connecting multiple tiles (`quadtree_and_mesh`)
 
-- A hierarchical quadtree-style multicast network built from `RouterL1`, `RouterL2`, and `RouterL3`
-- A `TopLayer` mesh that connects multiple quadtree instances into a larger NoC
-- Asynchronous handshake-based datapaths using `Req/Ack` channels
-- Verilog generation entry points for standalone routers and NoC top levels
-- Simulation scripts for both ModelSim/Questa and Vivado `xsim`
+The design uses request/acknowledge handshakes and supports multi-flit unicast and rectangle multicast.
 
-The current fork behavior is multicast-oriented: one input flit is held at the source side, multiple selected outputs consume it independently, and the input is released only after all active branches finish.
+## Current Status
 
-## Repository Layout
+Recent fixes completed in this branch:
 
-- `src/main/scala/DataStruct`: flit and handshake bundles
-- `src/main/scala/Router_Architecture`: router pipeline, routing logic, async primitives
-- `src/main/scala/NoC`: top-level NoC compositions
-- `src/main/resources/ASYNC`: supporting Verilog async cells
-- `sim/testbenches`: HDL testbenches
-- `sim/modelsim`: ModelSim/Questa scripts
-- `sim/xsim`: Vivado `xsim` scripts
-- `sim/work`: generated simulation outputs and logs
+- Routing now uses ingress direction suppression inside the same tree to avoid back-edge re-forwarding (duplicate sends / loops during multicast contention).
+- Level-1 local-injection exception is preserved so local destinations are still reachable.
+- The `three_level_quadtree` SystemVerilog testbench monitor was rewritten to non-blocking delayed-ACK scheduling (`pending + fork/join_none`) to avoid missed flit counting.
 
 ## Architecture
 
-### Router hierarchy
+- `RouterL1`: leaf router (`childLanes=1`, `parentLanes=2`)
+- `RouterL2`: middle router (`childLanes=2`, `parentLanes=4`)
+- `RouterL3`: root router of one quadtree tile (`childLanes=4`, `parentLanes=8`)
+- `RouterTop`: top-layer mesh router
 
-- `RouterL1`: leaf router, `childLanes = 1`, `parentLanes = 2`
-- `RouterL2`: intermediate router, `childLanes = 2`, `parentLanes = 4`
-- `RouterL3`: upper tree router, `childLanes = 4`, `parentLanes = 8`
-- `RouterTop`: top mesh router used by `TopLayer`
+Top-level generators:
 
-### Top-level compositions
+- `NoC.three_level_quadtree`: one tile with 64 core ports + 8 top ports
+- `NoC.quadtree_and_mesh`: 4x4 tile network connected by `TopLayer`
 
-- `NoC.three_level_quadtree`: one 8x8 tile of 64 cores plus 8 top ports
-- `NoC.quadtree_and_mesh`: four `three_level_quadtree` instances connected by `TopLayer`
+## Flit Layout (22 bits)
 
-### Flit format
+- `[21]` `isHead`
+- `[20]` `isTail`
+- `[19:16]` `treeId` (top mesh tree index)
+- `[15:13]` `xMin`
+- `[12:10]` `xMax`
+- `[9:7]` `yMin`
+- `[6:4]` `yMax`
+- `[3:2]` reserved
+- `[1:0]` packet `id`
 
-The packet payload is 22 bits wide:
+Definitions are in `src/main/scala/DataStruct/Packet.scala`.
 
-- bit `21`: `isHead`
-- bit `20`: `isTail`
-- bits `19:14`: `destX`
-- bits `13:8`: `destY`
-- bits `7:5`: `copyX`
-- bits `4:2`: `copyY`
-- bits `1:0`: packet `id`
+## Verification Coverage (three_level_quadtree_tb)
 
-The handshake interface is `HS_Packet`, which combines `Req/Ack` control with the 22-bit payload.
+Main testbench: `sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv`  
+DUT macro header: `sim/testbenches/three_level_quadtree/three_level_quadtree_dut_inst.vh`
 
-## Build and Verilog Generation
+Included regression cases:
 
-This project uses:
+- `T1` multi-flit unicast (`core0 -> core63`)
+- `T2` multi-flit rectangle multicast (`x2..5, y1..3`)
+- `T3` inverted rectangle bounds normalization
+- `T4` full-tree multicast (`8x8`)
+- `T5` tree-id mismatch routing upward to exactly one top lane
+- `T6` top-input downlink multicast to local cores
+- `T7` multicast backpressure branch throttling behavior
+- `T8` competing multicasts with overlap region
+- `T9` unicast contention to the same destination
+
+## Build and Run
+
+Requirements:
 
 - Scala `2.13.14`
 - Chisel `3.6.1`
 - `sbt`
+- Vivado `xsim` (for the commands below)
 
-Compile the Scala/Chisel sources:
-
-```powershell
-sbt compile
-```
-
-Generate Verilog for a single 8x8 quadtree tile:
+Generate Verilog:
 
 ```powershell
 sbt "runMain NoC.three_level_quadtree"
 ```
 
-Generate Verilog for the quadtree plus top-layer mesh:
+Compile and run the main regression:
 
 ```powershell
-sbt "runMain NoC.quadtree_and_mesh"
+xvlog -sv -i sim/testbenches/three_level_quadtree generated/three_level_quadtree.v sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv
+xelab --timescale 1ns/1ps three_level_quadtree_tb -s three_level_quadtree_tb_sim
+xsim three_level_quadtree_tb_sim -runall
 ```
 
-Generate Verilog for a standalone L1 router:
+Expected pass banner:
 
-```powershell
-sbt "runMain Router_Architecture.instantiation.RouterL1"
+```text
+[TB] all three_level_quadtree tests PASSED
 ```
 
-Generated files are written to `generated/`, which is intentionally ignored by Git.
+You can also use helper scripts under `sim/xsim/three_level_quadtree` and details in [sim/README.md](sim/README.md).
 
-## Simulation
+## Repository Layout
 
-Detailed script locations are listed in [sim/README.md](sim/README.md).
-
-### Vivado xsim
-
-Run the `three_level_quadtree` throughput benchmark in batch mode:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode batch
-```
-
-Open the same design in GUI mode:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode gui
-```
-
-`launch.ps1` prints the exact `source` commands for the current machine. In the `xsim` Tcl console, source the wave and benchmark scripts it prints.
-
-### ModelSim / Questa
-
-Available scripts include:
-
-- `sim/modelsim/three_level_quadtree/throughput_3flit.do`
-- `sim/modelsim/three_level_quadtree/throughput_wave.do`
-- `sim/modelsim/three_level_quadtree/complex_test.do`
-
-There is also a standalone RouterL1 testbench:
-
-- `sim/testbenches/routerl1/routerl1_three_flit_packet_tb.sv`
-
-## Measured Benchmark
-
-The current `three_level_quadtree` throughput benchmark uses four concurrent diagonal long-distance unicast flows:
-
-- `0 -> 63`
-- `7 -> 56`
-- `56 -> 7`
-- `63 -> 0`
-
-Each packet contains 3 flits. Measured over a 500 ns window after warmup, the observed aggregate throughput is:
-
-- `2.008 flits/ns`
-- `0.664 packets/ns`
-- `44.176 bits/ns`
-
-These numbers were reproduced with Vivado `xsim` using the batch script in `sim/xsim/three_level_quadtree`.
-
-## Notes
-
-- `sim/work/` stores simulator outputs and is ignored by Git.
-- `generated/` is not tracked; regenerate it locally when needed.
-- The repository focuses on source code, generators, and reusable simulation scripts rather than checked-in build artifacts.
+- `src/main/scala/DataStruct`: packet and handshake definitions
+- `src/main/scala/Router_Architecture`: router blocks and routing logic
+- `src/main/scala/NoC`: top-level NoC compositions
+- `src/main/resources/ASYNC`: async Verilog cells (`DelayElement`, `Mutex2`, etc.)
+- `sim/testbenches`: SystemVerilog testbenches
+- `sim/modelsim`: ModelSim/Questa scripts
+- `sim/xsim`: Vivado xsim scripts
 
 ## License
 
-This project is released under the MIT License. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
