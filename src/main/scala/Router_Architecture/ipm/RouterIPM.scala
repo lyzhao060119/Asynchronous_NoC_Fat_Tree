@@ -6,7 +6,7 @@ import chisel3._
 
 class RouterIPM(
   config: RouterModuleConfig,
-  computeHeadRouting: (Packet, Bool) => Vec[Bool]
+  computeHeadRouting: (Packet, Bool, UInt) => Vec[Bool]
 ) extends Module {
   val io = IO(new Bundle {
     val inputs = new RouterDirGroupedHSIO(config.childLanes, config.parentLanes)

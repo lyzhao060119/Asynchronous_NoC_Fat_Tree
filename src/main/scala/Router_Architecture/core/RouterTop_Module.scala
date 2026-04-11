@@ -21,7 +21,7 @@ class RouterTop_Module(
         isHeadIndex = isHead_index,
         isTailIndex = isTail_index
       ),
-      computeHeadRouting = (packet: Packet, inValid: Bool) =>
+      computeHeadRouting = (packet: Packet, inValid: Bool, _: UInt) =>
         new RoutingLogic_top_layer(x_coordinate, y_coordinate)
           .computeRouting(packet, inValid)
           .output_valid

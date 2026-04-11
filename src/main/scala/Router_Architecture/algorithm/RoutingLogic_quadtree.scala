@@ -114,7 +114,8 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
 
   def computeRouting(current_Packet: Packet,
                      Packet_valid: Bool,
-                     router_level: UInt
+                     router_level: UInt,
+                     ingressDir: UInt
                     ): RoutingDecision = {
     val decision = Wire(new RoutingDecision)
     for (i <- 0 until 5) {
@@ -146,10 +147,20 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
       }
     }
 
+    val projectedNoBack = Wire(Vec(5, Bool()))
+    val bypassIngressSuppress =
+      (router_level === 1.U) && (ingressDir =/= 4.U)
+    for (i <- 0 until 5) {
+      projectedNoBack(i) := projectedDir(i)
+      when(!bypassIngressSuppress && (ingressDir === i.U)) {
+        projectedNoBack(i) := false.B
+      }
+    }
+
     val dir = WireInit(0.U(5.W))
     when(Packet_valid) {
       when(sameTree) {
-        dir := projectedDir
+        dir := projectedNoBack.asUInt
       }.otherwise {
         dir := "b10000".U // route upward until reaching target tree in top layer
       }

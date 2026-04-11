@@ -22,8 +22,8 @@ class RouterTree_Module(
         isHeadIndex = isHead_index,
         isTailIndex = isTail_index
       ),
-      computeHeadRouting = (packet: Packet, inValid: Bool) =>
+      computeHeadRouting = (packet: Packet, inValid: Bool, ingressDir: UInt) =>
         new RoutingLogic(x_coordinate, y_coordinate)
-          .computeRouting(packet, inValid, routerLevel.U(3.W))
+          .computeRouting(packet, inValid, routerLevel.U(3.W), ingressDir)
           .output_valid
     )
