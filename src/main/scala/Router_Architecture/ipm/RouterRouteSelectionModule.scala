@@ -20,7 +20,7 @@ class RouterRouteSelectionModule(
 
   for (i <- 0 until config.totalPorts) {
     val ingressDir = config.dirOfPhys(i).U(dirW.W)
-    val headDecision = computeHeadRouting(io.inBits(i), io.inValid(i), ingressDir)
+    val headDecision = computeHeadRouting(io.inBits(i), io.inValid(i), ingressDir) //illegal transporting back to the same direction
     when(io.isHead(i)) {
       io.currentDestVec(i) := headDecision
     }.otherwise {

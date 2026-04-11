@@ -49,7 +49,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
 
         val xGroup = (x >> level).U(2.W)
         val yGroup = (y >> level).U(2.W) //coordination of multicasting rectangle
-        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY) //within present router's children
+        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY) //within parent router's children
 
         val xSel = (x >> (level - 1)) & 0x1
         val ySel = (y >> (level - 1)) & 0x1
