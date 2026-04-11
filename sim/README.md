@@ -8,6 +8,7 @@ Simulation files are organized by role:
 Current files:
 
 - `sim/testbenches/routerl1/routerl1_three_flit_packet_tb.sv`
+- `sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv`
 - `sim/modelsim/three_level_quadtree/complex_test.do`
 - `sim/modelsim/three_level_quadtree/throughput_3flit.do`
 - `sim/modelsim/three_level_quadtree/throughput_wave.do`
@@ -39,3 +40,16 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/cleanup_outputs.ps1
 ```
 
 This removes `webtalk`/`.Xil` artifacts and root-level legacy Vivado logs, and archives legacy xsim workspace under `sim/work/xsim/archive/root_legacy` when present.
+
+Vivado New Project (GUI) with HDL testbench:
+
+1. Add design sources:
+   - `generated/three_level_quadtree.v`
+   - `src/main/resources/ASYNC/DelayElement.v`
+   - `src/main/resources/ASYNC/MrGo.v`
+   - `src/main/resources/ASYNC/Mutex2.v`
+2. Add simulation source:
+   - `sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv`
+3. Set simulation top:
+   - `three_level_quadtree_tb`
+4. Run Behavioral Simulation.
