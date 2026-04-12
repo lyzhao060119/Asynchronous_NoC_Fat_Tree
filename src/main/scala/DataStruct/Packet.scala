@@ -3,28 +3,22 @@ package DataStruct
 import chisel3._
 
 object PacketLayout {
-  val IdHigh = 1
-  val IdLow = 0
+  val IdHi = 1
+  val IdLo = 0
 
-  val ReservedHigh = 3
-  val ReservedLow = 2
+  // Rectangle corners in global 32x32 space.
+  // Two diagonal points: (x0, y0) and (x1, y1), each coordinate is 6 bits.
+  val X0Lo = 2
+  val X0Hi = 7
+  val Y0Lo = 8
+  val Y0Hi = 13
+  val X1Lo = 14
+  val X1Hi = 19
+  val Y1Lo = 20
+  val Y1Hi = 25
 
-  // Tree id in top mesh : treeY * 4 + treeX
-  val TreeIdHi = 19
-  val TreeIdLo = 16
-
-  // Rectangle multicast region in one tree-local 8x8 space.
-  val YMaxHi = 6
-  val YMaxLo = 4
-  val YMinHi = 9
-  val YMinLo = 7
-  val XMaxHi = 12
-  val XMaxLo = 10
-  val XMinHi = 15
-  val XMinLo = 13
-
-  val IsTailIndex = 20
-  val IsHeadIndex = 21
+  val IsTailIndex = 26
+  val IsHeadIndex = 27
 
   val FlitWidth = IsHeadIndex + 1
 }
@@ -32,11 +26,9 @@ object PacketLayout {
 class Packet extends Bundle {
   val flit = UInt(PacketLayout.FlitWidth.W)
 
-  // payload[21]:isHead payload[20]:isTail
-  // payload[19:16]:treeId
-  // payload[15:13]:xMin payload[12:10]:xMax
-  // payload[9:7]:yMin  payload[6:4]:yMax
-  // payload[3:2]:reserved payload[1:0]:id
+  // payload[27]:isHead payload[26]:isTail
+  // payload[25:20]:y1 payload[19:14]:x1
+  // payload[13:8]:y0 payload[7:2]:x0
+  // payload[1:0]:id
 
 }
-

@@ -2,6 +2,7 @@ package Router_Architecture.algorithm
 
 import DataStruct._
 import chisel3._
+import chisel3.util._
 
 class RoutingDecision_top extends Bundle {
   val output_ports = Vec(5, Bool())
@@ -10,8 +11,15 @@ class RoutingDecision_top extends Bundle {
 }
 
 class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
+  private val DirWest = 0.U(3.W)
+  private val DirSouth = 1.U(3.W)
+  private val DirEast = 2.U(3.W)
+  private val DirNorth = 3.U(3.W)
+  private val DirLocal = 4.U(3.W)
+
   def computeRouting(current_Packet: Packet,
-                     Packet_valid: Bool): RoutingDecision_top = {
+                     Packet_valid: Bool,
+                     ingressDir: UInt): RoutingDecision_top = {
     val decision = Wire(new RoutingDecision_top)
     for (i <- 0 until 5) {
       decision.output_valid(i) := false.B
@@ -19,23 +27,86 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
       decision.output_packets(i) := DontCare
     }
 
-    val treeId = current_Packet.flit(PacketLayout.TreeIdHi, PacketLayout.TreeIdLo)
-    val dest_x = treeId(1, 0)
-    val dest_y = treeId(3, 2)
-    val dir = WireInit(0.U(5.W))
+    val x0 = current_Packet.flit(PacketLayout.X0Hi, PacketLayout.X0Lo)
+    val y0 = current_Packet.flit(PacketLayout.Y0Hi, PacketLayout.Y0Lo)
+    val x1 = current_Packet.flit(PacketLayout.X1Hi, PacketLayout.X1Lo)
+    val y1 = current_Packet.flit(PacketLayout.Y1Hi, PacketLayout.Y1Lo)
+
+    val xLo = Wire(UInt(6.W))
+    val xHi = Wire(UInt(6.W))
+    val yLo = Wire(UInt(6.W))
+    val yHi = Wire(UInt(6.W))
+    xLo := Mux(x0 <= x1, x0, x1)
+    xHi := Mux(x0 <= x1, x1, x0)
+    yLo := Mux(y0 <= y1, y0, y1)
+    yHi := Mux(y0 <= y1, y1, y0)
+
+    // Top layer routes between 8x8 trees, so each mesh coordinate uses global bits [5:3].
+    val txLo = xLo(5, 3)
+    val txHi = xHi(5, 3)
+    val tyLo = yLo(5, 3)
+    val tyHi = yHi(5, 3)
+
+    val cx = Wire(UInt(2.W))
+    val cy = Wire(UInt(2.W))
+    cx := coordinate_x
+    cy := coordinate_y
+
+    val inRectColumn = (cx >= txLo) && (cx <= txHi)
+    val inRectRow = (cy >= tyLo) && (cy <= tyHi)
+    val localHit = inRectColumn && inRectRow
+
+    val eastNeeded = cx < txHi
+    val westNeeded = cx > txLo
+    val northNeeded = inRectColumn && (cy < tyHi)
+    val southNeeded = inRectColumn && (cy > tyLo)
+
+    val goWest = WireInit(false.B)
+    val goSouth = WireInit(false.B)
+    val goEast = WireInit(false.B)
+    val goNorth = WireInit(false.B)
+    val goLocal = WireInit(false.B)
+
     when(Packet_valid) {
-      when(dest_x > coordinate_x) {
-        dir := "b00100".U
-      }.elsewhen(dest_x < coordinate_x) {
-        dir := "b00001".U
-      }.elsewhen(dest_y > coordinate_y) {
-        dir := "b01000".U
-      }.elsewhen(dest_y < coordinate_y) {
-        dir := "b00010".U
-      }.otherwise {
-        dir := "b10000".U
+      goLocal := localHit
+
+      // Tree-based mesh forwarding without duplicate loops:
+      // - Trunk packets (from West/East) keep moving away from source.
+      // - Vertical branches (from North/South) stay vertical only.
+      // - Source injection (from Local) can spawn both trunk directions when needed.
+      switch(ingressDir) {
+        is(DirWest) {
+          goEast := eastNeeded
+          goNorth := northNeeded
+          goSouth := southNeeded
+        }
+        is(DirEast) {
+          goWest := westNeeded
+          goNorth := northNeeded
+          goSouth := southNeeded
+        }
+        is(DirNorth) {
+          goSouth := southNeeded
+        }
+        is(DirSouth) {
+          goNorth := northNeeded
+        }
+        is(DirLocal) {
+          when(cx < txLo) {
+            goEast := true.B
+          }.elsewhen(cx > txHi) {
+            goWest := true.B
+          }.otherwise {
+            goWest := westNeeded
+            goEast := eastNeeded
+          }
+          goNorth := northNeeded
+          goSouth := southNeeded
+        }
       }
     }
+
+    val dir = Cat(goLocal, goNorth, goEast, goSouth, goWest)
     for (i <- 0 until 5) {
       when(dir(i)) {
         decision.output_packets(i) := current_Packet

@@ -38,18 +38,18 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yHi := Mux(yMin <= yMax, yMax, yMin)
 
     val childMask = Wire(Vec(4, Bool()))
-    childMask := VecInit(Seq.fill(4)(false.B)) //to children
+    childMask := VecInit(Seq.fill(4)(false.B))
     val toParent = WireInit(false.B)
 
     for (y <- 0 until 8) {
       for (x <- 0 until 8) {
         val inRect =
           (x.U(3.W) >= xLo) && (x.U(3.W) <= xHi) &&
-          (y.U(3.W) >= yLo) && (y.U(3.W) <= yHi) //in the target rectangle
+          (y.U(3.W) >= yLo) && (y.U(3.W) <= yHi)
 
         val xGroup = (x >> level).U(2.W)
-        val yGroup = (y >> level).U(2.W) //coordination of multicasting rectangle
-        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY) //within parent router's children
+        val yGroup = (y >> level).U(2.W)
+        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY)
 
         val xSel = (x >> (level - 1)) & 0x1
         val ySel = (y >> (level - 1)) & 0x1
@@ -68,7 +68,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     Cat(toParent, childMask.asUInt)
   }
 
-  private def currentTreeId(router_level: UInt): UInt = {
+  private def currentTreeCoord(router_level: UInt): (UInt, UInt) = {
     val treeX = WireInit(0.U(2.W))
     val treeY = WireInit(0.U(2.W))
 
@@ -87,8 +87,8 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
       }
     }
 
-    Cat(treeY, treeX)
-  }// identify tree's index
+    (treeX, treeY)
+  } // identify tree (0..3, 0..3) in top layer
 
   private def localRouterCoord(router_level: UInt): (UInt, UInt) = {
     val localX = WireInit(0.U(2.W))
@@ -110,7 +110,40 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     }
 
     (localX, localY)
-  }//router index in the local tree
+  } // router index in local tree
+
+  private def localRectInCurrentTree(
+    router_level: UInt,
+    xLoGlobal: UInt,
+    xHiGlobal: UInt,
+    yLoGlobal: UInt,
+    yHiGlobal: UInt
+  ): (Bool, UInt, UInt, UInt, UInt) = {
+    val (treeX, treeY) = currentTreeCoord(router_level)
+
+    val treeBaseX = Cat(0.U(1.W), treeX, 0.U(3.W))
+    val treeBaseY = Cat(0.U(1.W), treeY, 0.U(3.W))
+    val treeMaxX = Wire(UInt(6.W))
+    val treeMaxY = Wire(UInt(6.W))
+    treeMaxX := treeBaseX + 7.U
+    treeMaxY := treeBaseY + 7.U
+
+    val xIntersects = (xHiGlobal >= treeBaseX) && (xLoGlobal <= treeMaxX)
+    val yIntersects = (yHiGlobal >= treeBaseY) && (yLoGlobal <= treeMaxY)
+    val treeIntersects = xIntersects && yIntersects
+
+    val xLoLocal6 = Wire(UInt(6.W))
+    val xHiLocal6 = Wire(UInt(6.W))
+    val yLoLocal6 = Wire(UInt(6.W))
+    val yHiLocal6 = Wire(UInt(6.W))
+
+    xLoLocal6 := Mux(xLoGlobal > treeBaseX, xLoGlobal - treeBaseX, 0.U)
+    yLoLocal6 := Mux(yLoGlobal > treeBaseY, yLoGlobal - treeBaseY, 0.U)
+    xHiLocal6 := Mux(xHiGlobal < treeMaxX, xHiGlobal - treeBaseX, 7.U)
+    yHiLocal6 := Mux(yHiGlobal < treeMaxY, yHiGlobal - treeBaseY, 7.U)
+
+    (treeIntersects, xLoLocal6(2, 0), xHiLocal6(2, 0), yLoLocal6(2, 0), yHiLocal6(2, 0))
+  }
 
   def computeRouting(current_Packet: Packet,
                      Packet_valid: Bool,
@@ -122,28 +155,39 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
       decision.output_valid(i) := false.B
       decision.output_ports(i) := false.B
       decision.output_packets(i) := DontCare
-    } //initialize
+    }
 
-    val packetTreeId = current_Packet.flit(PacketLayout.TreeIdHi, PacketLayout.TreeIdLo) //target tree id
-    val xMin = current_Packet.flit(PacketLayout.XMinHi, PacketLayout.XMinLo)
-    val xMax = current_Packet.flit(PacketLayout.XMaxHi, PacketLayout.XMaxLo)
-    val yMin = current_Packet.flit(PacketLayout.YMinHi, PacketLayout.YMinLo)
-    val yMax = current_Packet.flit(PacketLayout.YMaxHi, PacketLayout.YMaxLo)
+    val x0 = current_Packet.flit(PacketLayout.X0Hi, PacketLayout.X0Lo)
+    val y0 = current_Packet.flit(PacketLayout.Y0Hi, PacketLayout.Y0Lo)
+    val x1 = current_Packet.flit(PacketLayout.X1Hi, PacketLayout.X1Lo)
+    val y1 = current_Packet.flit(PacketLayout.Y1Hi, PacketLayout.Y1Lo)
 
-    val thisTreeId = currentTreeId(router_level)
-    val sameTree = packetTreeId === thisTreeId
+    val xLoGlobal = Wire(UInt(6.W))
+    val xHiGlobal = Wire(UInt(6.W))
+    val yLoGlobal = Wire(UInt(6.W))
+    val yHiGlobal = Wire(UInt(6.W))
+    xLoGlobal := Mux(x0 <= x1, x0, x1)
+    xHiGlobal := Mux(x0 <= x1, x1, x0)
+    yLoGlobal := Mux(y0 <= y1, y0, y1)
+    yHiGlobal := Mux(y0 <= y1, y1, y0)
+
+    val (treeIntersects, xMinLocal, xMaxLocal, yMinLocal, yMaxLocal) =
+      localRectInCurrentTree(router_level, xLoGlobal, xHiGlobal, yLoGlobal, yHiGlobal)
+
     val (localX, localY) = localRouterCoord(router_level)
 
     val projectedDir = WireInit(0.U(5.W))
-    switch(router_level) {
-      is(1.U) {
-        projectedDir := projectRectAtLevel(xMin, xMax, yMin, yMax, level = 1, localX, localY)
-      }
-      is(2.U) {
-        projectedDir := projectRectAtLevel(xMin, xMax, yMin, yMax, level = 2, localX, localY)
-      }
-      is(3.U) {
-        projectedDir := projectRectAtLevel(xMin, xMax, yMin, yMax, level = 3, localX, localY)
+    when(treeIntersects) {
+      switch(router_level) {
+        is(1.U) {
+          projectedDir := projectRectAtLevel(xMinLocal, xMaxLocal, yMinLocal, yMaxLocal, level = 1, localX, localY)
+        }
+        is(2.U) {
+          projectedDir := projectRectAtLevel(xMinLocal, xMaxLocal, yMinLocal, yMaxLocal, level = 2, localX, localY)
+        }
+        is(3.U) {
+          projectedDir := projectRectAtLevel(xMinLocal, xMaxLocal, yMinLocal, yMaxLocal, level = 3, localX, localY)
+        }
       }
     }
 
@@ -159,10 +203,15 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
 
     val dir = WireInit(0.U(5.W))
     when(Packet_valid) {
-      when(sameTree) {
+      when(treeIntersects) {
         dir := projectedNoBack.asUInt
       }.otherwise {
-        dir := "b10000".U // route upward until reaching target tree in top layer
+        // Not this tree: keep going up, except packet coming from parent (drop to avoid bounce).
+        when(ingressDir =/= 4.U) {
+          dir := "b10000".U
+        }.otherwise {
+          dir := 0.U
+        }
       }
     }
 
