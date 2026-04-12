@@ -17,6 +17,10 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
   private val DirNorth = 3.U(3.W)
   private val DirLocal = 4.U(3.W)
 
+  private def absDiff(a: UInt, b: UInt): UInt = {
+    Mux(a >= b, a - b, b - a)
+  }
+
   def computeRouting(current_Packet: Packet,
                      Packet_valid: Bool,
                      ingressDir: UInt): RoutingDecision_top = {
@@ -56,6 +60,26 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
     val inRectRow = (cy >= tyLo) && (cy <= tyHi)
     val localHit = inRectColumn && inRectRow
 
+    // Phase-A: outside the rectangle, route with XY to the nearest corner.
+    val dLL = absDiff(cx, txLo) +& absDiff(cy, tyLo) // (xLo, yLo)
+    val dLH = absDiff(cx, txLo) +& absDiff(cy, tyHi) // (xLo, yHi)
+    val dHL = absDiff(cx, txHi) +& absDiff(cy, tyLo) // (xHi, yLo)
+    val dHH = absDiff(cx, txHi) +& absDiff(cy, tyHi) // (xHi, yHi)
+
+    val chooseLH = dLH < dLL
+    val bestXLeft = txLo
+    val bestYLeft = Mux(chooseLH, tyHi, tyLo)
+    val bestDLeft = Mux(chooseLH, dLH, dLL)
+
+    val chooseHH = dHH < dHL
+    val bestXRight = txHi
+    val bestYRight = Mux(chooseHH, tyHi, tyLo)
+    val bestDRight = Mux(chooseHH, dHH, dHL)
+
+    val chooseRight = bestDRight < bestDLeft
+    val targetX = Mux(chooseRight, bestXRight, bestXLeft)
+    val targetY = Mux(chooseRight, bestYRight, bestYLeft)
+
     val eastNeeded = cx < txHi
     val westNeeded = cx > txLo
     val northNeeded = inRectColumn && (cy < tyHi)
@@ -68,40 +92,49 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
     val goLocal = WireInit(false.B)
 
     when(Packet_valid) {
-      goLocal := localHit
-
-      // Tree-based mesh forwarding without duplicate loops:
-      // - Trunk packets (from West/East) keep moving away from source.
-      // - Vertical branches (from North/South) stay vertical only.
-      // - Source injection (from Local) can spawn both trunk directions when needed.
-      switch(ingressDir) {
-        is(DirWest) {
-          goEast := eastNeeded
-          goNorth := northNeeded
-          goSouth := southNeeded
+      when(!localHit) {
+        // Phase-A: XY unicast to nearest corner (single path, no branch).
+        when(cx < targetX) {
+          goEast := true.B
+        }.elsewhen(cx > targetX) {
+          goWest := true.B
+        }.elsewhen(cy < targetY) {
+          goNorth := true.B
+        }.elsewhen(cy > targetY) {
+          goSouth := true.B
         }
-        is(DirEast) {
-          goWest := westNeeded
-          goNorth := northNeeded
-          goSouth := southNeeded
-        }
-        is(DirNorth) {
-          goSouth := southNeeded
-        }
-        is(DirSouth) {
-          goNorth := northNeeded
-        }
-        is(DirLocal) {
-          when(cx < txLo) {
-            goEast := true.B
-          }.elsewhen(cx > txHi) {
-            goWest := true.B
-          }.otherwise {
-            goWest := westNeeded
+      }.otherwise {
+        // Phase-B: inside rectangle, tree-based spreading.
+        goLocal := true.B
+        switch(ingressDir) {
+          is(DirWest) {
             goEast := eastNeeded
+            goNorth := northNeeded
+            goSouth := southNeeded
           }
-          goNorth := northNeeded
-          goSouth := southNeeded
+          is(DirEast) {
+            goWest := westNeeded
+            goNorth := northNeeded
+            goSouth := southNeeded
+          }
+          is(DirNorth) {
+            goSouth := southNeeded
+          }
+          is(DirSouth) {
+            goNorth := northNeeded
+          }
+          is(DirLocal) {
+            when(cx < txLo) {
+              goEast := true.B
+            }.elsewhen(cx > txHi) {
+              goWest := true.B
+            }.otherwise {
+              goWest := westNeeded
+              goEast := eastNeeded
+            }
+            goNorth := northNeeded
+            goSouth := southNeeded
+          }
         }
       }
     }
