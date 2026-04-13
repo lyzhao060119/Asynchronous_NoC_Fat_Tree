@@ -118,9 +118,21 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
             goSouth := southNeeded
           }
           is(DirNorth) {
+            // Entering from north boundary: start X-trunk and keep Y-branch.
+            // Interior vertical branch packets remain vertical-only to avoid duplicates.
+            when(cy === tyHi) {
+              goWest := westNeeded
+              goEast := eastNeeded
+            }
             goSouth := southNeeded
           }
           is(DirSouth) {
+            // Entering from south boundary: start X-trunk and keep Y-branch.
+            // Interior vertical branch packets remain vertical-only to avoid duplicates.
+            when(cy === tyLo) {
+              goWest := westNeeded
+              goEast := eastNeeded
+            }
             goNorth := northNeeded
           }
           is(DirLocal) {
