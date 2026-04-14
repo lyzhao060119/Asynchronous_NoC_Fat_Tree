@@ -105,7 +105,11 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
         }
       }.otherwise {
         // Phase-B: inside rectangle, tree-based spreading.
-        goLocal := true.B
+        // Packets entering from local tree have already been delivered locally
+        // in quadtree logic; avoid sending back to local to prevent duplicates.
+        when(ingressDir =/= DirLocal) {
+          goLocal := true.B
+        }
         switch(ingressDir) {
           is(DirWest) {
             goEast := eastNeeded

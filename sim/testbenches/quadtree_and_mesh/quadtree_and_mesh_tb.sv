@@ -2,12 +2,12 @@
 `default_nettype none
 
 module quadtree_and_mesh_tb;
-  localparam int FLIT_W = 22;
-  localparam int N_QUAD = 4;
-  localparam int N_CORE = 64;
-  localparam int EDGE_N = 2;
+  localparam int FLIT_W = 28;
+  localparam int N_QUAD = 4;      // 2x2 tree tiles
+  localparam int N_CORE = 64;     // per tile
+  localparam int EDGE_N = 2;      // 2 rows / 2 cols
   localparam int TOP_LANE = 4;
-  localparam int MAX_RX_PER_PORT = 512;
+  localparam int MAX_RX_PER_PORT = 1024;
   localparam int DEFAULT_ACK_DELAY_NS = 1;
   localparam int HANDSHAKE_TIMEOUT_NS = 500000;
   localparam int GLOBAL_TIMEOUT_NS = 8000000;
@@ -91,34 +91,35 @@ module quadtree_and_mesh_tb;
     core_index = x + (y * 8);
   endfunction
 
-  function automatic [3:0] tree_id_of_quad(input int q);
-    int x;
-    int y;
-    x = q % EDGE_N;
-    y = q / EDGE_N;
-    tree_id_of_quad = (y << 2) | x;
+  function automatic int q_index_of_global(input int gx, input int gy);
+    q_index_of_global = (gx / 8) + ((gy / 8) * EDGE_N);
+  endfunction
+
+  function automatic int c_index_of_global(input int gx, input int gy);
+    c_index_of_global = core_index(gx % 8, gy % 8);
   endfunction
 
   function automatic [FLIT_W-1:0] mk_flit_rect(
     input bit isHead,
     input bit isTail,
-    input [3:0] treeId,
-    input [2:0] xMin,
-    input [2:0] xMax,
-    input [2:0] yMin,
-    input [2:0] yMax,
+    input [5:0] x0,
+    input [5:0] y0,
+    input [5:0] x1,
+    input [5:0] y1,
     input [1:0] pktId
   );
+    // payload[27]:isHead payload[26]:isTail
+    // payload[25:20]:y1 payload[19:14]:x1
+    // payload[13:8]:y0  payload[7:2]:x0
+    // payload[1:0]:id
     mk_flit_rect = {
-      isHead,              // [21]
-      isTail,              // [20]
-      treeId,              // [19:16]
-      xMin,                // [15:13]
-      xMax,                // [12:10]
-      yMin,                // [9:7]
-      yMax,                // [6:4]
-      2'b00,               // [3:2] reserved
-      pktId                // [1:0]
+      isHead,
+      isTail,
+      y1,
+      x1,
+      y0,
+      x0,
+      pktId
     };
   endfunction
 
@@ -227,8 +228,18 @@ module quadtree_and_mesh_tb;
     exp_core_flits[q][c] = exp_core_flits[q][c] + flit_count;
   endtask
 
-  task automatic expect_rect_flits(
-    input int q,
+  task automatic expect_global_flits(input int gx, input int gy, input int flit_count);
+    int q;
+    int c;
+    if ((gx < 0) || (gy < 0) || (gx >= (EDGE_N * 8)) || (gy >= (EDGE_N * 8))) begin
+      return;
+    end
+    q = q_index_of_global(gx, gy);
+    c = c_index_of_global(gx, gy);
+    expect_core_flits(q, c, flit_count);
+  endtask
+
+  task automatic expect_global_rect_flits(
     input int x0,
     input int x1,
     input int y0,
@@ -239,15 +250,15 @@ module quadtree_and_mesh_tb;
     int xHi;
     int yLo;
     int yHi;
-    int x;
-    int y;
+    int gx;
+    int gy;
     xLo = min2(x0, x1);
     xHi = max2(x0, x1);
     yLo = min2(y0, y1);
     yHi = max2(y0, y1);
-    for (y = yLo; y <= yHi; y = y + 1) begin
-      for (x = xLo; x <= xHi; x = x + 1) begin
-        expect_core_flits(q, core_index(x, y), flit_count);
+    for (gy = yLo; gy <= yHi; gy = gy + 1) begin
+      for (gx = xLo; gx <= xHi; gx = gx + 1) begin
+        expect_global_flits(gx, gy, flit_count);
       end
     end
   endtask
@@ -393,6 +404,21 @@ module quadtree_and_mesh_tb;
     end
   endtask
 
+  task automatic check_global_triplet(
+    input string tag,
+    input int gx,
+    input int gy,
+    input [FLIT_W-1:0] h,
+    input [FLIT_W-1:0] b,
+    input [FLIT_W-1:0] t
+  );
+    int q;
+    int c;
+    q = q_index_of_global(gx, gy);
+    c = c_index_of_global(gx, gy);
+    check_core_triplet(tag, q, c, h, b, t);
+  endtask
+
   initial clock = 1'b0;
   always #1 clock = ~clock;
 
@@ -528,7 +554,7 @@ module quadtree_and_mesh_tb;
     reg [FLIT_W-1:0] h1;
     reg [FLIT_W-1:0] b1;
     reg [FLIT_W-1:0] t1;
-    int dst;
+    int base_idx;
 
     reset = 1'b1;
 
@@ -582,75 +608,75 @@ module quadtree_and_mesh_tb;
     reset = 1'b0;
     $display("[QAM-TB] reset released at t=%0t ns", $time);
 
-    // T1: same-tree unicast in non-zero tree (q=1)
+    // T1) Same-tree multi-flit unicast: q1 core0 -> q1 core63 (global 15,7)
     begin_case("T1 same-tree unicast q1 core0->core63");
-    h0 = mk_flit_rect(1'b1, 1'b0, tree_id_of_quad(1), 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, tree_id_of_quad(1), 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, tree_id_of_quad(1), 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    expect_core_flits(1, 63, 3);
+    h0 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd7, 6'd15, 6'd7, 2'd1);
+    b0 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd7, 6'd15, 6'd7, 2'd1);
+    t0 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd7, 6'd15, 6'd7, 2'd1);
+    expect_global_flits(15, 7, 3);
     send_core_packet3(1, 0, h0, b0, t0, "T1");
     wait_for_idle("T1");
     check_expected_counts("T1");
-    check_core_triplet("T1", 1, 63, h0, b0, t0);
+    check_global_triplet("T1", 15, 7, h0, b0, t0);
 
-    // T2: cross-tree unicast q0 -> q3
+    // T2) Cross-tree multi-flit unicast: q0 core0 -> q3 core63 (global 15,15)
     begin_case("T2 cross-tree unicast q0 core0->q3 core63");
-    h0 = mk_flit_rect(1'b1, 1'b0, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd2);
-    b0 = mk_flit_rect(1'b0, 1'b0, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd2);
-    t0 = mk_flit_rect(1'b0, 1'b1, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd2);
-    expect_core_flits(3, 63, 3);
+    h0 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
+    b0 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
+    t0 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
+    expect_global_flits(15, 15, 3);
     send_core_packet3(0, 0, h0, b0, t0, "T2");
     wait_for_idle("T2");
     check_expected_counts("T2");
-    check_core_triplet("T2", 3, 63, h0, b0, t0);
+    check_global_triplet("T2", 15, 15, h0, b0, t0);
 
-    // T3: cross-tree rectangle multicast q0 -> q2 x6..7 y6..7
-    begin_case("T3 cross-tree multicast q0->q2 rect x6..7 y6..7");
-    h0 = mk_flit_rect(1'b1, 1'b0, tree_id_of_quad(2), 3'd6, 3'd7, 3'd6, 3'd7, 2'd3);
-    b0 = mk_flit_rect(1'b0, 1'b0, tree_id_of_quad(2), 3'd6, 3'd7, 3'd6, 3'd7, 2'd3);
-    t0 = mk_flit_rect(1'b0, 1'b1, tree_id_of_quad(2), 3'd6, 3'd7, 3'd6, 3'd7, 2'd3);
-    expect_rect_flits(2, 6, 7, 6, 7, 3);
+    // T3) Cross-tree rectangle multicast across boundaries: x6..9, y6..9
+    begin_case("T3 cross-tree multicast rect x6..9 y6..9");
+    h0 = mk_flit_rect(1'b1, 1'b0, 6'd6, 6'd6, 6'd9, 6'd9, 2'd3);
+    b0 = mk_flit_rect(1'b0, 1'b0, 6'd6, 6'd6, 6'd9, 6'd9, 2'd3);
+    t0 = mk_flit_rect(1'b0, 1'b1, 6'd6, 6'd6, 6'd9, 6'd9, 2'd3);
+    expect_global_rect_flits(6, 9, 6, 9, 3);
     send_core_packet3(0, 1, h0, b0, t0, "T3");
     wait_for_idle("T3");
     check_expected_counts("T3");
-    check_core_triplet("T3", 2, 54, h0, b0, t0);
-    check_core_triplet("T3", 2, 55, h0, b0, t0);
-    check_core_triplet("T3", 2, 62, h0, b0, t0);
-    check_core_triplet("T3", 2, 63, h0, b0, t0);
+    check_global_triplet("T3", 6, 6, h0, b0, t0);
+    check_global_triplet("T3", 8, 6, h0, b0, t0);
+    check_global_triplet("T3", 6, 8, h0, b0, t0);
+    check_global_triplet("T3", 8, 8, h0, b0, t0);
 
-    // T4: contention: two trees target same destination core in q3
-    begin_case("T4 cross-tree contention to same destination");
-    h0 = mk_flit_rect(1'b1, 1'b0, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    h1 = mk_flit_rect(1'b1, 1'b0, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd2);
-    b1 = mk_flit_rect(1'b0, 1'b0, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd2);
-    t1 = mk_flit_rect(1'b0, 1'b1, tree_id_of_quad(3), 3'd7, 3'd7, 3'd7, 3'd7, 2'd2);
-    expect_core_flits(3, 63, 6);
+    // T4) Two unicast packets contending for same destination (global 15,15)
+    begin_case("T4 cross-tree unicast contention same destination");
+    h0 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd1);
+    b0 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd1);
+    t0 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd15, 6'd15, 6'd15, 2'd1);
+    h1 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
+    b1 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
+    t1 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
+    expect_global_flits(15, 15, 6);
     fork
       send_core_packet3(0, 2, h0, b0, t0, "T4-A");
       send_core_packet3(1, 61, h1, b1, t1, "T4-B");
     join
     wait_for_idle("T4");
     check_expected_counts("T4");
-    dst = base_core_count[3][63];
-    if (core_id_count(3, 63, dst, 2'b01) != 3) begin
+    base_idx = base_core_count[3][63];
+    if (core_id_count(3, 63, base_idx, 2'b01) != 3) begin
       $fatal(1, "[T4] q3 core63 id=1 flit count mismatch");
     end
-    if (core_id_count(3, 63, dst, 2'b10) != 3) begin
+    if (core_id_count(3, 63, base_idx, 2'b10) != 3) begin
       $fatal(1, "[T4] q3 core63 id=2 flit count mismatch");
     end
 
-    // T5: inject from mesh boundary PE (west side) into internal tree
+    // T5) Injection from west boundary PE into local trees
     begin_case("T5 west boundary injection to q2 core(1,2)");
-    h0 = mk_flit_rect(1'b1, 1'b0, tree_id_of_quad(2), 3'd1, 3'd1, 3'd2, 3'd2, 2'd0);
-    b0 = mk_flit_rect(1'b0, 1'b0, tree_id_of_quad(2), 3'd1, 3'd1, 3'd2, 3'd2, 2'd0);
-    t0 = mk_flit_rect(1'b0, 1'b1, tree_id_of_quad(2), 3'd1, 3'd1, 3'd2, 3'd2, 2'd0);
-    expect_core_flits(2, core_index(1, 2), 3);
+    h0 = mk_flit_rect(1'b1, 1'b0, 6'd1, 6'd10, 6'd1, 6'd10, 2'd0);
+    b0 = mk_flit_rect(1'b0, 1'b0, 6'd1, 6'd10, 6'd1, 6'd10, 2'd0);
+    t0 = mk_flit_rect(1'b0, 1'b1, 6'd1, 6'd10, 6'd1, 6'd10, 2'd0);
+    expect_global_flits(1, 10, 3);
     send_west_to_packet3(1, 0, h0, b0, t0, "T5");
     wait_for_idle("T5");
     check_expected_counts("T5");
-    check_core_triplet("T5", 2, core_index(1, 2), h0, b0, t0);
+    check_global_triplet("T5", 1, 10, h0, b0, t0);
 
     $display("\n[QAM-TB] all quadtree_and_mesh tests PASSED");
     #10;

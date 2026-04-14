@@ -118,7 +118,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     xHiGlobal: UInt,
     yLoGlobal: UInt,
     yHiGlobal: UInt
-  ): (Bool, UInt, UInt, UInt, UInt) = {
+  ): (Bool, Bool, UInt, UInt, UInt, UInt) = {
     val (treeX, treeY) = currentTreeCoord(router_level)
 
     val treeBaseX = Cat(0.U(1.W), treeX, 0.U(3.W))
@@ -131,6 +131,9 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     val xIntersects = (xHiGlobal >= treeBaseX) && (xLoGlobal <= treeMaxX)
     val yIntersects = (yHiGlobal >= treeBaseY) && (yLoGlobal <= treeMaxY)
     val treeIntersects = xIntersects && yIntersects
+    val treeContainsRect =
+      (xLoGlobal >= treeBaseX) && (xHiGlobal <= treeMaxX) &&
+      (yLoGlobal >= treeBaseY) && (yHiGlobal <= treeMaxY)
 
     val xLoLocal6 = Wire(UInt(6.W))
     val xHiLocal6 = Wire(UInt(6.W))
@@ -142,7 +145,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     xHiLocal6 := Mux(xHiGlobal < treeMaxX, xHiGlobal - treeBaseX, 7.U)
     yHiLocal6 := Mux(yHiGlobal < treeMaxY, yHiGlobal - treeBaseY, 7.U)
 
-    (treeIntersects, xLoLocal6(2, 0), xHiLocal6(2, 0), yLoLocal6(2, 0), yHiLocal6(2, 0))
+    (treeIntersects, treeContainsRect, xLoLocal6(2, 0), xHiLocal6(2, 0), yLoLocal6(2, 0), yHiLocal6(2, 0))
   }
 
   def computeRouting(current_Packet: Packet,
@@ -171,7 +174,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yLoGlobal := Mux(y0 <= y1, y0, y1)
     yHiGlobal := Mux(y0 <= y1, y1, y0)
 
-    val (treeIntersects, xMinLocal, xMaxLocal, yMinLocal, yMaxLocal) =
+    val (treeIntersects, treeContainsRect, xMinLocal, xMaxLocal, yMinLocal, yMaxLocal) =
       localRectInCurrentTree(router_level, xLoGlobal, xHiGlobal, yLoGlobal, yHiGlobal)
 
     val (localX, localY) = localRouterCoord(router_level)
@@ -205,6 +208,10 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     when(Packet_valid) {
       when(treeIntersects) {
         dir := projectedNoBack.asUInt
+        // Only the tree root should duplicate upward for cross-tree multicast.
+        when((router_level === 3.U) && !treeContainsRect && (ingressDir =/= 4.U)) {
+          dir := projectedNoBack.asUInt | "b10000".U
+        }
       }.otherwise {
         // Not this tree: keep going up, except packet coming from parent (drop to avoid bounce).
         when(ingressDir =/= 4.U) {
