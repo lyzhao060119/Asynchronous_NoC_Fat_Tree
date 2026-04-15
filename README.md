@@ -1,36 +1,36 @@
 # Asynchronous Fat-Tree Multicast NoC
 
-Chinese version: [README.zh-CN.md](README.zh-CN.md)
+This repository contains Chisel implementations of an asynchronous multicast NoC:
 
-This repository contains a Chisel implementation of an asynchronous multicast NoC built from:
+- `NoC.three_level_quadtree`: one 8x8 quadtree tile (64 core ports + 8 top ports)
+- `NoC.quadtree_and_mesh`: 2x2 quadtree-tiles connected by `TopLayer`
+- `NoC.TopLayer`: standalone top-layer mesh generator (used by the dedicated mesh testbench)
 
-- a three-level quadtree tile (`three_level_quadtree`)
-- a top mesh connecting multiple tiles (`quadtree_and_mesh`)
-
-The design uses request/acknowledge handshakes and supports multi-flit unicast and rectangle multicast.
+The network uses request/acknowledge handshakes and supports multi-flit unicast and rectangle multicast, including cross-quadtree multicast.
 
 ## Current Status
 
-Recent fixes completed in this branch:
-
-- Routing now uses ingress direction suppression inside the same tree to avoid back-edge re-forwarding (duplicate sends / loops during multicast contention).
-- Level-1 local-injection exception is preserved so local destinations are still reachable.
-- The `three_level_quadtree` SystemVerilog testbench monitor was rewritten to non-blocking delayed-ACK scheduling (`pending + fork/join_none`) to avoid missed flit counting.
+- Quadtree routing suppresses same-tree back-edge re-forwarding to avoid duplicate sends and loops.
+- Quadtree root routing supports cross-tree rectangle multicast (partial overlap keeps local fanout and duplicates upward).
+- Top-layer routing supports cross-quadtree rectangle spread with ingress-aware duplicate suppression.
 
 ## Architecture
 
 - `RouterL1`: leaf router (`childLanes=1`, `parentLanes=2`)
 - `RouterL2`: middle router (`childLanes=2`, `parentLanes=4`)
-- `RouterL3`: root router of one quadtree tile (`childLanes=4`, `parentLanes=8`)
+- `RouterL3`: root router (`childLanes=4`, `parentLanes=8`)
 - `RouterTop`: top-layer mesh router
 
-Top-level generators:
+## Flit Layout (28 bits)
 
+<<<<<<< HEAD
 - `NoC.three_level_quadtree`: one tile with 64 core ports + 8 top ports
 - `NoC.quadtree_and_mesh`: 2x2 tile network connected by `TopLayer`
 
 ## Flit Layout (28 bits)
 
+=======
+>>>>>>> 0a21c73d44514b7b8ba24e7fd5ffe1f9dc29f3bd
 - `[27]` `isHead`
 - `[26]` `isTail`
 - `[25:20]` `y1`
@@ -39,10 +39,11 @@ Top-level generators:
 - `[7:2]` `x0`
 - `[1:0]` packet `id`
 
-Definitions are in `src/main/scala/DataStruct/Packet.scala`.
+Coordinates are global rectangle corners (`(x0,y0)` and `(x1,y1)`), and routing logic normalizes min/max bounds internally.
 
-## Verification Coverage (three_level_quadtree_tb)
+Definitions: `src/main/scala/DataStruct/Packet.scala`.
 
+<<<<<<< HEAD
 Main testbench: `sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv`  
 DUT macro header: `sim/testbenches/three_level_quadtree/three_level_quadtree_dut_inst.vh`
 
@@ -79,43 +80,74 @@ Included regression cases:
 ## Build and Run
 
 Requirements:
+=======
+## Build Requirements
+>>>>>>> 0a21c73d44514b7b8ba24e7fd5ffe1f9dc29f3bd
 
 - Scala `2.13.14`
-- Chisel `3.6.1`
 - `sbt`
-- Vivado `xsim` (for the commands below)
+- Vivado simulator (`xvlog`, `xelab`, `xsim`)
 
-Generate Verilog:
+## Generate RTL
 
 ```powershell
 sbt "runMain NoC.three_level_quadtree"
+sbt "runMain NoC.quadtree_and_mesh"
+sbt "runMain NoC.TopLayer"
 ```
 
-Compile and run the main regression:
+## Run Simulation (Recommended Scripts)
+
+`three_level_quadtree`:
 
 ```powershell
-xvlog -sv -i sim/testbenches/three_level_quadtree generated/three_level_quadtree.v sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv
-xelab --timescale 1ns/1ps three_level_quadtree_tb -s three_level_quadtree_tb_sim
-xsim three_level_quadtree_tb_sim -runall
+powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode gui
+powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode batch -Test throughput
+powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps1 -Mode batch -Test multicast
 ```
 
-Expected pass banner:
+`quadtree_and_mesh`:
 
-```text
-[TB] all three_level_quadtree tests PASSED
+```powershell
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -Mode batch
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -Mode gui -Regenerate
 ```
 
-You can also use helper scripts under `sim/xsim/three_level_quadtree` and details in [sim/README.md](sim/README.md).
+`toplayer_mesh`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File sim/xsim/toplayer_mesh/launch.ps1 -Mode batch
+powershell -ExecutionPolicy Bypass -File sim/xsim/toplayer_mesh/launch.ps1 -Mode gui
+```
+
+Generated Vivado/xsim outputs are placed under `sim/work/xsim/...` instead of the project root.
+
+## Cleanup Generated Artifacts
+
+```powershell
+powershell -ExecutionPolicy Bypass -File sim/xsim/cleanup_outputs.ps1
+```
+
+This removes generated webtalk artifacts and cleans legacy root-level Vivado outputs (`.Xil`, `xsim.dir`, logs, backup journals). Legacy root outputs are archived under `sim/work/xsim/archive`.
+
+## Verification Assets
+
+- `sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv` (`T1..T9`)
+- `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_tb.sv` (`T1..T5`, includes cross-tree multicast)
+- `sim/testbenches/toplayer_mesh/toplayer_mesh_tb.sv` (`M1..M6`, includes cross-tree rectangle multicast)
+- `sim/xsim/*` for scripted xsim runs
+
+For simulation-specific details, see [sim/README.md](sim/README.md).
 
 ## Repository Layout
 
 - `src/main/scala/DataStruct`: packet and handshake definitions
-- `src/main/scala/Router_Architecture`: router blocks and routing logic
-- `src/main/scala/NoC`: top-level NoC compositions
-- `src/main/resources/ASYNC`: async Verilog cells (`DelayElement`, `Mutex2`, etc.)
+- `src/main/scala/Router_Architecture`: router building blocks and routing logic
+- `src/main/scala/NoC`: top-level network generators
+- `src/main/resources/ASYNC`: async Verilog cells (`DelayElement`, `Mutex2`, `MrGo`)
 - `sim/testbenches`: SystemVerilog testbenches
 - `sim/modelsim`: ModelSim/Questa scripts
-- `sim/xsim`: Vivado xsim scripts
+- `sim/xsim`: Vivado xsim launch/Tcl scripts
 
 ## License
 

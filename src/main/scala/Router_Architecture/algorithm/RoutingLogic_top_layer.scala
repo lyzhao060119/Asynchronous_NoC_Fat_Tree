@@ -45,7 +45,6 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
     yLo := Mux(y0 <= y1, y0, y1)
     yHi := Mux(y0 <= y1, y1, y0)
 
-    // Top layer routes between 8x8 trees, so each mesh coordinate uses global bits [5:3].
     val txLo = xLo(5, 3)
     val txHi = xHi(5, 3)
     val tyLo = yLo(5, 3)
@@ -60,7 +59,7 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
     val inRectRow = (cy >= tyLo) && (cy <= tyHi)
     val localHit = inRectColumn && inRectRow
 
-    // Phase-A: outside the rectangle, route with XY to the nearest corner.
+    // outside the rectangle, route with XY to the nearest corner.
     val dLL = absDiff(cx, txLo) +& absDiff(cy, tyLo) // (xLo, yLo)
     val dLH = absDiff(cx, txLo) +& absDiff(cy, tyHi) // (xLo, yHi)
     val dHL = absDiff(cx, txHi) +& absDiff(cy, tyLo) // (xHi, yLo)
@@ -93,7 +92,7 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
 
     when(Packet_valid) {
       when(!localHit) {
-        // Phase-A: XY unicast to nearest corner (single path, no branch).
+        // XY unicast to nearest corner (no branch).
         when(cx < targetX) {
           goEast := true.B
         }.elsewhen(cx > targetX) {
@@ -104,9 +103,10 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
           goSouth := true.B
         }
       }.otherwise {
-        // Phase-B: inside rectangle, tree-based spreading.
+        // inside rectangle, tree-based spreading.
         // Packets entering from local tree have already been delivered locally
-        // in quadtree logic; avoid sending back to local to prevent duplicates.
+        // in quadtree logic;
+        // avoid sending back to local to prevent duplicates.
         when(ingressDir =/= DirLocal) {
           goLocal := true.B
         }
@@ -122,8 +122,8 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
             goSouth := southNeeded
           }
           is(DirNorth) {
-            // Entering from north boundary: start X-trunk and keep Y-branch.
-            // Interior vertical branch packets remain vertical-only to avoid duplicates.
+            // Entering from north boundary: start X-trunk and Y-branch.
+            // Interior vertical branch remain vertical-only to avoid duplicates.
             when(cy === tyHi) {
               goWest := westNeeded
               goEast := eastNeeded
@@ -131,8 +131,8 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
             goSouth := southNeeded
           }
           is(DirSouth) {
-            // Entering from south boundary: start X-trunk and keep Y-branch.
-            // Interior vertical branch packets remain vertical-only to avoid duplicates.
+            // Entering from south boundary: start X-trunk and Y-branch.
+            // Interior vertical branch remain vertical-only to avoid duplicates.
             when(cy === tyLo) {
               goWest := westNeeded
               goEast := eastNeeded
