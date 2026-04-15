@@ -39,18 +39,17 @@ proc set_bit {path value} {
 }
 
 proc set_hex {path value} {
-  set_value -radix hex $path [format "%06X" $value]
+  set_value -radix hex $path [format "%07X" $value]
 }
 
 proc mk_flit_rect {isHead isTail treeId xMin xMax yMin yMax id} {
   return [expr {
-    (($isHead & 1) << 21) |
-    (($isTail & 1) << 20) |
-    (($treeId & 15) << 16) |
-    (($xMin   & 7)  << 13) |
-    (($xMax   & 7)  << 10) |
-    (($yMin   & 7)  << 7)  |
-    (($yMax   & 7)  << 4)  |
+    (($isHead & 1) << 27) |
+    (($isTail & 1) << 26) |
+    (($yMax   & 63) << 20) |
+    (($xMax   & 63) << 14) |
+    (($yMin   & 63) << 8)  |
+    (($xMin   & 63) << 2)  |
     ($id & 3)
   }]
 }
@@ -73,7 +72,7 @@ proc core_y {idx} {
 
 proc init_flow {name srcIdx dstIdx treeId id} {
   global flow_src flow_dst flow_id flow_req flow_wait flow_flit_idx flow_sent_pkts flow_inj_flits flow_pkt flow_meas_pkts flow_meas_flits
-  global flow_send_head_ps flow_lat_sum_ps flow_lat_samples flow_lat_min_ps flow_lat_max_ps
+  global flow_send_head_ps flow_lat_sum_ps flow_lat_samples flow_lat_min_ps flow_lat_max_ps recv_flows_pkts recv_flows_flits
   set flow_src($name) $srcIdx
   set flow_dst($name) $dstIdx
   set flow_id($name)  $id
@@ -89,6 +88,8 @@ proc init_flow {name srcIdx dstIdx treeId id} {
   set flow_lat_samples($name) 0
   set flow_lat_min_ps($name) -1
   set flow_lat_max_ps($name) 0
+  set recv_flows_pkts($name) 0
+  set recv_flows_flits($name) 0
 
   set dstX [core_x $dstIdx]
   set dstY [core_y $dstIdx]
@@ -159,7 +160,7 @@ proc handle_outputs {} {
       if {$sim_ps >= $measure_start_ps} {
         incr recv_flits
         incr recv_flows_flits($name)
-        if {[expr {($data >> 21) & 1}] == 1} {
+        if {[expr {($data >> 27) & 1}] == 1} {
           set q $flow_send_head_ps($name)
           if {[llength $q] > 0} {
             set t0 [lindex $q 0]
@@ -175,7 +176,7 @@ proc handle_outputs {} {
             }
           }
         }
-        if {[expr {($data >> 20) & 1}] == 1} {
+        if {[expr {($data >> 26) & 1}] == 1} {
           incr recv_pkts
           incr recv_flows_pkts($name)
         }
@@ -260,7 +261,7 @@ while {$sim_ps < $measure_end_ps} {
 set measure_ns [ns_from_ps $measure_ps]
 set flits_per_ns   [expr {$recv_flits / $measure_ns}]
 set pkts_per_ns    [expr {$recv_pkts  / $measure_ns}]
-set bits_per_ns    [expr {$recv_flits * 22.0 / $measure_ns}]
+set bits_per_ns    [expr {$recv_flits * 28.0 / $measure_ns}]
 set gbps_equiv     $bits_per_ns
 
 puts ""

@@ -27,18 +27,16 @@ Recent fixes completed in this branch:
 Top-level generators:
 
 - `NoC.three_level_quadtree`: one tile with 64 core ports + 8 top ports
-- `NoC.quadtree_and_mesh`: 4x4 tile network connected by `TopLayer`
+- `NoC.quadtree_and_mesh`: 2x2 tile network connected by `TopLayer`
 
-## Flit Layout (22 bits)
+## Flit Layout (28 bits)
 
-- `[21]` `isHead`
-- `[20]` `isTail`
-- `[19:16]` `treeId` (top mesh tree index)
-- `[15:13]` `xMin`
-- `[12:10]` `xMax`
-- `[9:7]` `yMin`
-- `[6:4]` `yMax`
-- `[3:2]` reserved
+- `[27]` `isHead`
+- `[26]` `isTail`
+- `[25:20]` `y1`
+- `[19:14]` `x1`
+- `[13:8]` `y0`
+- `[7:2]` `x0`
 - `[1:0]` packet `id`
 
 Definitions are in `src/main/scala/DataStruct/Packet.scala`.
@@ -54,11 +52,29 @@ Included regression cases:
 - `T2` multi-flit rectangle multicast (`x2..5, y1..3`)
 - `T3` inverted rectangle bounds normalization
 - `T4` full-tree multicast (`8x8`)
-- `T5` tree-id mismatch routing upward to exactly one top lane
+- `T5` out-of-tree destination routing upward to exactly one top lane
 - `T6` top-input downlink multicast to local cores
 - `T7` multicast backpressure branch throttling behavior
 - `T8` competing multicasts with overlap region
 - `T9` unicast contention to the same destination
+- `T10` triple-overlap multicast contention (mixed core/top injection)
+
+## Verification Coverage (quadtree_and_mesh_tb)
+
+Main testbench: `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_tb.sv`  
+DUT macro header: `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_dut_inst.vh`
+
+Included regression cases:
+
+- `T1` same-tree unicast
+- `T2` cross-tree unicast
+- `T3` cross-tree rectangle multicast across tile boundaries
+- `T4` unicast contention to the same global destination
+- `T5` west-boundary PE injection into local core
+- `T6` packet-level bubble insertion with concurrent background flow
+- `T7` inverted global rectangle bounds normalization
+- `T8` triple-rectangle overlap contention (`A-only`, `A+C`, `A+B`, `A+B+C`, `B-only` checks)
+- `T9` overlap contention under slow-hotspot backpressure
 
 ## Build and Run
 

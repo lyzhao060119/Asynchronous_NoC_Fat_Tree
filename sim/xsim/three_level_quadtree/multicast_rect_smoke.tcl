@@ -39,18 +39,17 @@ proc set_bit {path value} {
 }
 
 proc set_hex {path value} {
-  set_value -radix hex $path [format "%06X" $value]
+  set_value -radix hex $path [format "%07X" $value]
 }
 
 proc mk_flit_rect {isHead isTail treeId xMin xMax yMin yMax id} {
   return [expr {
-    (($isHead & 1) << 21) |
-    (($isTail & 1) << 20) |
-    (($treeId & 15) << 16) |
-    (($xMin   & 7)  << 13) |
-    (($xMax   & 7)  << 10) |
-    (($yMin   & 7)  << 7)  |
-    (($yMax   & 7)  << 4)  |
+    (($isHead & 1) << 27) |
+    (($isTail & 1) << 26) |
+    (($yMax   & 63) << 20) |
+    (($xMax   & 63) << 14) |
+    (($yMin   & 63) << 8)  |
+    (($xMin   & 63) << 2)  |
     ($id & 3)
   }]
 }
@@ -136,7 +135,7 @@ while {$sim_ps < $end_ps} {
       set data [get_uint [data_path core outputs $idx]]
       set_bit $ackSig $req
       incr out_flits($idx)
-      if {[expr {($data >> 20) & 1}] == 1} {
+      if {[expr {($data >> 26) & 1}] == 1} {
         incr out_pkts($idx)
       }
     }
@@ -168,7 +167,7 @@ while {$sim_ps < $end_ps} {
 puts ""
 puts "=== Multicast Rectangle Smoke Summary ==="
 puts [format "Elapsed : %.1f ns" [ns_from_ps [expr {$sim_ps - 20000}]]]
-puts [format "Src core: %d, rect=(x:%d..%d, y:%d..%d), treeId=%d" $src_idx $x_min $x_max $y_min $y_max $tree_id]
+puts [format "Src core: %d, rect=(x:%d..%d, y:%d..%d), pktId=%d" $src_idx $x_min $x_max $y_min $y_max $pkt_id]
 puts [format "Unexpected top flits: %d" $unexpected_top_flits]
 
 set failures 0

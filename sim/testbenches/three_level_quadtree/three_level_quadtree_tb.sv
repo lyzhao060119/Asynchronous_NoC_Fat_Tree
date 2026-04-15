@@ -2,7 +2,7 @@
 `default_nettype none
 
 module three_level_quadtree_tb;
-  localparam int FLIT_W = 22;
+  localparam int FLIT_W = 28;
   localparam int N_CORE = 64;
   localparam int N_TOP = 8;
   localparam int MAX_RX_PER_PORT = 2048;
@@ -68,21 +68,21 @@ module three_level_quadtree_tb;
     input bit isHead,
     input bit isTail,
     input [3:0] treeId,
-    input [2:0] xMin,
-    input [2:0] xMax,
-    input [2:0] yMin,
-    input [2:0] yMax,
+    input [5:0] xMin,
+    input [5:0] xMax,
+    input [5:0] yMin,
+    input [5:0] yMax,
     input [1:0] pktId
   );
     mk_flit_rect = {
-      isHead,              // [21]
-      isTail,              // [20]
-      treeId,              // [19:16]
-      xMin,                // [15:13]
-      xMax,                // [12:10]
-      yMin,                // [9:7]
-      yMax,                // [6:4]
-      2'b00,               // [3:2] reserved
+      // Keep `treeId` in the helper signature for backward compatibility with old
+      // testcase call sites; packet routing now only depends on global rectangle.
+      isHead,              // [27]
+      isTail,              // [26]
+      yMax,                // [25:20]
+      xMax,                // [19:14]
+      yMin,                // [13:8]
+      xMin,                // [7:2]
       pktId                // [1:0]
     };
   endfunction
@@ -419,19 +419,19 @@ module three_level_quadtree_tb;
         if (f[1:0] === id) begin
           case (state)
             0: begin
-              if (!(f[21] === 1'b1 && f[20] === 1'b0)) begin
+              if (!(f[27] === 1'b1 && f[26] === 1'b0)) begin
                 $fatal(1, "[%s] core_out[%0d] id=%0d head format error", tag, idx, id);
               end
               state = 1;
             end
             1: begin
-              if (!(f[21] === 1'b0 && f[20] === 1'b0)) begin
+              if (!(f[27] === 1'b0 && f[26] === 1'b0)) begin
                 $fatal(1, "[%s] core_out[%0d] id=%0d body format error", tag, idx, id);
               end
               state = 2;
             end
             2: begin
-              if (!(f[21] === 1'b0 && f[20] === 1'b1)) begin
+              if (!(f[27] === 1'b0 && f[26] === 1'b1)) begin
                 $fatal(1, "[%s] core_out[%0d] id=%0d tail format error", tag, idx, id);
               end
               state = 3;
@@ -480,14 +480,14 @@ module three_level_quadtree_tb;
         $fatal(1, "[%s] core_out[%0d] packet interleaving detected", tag, idx);
       end
 
-      if (!(f0[21] === 1'b1 && f0[20] === 1'b0 &&
-            f1[21] === 1'b0 && f1[20] === 1'b0 &&
-            f2[21] === 1'b0 && f2[20] === 1'b1)) begin
+      if (!(f0[27] === 1'b1 && f0[26] === 1'b0 &&
+            f1[27] === 1'b0 && f1[26] === 1'b0 &&
+            f2[27] === 1'b0 && f2[26] === 1'b1)) begin
         $fatal(1, "[%s] core_out[%0d] first packet H/B/T sequence error", tag, idx);
       end
-      if (!(f3[21] === 1'b1 && f3[20] === 1'b0 &&
-            f4[21] === 1'b0 && f4[20] === 1'b0 &&
-            f5[21] === 1'b0 && f5[20] === 1'b1)) begin
+      if (!(f3[27] === 1'b1 && f3[26] === 1'b0 &&
+            f4[27] === 1'b0 && f4[26] === 1'b0 &&
+            f5[27] === 1'b0 && f5[26] === 1'b1)) begin
         $fatal(1, "[%s] core_out[%0d] second packet H/B/T sequence error", tag, idx);
       end
     end
@@ -630,6 +630,9 @@ module three_level_quadtree_tb;
     logic [FLIT_W-1:0] h1;
     logic [FLIT_W-1:0] b1;
     logic [FLIT_W-1:0] t1;
+    logic [FLIT_W-1:0] h2;
+    logic [FLIT_W-1:0] b2;
+    logic [FLIT_W-1:0] t2;
     integer i;
     integer lane;
     integer lane_count;
@@ -689,11 +692,11 @@ module three_level_quadtree_tb;
     check_expected_counts("T4");
     check_packet_on_rect("T4", 0, 7, 0, 7, h0, b0, t0);
 
-    // 5) Tree-id mismatch should go upward to exactly one top_output lane
-    begin_case("T5 tree-id mismatch upward routing");
-    h0 = mk_flit_rect(1'b1, 1'b0, 4'd4, 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, 4'd4, 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, 4'd4, 3'd7, 3'd7, 3'd7, 3'd7, 2'd1);
+    // 5) Out-of-tree destination should go upward to exactly one top_output lane
+    begin_case("T5 out-of-tree destination upward routing");
+    h0 = mk_flit_rect(1'b1, 1'b0, 4'd0, 6'd12, 6'd12, 6'd12, 6'd12, 2'd1);
+    b0 = mk_flit_rect(1'b0, 1'b0, 4'd0, 6'd12, 6'd12, 6'd12, 6'd12, 2'd1);
+    t0 = mk_flit_rect(1'b0, 1'b1, 4'd0, 6'd12, 6'd12, 6'd12, 6'd12, 2'd1);
     send_core_packet3(5, h0, b0, t0);
     wait_for_idle("T5");
     lane = -1;
@@ -825,6 +828,85 @@ module three_level_quadtree_tb;
       $fatal(1, "[T9] core_out[63] id-wise flit count mismatch");
     end
     check_two_triplets_atomic("T9", 63);
+
+    // 10) Triple-overlap multicast contention (core/core/top mixed injection)
+    // A: x2..7 y2..7 id=0 (core_in[0])
+    // B: x4..7 y4..7 id=1 (core_in[63])
+    // C: x5..7 y0..5 id=2 (top_in[1])
+    begin_case("T10 triple-overlap multicast contention");
+    h0 = mk_flit_rect(1'b1, 1'b0, 4'd0, 3'd2, 3'd7, 3'd2, 3'd7, 2'd0);
+    b0 = mk_flit_rect(1'b0, 1'b0, 4'd0, 3'd2, 3'd7, 3'd2, 3'd7, 2'd0);
+    t0 = mk_flit_rect(1'b0, 1'b1, 4'd0, 3'd2, 3'd7, 3'd2, 3'd7, 2'd0);
+
+    h1 = mk_flit_rect(1'b1, 1'b0, 4'd0, 3'd4, 3'd7, 3'd4, 3'd7, 2'd1);
+    b1 = mk_flit_rect(1'b0, 1'b0, 4'd0, 3'd4, 3'd7, 3'd4, 3'd7, 2'd1);
+    t1 = mk_flit_rect(1'b0, 1'b1, 4'd0, 3'd4, 3'd7, 3'd4, 3'd7, 2'd1);
+
+    h2 = mk_flit_rect(1'b1, 1'b0, 4'd0, 3'd5, 3'd7, 3'd0, 3'd5, 2'd2);
+    b2 = mk_flit_rect(1'b0, 1'b0, 4'd0, 3'd5, 3'd7, 3'd0, 3'd5, 2'd2);
+    t2 = mk_flit_rect(1'b0, 1'b1, 4'd0, 3'd5, 3'd7, 3'd0, 3'd5, 2'd2);
+
+    expect_rect_flit_count(2, 7, 2, 7, 3);
+    expect_rect_flit_count(4, 7, 4, 7, 3);
+    expect_rect_flit_count(5, 7, 0, 5, 3);
+
+    fork
+      send_core_packet3(0, h0, b0, t0);
+      send_core_packet3(63, h1, b1, t1);
+      send_top_packet3(1, h2, b2, t2);
+    join
+
+    wait_for_idle("T10");
+    check_expected_counts("T10");
+
+    // A+B+C overlap hotspot: core(6,4)
+    base_idx = core_index(6, 4);
+    if (core_id_count(base_idx, base_core_count[base_idx], 2'b00) != 3 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b01) != 3 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b10) != 3) begin
+      $fatal(1, "[T10] core_out[%0d] expected three packet triplets", base_idx);
+    end
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b00);
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b01);
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b10);
+
+    // A+B only: core(7,7)
+    base_idx = core_index(7, 7);
+    if (core_id_count(base_idx, base_core_count[base_idx], 2'b00) != 3 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b01) != 3 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b10) != 0) begin
+      $fatal(1, "[T10] core_out[%0d] expected A+B only", base_idx);
+    end
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b00);
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b01);
+
+    // A+C only: core(5,2)
+    base_idx = core_index(5, 2);
+    if (core_id_count(base_idx, base_core_count[base_idx], 2'b00) != 3 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b01) != 0 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b10) != 3) begin
+      $fatal(1, "[T10] core_out[%0d] expected A+C only", base_idx);
+    end
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b00);
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b10);
+
+    // C only: core(6,1)
+    base_idx = core_index(6, 1);
+    if (core_id_count(base_idx, base_core_count[base_idx], 2'b00) != 0 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b01) != 0 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b10) != 3) begin
+      $fatal(1, "[T10] core_out[%0d] expected C only", base_idx);
+    end
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b10);
+
+    // A only: core(3,3)
+    base_idx = core_index(3, 3);
+    if (core_id_count(base_idx, base_core_count[base_idx], 2'b00) != 3 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b01) != 0 ||
+        core_id_count(base_idx, base_core_count[base_idx], 2'b10) != 0) begin
+      $fatal(1, "[T10] core_out[%0d] expected A only", base_idx);
+    end
+    check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b00);
 
     $display("\n[TB] all three_level_quadtree tests PASSED");
     #40;
