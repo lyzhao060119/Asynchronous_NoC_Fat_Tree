@@ -1,0 +1,3 @@
+`define RAND_SEED 12345
+`define RAND_NUM_CASES 24
+`define RAND_MAX_PKTS 3

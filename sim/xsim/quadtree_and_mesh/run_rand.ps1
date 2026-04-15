@@ -1,6 +1,10 @@
 param(
   [ValidateSet("gui", "batch")]
   [string]$Mode = "batch",
+  [int]$Seed = 1379260429,
+  [int]$Cases = 24,
+  [ValidateRange(1, 3)]
+  [int]$MaxPkts = 3,
   [switch]$Regenerate
 )
 
@@ -27,12 +31,13 @@ function Assert-LastExitCode([string]$Label) {
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 $runStamp = Get-Date -Format "yyyyMMdd_HHmmss_fff"
-$runDir = Join-Path $root "sim\work\xsim\quadtree_and_mesh\$runStamp"
+$runDir = Join-Path $root "sim\work\xsim\quadtree_and_mesh_rand\$runStamp"
 $tbDir = Join-Path $root "sim\testbenches\quadtree_and_mesh"
-$tbFile = Join-Path $tbDir "quadtree_and_mesh_tb.sv"
+$tbFile = Join-Path $tbDir "quadtree_and_mesh_rand_tb.sv"
+$cfgFile = Join-Path $tbDir "quadtree_and_mesh_rand_cfg.vh"
 $instGen = Join-Path $tbDir "gen_dut_inst_vh.ps1"
 $instVh = Join-Path $tbDir "quadtree_and_mesh_dut_inst.vh"
-$batchTcl = Join-Path $root "sim\xsim\quadtree_and_mesh\run_all.tcl"
+$batchTcl = Join-Path $root "sim\xsim\quadtree_and_mesh\run_rand.tcl"
 
 $generatedNoC = Join-Path $root "generated\quadtree_and_mesh.v"
 
@@ -44,6 +49,13 @@ try {
     sbt "runMain NoC.quadtree_and_mesh"
     Assert-LastExitCode "sbt runMain NoC.quadtree_and_mesh"
   }
+
+  @(
+    ('`define RAND_SEED {0}' -f $Seed),
+    ('`define RAND_NUM_CASES {0}' -f $Cases),
+    ('`define RAND_MAX_PKTS {0}' -f $MaxPkts)
+  ) | Set-Content -Path $cfgFile -Encoding Ascii
+
   & $instGen -OutFile $instVh
   Assert-LastExitCode "gen_dut_inst_vh.ps1"
 } finally {
@@ -76,11 +88,16 @@ try {
     $tbFile
   Assert-LastExitCode "xvlog"
 
-  xelab --timescale 1ns/1ps --debug typical -s quadtree_and_mesh_tb_sim work.quadtree_and_mesh_tb
+  xelab --timescale 1ns/1ps --debug typical -s quadtree_and_mesh_rand_tb_sim work.quadtree_and_mesh_rand_tb
   Assert-LastExitCode "xelab"
 
+  $xsimArgs = @(
+    "quadtree_and_mesh_rand_tb_sim",
+    "--sv_seed", "$Seed"
+  )
+
   if ($Mode -eq "batch") {
-    xsim quadtree_and_mesh_tb_sim -tclbatch (To-XsimPath $batchTcl)
+    & xsim @xsimArgs --runall
     Assert-LastExitCode "xsim batch"
   } else {
     Write-Host "GUI mode ready."
@@ -88,7 +105,9 @@ try {
     Write-Host "  $runDir"
     Write-Host "In xsim Tcl console:"
     Write-Host "  source $(To-XsimPath $batchTcl)"
-    xsim quadtree_and_mesh_tb_sim -gui
+    Write-Host "Random plusargs:"
+    Write-Host "  RAND_SEED=$Seed RAND_NUM_CASES=$Cases RAND_MAX_PKTS=$MaxPkts"
+    & xsim @xsimArgs --gui
     Assert-LastExitCode "xsim gui"
   }
 } finally {

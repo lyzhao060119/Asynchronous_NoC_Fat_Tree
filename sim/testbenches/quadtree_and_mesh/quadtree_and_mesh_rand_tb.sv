@@ -1,7 +1,20 @@
 `timescale 1ns/1ps
 `default_nettype none
+`include "quadtree_and_mesh_rand_cfg.vh"
 
-module quadtree_and_mesh_tb;
+`ifndef RAND_SEED
+`define RAND_SEED 1379260429
+`endif
+
+`ifndef RAND_NUM_CASES
+`define RAND_NUM_CASES 24
+`endif
+
+`ifndef RAND_MAX_PKTS
+`define RAND_MAX_PKTS 3
+`endif
+
+module quadtree_and_mesh_rand_tb;
   localparam int FLIT_W = 28;
   localparam int N_QUAD = 4;      // 2x2 tree tiles
   localparam int N_CORE = 64;     // per tile
@@ -11,6 +24,8 @@ module quadtree_and_mesh_tb;
   localparam int DEFAULT_ACK_DELAY_NS = 1;
   localparam int HANDSHAKE_TIMEOUT_NS = 500000;
   localparam int GLOBAL_TIMEOUT_NS = 8000000;
+  localparam int SRC_KIND_CORE = 0;
+  localparam int SRC_KIND_WEST = 1;
 
   logic clock;
   logic reset;
@@ -98,6 +113,33 @@ module quadtree_and_mesh_tb;
 
   function automatic int c_index_of_global(input int gx, input int gy);
     c_index_of_global = core_index(gx % 8, gy % 8);
+  endfunction
+
+  function automatic int global_x_of_core(input int q, input int c);
+    global_x_of_core = ((q % EDGE_N) * 8) + (c % 8);
+  endfunction
+
+  function automatic int global_y_of_core(input int q, input int c);
+    global_y_of_core = ((q / EDGE_N) * 8) + (c / 8);
+  endfunction
+
+  function automatic bit point_in_rect(
+    input int px,
+    input int py,
+    input int x0,
+    input int y0,
+    input int x1,
+    input int y1
+  );
+    int xLo;
+    int xHi;
+    int yLo;
+    int yHi;
+    xLo = min2(x0, x1);
+    xHi = max2(x0, x1);
+    yLo = min2(y0, y1);
+    yHi = max2(y0, y1);
+    point_in_rect = ((px >= xLo) && (px <= xHi) && (py >= yLo) && (py <= yHi));
   endfunction
 
   function automatic [FLIT_W-1:0] mk_flit_rect(
@@ -420,6 +462,47 @@ module quadtree_and_mesh_tb;
     send_west_to_flit(y, lane, tail_flit, tag);
   endtask
 
+  task automatic send_west_to_packet3_bubble(
+    input int y,
+    input int lane,
+    input [FLIT_W-1:0] head_flit,
+    input [FLIT_W-1:0] body_flit,
+    input [FLIT_W-1:0] tail_flit,
+    input int gap_ns,
+    input string tag
+  );
+    send_west_to_flit(y, lane, head_flit, tag);
+    #(gap_ns);
+    send_west_to_flit(y, lane, body_flit, tag);
+    #(gap_ns);
+    send_west_to_flit(y, lane, tail_flit, tag);
+  endtask
+
+  task automatic launch_packet3(
+    input int src_kind,
+    input int src_a,
+    input int src_b,
+    input [FLIT_W-1:0] head_flit,
+    input [FLIT_W-1:0] body_flit,
+    input [FLIT_W-1:0] tail_flit,
+    input int gap_ns,
+    input string tag
+  );
+    if (src_kind == SRC_KIND_CORE) begin
+      if (gap_ns > 0) begin
+        send_core_packet3_bubble(src_a, src_b, head_flit, body_flit, tail_flit, gap_ns, tag);
+      end else begin
+        send_core_packet3(src_a, src_b, head_flit, body_flit, tail_flit, tag);
+      end
+    end else begin
+      if (gap_ns > 0) begin
+        send_west_to_packet3_bubble(src_a, src_b, head_flit, body_flit, tail_flit, gap_ns, tag);
+      end else begin
+        send_west_to_packet3(src_a, src_b, head_flit, body_flit, tail_flit, tag);
+      end
+    end
+  endtask
+
   task automatic check_core_triplet(
     input string tag,
     input int q,
@@ -515,6 +598,44 @@ module quadtree_and_mesh_tb;
     q = q_index_of_global(gx, gy);
     c = c_index_of_global(gx, gy);
     check_core_id_triplet(tag, q, c, base_idx, pktId);
+  endtask
+
+  task automatic check_packet_rect_delivery(
+    input string tag,
+    input int x0,
+    input int y0,
+    input int x1,
+    input int y1,
+    input [1:0] pktId
+  );
+    int xLo;
+    int xHi;
+    int yLo;
+    int yHi;
+    int gx;
+    int gy;
+    int q;
+    int c;
+    int base_idx;
+    xLo = min2(x0, x1);
+    xHi = max2(x0, x1);
+    yLo = min2(y0, y1);
+    yHi = max2(y0, y1);
+    for (gy = yLo; gy <= yHi; gy = gy + 1) begin
+      for (gx = xLo; gx <= xHi; gx = gx + 1) begin
+        q = q_index_of_global(gx, gy);
+        c = c_index_of_global(gx, gy);
+        base_idx = base_core_count[q][c];
+        if (core_id_count(q, c, base_idx, pktId) != 3) begin
+          $fatal(
+            1,
+            "[%0s] global(%0d,%0d) expected one id=%0d triplet",
+            tag, gx, gy, pktId
+          );
+        end
+        check_global_id_triplet(tag, gx, gy, base_idx, pktId);
+      end
+    end
   endtask
 
   initial clock = 1'b0;
@@ -667,21 +788,49 @@ module quadtree_and_mesh_tb;
     int c;
     int e;
     int l;
-    reg [FLIT_W-1:0] h0;
-    reg [FLIT_W-1:0] b0;
-    reg [FLIT_W-1:0] t0;
-    reg [FLIT_W-1:0] h1;
-    reg [FLIT_W-1:0] b1;
-    reg [FLIT_W-1:0] t1;
-    reg [FLIT_W-1:0] h2;
-    reg [FLIT_W-1:0] b2;
-    reg [FLIT_W-1:0] t2;
-    int base_idx;
-    int q_hot;
-    int c_hot;
-    time t_head_slow;
-    time t_body_slow;
-    time t_tail_slow;
+    int seed;
+    int num_cases;
+    int max_packets;
+    int case_idx;
+    int pkt_count;
+    int pkt;
+    int prev;
+    int tries;
+    int slow_count;
+    int slow_idx;
+    int shape_sel;
+    int slow_gx;
+    int slow_gy;
+    int slow_q;
+    int slow_c;
+    int src_kind [0:2];
+    int src_a [0:2];
+    int src_b [0:2];
+    int src_gx [0:2];
+    int src_gy [0:2];
+    int gap_ns [0:2];
+    int rect_x_lo [0:2];
+    int rect_x_hi [0:2];
+    int rect_y_lo [0:2];
+    int rect_y_hi [0:2];
+    int rect_x0 [0:2];
+    int rect_x1 [0:2];
+    int rect_y0 [0:2];
+    int rect_y1 [0:2];
+    bit duplicate_src;
+    logic [1:0] pkt_id [0:2];
+    logic [FLIT_W-1:0] h [0:2];
+    logic [FLIT_W-1:0] b [0:2];
+    logic [FLIT_W-1:0] t [0:2];
+    string case_tag;
+    string pkt_tag [0:2];
+
+    seed = `RAND_SEED;
+    num_cases = `RAND_NUM_CASES;
+    max_packets = `RAND_MAX_PKTS;
+    if (num_cases < 1) num_cases = 1;
+    if (max_packets < 1) max_packets = 1;
+    if (max_packets > 3) max_packets = 3;
 
     reset = 1'b1;
 
@@ -729,290 +878,178 @@ module quadtree_and_mesh_tb;
         base_south_from_count[e][l] = 0;
       end
     end
+
     set_default_ack_delay();
     #30;
     reset = 1'b0;
-    $display("[QAM-TB] reset released at t=%0t ns", $time);
+    $display("[QAM-RAND] reset released at t=%0t ns", $time);
+    $display("[QAM-RAND] seed=%0d cases=%0d max_packets=%0d", seed, num_cases, max_packets);
 
-    // T1) Same-tree multi-flit unicast: q1 core0 -> q1 core63 (global 15,7)
-    begin_case("T1 same-tree unicast q1 core0->core63");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd7, 6'd15, 6'd7, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd7, 6'd15, 6'd7, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd7, 6'd15, 6'd7, 2'd1);
-    expect_global_flits(15, 7, 3);
-    send_core_packet3(1, 0, h0, b0, t0, "T1");
-    wait_for_idle("T1");
-    check_expected_counts("T1");
-    check_global_triplet("T1", 15, 7, h0, b0, t0);
+    for (case_idx = 0; case_idx < num_cases; case_idx = case_idx + 1) begin
+      set_default_ack_delay();
+      slow_count = $urandom_range(2, 0);
+      for (slow_idx = 0; slow_idx < slow_count; slow_idx = slow_idx + 1) begin
+        slow_gx = $urandom_range((EDGE_N * 8) - 1, 0);
+        slow_gy = $urandom_range((EDGE_N * 8) - 1, 0);
+        slow_q = q_index_of_global(slow_gx, slow_gy);
+        slow_c = c_index_of_global(slow_gx, slow_gy);
+        core_ack_delay_ns[slow_q][slow_c] = 40 + (20 * $urandom_range(4, 1));
+      end
 
-    // T2) Cross-tree multi-flit unicast: q0 core0 -> q3 core63 (global 15,15)
-    begin_case("T2 cross-tree unicast q0 core0->q3 core63");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
-    expect_global_flits(15, 15, 3);
-    send_core_packet3(0, 0, h0, b0, t0, "T2");
-    wait_for_idle("T2");
-    check_expected_counts("T2");
-    check_global_triplet("T2", 15, 15, h0, b0, t0);
+      if (max_packets == 1) begin
+        pkt_count = 1;
+      end else begin
+        pkt_count = 1 + $urandom_range(max_packets - 1, 0);
+      end
 
-    // T3) Cross-tree rectangle multicast across boundaries: x6..9, y6..9
-    begin_case("T3 cross-tree multicast rect x6..9 y6..9");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd6, 6'd6, 6'd9, 6'd9, 2'd3);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd6, 6'd6, 6'd9, 6'd9, 2'd3);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd6, 6'd6, 6'd9, 6'd9, 2'd3);
-    expect_global_rect_flits(6, 9, 6, 9, 3);
-    send_core_packet3(0, 1, h0, b0, t0, "T3");
-    wait_for_idle("T3");
-    check_expected_counts("T3");
-    check_global_triplet("T3", 6, 6, h0, b0, t0);
-    check_global_triplet("T3", 8, 6, h0, b0, t0);
-    check_global_triplet("T3", 6, 8, h0, b0, t0);
-    check_global_triplet("T3", 8, 8, h0, b0, t0);
+      for (pkt = 0; pkt < pkt_count; pkt = pkt + 1) begin
+        pkt_id[pkt] = pkt[1:0];
+        pkt_tag[pkt] = $sformatf("R%0d-P%0d", case_idx, pkt);
+        src_kind[pkt] = ($urandom_range(99, 0) < 75) ? SRC_KIND_CORE : SRC_KIND_WEST;
 
-    // T4) Two unicast packets contending for same destination (global 15,15)
-    begin_case("T4 cross-tree unicast contention same destination");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd15, 6'd15, 6'd15, 2'd1);
-    h1 = mk_flit_rect(1'b1, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
-    b1 = mk_flit_rect(1'b0, 1'b0, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
-    t1 = mk_flit_rect(1'b0, 1'b1, 6'd15, 6'd15, 6'd15, 6'd15, 2'd2);
-    expect_global_flits(15, 15, 6);
-    fork
-      send_core_packet3(0, 2, h0, b0, t0, "T4-A");
-      send_core_packet3(1, 61, h1, b1, t1, "T4-B");
-    join
-    wait_for_idle("T4");
-    check_expected_counts("T4");
-    base_idx = base_core_count[3][63];
-    if (core_id_count(3, 63, base_idx, 2'b01) != 3) begin
-      $fatal(1, "[T4] q3 core63 id=1 flit count mismatch");
+        tries = 0;
+        duplicate_src = 1'b0;
+        do begin
+          if (src_kind[pkt] == SRC_KIND_CORE) begin
+            src_a[pkt] = $urandom_range(N_QUAD - 1, 0);
+            src_b[pkt] = $urandom_range(N_CORE - 1, 0);
+          end else begin
+            src_a[pkt] = $urandom_range(EDGE_N - 1, 0);
+            src_b[pkt] = $urandom_range(TOP_LANE - 1, 0);
+          end
+
+          duplicate_src = 1'b0;
+          for (prev = 0; prev < pkt; prev = prev + 1) begin
+            if ((src_kind[prev] == src_kind[pkt]) &&
+                (src_a[prev] == src_a[pkt]) &&
+                (src_b[prev] == src_b[pkt])) begin
+              duplicate_src = 1'b1;
+            end
+          end
+          tries = tries + 1;
+        end while (duplicate_src && (tries < 20));
+
+        if (src_kind[pkt] == SRC_KIND_CORE) begin
+          src_gx[pkt] = global_x_of_core(src_a[pkt], src_b[pkt]);
+          src_gy[pkt] = global_y_of_core(src_a[pkt], src_b[pkt]);
+        end else begin
+          src_gx[pkt] = -1;
+          src_gy[pkt] = -1;
+        end
+
+        tries = 0;
+        do begin
+          shape_sel = $urandom_range(99, 0);
+          if (shape_sel < 35) begin
+            rect_x_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_x_hi[pkt] = rect_x_lo[pkt];
+            rect_y_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_y_hi[pkt] = rect_y_lo[pkt];
+          end else if (shape_sel < 65) begin
+            rect_x_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_y_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_x_hi[pkt] = min2((EDGE_N * 8) - 1, rect_x_lo[pkt] + $urandom_range(2, 0));
+            rect_y_hi[pkt] = min2((EDGE_N * 8) - 1, rect_y_lo[pkt] + $urandom_range(2, 0));
+          end else if (shape_sel < 85) begin
+            rect_x_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_y_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_x_hi[pkt] = min2((EDGE_N * 8) - 1, rect_x_lo[pkt] + $urandom_range(5, 1));
+            rect_y_hi[pkt] = min2((EDGE_N * 8) - 1, rect_y_lo[pkt] + $urandom_range(5, 1));
+          end else begin
+            rect_x_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_y_lo[pkt] = $urandom_range((EDGE_N * 8) - 1, 0);
+            rect_x_hi[pkt] = min2((EDGE_N * 8) - 1, rect_x_lo[pkt] + $urandom_range(8, 3));
+            rect_y_hi[pkt] = min2((EDGE_N * 8) - 1, rect_y_lo[pkt] + $urandom_range(8, 3));
+          end
+          tries = tries + 1;
+        end while ((src_kind[pkt] == SRC_KIND_CORE) &&
+                    point_in_rect(
+                      src_gx[pkt], src_gy[pkt],
+                      rect_x_lo[pkt], rect_y_lo[pkt], rect_x_hi[pkt], rect_y_hi[pkt]
+                    ) &&
+                    (tries < 20));
+
+        if ((src_kind[pkt] == SRC_KIND_CORE) &&
+            point_in_rect(
+              src_gx[pkt], src_gy[pkt],
+              rect_x_lo[pkt], rect_y_lo[pkt], rect_x_hi[pkt], rect_y_hi[pkt]
+            )) begin
+          rect_x_lo[pkt] = (src_gx[pkt] + 1 + $urandom_range((EDGE_N * 8) - 2, 0)) % (EDGE_N * 8);
+          rect_x_hi[pkt] = rect_x_lo[pkt];
+          rect_y_lo[pkt] = (src_gy[pkt] + 1 + $urandom_range((EDGE_N * 8) - 2, 0)) % (EDGE_N * 8);
+          rect_y_hi[pkt] = rect_y_lo[pkt];
+        end
+
+        if ($urandom_range(1, 0)) begin
+          rect_x0[pkt] = rect_x_hi[pkt];
+          rect_x1[pkt] = rect_x_lo[pkt];
+        end else begin
+          rect_x0[pkt] = rect_x_lo[pkt];
+          rect_x1[pkt] = rect_x_hi[pkt];
+        end
+
+        if ($urandom_range(1, 0)) begin
+          rect_y0[pkt] = rect_y_hi[pkt];
+          rect_y1[pkt] = rect_y_lo[pkt];
+        end else begin
+          rect_y0[pkt] = rect_y_lo[pkt];
+          rect_y1[pkt] = rect_y_hi[pkt];
+        end
+
+        gap_ns[pkt] = ($urandom_range(99, 0) < 30) ? (10 * $urandom_range(1, 5)) : 0;
+
+        h[pkt] = mk_flit_rect(1'b1, 1'b0, rect_x0[pkt][5:0], rect_y0[pkt][5:0], rect_x1[pkt][5:0], rect_y1[pkt][5:0], pkt_id[pkt]);
+        b[pkt] = mk_flit_rect(1'b0, 1'b0, rect_x0[pkt][5:0], rect_y0[pkt][5:0], rect_x1[pkt][5:0], rect_y1[pkt][5:0], pkt_id[pkt]);
+        t[pkt] = mk_flit_rect(1'b0, 1'b1, rect_x0[pkt][5:0], rect_y0[pkt][5:0], rect_x1[pkt][5:0], rect_y1[pkt][5:0], pkt_id[pkt]);
+      end
+
+      case_tag = $sformatf("R%0d random correctness pkts=%0d slow=%0d", case_idx, pkt_count, slow_count);
+      begin_case(case_tag);
+      for (pkt = 0; pkt < pkt_count; pkt = pkt + 1) begin
+        expect_global_rect_flits(rect_x0[pkt], rect_x1[pkt], rect_y0[pkt], rect_y1[pkt], 3);
+        if (src_kind[pkt] == SRC_KIND_CORE) begin
+          $display(
+            "[QAM-RAND] %0s src=core(q=%0d,c=%0d,g=(%0d,%0d)) rect=(%0d,%0d)->(%0d,%0d) id=%0d gap=%0d",
+            pkt_tag[pkt], src_a[pkt], src_b[pkt], src_gx[pkt], src_gy[pkt],
+            rect_x0[pkt], rect_y0[pkt], rect_x1[pkt], rect_y1[pkt], pkt_id[pkt], gap_ns[pkt]
+          );
+        end else begin
+          $display(
+            "[QAM-RAND] %0s src=west(y=%0d,lane=%0d) rect=(%0d,%0d)->(%0d,%0d) id=%0d gap=%0d",
+            pkt_tag[pkt], src_a[pkt], src_b[pkt],
+            rect_x0[pkt], rect_y0[pkt], rect_x1[pkt], rect_y1[pkt], pkt_id[pkt], gap_ns[pkt]
+          );
+        end
+      end
+
+      case (pkt_count)
+        1: begin
+          launch_packet3(src_kind[0], src_a[0], src_b[0], h[0], b[0], t[0], gap_ns[0], pkt_tag[0]);
+        end
+        2: begin
+          fork
+            launch_packet3(src_kind[0], src_a[0], src_b[0], h[0], b[0], t[0], gap_ns[0], pkt_tag[0]);
+            launch_packet3(src_kind[1], src_a[1], src_b[1], h[1], b[1], t[1], gap_ns[1], pkt_tag[1]);
+          join
+        end
+        default: begin
+          fork
+            launch_packet3(src_kind[0], src_a[0], src_b[0], h[0], b[0], t[0], gap_ns[0], pkt_tag[0]);
+            launch_packet3(src_kind[1], src_a[1], src_b[1], h[1], b[1], t[1], gap_ns[1], pkt_tag[1]);
+            launch_packet3(src_kind[2], src_a[2], src_b[2], h[2], b[2], t[2], gap_ns[2], pkt_tag[2]);
+          join
+        end
+      endcase
+
+      wait_for_idle(case_tag);
+      check_expected_counts(case_tag);
+      for (pkt = 0; pkt < pkt_count; pkt = pkt + 1) begin
+        check_packet_rect_delivery(case_tag, rect_x0[pkt], rect_y0[pkt], rect_x1[pkt], rect_y1[pkt], pkt_id[pkt]);
+      end
     end
-    if (core_id_count(3, 63, base_idx, 2'b10) != 3) begin
-      $fatal(1, "[T4] q3 core63 id=2 flit count mismatch");
-    end
 
-    // T5) Injection from west boundary PE into local trees
-    begin_case("T5 west boundary injection to q2 core(1,2)");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd1, 6'd10, 6'd1, 6'd10, 2'd0);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd1, 6'd10, 6'd1, 6'd10, 2'd0);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd1, 6'd10, 6'd1, 6'd10, 2'd0);
-    expect_global_flits(1, 10, 3);
-    send_west_to_packet3(1, 0, h0, b0, t0, "T5");
-    wait_for_idle("T5");
-    check_expected_counts("T5");
-    check_global_triplet("T5", 1, 10, h0, b0, t0);
-
-    // T6) Bubble injection between flits + concurrent background flow
-    begin_case("T6 bubble-injected packet with concurrent traffic");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd14, 6'd1, 6'd14, 6'd1, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd14, 6'd1, 6'd14, 6'd1, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd14, 6'd1, 6'd14, 6'd1, 2'd1);
-    h1 = mk_flit_rect(1'b1, 1'b0, 6'd1, 6'd14, 6'd1, 6'd14, 2'd2);
-    b1 = mk_flit_rect(1'b0, 1'b0, 6'd1, 6'd14, 6'd1, 6'd14, 2'd2);
-    t1 = mk_flit_rect(1'b0, 1'b1, 6'd1, 6'd14, 6'd1, 6'd14, 2'd2);
-    expect_global_flits(14, 1, 3);
-    expect_global_flits(1, 14, 3);
-    fork
-      send_core_packet3_bubble(0, 3, h0, b0, t0, 40, "T6-A");
-      send_core_packet3(3, 60, h1, b1, t1, "T6-B");
-    join
-    wait_for_idle("T6");
-    check_expected_counts("T6");
-    check_global_triplet("T6", 14, 1, h0, b0, t0);
-    check_global_triplet("T6", 1, 14, h1, b1, t1);
-
-    // T7) Inverted bounds should be normalized in global rectangle routing
-    begin_case("T7 inverted global rectangle normalization");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd11, 6'd12, 6'd4, 6'd3, 2'd3);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd11, 6'd12, 6'd4, 6'd3, 2'd3);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd11, 6'd12, 6'd4, 6'd3, 2'd3);
-    expect_global_rect_flits(4, 11, 3, 12, 3);
-    send_core_packet3(2, 5, h0, b0, t0, "T7");
-    wait_for_idle("T7");
-    check_expected_counts("T7");
-    check_global_triplet("T7", 4, 3, h0, b0, t0);
-    check_global_triplet("T7", 11, 3, h0, b0, t0);
-    check_global_triplet("T7", 4, 12, h0, b0, t0);
-    check_global_triplet("T7", 11, 12, h0, b0, t0);
-    check_global_triplet("T7", 8, 8, h0, b0, t0);
-
-    // T8) Three overlapping multicast rectangles contend on shared regions
-    begin_case("T8 triple-rectangle overlap contention");
-    // A: x2..13 y2..13 id=0
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd2, 6'd2, 6'd13, 6'd13, 2'd0);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd2, 6'd2, 6'd13, 6'd13, 2'd0);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd2, 6'd2, 6'd13, 6'd13, 2'd0);
-    // B: x8..15 y8..15 id=1
-    h1 = mk_flit_rect(1'b1, 1'b0, 6'd8, 6'd8, 6'd15, 6'd15, 2'd1);
-    b1 = mk_flit_rect(1'b0, 1'b0, 6'd8, 6'd8, 6'd15, 6'd15, 2'd1);
-    t1 = mk_flit_rect(1'b0, 1'b1, 6'd8, 6'd8, 6'd15, 6'd15, 2'd1);
-    // C: x6..11 y6..11 id=2 (from west boundary)
-    h2 = mk_flit_rect(1'b1, 1'b0, 6'd6, 6'd6, 6'd11, 6'd11, 2'd2);
-    b2 = mk_flit_rect(1'b0, 1'b0, 6'd6, 6'd6, 6'd11, 6'd11, 2'd2);
-    t2 = mk_flit_rect(1'b0, 1'b1, 6'd6, 6'd6, 6'd11, 6'd11, 2'd2);
-    expect_global_rect_flits(2, 13, 2, 13, 3);
-    expect_global_rect_flits(8, 15, 8, 15, 3);
-    expect_global_rect_flits(6, 11, 6, 11, 3);
-    fork
-      send_core_packet3(0, 0, h0, b0, t0, "T8-A");
-      send_core_packet3(3, 63, h1, b1, t1, "T8-B");
-      send_west_to_packet3(1, 1, h2, b2, t2, "T8-C");
-    join
-    wait_for_idle("T8");
-    check_expected_counts("T8");
-
-    // A+B+C overlap point: (9,9)
-    base_idx = base_core_count[q_index_of_global(9, 9)][c_index_of_global(9, 9)];
-    if (core_id_count(q_index_of_global(9, 9), c_index_of_global(9, 9), base_idx, 2'b00) != 3 ||
-        core_id_count(q_index_of_global(9, 9), c_index_of_global(9, 9), base_idx, 2'b01) != 3 ||
-        core_id_count(q_index_of_global(9, 9), c_index_of_global(9, 9), base_idx, 2'b10) != 3) begin
-      $fatal(1, "[T8] global(9,9) expected id0/id1/id2 triplets");
-    end
-    check_global_id_triplet("T8", 9, 9, base_idx, 2'b00);
-    check_global_id_triplet("T8", 9, 9, base_idx, 2'b01);
-    check_global_id_triplet("T8", 9, 9, base_idx, 2'b10);
-
-    // A+B only point: (13,13)
-    base_idx = base_core_count[q_index_of_global(13, 13)][c_index_of_global(13, 13)];
-    if (core_id_count(q_index_of_global(13, 13), c_index_of_global(13, 13), base_idx, 2'b00) != 3 ||
-        core_id_count(q_index_of_global(13, 13), c_index_of_global(13, 13), base_idx, 2'b01) != 3 ||
-        core_id_count(q_index_of_global(13, 13), c_index_of_global(13, 13), base_idx, 2'b10) != 0) begin
-      $fatal(1, "[T8] global(13,13) expected id0+id1 only");
-    end
-    check_global_id_triplet("T8", 13, 13, base_idx, 2'b00);
-    check_global_id_triplet("T8", 13, 13, base_idx, 2'b01);
-
-    // A+C only point: (6,6)
-    base_idx = base_core_count[q_index_of_global(6, 6)][c_index_of_global(6, 6)];
-    if (core_id_count(q_index_of_global(6, 6), c_index_of_global(6, 6), base_idx, 2'b00) != 3 ||
-        core_id_count(q_index_of_global(6, 6), c_index_of_global(6, 6), base_idx, 2'b01) != 0 ||
-        core_id_count(q_index_of_global(6, 6), c_index_of_global(6, 6), base_idx, 2'b10) != 3) begin
-      $fatal(1, "[T8] global(6,6) expected id0+id2 only");
-    end
-    check_global_id_triplet("T8", 6, 6, base_idx, 2'b00);
-    check_global_id_triplet("T8", 6, 6, base_idx, 2'b10);
-
-    // A only point: (3,3)
-    base_idx = base_core_count[q_index_of_global(3, 3)][c_index_of_global(3, 3)];
-    if (core_id_count(q_index_of_global(3, 3), c_index_of_global(3, 3), base_idx, 2'b00) != 3 ||
-        core_id_count(q_index_of_global(3, 3), c_index_of_global(3, 3), base_idx, 2'b01) != 0 ||
-        core_id_count(q_index_of_global(3, 3), c_index_of_global(3, 3), base_idx, 2'b10) != 0) begin
-      $fatal(1, "[T8] global(3,3) expected id0 only");
-    end
-    check_global_id_triplet("T8", 3, 3, base_idx, 2'b00);
-
-    // B only point: (15,15)
-    base_idx = base_core_count[q_index_of_global(15, 15)][c_index_of_global(15, 15)];
-    if (core_id_count(q_index_of_global(15, 15), c_index_of_global(15, 15), base_idx, 2'b00) != 0 ||
-        core_id_count(q_index_of_global(15, 15), c_index_of_global(15, 15), base_idx, 2'b01) != 3 ||
-        core_id_count(q_index_of_global(15, 15), c_index_of_global(15, 15), base_idx, 2'b10) != 0) begin
-      $fatal(1, "[T8] global(15,15) expected id1 only");
-    end
-    check_global_id_triplet("T8", 15, 15, base_idx, 2'b01);
-
-    // T9) Overlap contention with slow hotspot backpressure
     set_default_ack_delay();
-    q_hot = q_index_of_global(10, 10);
-    c_hot = c_index_of_global(10, 10);
-    core_ack_delay_ns[q_hot][c_hot] = 80;
-    begin_case("T9 overlap contention under slow hotspot backpressure");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd8, 6'd8, 6'd12, 6'd12, 2'd1);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd8, 6'd8, 6'd12, 6'd12, 2'd1);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd8, 6'd8, 6'd12, 6'd12, 2'd1);
-    h1 = mk_flit_rect(1'b1, 1'b0, 6'd10, 6'd10, 6'd14, 6'd14, 2'd2);
-    b1 = mk_flit_rect(1'b0, 1'b0, 6'd10, 6'd10, 6'd14, 6'd14, 2'd2);
-    t1 = mk_flit_rect(1'b0, 1'b1, 6'd10, 6'd10, 6'd14, 6'd14, 2'd2);
-    expect_global_rect_flits(8, 12, 8, 12, 3);
-    expect_global_rect_flits(10, 14, 10, 14, 3);
-    fork
-      send_core_packet3(0, 4, h0, b0, t0, "T9-A");
-      send_core_packet3(1, 62, h1, b1, t1, "T9-B");
-    join
-    wait_for_idle("T9");
-    check_expected_counts("T9");
-
-    base_idx = base_core_count[q_hot][c_hot];
-    if (core_id_count(q_hot, c_hot, base_idx, 2'b01) != 3 ||
-        core_id_count(q_hot, c_hot, base_idx, 2'b10) != 3) begin
-      $fatal(1, "[T9] hotspot global(10,10) expected id1+id2");
-    end
-    check_global_id_triplet("T9", 10, 10, base_idx, 2'b01);
-    check_global_id_triplet("T9", 10, 10, base_idx, 2'b10);
-
-    base_idx = base_core_count[q_index_of_global(8, 8)][c_index_of_global(8, 8)];
-    if (core_id_count(q_index_of_global(8, 8), c_index_of_global(8, 8), base_idx, 2'b01) != 3 ||
-        core_id_count(q_index_of_global(8, 8), c_index_of_global(8, 8), base_idx, 2'b10) != 0) begin
-      $fatal(1, "[T9] global(8,8) expected id1 only");
-    end
-    check_global_id_triplet("T9", 8, 8, base_idx, 2'b01);
-
-    base_idx = base_core_count[q_index_of_global(14, 14)][c_index_of_global(14, 14)];
-    if (core_id_count(q_index_of_global(14, 14), c_index_of_global(14, 14), base_idx, 2'b01) != 0 ||
-        core_id_count(q_index_of_global(14, 14), c_index_of_global(14, 14), base_idx, 2'b10) != 3) begin
-      $fatal(1, "[T9] global(14,14) expected id2 only");
-    end
-    check_global_id_triplet("T9", 14, 14, base_idx, 2'b10);
-
-    t_head_slow = core_time_of_id_n(q_hot, c_hot, base_core_count[q_hot][c_hot], 2'b01, 1);
-    t_body_slow = core_time_of_id_n(q_hot, c_hot, base_core_count[q_hot][c_hot], 2'b01, 2);
-    t_tail_slow = core_time_of_id_n(q_hot, c_hot, base_core_count[q_hot][c_hot], 2'b01, 3);
-    if ((t_head_slow == 0) || (t_body_slow == 0) || (t_tail_slow == 0)) begin
-      $fatal(1, "[T9] failed to capture hotspot timing for id=1");
-    end
-    if ((t_body_slow - t_head_slow) < 60) begin
-      $fatal(1, "[T9] hotspot id=1 head->body gap too small: %0t ns", (t_body_slow - t_head_slow));
-    end
-    if ((t_tail_slow - t_body_slow) < 60) begin
-      $fatal(1, "[T9] hotspot id=1 body->tail gap too small: %0t ns", (t_tail_slow - t_body_slow));
-    end
-    set_default_ack_delay();
-
-    // T10) Deterministic repro of the random regression rectangle that touches q0 top row
-    begin_case("T10 deterministic repro single packet q1->rect x3..11 y7..15");
-    h1 = mk_flit_rect(1'b1, 1'b0, 6'd11, 6'd7, 6'd3, 6'd15, 2'd1);
-    b1 = mk_flit_rect(1'b0, 1'b0, 6'd11, 6'd7, 6'd3, 6'd15, 2'd1);
-    t1 = mk_flit_rect(1'b0, 1'b1, 6'd11, 6'd7, 6'd3, 6'd15, 2'd1);
-    expect_global_rect_flits(11, 3, 7, 15, 3);
-    send_core_packet3(1, 33, h1, b1, t1, "T10");
-    wait_for_idle("T10");
-    check_expected_counts("T10");
-    check_global_triplet("T10", 3, 7, h1, b1, t1);
-    check_global_triplet("T10", 7, 7, h1, b1, t1);
-    check_global_triplet("T10", 8, 7, h1, b1, t1);
-    check_global_triplet("T10", 3, 8, h1, b1, t1);
-    check_global_triplet("T10", 11, 15, h1, b1, t1);
-
-    // T11) Concurrency repro from random regression R23
-    begin_case("T11 deterministic repro concurrent R23 pair");
-    h0 = mk_flit_rect(1'b1, 1'b0, 6'd11, 6'd3, 6'd12, 6'd7, 2'd0);
-    b0 = mk_flit_rect(1'b0, 1'b0, 6'd11, 6'd3, 6'd12, 6'd7, 2'd0);
-    t0 = mk_flit_rect(1'b0, 1'b1, 6'd11, 6'd3, 6'd12, 6'd7, 2'd0);
-    h1 = mk_flit_rect(1'b1, 1'b0, 6'd11, 6'd7, 6'd3, 6'd15, 2'd1);
-    b1 = mk_flit_rect(1'b0, 1'b0, 6'd11, 6'd7, 6'd3, 6'd15, 2'd1);
-    t1 = mk_flit_rect(1'b0, 1'b1, 6'd11, 6'd7, 6'd3, 6'd15, 2'd1);
-    expect_global_rect_flits(11, 12, 3, 7, 3);
-    expect_global_rect_flits(11, 3, 7, 15, 3);
-    fork
-      send_core_packet3(3, 40, h0, b0, t0, "T11-A");
-      send_core_packet3(1, 33, h1, b1, t1, "T11-B");
-    join
-    wait_for_idle("T11");
-    check_expected_counts("T11");
-    base_idx = base_core_count[q_index_of_global(11, 7)][c_index_of_global(11, 7)];
-    if (core_id_count(q_index_of_global(11, 7), c_index_of_global(11, 7), base_idx, 2'b00) != 3 ||
-        core_id_count(q_index_of_global(11, 7), c_index_of_global(11, 7), base_idx, 2'b01) != 3) begin
-      $fatal(1, "[T11] global(11,7) expected id0+id1 triplets");
-    end
-    check_global_id_triplet("T11", 11, 7, base_idx, 2'b00);
-    check_global_id_triplet("T11", 11, 7, base_idx, 2'b01);
-    check_global_triplet("T11", 3, 7, h1, b1, t1);
-    check_global_triplet("T11", 7, 7, h1, b1, t1);
-    check_global_triplet("T11", 3, 8, h1, b1, t1);
-    check_global_triplet("T11", 11, 15, h1, b1, t1);
-
-    $display("\n[QAM-TB] all quadtree_and_mesh tests PASSED");
+    $display("\n[QAM-RAND] all random quadtree_and_mesh tests PASSED");
     #10;
     $finish;
   end

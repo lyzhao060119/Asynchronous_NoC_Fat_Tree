@@ -908,6 +908,17 @@ module three_level_quadtree_tb;
     end
     check_core_id_triplet("T10", base_idx, base_core_count[base_idx], 2'b00);
 
+    // 11) Top-input injection of a top-row strip that spans two L2 quadrants
+    begin_case("T11 top_input strip x3..7 y7..7");
+    h0 = mk_flit_rect(1'b1, 1'b0, 4'd0, 3'd3, 3'd7, 3'd7, 3'd7, 2'd3);
+    b0 = mk_flit_rect(1'b0, 1'b0, 4'd0, 3'd3, 3'd7, 3'd7, 3'd7, 2'd3);
+    t0 = mk_flit_rect(1'b0, 1'b1, 4'd0, 3'd3, 3'd7, 3'd7, 3'd7, 2'd3);
+    expect_rect_flit_count(3, 7, 7, 7, 3);
+    send_top_packet3(0, h0, b0, t0);
+    wait_for_idle("T11");
+    check_expected_counts("T11");
+    check_packet_on_rect("T11", 3, 7, 7, 7, h0, b0, t0);
+
     $display("\n[TB] all three_level_quadtree tests PASSED");
     #40;
     $finish;

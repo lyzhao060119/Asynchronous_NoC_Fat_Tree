@@ -590,30 +590,33 @@ module toplayer_mesh_tb;
 
     // M3: 2x2 destination in mesh, source inside rectangle.
     // Dest trees: x=1..2, y=1..2.
+    // For local injection, the source tree is assumed to have already serviced
+    // its local delivery before entering the standalone top mesh.
     begin_case("M3 2x2 rectangle, source inside");
     h = mk_rect_flit(1'b1, 1'b0, 6'd8, 6'd8, 6'd23, 6'd23, 2'd2);
     b = mk_rect_flit(1'b0, 1'b0, 6'd8, 6'd8, 6'd23, 6'd23, 2'd2);
     t = mk_rect_flit(1'b0, 1'b1, 6'd8, 6'd8, 6'd23, 6'd23, 2'd2);
-    expect_tree_rect(1, 2, 1, 2, 3);
+    expect_tree_flits(tree_index(2, 1), 3);
+    expect_tree_flits(tree_index(1, 2), 3);
+    expect_tree_flits(tree_index(2, 2), 3);
     send_input_packet3(tree_index(1, 1), 0, h, b, t, "M3");
     wait_for_idle("M3");
     check_expected_counts("M3");
-    check_tree_triplet("M3", tree_index(1, 1), h, b, t);
     check_tree_triplet("M3", tree_index(2, 1), h, b, t);
     check_tree_triplet("M3", tree_index(1, 2), h, b, t);
     check_tree_triplet("M3", tree_index(2, 2), h, b, t);
 
     // M4: 1x2 destination in mesh, source inside rectangle.
     // Dest trees: x=2..2, y=1..2.
+    // Local destination is assumed to be consumed before mesh injection.
     begin_case("M4 1x2 rectangle, source inside");
     h = mk_rect_flit(1'b1, 1'b0, 6'd16, 6'd8, 6'd23, 6'd23, 2'd3);
     b = mk_rect_flit(1'b0, 1'b0, 6'd16, 6'd8, 6'd23, 6'd23, 2'd3);
     t = mk_rect_flit(1'b0, 1'b1, 6'd16, 6'd8, 6'd23, 6'd23, 2'd3);
-    expect_tree_rect(2, 2, 1, 2, 3);
+    expect_tree_flits(tree_index(2, 2), 3);
     send_input_packet3(tree_index(2, 1), 0, h, b, t, "M4");
     wait_for_idle("M4");
     check_expected_counts("M4");
-    check_tree_triplet("M4", tree_index(2, 1), h, b, t);
     check_tree_triplet("M4", tree_index(2, 2), h, b, t);
 
     // M5: explicit cross-tree multicast over a 3x2 tree rectangle.
@@ -631,11 +634,19 @@ module toplayer_mesh_tb;
     check_tree_triplet("M5", tree_index(3, 1), h, b, t);
 
     // M6: full-mesh cross-tree multicast over all 4x4 trees.
+    // The source tree's local delivery is assumed complete before top injection,
+    // so only the other 15 trees should observe the packet.
     begin_case("M6 cross-tree multicast full 4x4");
     h = mk_rect_flit(1'b1, 1'b0, 6'd0, 6'd0, 6'd31, 6'd31, 2'd1);
     b = mk_rect_flit(1'b0, 1'b0, 6'd0, 6'd0, 6'd31, 6'd31, 2'd1);
     t = mk_rect_flit(1'b0, 1'b1, 6'd0, 6'd0, 6'd31, 6'd31, 2'd1);
-    expect_tree_rect(0, 3, 0, 3, 3);
+    for (int y = 0; y < GRID_Y; y = y + 1) begin
+      for (int x = 0; x < GRID_X; x = x + 1) begin
+        if (!((x == 2) && (y == 2))) begin
+          expect_tree_flits(tree_index(x, y), 3);
+        end
+      end
+    end
     send_input_packet3(tree_index(2, 2), 0, h, b, t, "M6");
     wait_for_idle("M6");
     check_expected_counts("M6");

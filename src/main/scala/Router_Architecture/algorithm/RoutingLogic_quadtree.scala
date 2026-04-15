@@ -208,8 +208,11 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     when(Packet_valid) {
       when(treeIntersects) {
         dir := projectedNoBack.asUInt
-        // Only the tree root should duplicate upward for cross-tree multicast.
-        when((router_level === 3.U) && !treeContainsRect && (ingressDir =/= 4.U)) {
+        // If the global rectangle is only partially covered by the current subtree,
+        // keep a copy moving upward so ancestors can fan out into sibling subtrees
+        // or other tiles. Limiting this to the root traps packets whose local slice
+        // stays inside the source-side subtree.
+        when(!treeContainsRect && (ingressDir =/= 4.U)) {
           dir := projectedNoBack.asUInt | "b10000".U
         }
       }.otherwise {
