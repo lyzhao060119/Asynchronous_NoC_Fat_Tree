@@ -2,12 +2,13 @@ package tool
 
 import chisel3.RawModule
 import chisel3.stage.ChiselGeneratorAnnotation
+import circt.stage.ChiselStage
 import firrtl.analyses.{CircuitGraph, ConnectionGraph}
 import firrtl.annotations.{CircuitTarget, InstanceTarget, ModuleTarget}
 import firrtl.graph.PathNotFoundException
 import firrtl.options.Dependency
 import firrtl.passes.ExpandWhensAndCheck
-import firrtl.{CircuitState, FileUtils, HighForm, Parser, UnknownForm}
+import firrtl.{CircuitState, FileUtils, HighForm, UnknownForm}
 
 import java.io.PrintWriter
 
@@ -17,11 +18,11 @@ class AnalyzeCircuit(modulename:String,tclfilename:String) extends RawModule{
 
   val circuit = new firrtl.stage.transforms.Compiler(Seq(Dependency[ExpandWhensAndCheck]))
     .runTransform(
-      CircuitState(Parser.parse(FileUtils.getText("Outputs/"+modulename+"/"+modulename+".fir")), UnknownForm)
+      CircuitState(FirrtlCompat.parseCircuit(FileUtils.getText("Outputs/"+modulename+"/"+modulename+".fir")), UnknownForm)
     )
     .circuit
 
-  val Test = ModuleTarget(modulename, modulename)
+  val Test = CircuitTarget(modulename).module(modulename)
   val irGraph = ConnectionGraph(circuit)
 
 
@@ -112,6 +113,6 @@ class AnalyzeCircuit(modulename:String,tclfilename:String) extends RawModule{
 
 }
 object AnalyzeCircuit extends App {
-  (new chisel3.stage.ChiselStage).execute(args, Seq(ChiselGeneratorAnnotation(() => new AnalyzeCircuit(args(0),args(1)))))
+  (new ChiselStage).execute(args, Seq(ChiselGeneratorAnnotation(() => new AnalyzeCircuit(args(0),args(1)))))
   //(new chisel3.stage.ChiselStage).execute(args, Seq(ChiselGeneratorAnnotation(() => new AnalyzeCircuit("AddOne_3Stage","C://Users/qianc/Desktop/sdc"))))
 }

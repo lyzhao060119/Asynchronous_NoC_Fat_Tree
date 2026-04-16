@@ -6,7 +6,7 @@ import chisel3._
 
 class RouterOPM(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
-    val fromIpm = Vec(config.totalPorts, Vec(config.totalPorts, new HS_Packet))
+    val fromIpm = Vec(config.edgeCount, new HS_Packet)
     val outputs = Flipped(new RouterDirGroupedHSIO(config.childLanes, config.parentLanes))
 
     val holder = Output(Vec(config.totalPorts, UInt(config.holderW.W)))
@@ -19,13 +19,15 @@ class RouterOPM(config: RouterModuleConfig) extends Module {
     if (d < 4) io.outputs.child(d)(l) else io.outputs.parent(l)
   }
 
-  private val outputPorts = Seq.fill(config.totalPorts)(Module(new RouterOutputPortModule(config)))
+  private val outputPorts = Seq.tabulate(config.totalPorts) { o =>
+    Module(new RouterOutputPortModule(config, config.edgesByOutput(o).map(edgeId => config.edgeInput(edgeId))))
+  }
   for (o <- 0 until config.totalPorts) {
     outputPorts(o).io.out <> outPort(o)
   }
   for (o <- 0 until config.totalPorts) {
-    for (i <- 0 until config.totalPorts) {
-      outputPorts(o).io.inputs(i) <> io.fromIpm(o)(i)
+    for ((edgeId, localIdx) <- config.edgesByOutput(o).zipWithIndex) {
+      outputPorts(o).io.inputs(localIdx) <> io.fromIpm(edgeId)
     }
     io.holder(o) := outputPorts(o).io.holder
     io.anyPending(o) := outputPorts(o).io.anyPending

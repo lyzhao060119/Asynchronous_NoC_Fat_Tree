@@ -19,7 +19,9 @@ class RouterTop_Module(
         parentLanes = parentLanes,
         fifoDepth = fifoDepth,
         isHeadIndex = isHead_index,
-        isTailIndex = isTail_index
+        isTailIndex = isTail_index,
+        allowSameDirChild = false,
+        allowSameDirParent = false
       ),
       computeHeadRouting = (packet: Packet, inValid: Bool, ingressDir: UInt) =>
         new RoutingLogic_top_layer(x_coordinate, y_coordinate)

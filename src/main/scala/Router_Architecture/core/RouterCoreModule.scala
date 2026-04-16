@@ -21,10 +21,8 @@ class RouterCoreModule(
   ipm.io.inputs <> io.inputs
   opm.io.outputs <> io.outputs
 
-  for (o <- 0 until config.totalPorts) {
-    for (i <- 0 until config.totalPorts) {
-      opm.io.fromIpm(o)(i) <> ipm.io.toOpm(i)(o)
-    }
+  for (edgeId <- 0 until config.edgeCount) {
+    opm.io.fromIpm(edgeId) <> ipm.io.toOpm(edgeId)
   }
 
   ipm.io.opmHolder := opm.io.holder

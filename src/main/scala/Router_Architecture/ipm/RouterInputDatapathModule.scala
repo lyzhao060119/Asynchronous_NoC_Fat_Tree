@@ -4,11 +4,13 @@ import DataStruct._
 import Router_Architecture.common.{AsyncFifo, AsyncFork, RouterModuleConfig}
 import chisel3._
 
-class RouterInputDatapathModule(config: RouterModuleConfig) extends Module {
+class RouterInputDatapathModule(config: RouterModuleConfig, forkWidth: Int) extends Module {
+  require(forkWidth >= 1)
+
   val io = IO(new Bundle {
     val in = new HS_Packet
-    val destMask = Input(Vec(config.totalPorts, Bool()))
-    val forkOutputs = Vec(config.totalPorts, Flipped(new HS_Packet))
+    val destMask = Input(Vec(forkWidth, Bool()))
+    val forkOutputs = Vec(forkWidth, Flipped(new HS_Packet))
 
     val inValid = Output(Bool())
     val inBits = Output(new Packet)
@@ -18,7 +20,7 @@ class RouterInputDatapathModule(config: RouterModuleConfig) extends Module {
   })
 
   private val fifo = Module(new AsyncFifo(config.fifoDepth))
-  private val fork = Module(new AsyncFork(config.totalPorts))
+  private val fork = Module(new AsyncFork(forkWidth))
 
   fifo.io.enq <> io.in
   fork.io.in <> fifo.io.deq

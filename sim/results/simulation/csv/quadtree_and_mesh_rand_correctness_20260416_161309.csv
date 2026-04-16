@@ -1,0 +1,6 @@
+seed,cases,max_pkts,status,exit_code,elapsed_sec,log_file
+12345,24,3,PASS,0,154.198,"D:\Asynchronous_NoC_Fat_Tree\sim\results\simulation\raw\rand_correctness\20260416_161309\seed_12345_cases_24_maxpkts_3.log"
+22345,24,3,PASS,0,103.125,"D:\Asynchronous_NoC_Fat_Tree\sim\results\simulation\raw\rand_correctness\20260416_161309\seed_22345_cases_24_maxpkts_3.log"
+32345,24,3,PASS,0,104.163,"D:\Asynchronous_NoC_Fat_Tree\sim\results\simulation\raw\rand_correctness\20260416_161309\seed_32345_cases_24_maxpkts_3.log"
+42345,24,3,PASS,0,125.464,"D:\Asynchronous_NoC_Fat_Tree\sim\results\simulation\raw\rand_correctness\20260416_161309\seed_42345_cases_24_maxpkts_3.log"
+52345,24,3,PASS,0,128.369,"D:\Asynchronous_NoC_Fat_Tree\sim\results\simulation\raw\rand_correctness\20260416_161309\seed_52345_cases_24_maxpkts_3.log"

@@ -30,6 +30,8 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps
 ```powershell
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -Mode batch
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -Mode gui -Regenerate
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand.ps1 -Mode batch -Seed 12345 -Cases 24 -MaxPkts 3
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand_suite.ps1 -Cases 24 -MaxPkts 3
 ```
 
 `toplayer_mesh`:
@@ -46,6 +48,8 @@ All launchers execute inside `sim/work/xsim/<target>`, which keeps generated Viv
 - `sim/xsim/three_level_quadtree/throughput_3flit.tcl`: 4 unicast flows with throughput and head-to-head latency summary
 - `sim/xsim/three_level_quadtree/multicast_rect_smoke.tcl`: one 2x2 rectangle multicast smoke test
 - `sim/xsim/quadtree_and_mesh/run_all.tcl`: run-to-completion batch flow for the full quadtree+mesh DUT
+- `sim/xsim/quadtree_and_mesh/run_rand.ps1`: single-seed constrained-random correctness regression
+- `sim/xsim/quadtree_and_mesh/run_rand_suite.ps1`: multi-seed constrained-random correctness sweep with CSV/log output under `sim/results/simulation`
 - `sim/xsim/toplayer_mesh/run_all.tcl`: run-to-completion batch flow for the standalone top mesh DUT
 
 ## Cleanup

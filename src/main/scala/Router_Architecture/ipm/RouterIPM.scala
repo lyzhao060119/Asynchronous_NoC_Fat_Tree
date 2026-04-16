@@ -10,7 +10,7 @@ class RouterIPM(
 ) extends Module {
   val io = IO(new Bundle {
     val inputs = new RouterDirGroupedHSIO(config.childLanes, config.parentLanes)
-    val toOpm = Vec(config.totalPorts, Vec(config.totalPorts, Flipped(new HS_Packet)))
+    val toOpm = Vec(config.edgeCount, Flipped(new HS_Packet))
 
     val opmHolder = Input(Vec(config.totalPorts, UInt(config.holderW.W)))
     val opmAnyPending = Input(Vec(config.totalPorts, Bool()))
@@ -22,7 +22,9 @@ class RouterIPM(
     if (d < 4) io.inputs.child(d)(l) else io.inputs.parent(l)
   }
 
-  private val inputPorts = Seq.fill(config.totalPorts)(Module(new RouterInputPortModule(config)))
+  private val inputPorts = Seq.tabulate(config.totalPorts) { i =>
+    Module(new RouterInputPortModule(config, config.edgesByInput(i).length))
+  }
   for (i <- 0 until config.totalPorts) {
     inputPorts(i).io.in <> inPort(i)
   }
@@ -59,7 +61,9 @@ class RouterIPM(
   for (i <- 0 until config.totalPorts) {
     inputPorts(i).io.nextDir := routeSelection.io.currentDestVec(i)
     inputPorts(i).io.nextLane := laneAllocator.io.headSelLane(i)
-    inputPorts(i).io.destMask := maskBuilder.io.destMask(i)
-    io.toOpm(i) <> inputPorts(i).io.forkOutputs
+    for ((edgeId, localIdx) <- config.edgesByInput(i).zipWithIndex) {
+      inputPorts(i).io.destMask(localIdx) := maskBuilder.io.destMask(i)(config.edgeOutput(edgeId))
+      io.toOpm(edgeId) <> inputPorts(i).io.forkOutputs(localIdx)
+    }
   }
 }

@@ -4,11 +4,11 @@ import DataStruct._
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
-class RouterInputPortModule(config: RouterModuleConfig) extends Module {
+class RouterInputPortModule(config: RouterModuleConfig, forkWidth: Int) extends Module {
   val io = IO(new Bundle {
     val in = new HS_Packet
-    val destMask = Input(Vec(config.totalPorts, Bool()))
-    val forkOutputs = Vec(config.totalPorts, Flipped(new HS_Packet))
+    val destMask = Input(Vec(forkWidth, Bool()))
+    val forkOutputs = Vec(forkWidth, Flipped(new HS_Packet))
 
     val inValid = Output(Bool())
     val inBits = Output(new Packet)
@@ -21,7 +21,7 @@ class RouterInputPortModule(config: RouterModuleConfig) extends Module {
     val nextLane = Input(Vec(config.nDirs, UInt(config.laneW.W)))
   })
 
-  private val datapath = Module(new RouterInputDatapathModule(config))
+  private val datapath = Module(new RouterInputDatapathModule(config, forkWidth))
   private val state = Module(new RouterInputStateModule(config))
 
   datapath.io.in <> io.in

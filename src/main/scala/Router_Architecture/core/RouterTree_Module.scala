@@ -20,7 +20,9 @@ class RouterTree_Module(
         parentLanes = parentLanes,
         fifoDepth = fifoDepth,
         isHeadIndex = isHead_index,
-        isTailIndex = isTail_index
+        isTailIndex = isTail_index,
+        allowSameDirChild = (routerLevel == 1),
+        allowSameDirParent = false
       ),
       computeHeadRouting = (packet: Packet, inValid: Bool, ingressDir: UInt) =>
         new RoutingLogic(x_coordinate, y_coordinate)

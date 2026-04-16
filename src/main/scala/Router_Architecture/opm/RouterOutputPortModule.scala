@@ -4,16 +4,16 @@ import DataStruct._
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
-class RouterOutputPortModule(config: RouterModuleConfig) extends Module {
+class RouterOutputPortModule(config: RouterModuleConfig, legalInputs: Seq[Int]) extends Module {
   val io = IO(new Bundle {
-    val inputs = Vec(config.totalPorts, new HS_Packet)
+    val inputs = Vec(legalInputs.length, new HS_Packet)
     val out = Flipped(new HS_Packet)
 
     val anyPending = Output(Bool())
     val holder = Output(UInt(config.holderW.W))
   })
 
-  private val arbiter = Module(new RouterOutputArbiterModule(config))
+  private val arbiter = Module(new RouterOutputArbiterModule(config, legalInputs))
   private val holder = Module(new RouterOutputHolderModule(config))
 
   arbiter.io.inputs <> io.inputs
