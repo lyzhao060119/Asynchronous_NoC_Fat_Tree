@@ -12,6 +12,7 @@ If you are planning verification for a paper or thesis, use [SIMULATION_README.m
 - `sim/testbenches/routerl1/routerl1_three_flit_packet_tb.sv`
 - `sim/testbenches/three_level_quadtree/three_level_quadtree_tb.sv`
 - `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_tb.sv`
+- `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_perf_tb.sv`
 - `sim/testbenches/toplayer_mesh/toplayer_mesh_tb.sv`
 
 ## Vivado xsim Usage
@@ -32,6 +33,8 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -Mode gui -Regenerate
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand.ps1 -Mode batch -Seed 12345 -Cases 24 -MaxPkts 3
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand_suite.ps1 -Cases 24 -MaxPkts 3
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern uniform_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_suite.ps1 -Pattern uniform_unicast -PacketGapsNs 0,10,20,40 -Seeds 12345,22345
 ```
 
 `toplayer_mesh`:
@@ -50,6 +53,8 @@ All launchers execute inside `sim/work/xsim/<target>`, which keeps generated Viv
 - `sim/xsim/quadtree_and_mesh/run_all.tcl`: run-to-completion batch flow for the full quadtree+mesh DUT
 - `sim/xsim/quadtree_and_mesh/run_rand.ps1`: single-seed constrained-random correctness regression
 - `sim/xsim/quadtree_and_mesh/run_rand_suite.ps1`: multi-seed constrained-random correctness sweep with CSV/log output under `sim/results/simulation`
+- `sim/xsim/quadtree_and_mesh/run_perf.ps1`: single-point performance run with CSV/log output under `sim/results/simulation`
+- `sim/xsim/quadtree_and_mesh/run_perf_suite.ps1`: multi-gap and multi-seed performance sweep that consolidates child CSV rows
 - `sim/xsim/toplayer_mesh/run_all.tcl`: run-to-completion batch flow for the standalone top mesh DUT
 
 ## Cleanup
