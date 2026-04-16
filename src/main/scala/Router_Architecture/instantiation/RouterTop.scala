@@ -3,11 +3,13 @@ package Router_Architecture.instantiation
 import Router_Architecture.core.RouterTop_Module
 import chisel3._
 
+/** Default lane counts used by the standalone top-layer mesh router. */
 object RouterTop_param {
   val child_lane = 4
   val parent_lane = 8
 }
 
+/** Top-layer mesh router preset. */
 class RouterTop(x_coordinate: UInt, y_coordinate: UInt) extends
   RouterTop_Module(
     x_coordinate = x_coordinate,

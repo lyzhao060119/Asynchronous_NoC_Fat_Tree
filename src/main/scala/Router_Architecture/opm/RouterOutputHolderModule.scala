@@ -6,6 +6,11 @@ import chisel3._
 import chisel3.util.log2Ceil
 import tool.AsyncClock
 
+/**
+ * Holds ownership of one output lane from the head flit until the tail flit.
+ *
+ * This enforces packet-level atomicity on each physical output port.
+ */
 class RouterOutputHolderModule(config: RouterModuleConfig) extends Module {
   private val inputIdxW = math.max(1, log2Ceil(config.totalPorts))
   private val noneLiteral = config.noneValue.U(config.holderW.W)

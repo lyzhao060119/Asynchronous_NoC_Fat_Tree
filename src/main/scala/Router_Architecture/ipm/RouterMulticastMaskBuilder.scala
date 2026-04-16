@@ -3,6 +3,12 @@ package Router_Architecture.ipm
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
+/**
+ * Converts logical per-direction routing decisions into per-output-port masks.
+ *
+ * Head flits use freshly allocated lanes, while body/tail flits can only launch
+ * when all previously reserved lanes are still held by the same input.
+ */
 class RouterMulticastMaskBuilder(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
     val inValid = Input(Vec(config.totalPorts, Bool()))

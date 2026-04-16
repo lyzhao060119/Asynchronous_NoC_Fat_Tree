@@ -4,6 +4,12 @@ import DataStruct._
 import Router_Architecture.common.{RouterDirGroupedHSIO, RouterModuleConfig}
 import chisel3._
 
+/**
+ * Output processing module.
+ *
+ * The OPM instantiates one output-port controller per physical lane and wires
+ * each of them only to the legal sparse edge set that can reach that lane.
+ */
 class RouterOPM(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
     val fromIpm = Vec(config.edgeCount, new HS_Packet)
@@ -27,6 +33,7 @@ class RouterOPM(config: RouterModuleConfig) extends Module {
   }
   for (o <- 0 until config.totalPorts) {
     for ((edgeId, localIdx) <- config.edgesByOutput(o).zipWithIndex) {
+      // Translate the global sparse edge id into this output port's local input list.
       outputPorts(o).io.inputs(localIdx) <> io.fromIpm(edgeId)
     }
     io.holder(o) := outputPorts(o).io.holder

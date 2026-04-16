@@ -4,6 +4,12 @@ import DataStruct._
 import Router_Architecture.common.{AsyncFifo, AsyncFork, RouterModuleConfig}
 import chisel3._
 
+/**
+ * Input datapath for one physical port.
+ *
+ * Incoming traffic is buffered in an asynchronous FIFO and then replicated
+ * through a per-port sparse fork according to the destination mask.
+ */
 class RouterInputDatapathModule(config: RouterModuleConfig, forkWidth: Int) extends Module {
   require(forkWidth >= 1)
 
@@ -31,5 +37,6 @@ class RouterInputDatapathModule(config: RouterModuleConfig, forkWidth: Int) exte
   io.inBits := fifo.io.deq.Data
   io.isHead := io.inValid && io.inBits.flit(config.isHeadIndex)
   io.isTail := io.inValid && io.inBits.flit(config.isTailIndex)
+  // The fork launch pulse is used to update per-packet route state.
   io.launchClock := fork.io.launch_clock
 }

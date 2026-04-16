@@ -5,6 +5,12 @@ import Router_Architecture.algorithm.RoutingLogic
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
+/**
+ * Parameterized quadtree router wrapper.
+ *
+ * L1 keeps same-direction child connectivity so a source core may still
+ * receive its own local copy, while upper levels use strict no-U-turn edges.
+ */
 class RouterTree_Module(
   x_coordinate: UInt,
   y_coordinate: UInt,

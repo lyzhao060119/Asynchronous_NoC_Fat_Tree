@@ -4,6 +4,12 @@ import DataStruct._
 import Router_Architecture.common.{RouterDirGroupedHSIO, RouterModuleConfig}
 import chisel3._
 
+/**
+ * Input processing module.
+ *
+ * This stage buffers incoming packets, computes route directions, allocates
+ * output lanes, builds sparse destination masks, and emits traffic toward OPM.
+ */
 class RouterIPM(
   config: RouterModuleConfig,
   computeHeadRouting: (Packet, Bool, UInt) => Vec[Bool]
@@ -62,6 +68,7 @@ class RouterIPM(
     inputPorts(i).io.nextDir := routeSelection.io.currentDestVec(i)
     inputPorts(i).io.nextLane := laneAllocator.io.headSelLane(i)
     for ((edgeId, localIdx) <- config.edgesByInput(i).zipWithIndex) {
+      // Convert dense physical output indexing into the local sparse fork index.
       inputPorts(i).io.destMask(localIdx) := maskBuilder.io.destMask(i)(config.edgeOutput(edgeId))
       io.toOpm(edgeId) <> inputPorts(i).io.forkOutputs(localIdx)
     }

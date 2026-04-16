@@ -4,6 +4,12 @@ import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 import chisel3.util.PriorityEncoder
 
+/**
+ * Reserves one free output lane per requested direction for each head flit.
+ *
+ * Allocation is done against the current OPM holder state so a new packet only
+ * launches when every requested direction has a free output lane.
+ */
 class RouterHeadLaneAllocator(config: RouterModuleConfig) extends Module {
   private val noneLiteral = config.noneValue.U(config.holderW.W)
 
@@ -32,6 +38,7 @@ class RouterHeadLaneAllocator(config: RouterModuleConfig) extends Module {
     }
   }
 
+  // remFree(i) represents the remaining free lanes after processing inputs [0, i).
   private val remFree = Wire(Vec(config.totalPorts + 1, Vec(config.nDirs, Vec(config.maxLanes, Bool()))))
   remFree(0) := freeLane0
 

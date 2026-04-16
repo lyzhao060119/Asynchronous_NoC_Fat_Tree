@@ -5,6 +5,12 @@ import Router_Architecture.common.{AsyncArbiter, RouterModuleConfig}
 import chisel3._
 import chisel3.util.log2Ceil
 
+/**
+ * Per-output arbiter wrapper.
+ *
+ * Each instance only sees the legal sparse input set for one physical output
+ * and maps the local arbiter winner back to the global input index.
+ */
 class RouterOutputArbiterModule(config: RouterModuleConfig, legalInputs: Seq[Int]) extends Module {
   require(legalInputs.nonEmpty)
 
@@ -26,6 +32,7 @@ class RouterOutputArbiterModule(config: RouterModuleConfig, legalInputs: Seq[Int
   arbiter.io.in <> io.inputs
   arbiter.io.out <> io.out
 
+  // Translate the local sparse-input winner back into the global input index.
   private val chosenGlobal = Wire(UInt(inputIdxW.W))
   chosenGlobal := legalInputs.head.U(inputIdxW.W)
   for ((globalIdx, localIdx) <- legalInputs.zipWithIndex) {

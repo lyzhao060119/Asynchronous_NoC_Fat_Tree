@@ -3,6 +3,12 @@ package Router_Architecture.common
 import DataStruct.PacketLayout
 import chisel3.util.log2Ceil
 
+/**
+ * Shared structural parameters for a router instance.
+ *
+ * Besides lane counts and packet bit indices, this config also defines the
+ * legal internal input-to-output edges used by the sparse router datapath.
+ */
 final case class RouterModuleConfig(
   childLanes: Int,
   parentLanes: Int,
@@ -38,6 +44,7 @@ final case class RouterModuleConfig(
   def laneOfPhys(idx: Int): Int =
     if (idx < 4 * childLanes) idx % childLanes else idx - 4 * childLanes
 
+  /** Returns true when an internal edge between two physical ports is allowed. */
   def canConnect(inIdx: Int, outIdx: Int): Boolean = {
     val inDir = dirOfPhys(inIdx)
     val outDir = dirOfPhys(outIdx)
@@ -63,6 +70,7 @@ final case class RouterModuleConfig(
     }
   }, "Every output port must retain at least one legal internal edge.")
 
+  /** Flat list of legal sparse edges, stored as (inputPort, outputPort). */
   lazy val legalEdges: IndexedSeq[(Int, Int)] =
     (for {
       inIdx <- 0 until totalPorts
@@ -70,14 +78,18 @@ final case class RouterModuleConfig(
       if canConnect(inIdx, outIdx)
     } yield (inIdx, outIdx)).toIndexedSeq
 
+  /** Number of physical internal connections kept after sparse pruning. */
   lazy val edgeCount: Int = legalEdges.length
 
+  /** Input port index for each sparse edge. */
   lazy val edgeInput: IndexedSeq[Int] =
     legalEdges.map(_._1)
 
+  /** Output port index for each sparse edge. */
   lazy val edgeOutput: IndexedSeq[Int] =
     legalEdges.map(_._2)
 
+  /** Sparse edge ids grouped by source input port. */
   lazy val edgesByInput: IndexedSeq[IndexedSeq[Int]] =
     (0 until totalPorts).map { inIdx =>
       legalEdges.zipWithIndex.collect {
@@ -85,6 +97,7 @@ final case class RouterModuleConfig(
       }.toIndexedSeq
     }.toIndexedSeq
 
+  /** Sparse edge ids grouped by destination output port. */
   lazy val edgesByOutput: IndexedSeq[IndexedSeq[Int]] =
     (0 until totalPorts).map { outIdx =>
       legalEdges.zipWithIndex.collect {

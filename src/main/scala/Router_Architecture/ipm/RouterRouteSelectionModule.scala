@@ -5,6 +5,10 @@ import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 import chisel3.util.log2Ceil
 
+/**
+ * Computes route destinations for head flits and reuses the stored
+ * direction vector for body/tail flits.
+ */
 class RouterRouteSelectionModule(
   config: RouterModuleConfig,
   computeHeadRouting: (Packet, Bool, UInt) => Vec[Bool]
@@ -20,7 +24,8 @@ class RouterRouteSelectionModule(
 
   for (i <- 0 until config.totalPorts) {
     val ingressDir = config.dirOfPhys(i).U(dirW.W)
-    val headDecision = computeHeadRouting(io.inBits(i), io.inValid(i), ingressDir) //illegal transporting back to the same direction
+    // The ingress direction is implied by the physical port index.
+    val headDecision = computeHeadRouting(io.inBits(i), io.inValid(i), ingressDir)
     when(io.isHead(i)) {
       io.currentDestVec(i) := headDecision
     }.otherwise {

@@ -4,12 +4,20 @@ import DataStruct._
 import chisel3._
 import chisel3.util._
 
+/** Direction-and-packet bundle emitted by the quadtree routing logic. */
 class RoutingDecision extends Bundle {
   val output_ports = Vec(5, Bool())
   val output_packets = Vec(5, new Packet)
   val output_valid = Vec(5, Bool())
 }
 
+/**
+ * Computes routing decisions for one quadtree router.
+ *
+ * The logic first clips the global rectangle to the current tree, projects the
+ * relevant region onto the current router level, and then decides which child
+ * quadrants and/or parent port should receive the packet.
+ */
 class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
   private def childDirBit(xSel: Int, ySel: Int): Int = {
     // (x,y)=00 -> child3, 01 -> child2, 10 -> child1, 11 -> child0
@@ -38,17 +46,17 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yHi := Mux(yMin <= yMax, yMax, yMin)
 
     val childMask = Wire(Vec(4, Bool()))
-    childMask := VecInit(Seq.fill(4)(false.B)) // children direction
-    val toParent = WireInit(false.B) // parent direction
+    childMask := VecInit(Seq.fill(4)(false.B)) // child quadrants selected at this level
+    val toParent = WireInit(false.B) // some part of the rectangle lies outside this subtree
 
     for (y <- 0 until 8) {
       for (x <- 0 until 8) {
         val inRect =
           (x.U(3.W) >= xLo) && (x.U(3.W) <= xHi) &&
-          (y.U(3.W) >= yLo) && (y.U(3.W) <= yHi) // Whether (x,y) core is within the rectangle
+          (y.U(3.W) >= yLo) && (y.U(3.W) <= yHi) // whether this leaf core is covered by the rectangle
 
         val xGroup = (x >> level).U(2.W)
-        val yGroup = (y >> level).U(2.W) // (x,y) core belongs to witch subtree
+        val yGroup = (y >> level).U(2.W) // subtree containing this leaf at the current level
         val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY)
 
         val xSel = (x >> (level - 1)) & 0x1
@@ -88,7 +96,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     }
 
     (treeX, treeY)
-  } // identify tree (0..3, 0..3) in top layer
+  } // identify the enclosing 8x8 tree instance in the top layer
 
   private def localRouterCoord(router_level: UInt): (UInt, UInt) = {
     val localX = WireInit(0.U(2.W))
@@ -110,7 +118,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     }
 
     (localX, localY)
-  } // router index in local tree
+  } // identify this router's subtree coordinate inside the current tree
 
   private def localRectInCurrentTree(
     router_level: UInt,
@@ -119,21 +127,21 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yLoGlobal: UInt,
     yHiGlobal: UInt
   ): (Bool, Bool, UInt, UInt, UInt, UInt) = {
-    val (treeX, treeY) = currentTreeCoord(router_level) // identify current tree_id
+    val (treeX, treeY) = currentTreeCoord(router_level) // identify the current tree id
 
     val treeBaseX = Cat(0.U(1.W), treeX, 0.U(3.W))
     val treeBaseY = Cat(0.U(1.W), treeY, 0.U(3.W))
     val treeMaxX = Wire(UInt(6.W))
     val treeMaxY = Wire(UInt(6.W))
     treeMaxX := treeBaseX + 7.U
-    treeMaxY := treeBaseY + 7.U // current router's tree's boundary
+    treeMaxY := treeBaseY + 7.U // bounds of the current 8x8 tree
 
     val xIntersects = (xHiGlobal >= treeBaseX) && (xLoGlobal <= treeMaxX)
     val yIntersects = (yHiGlobal >= treeBaseY) && (yLoGlobal <= treeMaxY)
-    val treeIntersects = xIntersects && yIntersects // intersect with destination rectangle
+    val treeIntersects = xIntersects && yIntersects // rectangle overlaps this tree at all
     val treeContainsRect =
       (xLoGlobal >= treeBaseX) && (xHiGlobal <= treeMaxX) &&
-      (yLoGlobal >= treeBaseY) && (yHiGlobal <= treeMaxY) // contains dest rectangle
+      (yLoGlobal >= treeBaseY) && (yHiGlobal <= treeMaxY) // rectangle is fully contained in this tree
 
     val xLoLocal6 = Wire(UInt(6.W))
     val xHiLocal6 = Wire(UInt(6.W))
@@ -143,7 +151,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     xLoLocal6 := Mux(xLoGlobal > treeBaseX, xLoGlobal - treeBaseX, 0.U)
     yLoLocal6 := Mux(yLoGlobal > treeBaseY, yLoGlobal - treeBaseY, 0.U)
     xHiLocal6 := Mux(xHiGlobal < treeMaxX, xHiGlobal - treeBaseX, 7.U)
-    yHiLocal6 := Mux(yHiGlobal < treeMaxY, yHiGlobal - treeBaseY, 7.U) // inner tree dest rectangle
+    yHiLocal6 := Mux(yHiGlobal < treeMaxY, yHiGlobal - treeBaseY, 7.U) // clipped rectangle in local tree coordinates
 
     (treeIntersects, treeContainsRect, xLoLocal6(2, 0), xHiLocal6(2, 0), yLoLocal6(2, 0), yHiLocal6(2, 0))
   }
@@ -179,6 +187,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
 
     val (localX, localY) = localRouterCoord(router_level)
 
+    // projectedDir is the raw child/parent decision before ingress suppression.
     val projectedDir = WireInit(0.U(5.W))
     when(treeIntersects) {
       switch(router_level) {
@@ -196,7 +205,7 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
 
     val projectedNoBack = Wire(Vec(5, Bool()))
     val bypassIngressSuppress =
-      (router_level === 1.U) && (ingressDir =/= 4.U) // prevent backward propagation
+      (router_level === 1.U) && (ingressDir =/= 4.U) // L1 keeps same-direction local child delivery
     for (i <- 0 until 5) {
       projectedNoBack(i) := projectedDir(i)
       when(!bypassIngressSuppress && (ingressDir === i.U)) {

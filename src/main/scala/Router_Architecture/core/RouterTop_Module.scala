@@ -5,6 +5,7 @@ import Router_Architecture.algorithm.RoutingLogic_top_layer
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
+/** Parameterized top-layer mesh router wrapper. */
 class RouterTop_Module(
   x_coordinate: UInt,
   y_coordinate: UInt,

@@ -4,6 +4,7 @@ import DataStruct._
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
+/** Wraps one physical output lane with its sparse arbiter and holder state. */
 class RouterOutputPortModule(config: RouterModuleConfig, legalInputs: Seq[Int]) extends Module {
   val io = IO(new Bundle {
     val inputs = Vec(legalInputs.length, new HS_Packet)

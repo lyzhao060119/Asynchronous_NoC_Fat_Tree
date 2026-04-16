@@ -4,10 +4,11 @@ import DataStruct._
 import chisel3._
 import tool._
 
+/** One asynchronous pipeline stage for a request/acknowledge packet channel. */
 class AsyncStage extends Module {
   val io = IO(new Bundle {
-    val in = new HS_Packet // sink
-    val out = Flipped(new HS_Packet) // source
+    val in = new HS_Packet // sink side of the stage
+    val out = Flipped(new HS_Packet) // source side of the stage
   })
 
   private val acg = Module(new ACG(Map(
@@ -15,7 +16,7 @@ class AsyncStage extends Module {
     "OutNum" -> 1,
   )))
 
-  // HS connect
+  // Handshake wires are handled by the ACG; only data is registered on fire.
   acg.In(0) <> io.in.HS
   acg.Out(0) <> io.out.HS
 

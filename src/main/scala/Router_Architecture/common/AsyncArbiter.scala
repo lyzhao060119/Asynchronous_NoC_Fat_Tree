@@ -5,13 +5,19 @@ import chisel3._
 import chisel3.util._
 import tool.{ACG, AsyncClock, Mutex2}
 
+/**
+ * Asynchronous arbiter for multiple packet channels.
+ *
+ * Requests are reduced through a tree of Mutex2 cells and the winner is
+ * acknowledged only when the output transfer fires.
+ */
 class AsyncArbiter(val nIn: Int) extends Module {
   require(nIn >= 1)
   private val idxW = math.max(1, log2Ceil(nIn))
 
   val io = IO(new Bundle {
-    val in = Vec(nIn, new HS_Packet) // from forks
-    val out = Flipped(new HS_Packet) // to output link
+    val in = Vec(nIn, new HS_Packet) // candidate inputs, usually from forks
+    val out = Flipped(new HS_Packet) // selected output link
 
     val fire = Output(Bool())
     val fire_clock = Output(Clock())
@@ -35,6 +41,7 @@ class AsyncArbiter(val nIn: Int) extends Module {
   private def emptyCandidate: Candidate =
     Candidate(false.B, true.B, 0.U(idxW.W), zeroPacket)
 
+  /** Resolves one pair of candidates using a mutex. */
   private def mergeCandidates(left: Candidate, right: Candidate): Candidate = {
     val mutex = Module(new Mutex2)
     val bothValid = left.valid && right.valid
@@ -80,6 +87,7 @@ class AsyncArbiter(val nIn: Int) extends Module {
     Candidate(outValid, outReady, outIdx, outData)
   }
 
+  /** Builds a balanced reduction tree until only one winner remains. */
   private def reduceCandidates(nodes: Seq[Candidate]): Candidate = {
     if (nodes.length == 1) {
       nodes.head

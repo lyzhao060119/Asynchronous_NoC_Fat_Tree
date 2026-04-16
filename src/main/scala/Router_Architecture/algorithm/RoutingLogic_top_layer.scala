@@ -4,12 +4,20 @@ import DataStruct._
 import chisel3._
 import chisel3.util._
 
+/** Direction-and-packet bundle emitted by the top-layer routing logic. */
 class RoutingDecision_top extends Bundle {
   val output_ports = Vec(5, Bool())
   val output_packets = Vec(5, new Packet)
   val output_valid = Vec(5, Bool())
 }
 
+/**
+ * Routing logic for the top-layer mesh.
+ *
+ * Outside the destination rectangle it performs a nearest-corner XY walk.
+ * Once inside the target tile rectangle, it expands traffic across the mesh
+ * and optionally down into the local quadtree tile.
+ */
 class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
   private val DirWest = 0.U(3.W)
   private val DirSouth = 1.U(3.W)
@@ -59,7 +67,7 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
     val inRectRow = (cy >= tyLo) && (cy <= tyHi)
     val localHit = inRectColumn && inRectRow
 
-    // outside the rectangle, route with XY to the nearest corner.
+    // Outside the rectangle, route toward the closest rectangle corner.
     val dLL = absDiff(cx, txLo) +& absDiff(cy, tyLo) // (xLo, yLo)
     val dLH = absDiff(cx, txLo) +& absDiff(cy, tyHi) // (xLo, yHi)
     val dHL = absDiff(cx, txHi) +& absDiff(cy, tyLo) // (xHi, yLo)
@@ -92,7 +100,7 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
 
     when(Packet_valid) {
       when(!localHit) {
-        // XY unicast to nearest corner (no branch).
+        // XY unicast toward the selected nearest corner (no branching yet).
         when(cx < targetX) {
           goEast := true.B
         }.elsewhen(cx > targetX) {
@@ -103,7 +111,7 @@ class RoutingLogic_top_layer(coordinate_x: UInt, coordinate_y: UInt) {
           goSouth := true.B
         }
       }.otherwise {
-        // inside rectangle, tree-based spreading.
+        // Once inside the rectangle, spread traffic across the mesh and local tile.
         // Packets entering from local tree have already been delivered locally
         // in quadtree logic;
         // avoid sending back to local to prevent duplicates.

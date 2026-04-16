@@ -4,6 +4,10 @@ import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 import tool.AsyncClock
 
+/**
+ * Stores the direction vector and selected lane for the current multi-flit
+ * packet so body/tail flits can reuse the head decision atomically.
+ */
 class RouterInputStateModule(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
     val launchClock = Input(Clock())

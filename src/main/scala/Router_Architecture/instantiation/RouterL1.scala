@@ -3,6 +3,7 @@ package Router_Architecture.instantiation
 import Router_Architecture.core.RouterTree_Module
 import chisel3._
 
+/** Leaf quadtree router preset. */
 class RouterL1(x_coordinate: UInt, y_coordinate: UInt)
   extends RouterTree_Module(
     x_coordinate = x_coordinate,

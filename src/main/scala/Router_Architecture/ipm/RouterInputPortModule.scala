@@ -4,6 +4,7 @@ import DataStruct._
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
+/** Combines the input datapath with stored route/lane state for one port. */
 class RouterInputPortModule(config: RouterModuleConfig, forkWidth: Int) extends Module {
   val io = IO(new Bundle {
     val in = new HS_Packet
