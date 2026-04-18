@@ -1,12 +1,18 @@
 param(
-  [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast")]
+  [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast", "uniform_multicast", "mixed_unicast_multicast", "overlapping_multicast")]
   [string]$Pattern = "uniform_unicast",
   [int[]]$Seeds = @(12345, 22345, 32345),
   [int[]]$PacketGapsNs = @(0, 10, 20, 40),
+  [string]$SeedsCsv = "",
+  [string]$PacketGapsCsv = "",
   [ValidateRange(1, 4)]
   [int]$NumFlows = 4,
   [ValidateRange(0, 1000000)]
   [int]$AckDelayNs = 1,
+  [ValidateRange(1, 16)]
+  [int]$RectW = 1,
+  [ValidateRange(1, 16)]
+  [int]$RectH = 1,
   [ValidateRange(1, 2000000000)]
   [int]$WarmupNs = 100000,
   [ValidateRange(1, 2000000000)]
@@ -15,6 +21,17 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+function ConvertTo-IntList([string]$Csv) {
+  $values = @()
+  foreach ($item in ($Csv -split '[,\s]+')) {
+    if ([string]::IsNullOrWhiteSpace($item)) {
+      continue
+    }
+    $values += [int]$item
+  }
+  return ,$values
+}
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 $runPerf = Join-Path $PSScriptRoot "run_perf.ps1"
@@ -29,6 +46,17 @@ New-Item -ItemType Directory -Force -Path $csvDir | Out-Null
 
 $headerWritten = $false
 $regenThisRun = $Regenerate
+
+if (-not [string]::IsNullOrWhiteSpace($SeedsCsv)) {
+  $Seeds = ConvertTo-IntList $SeedsCsv
+}
+if (-not [string]::IsNullOrWhiteSpace($PacketGapsCsv)) {
+  $PacketGapsNs = ConvertTo-IntList $PacketGapsCsv
+}
+
+if (($Seeds.Count -lt 1) -or ($PacketGapsNs.Count -lt 1)) {
+  throw "[QAM-PERF-SUITE] Seeds and PacketGapsNs must both be non-empty."
+}
 
 foreach ($gapNs in $PacketGapsNs) {
   foreach ($seed in $Seeds) {
@@ -46,6 +74,8 @@ foreach ($gapNs in $PacketGapsNs) {
       "-NumFlows", "$NumFlows",
       "-PacketGapNs", "$gapNs",
       "-AckDelayNs", "$AckDelayNs",
+      "-RectW", "$RectW",
+      "-RectH", "$RectH",
       "-WarmupNs", "$WarmupNs",
       "-MeasureNs", "$MeasureNs"
     )

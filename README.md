@@ -102,11 +102,20 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/three_level_quadtree/launch.ps
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -Mode batch
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand_suite.ps1 -Cases 24 -MaxPkts 3
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern uniform_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
-powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_suite.ps1 -Pattern uniform_unicast -PacketGapsNs 0,10,20,40 -Seeds 12345,22345
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern cross_tile_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern hotspot_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern uniform_multicast -NumFlows 1 -RectW 4 -RectH 4 -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern mixed_unicast_multicast -NumFlows 4 -RectW 4 -RectH 4 -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern overlapping_multicast -NumFlows 4 -RectW 4 -RectH 4 -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_suite.ps1 -Pattern uniform_unicast -PacketGapsCsv "0,10,20,40" -SeedsCsv "12345,22345"
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_rect_sweep.ps1 -Pattern uniform_multicast -RectSizesCsv "1,2,4,8,16" -SeedsCsv "12345,22345"
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_ack_sweep.ps1 -Pattern uniform_multicast -AckDelaysCsv "1,5,10,20" -SeedsCsv "12345,22345"
 powershell -ExecutionPolicy Bypass -File sim/xsim/toplayer_mesh/launch.ps1 -Mode batch
 ```
 
 Generated Vivado outputs are placed under `sim/work/xsim/...` instead of the repository root.
+
+Performance CSVs emitted by `run_perf.ps1` / `run_perf_suite.ps1` include both head-to-head latency and packet completion latency, which makes the results easier to use directly in paper plots.
 
 ## Cleanup Generated Artifacts
 

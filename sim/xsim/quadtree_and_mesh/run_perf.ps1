@@ -1,7 +1,7 @@
 param(
   [ValidateSet("gui", "batch")]
   [string]$Mode = "batch",
-  [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast")]
+  [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast", "uniform_multicast", "mixed_unicast_multicast", "overlapping_multicast")]
   [string]$Pattern = "uniform_unicast",
   [int]$Seed = 12345,
   [ValidateRange(1, 4)]
@@ -10,6 +10,10 @@ param(
   [int]$PacketGapNs = 0,
   [ValidateRange(0, 1000000)]
   [int]$AckDelayNs = 1,
+  [ValidateRange(1, 16)]
+  [int]$RectW = 1,
+  [ValidateRange(1, 16)]
+  [int]$RectH = 1,
   [ValidateRange(1, 2000000000)]
   [int]$WarmupNs = 100000,
   [ValidateRange(1, 2000000000)]
@@ -40,6 +44,9 @@ function Get-PatternCode([string]$PatternName) {
     "local_unicast" { return 1 }
     "cross_tile_unicast" { return 2 }
     "hotspot_unicast" { return 3 }
+    "uniform_multicast" { return 4 }
+    "mixed_unicast_multicast" { return 5 }
+    "overlapping_multicast" { return 6 }
     default { throw "Unsupported pattern: $PatternName" }
   }
 }
@@ -94,6 +101,8 @@ try {
     ('`define PERF_NUM_FLOWS {0}' -f $NumFlows),
     ('`define PERF_PACKET_GAP_NS {0}' -f $PacketGapNs),
     ('`define PERF_ACK_DELAY_NS {0}' -f $AckDelayNs),
+    ('`define PERF_RECT_W {0}' -f $RectW),
+    ('`define PERF_RECT_H {0}' -f $RectH),
     ('`define PERF_WARMUP_NS {0}' -f $WarmupNs),
     ('`define PERF_MEASURE_NS {0}' -f $MeasureNs)
   ) | Set-Content -Path $cfgFile -Encoding Ascii
@@ -179,6 +188,9 @@ if ($Mode -eq "batch") {
     "avg_latency_ns",
     "p95_latency_ns",
     "p99_latency_ns",
+    "avg_completion_latency_ns",
+    "p95_completion_latency_ns",
+    "p99_completion_latency_ns",
     "injected_flit_per_ns",
     "injected_pkt_per_ns",
     "throughput_flit_per_ns",
@@ -191,6 +203,8 @@ if ($Mode -eq "batch") {
     "unexpected_top_flits",
     "boundary_head_count",
     "pending_heads",
+    "boundary_tail_count",
+    "pending_packets",
     "status",
     "log_file"
   )

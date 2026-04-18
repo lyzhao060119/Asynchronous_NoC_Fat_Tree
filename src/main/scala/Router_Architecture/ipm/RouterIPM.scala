@@ -4,15 +4,16 @@ import DataStruct._
 import Router_Architecture.common.{RouterDirGroupedHSIO, RouterModuleConfig}
 import chisel3._
 
-/**
- * Input processing module.
- *
- * This stage buffers incoming packets, computes route directions, allocates
- * output lanes, builds sparse destination masks, and emits traffic toward OPM.
- */
+/** Input processing module.
+  *
+  * Paper-aligned modules are kept visible here: each input port has its own
+  * input buffer and request-generator path, while route selection is grouped in
+  * a dedicated control shell. Project-specific multi-flit context, lane
+  * reservation, and multicast masking are kept as separate submodules.
+  */
 class RouterIPM(
-  config: RouterModuleConfig,
-  computeHeadRouting: (Packet, Bool, UInt) => Vec[Bool]
+    config: RouterModuleConfig,
+    computeHeadRouting: (Packet, Bool, UInt) => Vec[Bool]
 ) extends Module {
   val io = IO(new Bundle {
     val inputs = new RouterDirGroupedHSIO(config.childLanes, config.parentLanes)
@@ -29,47 +30,34 @@ class RouterIPM(
   }
 
   private val inputPorts = Seq.tabulate(config.totalPorts) { i =>
-    Module(new RouterInputPortModule(config, config.edgesByInput(i).length))
+    Module(new InputPortModule(config, config.edgesByInput(i).length))
   }
   for (i <- 0 until config.totalPorts) {
     inputPorts(i).io.in <> inPort(i)
   }
 
-  private val routeSelection = Module(new RouterRouteSelectionModule(config, computeHeadRouting))
-  private val laneAllocator = Module(new RouterHeadLaneAllocator(config))
-  private val maskBuilder = Module(new RouterMulticastMaskBuilder(config))
+  private val control = Module(
+    new InputControlModule(config, computeHeadRouting)
+  )
 
   for (i <- 0 until config.totalPorts) {
-    routeSelection.io.inBits(i) := inputPorts(i).io.inBits
-    routeSelection.io.inValid(i) := inputPorts(i).io.inValid
-    routeSelection.io.isHead(i) := inputPorts(i).io.isHead
-    routeSelection.io.storedDir(i) := inputPorts(i).io.storedDir
+    control.io.inBits(i) := inputPorts(i).io.inBits
+    control.io.inValid(i) := inputPorts(i).io.inValid
+    control.io.isHead(i) := inputPorts(i).io.isHead
+    control.io.storedDir(i) := inputPorts(i).io.storedDir
+    control.io.storedLane(i) := inputPorts(i).io.storedLane
   }
-
-  laneAllocator.io.holder := io.opmHolder
-  laneAllocator.io.opmAnyPending := io.opmAnyPending
-  laneAllocator.io.currentDestVec := routeSelection.io.currentDestVec
-  for (i <- 0 until config.totalPorts) {
-    laneAllocator.io.inValid(i) := inputPorts(i).io.inValid
-    laneAllocator.io.isHead(i) := inputPorts(i).io.isHead
-  }
-
-  maskBuilder.io.currentDestVec := routeSelection.io.currentDestVec
-  maskBuilder.io.headSelLane := laneAllocator.io.headSelLane
-  maskBuilder.io.holder := io.opmHolder
-  maskBuilder.io.headAllocOk := laneAllocator.io.headAllocOk
-  for (i <- 0 until config.totalPorts) {
-    maskBuilder.io.inValid(i) := inputPorts(i).io.inValid
-    maskBuilder.io.isHead(i) := inputPorts(i).io.isHead
-    maskBuilder.io.storedLane(i) := inputPorts(i).io.storedLane
-  }
+  control.io.opmHolder := io.opmHolder
+  control.io.opmAnyPending := io.opmAnyPending
 
   for (i <- 0 until config.totalPorts) {
-    inputPorts(i).io.nextDir := routeSelection.io.currentDestVec(i)
-    inputPorts(i).io.nextLane := laneAllocator.io.headSelLane(i)
+    inputPorts(i).io.nextDir := control.io.nextDir(i)
+    inputPorts(i).io.nextLane := control.io.nextLane(i)
     for ((edgeId, localIdx) <- config.edgesByInput(i).zipWithIndex) {
       // Convert dense physical output indexing into the local sparse fork index.
-      inputPorts(i).io.destMask(localIdx) := maskBuilder.io.destMask(i)(config.edgeOutput(edgeId))
+      inputPorts(i).io.destMask(localIdx) := control.io.destMask(i)(
+        config.edgeOutput(edgeId)
+      )
       io.toOpm(edgeId) <> inputPorts(i).io.forkOutputs(localIdx)
     }
   }

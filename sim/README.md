@@ -34,7 +34,14 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/launch.ps1 -
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand.ps1 -Mode batch -Seed 12345 -Cases 24 -MaxPkts 3
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_rand_suite.ps1 -Cases 24 -MaxPkts 3
 powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern uniform_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
-powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_suite.ps1 -Pattern uniform_unicast -PacketGapsNs 0,10,20,40 -Seeds 12345,22345
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern cross_tile_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern hotspot_unicast -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern uniform_multicast -NumFlows 1 -RectW 4 -RectH 4 -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern mixed_unicast_multicast -NumFlows 4 -RectW 4 -RectH 4 -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -Mode batch -Pattern overlapping_multicast -NumFlows 4 -RectW 4 -RectH 4 -PacketGapNs 20 -WarmupNs 20000 -MeasureNs 50000
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_suite.ps1 -Pattern uniform_unicast -PacketGapsCsv "0,10,20,40" -SeedsCsv "12345,22345"
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_rect_sweep.ps1 -Pattern uniform_multicast -RectSizesCsv "1,2,4,8,16" -SeedsCsv "12345,22345"
+powershell -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf_ack_sweep.ps1 -Pattern uniform_multicast -AckDelaysCsv "1,5,10,20" -SeedsCsv "12345,22345"
 ```
 
 `toplayer_mesh`:
@@ -53,8 +60,10 @@ All launchers execute inside `sim/work/xsim/<target>`, which keeps generated Viv
 - `sim/xsim/quadtree_and_mesh/run_all.tcl`: run-to-completion batch flow for the full quadtree+mesh DUT
 - `sim/xsim/quadtree_and_mesh/run_rand.ps1`: single-seed constrained-random correctness regression
 - `sim/xsim/quadtree_and_mesh/run_rand_suite.ps1`: multi-seed constrained-random correctness sweep with CSV/log output under `sim/results/simulation`
-- `sim/xsim/quadtree_and_mesh/run_perf.ps1`: single-point performance run with CSV/log output under `sim/results/simulation`
-- `sim/xsim/quadtree_and_mesh/run_perf_suite.ps1`: multi-gap and multi-seed performance sweep that consolidates child CSV rows
+- `sim/xsim/quadtree_and_mesh/run_perf.ps1`: single-point performance run with CSV/log output under `sim/results/simulation`; reports head latency and packet completion latency
+- `sim/xsim/quadtree_and_mesh/run_perf_suite.ps1`: multi-gap and multi-seed performance sweep that consolidates child CSV rows; use `-SeedsCsv` and `-PacketGapsCsv` when launching from `powershell -File ...`
+- `sim/xsim/quadtree_and_mesh/run_perf_rect_sweep.ps1`: multi-seed rectangle-size sweep for multicast traffic patterns
+- `sim/xsim/quadtree_and_mesh/run_perf_ack_sweep.ps1`: multi-seed ack-delay sweep for latency and throughput sensitivity studies
 - `sim/xsim/toplayer_mesh/run_all.tcl`: run-to-completion batch flow for the standalone top mesh DUT
 
 ## Cleanup
