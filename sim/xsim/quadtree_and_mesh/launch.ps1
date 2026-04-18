@@ -45,7 +45,6 @@ try {
     Assert-LastExitCode "sbt runMain NoC.quadtree_and_mesh"
   }
   & $instGen -OutFile $instVh
-  Assert-LastExitCode "gen_dut_inst_vh.ps1"
 } finally {
   Pop-Location
 }

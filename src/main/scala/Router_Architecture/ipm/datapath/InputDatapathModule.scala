@@ -10,7 +10,7 @@ import chisel3._
   * dedicated request-generator block. Project-specific packet context is kept
   * in a separate module and is not mixed into this shell.
   */
-class RouterInputDatapathModule(config: RouterModuleConfig, forkWidth: Int)
+class InputDatapathModule(config: RouterModuleConfig, forkWidth: Int)
     extends Module {
   require(forkWidth >= 1)
 
@@ -29,7 +29,7 @@ class RouterInputDatapathModule(config: RouterModuleConfig, forkWidth: Int)
 
   private val buffer = Module(new InputBuffer(config))
   private val requestGen = Module(
-    new RouterInputRequestGeneratorModule(forkWidth)
+    new InputRequestGeneratorModule(forkWidth)
   )
 
   buffer.io.in <> io.in

@@ -29,7 +29,6 @@ class AsyncArbiter(val nIn: Int) extends Module {
 
   for (i <- 0 until nIn) {
     selector.io.in(i) <> io.in(i)
-    io.in(i).HS.Ack := selector.io.inAck(i)
   }
 
   selector.io.outAck := io.out.HS.Ack

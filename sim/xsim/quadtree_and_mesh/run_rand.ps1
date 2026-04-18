@@ -57,7 +57,6 @@ try {
   ) | Set-Content -Path $cfgFile -Encoding Ascii
 
   & $instGen -OutFile $instVh
-  Assert-LastExitCode "gen_dut_inst_vh.ps1"
 } finally {
   Pop-Location
 }

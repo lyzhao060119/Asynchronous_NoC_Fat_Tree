@@ -21,7 +21,6 @@ class AsyncArbiterRequestSelector(val nIn: Int) extends Module {
     val in = Vec(nIn, new HS_Packet)
     val outAck = Input(Bool())
 
-    val inAck = Output(Vec(nIn, Bool()))
     val outReq = Output(Bool())
 
     val fire = Output(Bool())
@@ -108,7 +107,7 @@ class AsyncArbiterRequestSelector(val nIn: Int) extends Module {
   }
 
   for (i <- 0 until nIn) {
-    io.inAck(i) := ackReg(i)
+    io.in(i).HS.Ack := ackReg(i)
   }
 
   private val fullVec = Wire(Vec(nIn, Bool()))

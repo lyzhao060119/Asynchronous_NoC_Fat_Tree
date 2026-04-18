@@ -35,7 +35,7 @@ class InputControlModule(
   private val routeSelector =
     Module(new PacketRouteSelector(config, computeHeadRouting))
   private val laneReservation = Module(new LaneReservation(config))
-  private val requestMask = Module(new RouterMulticastRequestMaskModule(config))
+  private val requestMask = Module(new MulticastRequestMaskModule(config))
 
   routeSelector.io.inBits := io.inBits
   routeSelector.io.inValid := io.inValid

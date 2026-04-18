@@ -4,15 +4,14 @@ import DataStruct._
 import Router_Architecture.common.AsyncFork
 import chisel3._
 
-/**
- * Paper-aligned request-generator block for one input port.
- *
- * In this design the low-level branch request launch and completion-ack merge
- * are both implemented by the asynchronous fork primitive, so this module
- * becomes the place where packet replication requests are issued toward the
- * sparse internal edge set.
- */
-class RouterInputRequestGeneratorModule(forkWidth: Int) extends Module {
+/** Paper-aligned request-generator block for one input port.
+  *
+  * In this design the low-level branch request launch and completion-ack merge
+  * are both implemented by the asynchronous fork primitive, so this module
+  * becomes the place where packet replication requests are issued toward the
+  * sparse internal edge set.
+  */
+class InputRequestGeneratorModule(forkWidth: Int) extends Module {
   require(forkWidth >= 1)
 
   val io = IO(new Bundle {

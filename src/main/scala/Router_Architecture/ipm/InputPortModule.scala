@@ -26,7 +26,7 @@ class InputPortModule(config: RouterModuleConfig, forkWidth: Int)
   })
 
   private val datapath = Module(
-    new RouterInputDatapathModule(config, forkWidth)
+    new InputDatapathModule(config, forkWidth)
   )
   private val context = Module(new RouterPacketContextModule(config))
 
