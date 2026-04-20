@@ -65,6 +65,13 @@ class TopLayer(Grid_x: Int, Grid_y: Int) extends Module {
 }
 
 object TopLayer extends App {
-  emitVerilog(new TopLayer(4, 4), Array("--target-dir", "generated"))
-  println("Multicast NoC generated")
+  val options = NoCGenOptions.parse(args, NoCScaleConfig.Paper1024)
+  emitVerilog(
+    new TopLayer(options.scale.quadNumX, options.scale.quadNumY),
+    Array("--target-dir", options.targetDir)
+  )
+  println(
+    s"TopLayer generated (${options.scale.quadNumX}x${options.scale.quadNumY} tiles, " +
+      s"${options.scale.totalNodes} cores equivalent)"
+  )
 }

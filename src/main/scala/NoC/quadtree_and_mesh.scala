@@ -3,13 +3,16 @@ package NoC
 import DataStruct._
 import Router_Architecture._
 import Router_Architecture.instantiation.RouterTop_param
+import circt.stage.ChiselStage
 import chisel3._
 import chisel3.util._
 
-class quadtree_and_mesh extends Module {
-  val quad_num_x = 2
-  val quad_num_y = 2
-  val quad_num = quad_num_y * quad_num_x
+class quadtree_and_mesh(
+    val quad_num_x: Int = NoCScaleConfig.Verification256.quadNumX,
+    val quad_num_y: Int = NoCScaleConfig.Verification256.quadNumY
+) extends Module {
+  private val scale = NoCScaleConfig(quad_num_x, quad_num_y)
+  val quad_num = scale.quadNum
   val io = IO(new Bundle {
     val inputs = Vec(quad_num, Vec(64, new HS_Packet))
     val outputs = Flipped(Vec(quad_num, Vec(64, new HS_Packet)))
@@ -54,6 +57,25 @@ class quadtree_and_mesh extends Module {
 }
 
 object quadtree_and_mesh extends App {
-  println("Multicast NoC generated")
-  emitVerilog(new quadtree_and_mesh, Array("--target-dir", "generated"))
+  val options = NoCGenOptions.parse(args, NoCScaleConfig.Verification256)
+
+  def emitPaperScaleFir(): Unit = {
+    ChiselStage.emitCHIRRTLFile(
+      new quadtree_and_mesh(options.scale.quadNumX, options.scale.quadNumY),
+      Array("-td", options.targetDir)
+    )
+  }
+
+  println(
+    s"Multicast NoC generated (${options.scale.quadNumX}x${options.scale.quadNumY} tiles, " +
+      s"${options.scale.totalNodes} cores)"
+  )
+  if (options.scale.totalNodes > NoCScaleConfig.Verification256.totalNodes) {
+    emitPaperScaleFir()
+  } else {
+    emitVerilog(
+      new quadtree_and_mesh(options.scale.quadNumX, options.scale.quadNumY),
+      Array("--target-dir", options.targetDir)
+    )
+  }
 }
