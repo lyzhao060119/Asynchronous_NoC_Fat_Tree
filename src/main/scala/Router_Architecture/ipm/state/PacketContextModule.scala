@@ -4,14 +4,12 @@ import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 import tool.AsyncClock
 
-/**
- * Extra multi-flit packet context for this project.
- *
- * The referenced papers only need single-packet path state. Our router must
- * additionally remember the selected directions and reserved lanes so body/tail
- * flits can bypass route recomputation and lane reallocation.
- */
-class RouterPacketContextModule(config: RouterModuleConfig) extends Module {
+/** Extra multi-flit packet context for this project.
+  *
+  * This router additionally remember the selected directions and reserved lanes
+  * so body/tail flits can bypass route recomputation and lane reallocation.
+  */
+class PacketContextModule(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
     val launchClock = Input(Clock())
     val isHead = Input(Bool())

@@ -28,7 +28,7 @@ class InputPortModule(config: RouterModuleConfig, forkWidth: Int)
   private val datapath = Module(
     new InputDatapathModule(config, forkWidth)
   )
-  private val context = Module(new RouterPacketContextModule(config))
+  private val context = Module(new PacketContextModule(config))
 
   datapath.io.in <> io.in
   datapath.io.destMask := io.destMask

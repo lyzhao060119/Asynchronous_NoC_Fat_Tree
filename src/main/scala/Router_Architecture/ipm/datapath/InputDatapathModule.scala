@@ -6,9 +6,8 @@ import chisel3._
 
 /** Input datapath shell for one physical port.
   *
-  * The datapath is intentionally split into a paper-aligned input buffer and a
-  * dedicated request-generator block. Project-specific packet context is kept
-  * in a separate module and is not mixed into this shell.
+  * The datapath is intentionally split into a input buffer and a dedicated
+  * request-generator block.
   */
 class InputDatapathModule(config: RouterModuleConfig, forkWidth: Int)
     extends Module {

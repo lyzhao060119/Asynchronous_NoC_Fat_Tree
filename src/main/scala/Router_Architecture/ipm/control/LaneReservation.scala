@@ -6,9 +6,9 @@ import chisel3.util.PriorityEncoder
 
 /** Extra multi-lane reservation block for this project.
   *
-  * The paper routers expose one physical port per direction. This design can
-  * have multiple lanes per direction, so head flits need an explicit allocator
-  * that reserves one free physical lane for each requested logical direction.
+  * This design can have multiple lanes per direction, so head flits need an
+  * explicit allocator that reserves one free physical lane for each requested
+  * logical direction.
   */
 class LaneReservation(config: RouterModuleConfig) extends Module {
   private val noneLiteral = config.noneValue.U(config.holderW.W)

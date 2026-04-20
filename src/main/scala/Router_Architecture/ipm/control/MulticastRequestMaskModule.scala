@@ -5,10 +5,8 @@ import chisel3._
 
 /** Extra multicast-aware request mask builder for this project.
   *
-  * The paper routers emit one request per selected output. Our design adds
-  * multicast fan-out, packet-level atomic lane ownership, and multi-lane body
-  * bypass, so those behaviors are isolated in this block instead of being mixed
-  * into the paper-aligned request generator.
+  * This design adds multicast fan-out, packet-level atomic lane ownership, and
+  * multi-lane body bypass.
   */
 class MulticastRequestMaskModule(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
