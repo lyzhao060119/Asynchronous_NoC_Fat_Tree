@@ -32,6 +32,27 @@ function Assert-LastExitCode([string]$Label) {
   }
 }
 
+function Resolve-DutTopFile([string]$GeneratedDir) {
+  $candidates = @(
+    (Join-Path $GeneratedDir "quadtree_and_mesh.sv"),
+    (Join-Path $GeneratedDir "quadtree_and_mesh.v")
+  )
+  foreach ($path in $candidates) {
+    if (Test-Path $path) {
+      return $path
+    }
+  }
+  return $candidates[0]
+}
+
+function Test-IsMonolithicTopFile([string]$TopFile) {
+  if (-not (Test-Path $TopFile)) {
+    return $false
+  }
+  $moduleMatches = Select-String -Path $TopFile -Pattern '^\s*module\s+' | Select-Object -First 2
+  return (($moduleMatches | Measure-Object).Count -ge 2)
+}
+
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 $runStamp = Get-Date -Format "yyyyMMdd_HHmmss_fff"
 $resolvedRunRoot = if ([string]::IsNullOrWhiteSpace($RunRoot)) { Join-Path $root ".xsim_qam_rand" } else { $RunRoot }
@@ -43,7 +64,8 @@ $instGen = Join-Path $tbDir "gen_dut_inst_vh.ps1"
 $instVh = Join-Path $tbDir "quadtree_and_mesh_dut_inst.vh"
 $batchTcl = Join-Path $root "sim\xsim\quadtree_and_mesh\run_rand.tcl"
 
-$generatedNoC = Join-Path $root "generated\quadtree_and_mesh.v"
+$generatedDir = Join-Path $root "generated"
+$generatedNoC = Resolve-DutTopFile -GeneratedDir $generatedDir
 
 if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) {
   New-Item -ItemType Directory -Force -Path $runDir | Out-Null
@@ -54,6 +76,7 @@ if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) {
       sbt "runMain NoC.quadtree_and_mesh"
       Assert-LastExitCode "sbt runMain NoC.quadtree_and_mesh"
     }
+    $generatedNoC = Resolve-DutTopFile -GeneratedDir $generatedDir
 
     @(
       ('`define RAND_SEED {0}' -f $Seed),
@@ -66,6 +89,8 @@ if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) {
     Pop-Location
   }
 }
+
+$useEmbeddedBlackboxes = Test-IsMonolithicTopFile -TopFile $generatedNoC
 
 $delayFile = Resolve-FirstExisting @(
   (Join-Path $root "generated\DelayElement.v"),
@@ -91,13 +116,16 @@ try {
   if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) {
     Remove-Item -LiteralPath "xsim.dir" -Recurse -Force -ErrorAction SilentlyContinue
 
-    xvlog --sv --work work `
+    $xvlogSources = @($generatedNoC)
+    if (-not $useEmbeddedBlackboxes) {
+      $xvlogSources += @($delayFile, $mrgoFile, $mutexFile)
+    }
+    $xvlogSources += $tbFile
+
+    & xvlog --sv --work work `
+      -i $generatedDir `
       -i $tbDir `
-      $generatedNoC `
-      $delayFile `
-      $mrgoFile `
-      $mutexFile `
-      $tbFile
+      @xvlogSources
     Assert-LastExitCode "xvlog"
 
     xelab --timescale 1ns/1ps --debug off --mt off --nosignalhandlers -s quadtree_and_mesh_rand_tb_sim work.quadtree_and_mesh_rand_tb

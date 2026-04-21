@@ -1,26 +1,23 @@
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "2.13.14"
 ThisBuild / version := "0.1.0"
 ThisBuild / organization := "Tsinghua University"
 
-val chiselVersion = "7.7.0"
+val chiselVersion = "3.6.1"
 
 lazy val root = (project in file("."))
   .settings(
     name := "noc-project",
     libraryDependencies ++= Seq(
-      "org.chipsalliance" %% "chisel" % chiselVersion,
-      // AnalyzeCircuit still uses legacy FIRRTL analysis APIs.
-      "edu.berkeley.cs" %% "firrtl" % "1.6.0",
-      "org.scalatest" %% "scalatest" % "3.2.19" % Test
+      "edu.berkeley.cs" %% "chisel3" % chiselVersion,
+      "edu.berkeley.cs" %% "chiseltest" % "0.6.2"
     ),
     scalacOptions ++= Seq(
       "-language:reflectiveCalls",
       "-deprecation",
       "-feature",
-      "-Xcheckinit",
-      "-Ymacro-annotations"
+      "-unchecked"
     ),
     addCompilerPlugin(
-      "org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full
+      "edu.berkeley.cs" % "chisel3-plugin" % chiselVersion cross CrossVersion.full
     )
   )
