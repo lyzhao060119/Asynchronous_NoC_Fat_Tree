@@ -38,12 +38,16 @@
 `define PERF_MEASURE_NS 500000
 `endif
 
+`ifndef PERF_TOP_LANE
+`define PERF_TOP_LANE 4
+`endif
+
 module quadtree_and_mesh_perf_tb;
   localparam int FLIT_W = 28;
   localparam int N_QUAD = 4;
   localparam int N_CORE = 64;
   localparam int EDGE_N = 2;
-  localparam int TOP_LANE = 4;
+  localparam int TOP_LANE = `PERF_TOP_LANE;
   localparam int MAX_FLOWS = 4;
   localparam int MAX_DESTS = N_QUAD * N_CORE;
   localparam int HANDSHAKE_TIMEOUT_NS = 500000;

@@ -11,27 +11,26 @@ class RoutingDecision extends Bundle {
   val output_valid = Vec(5, Bool())
 }
 
-/**
- * Computes routing decisions for one quadtree router.
- *
- * The logic first clips the global rectangle to the current tree, projects the
- * relevant region onto the current router level, and then decides which child
- * quadrants and/or parent port should receive the packet.
- */
-class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
+/** Computes routing decisions for one quadtree router.
+  *
+  * The logic first clips the global rectangle to the current tree, projects the
+  * relevant region onto the current router level, and then decides which child
+  * quadrants and/or parent port should receive the packet.
+  */
+class RoutingLogic(coordinate_x: Int, coordinate_y: Int) {
   private def childDirBit(xSel: Int, ySel: Int): Int = {
     // (x,y)=00 -> child3, 01 -> child2, 10 -> child1, 11 -> child0
     3 - ((xSel << 1) | ySel)
   }
 
   private def projectRectAtLevel(
-    xMin: UInt,
-    xMax: UInt,
-    yMin: UInt,
-    yMax: UInt,
-    level: Int,
-    localRouterX: UInt,
-    localRouterY: UInt
+      xMin: UInt,
+      xMax: UInt,
+      yMin: UInt,
+      yMax: UInt,
+      level: Int,
+      localRouterX: UInt,
+      localRouterY: UInt
   ): UInt = {
     require(level >= 1 && level <= 3)
 
@@ -45,103 +44,110 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yLo := Mux(yMin <= yMax, yMin, yMax)
     yHi := Mux(yMin <= yMax, yMax, yMin)
 
-    val childMask = Wire(Vec(4, Bool()))
-    childMask := VecInit(Seq.fill(4)(false.B)) // child quadrants selected at this level
-    val toParent = WireInit(false.B) // some part of the rectangle lies outside this subtree
+    val projectedDir = Wire(Vec(5, Bool()))
 
-    for (y <- 0 until 8) {
-      for (x <- 0 until 8) {
-        val inRect =
-          (x.U(3.W) >= xLo) && (x.U(3.W) <= xHi) &&
-          (y.U(3.W) >= yLo) && (y.U(3.W) <= yHi) // whether this leaf core is covered by the rectangle
-
-        val xGroup = (x >> level).U(2.W)
-        val yGroup = (y >> level).U(2.W) // subtree containing this leaf at the current level
-        val inSubtree = (xGroup === localRouterX) && (yGroup === localRouterY)
-
-        val xSel = (x >> (level - 1)) & 0x1
-        val ySel = (y >> (level - 1)) & 0x1
-        val dBit = childDirBit(xSel, ySel)
-
-        when(inRect) {
-          when(inSubtree) {
-            childMask(dBit) := true.B
-          }.otherwise {
-            toParent := true.B
-          }
-        }
-      }
+    if (level == 3) {
+      projectedDir(3) := (xMin <= 3.U) && (yMin <= 3.U)
+      projectedDir(1) := (xMax > 3.U) && (yMin <= 3.U)
+      projectedDir(2) := (xMin <= 3.U) && (yMax > 3.U)
+      projectedDir(0) := (xMax > 3.U) && (yMax > 3.U)
+      projectedDir(4) := false.B
+    } else if (level == 2) {
+      val coords_00_x = coordinate_x
+      val coords_00_y = coordinate_y
+      val coords_01_x = coordinate_x | 0x2
+      val coords_01_y = coordinate_y
+      val coords_10_x = coordinate_x
+      val coords_10_y = coordinate_y | 0x2
+      val coords_11_x = coordinate_x | 0x2
+      val coords_11_y = coordinate_y | 0x2
+      projectedDir(
+        3
+      ) := ((coords_00_x.U | 0x1.U) >= xMin) && (coords_00_x.U <= xMax) && ((coords_00_y.U | 0x1.U) >= yMin) && (coords_00_y.U <= yMax)
+      projectedDir(
+        1
+      ) := ((coords_01_x.U | 0x1.U) >= xMin) && (coords_01_x.U <= xMax) && ((coords_01_y.U | 0x1.U) >= yMin) && (coords_01_y.U <= yMax)
+      projectedDir(
+        2
+      ) := ((coords_10_x.U | 0x1.U) >= xMin) && (coords_10_x.U <= xMax) && ((coords_10_y.U | 0x1.U) >= yMin) && (coords_10_y.U <= yMax)
+      projectedDir(
+        0
+      ) := ((coords_11_x.U | 0x1.U) >= xMin) && (coords_11_x.U <= xMax) && ((coords_11_y.U | 0x1.U) >= yMin) && (coords_11_y.U <= yMax)
+      projectedDir(
+        4
+      ) := !((xMin >= coords_00_x.U) && (xMax <= (coords_01_x.U | 0x1.U)) && (yMin >= coords_00_y.U) && (yMax <= (coords_10_y.U | 0x1.U)))
+    } else if (level == 1) {
+      val coords_00_x = coordinate_x.U
+      val coords_00_y = coordinate_y.U
+      val coords_01_x = coordinate_x.U | 0x1.U
+      val coords_01_y = coordinate_y.U
+      val coords_10_x = coordinate_x.U
+      val coords_10_y = coordinate_y.U | 0x1.U
+      val coords_11_x = coordinate_x.U | 0x1.U
+      val coords_11_y = coordinate_y.U | 0x1.U
+      projectedDir(
+        3
+      ) := (coords_00_x >= xMin) && (coords_00_x <= xMax) && (coords_00_y >= yMin) && (coords_00_y <= yMax)
+      projectedDir(
+        1
+      ) := (coords_01_x >= xMin) && (coords_01_x <= xMax) && (coords_01_y >= yMin) && (coords_01_y <= yMax)
+      projectedDir(
+        2
+      ) := (coords_10_x >= xMin) && (coords_10_x <= xMax) && (coords_10_y >= yMin) && (coords_10_y <= yMax)
+      projectedDir(
+        0
+      ) := (coords_11_x >= xMin) && (coords_11_x <= xMax) && (coords_11_y >= yMin) && (coords_11_y <= yMax)
+      projectedDir(
+        4
+      ) := !((xMin >= coords_00_x) && (xMax <= coords_01_x) && (yMin >= coords_00_y) && (yMax <= coords_10_y))
     }
-
-    Cat(toParent, childMask.asUInt)
+    
+    projectedDir.asUInt
   }
 
-  private def currentTreeCoord(router_level: UInt): (UInt, UInt) = {
-    val treeX = WireInit(0.U(2.W))
-    val treeY = WireInit(0.U(2.W))
+  private def currentTreeCoord(router_level: Int): (Int, Int) = {
+    require(router_level >= 1 && router_level <= 3)
 
-    switch(router_level) {
-      is(1.U) {
-        treeX := coordinate_x(3, 2)
-        treeY := coordinate_y(3, 2)
-      }
-      is(2.U) {
-        treeX := coordinate_x(2, 1)
-        treeY := coordinate_y(2, 1)
-      }
-      is(3.U) {
-        treeX := coordinate_x(1, 0)
-        treeY := coordinate_y(1, 0)
-      }
+    router_level match {
+      case 1 => ((coordinate_x >> 2) & 0x3, (coordinate_y >> 2) & 0x3)
+      case 2 => ((coordinate_x >> 1) & 0x3, (coordinate_y >> 1) & 0x3)
+      case 3 => (coordinate_x & 0x3, coordinate_y & 0x3)
     }
-
-    (treeX, treeY)
   } // identify the enclosing 8x8 tree instance in the top layer
 
-  private def localRouterCoord(router_level: UInt): (UInt, UInt) = {
-    val localX = WireInit(0.U(2.W))
-    val localY = WireInit(0.U(2.W))
+  private def localRouterCoord(router_level: Int): (UInt, UInt) = {
+    require(router_level >= 1 && router_level <= 3)
 
-    switch(router_level) {
-      is(1.U) {
-        localX := coordinate_x(1, 0)
-        localY := coordinate_y(1, 0)
-      }
-      is(2.U) {
-        localX := Cat(0.U(1.W), coordinate_x(0))
-        localY := Cat(0.U(1.W), coordinate_y(0))
-      }
-      is(3.U) {
-        localX := 0.U
-        localY := 0.U
-      }
+    router_level match {
+      case 1 => ((coordinate_x & 0x3).U(2.W), (coordinate_y & 0x3).U(2.W))
+      case 2 => ((coordinate_x & 0x1).U(2.W), (coordinate_y & 0x1).U(2.W))
+      case 3 => (0.U(2.W), 0.U(2.W))
     }
-
-    (localX, localY)
   } // identify this router's subtree coordinate inside the current tree
 
   private def localRectInCurrentTree(
-    router_level: UInt,
-    xLoGlobal: UInt,
-    xHiGlobal: UInt,
-    yLoGlobal: UInt,
-    yHiGlobal: UInt
+      router_level: Int,
+      xLoGlobal: UInt,
+      xHiGlobal: UInt,
+      yLoGlobal: UInt,
+      yHiGlobal: UInt
   ): (Bool, Bool, UInt, UInt, UInt, UInt) = {
-    val (treeX, treeY) = currentTreeCoord(router_level) // identify the current tree id
+    val (treeX, treeY) = currentTreeCoord(
+      router_level
+    ) // identify the current tree id
 
-    val treeBaseX = Cat(0.U(1.W), treeX, 0.U(3.W))
-    val treeBaseY = Cat(0.U(1.W), treeY, 0.U(3.W))
-    val treeMaxX = Wire(UInt(6.W))
-    val treeMaxY = Wire(UInt(6.W))
-    treeMaxX := treeBaseX + 7.U
-    treeMaxY := treeBaseY + 7.U // bounds of the current 8x8 tree
+    val treeBaseX = (treeX << 3).U(6.W)
+    val treeBaseY = (treeY << 3).U(6.W)
+    val treeMaxX = ((treeX << 3) + 7).U(6.W)
+    val treeMaxY = ((treeY << 3) + 7).U(6.W) // bounds of the current 8x8 tree
 
     val xIntersects = (xHiGlobal >= treeBaseX) && (xLoGlobal <= treeMaxX)
     val yIntersects = (yHiGlobal >= treeBaseY) && (yLoGlobal <= treeMaxY)
-    val treeIntersects = xIntersects && yIntersects // rectangle overlaps this tree at all
+    val treeIntersects =
+      xIntersects && yIntersects // rectangle overlaps this tree at all
     val treeContainsRect =
       (xLoGlobal >= treeBaseX) && (xHiGlobal <= treeMaxX) &&
-      (yLoGlobal >= treeBaseY) && (yHiGlobal <= treeMaxY) // rectangle is fully contained in this tree
+        (yLoGlobal >= treeBaseY) && (yHiGlobal <= treeMaxY) // rectangle is fully contained in this tree
 
     val xLoLocal6 = Wire(UInt(6.W))
     val xHiLocal6 = Wire(UInt(6.W))
@@ -151,16 +157,28 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     xLoLocal6 := Mux(xLoGlobal > treeBaseX, xLoGlobal - treeBaseX, 0.U)
     yLoLocal6 := Mux(yLoGlobal > treeBaseY, yLoGlobal - treeBaseY, 0.U)
     xHiLocal6 := Mux(xHiGlobal < treeMaxX, xHiGlobal - treeBaseX, 7.U)
-    yHiLocal6 := Mux(yHiGlobal < treeMaxY, yHiGlobal - treeBaseY, 7.U) // clipped rectangle in local tree coordinates
+    yHiLocal6 := Mux(
+      yHiGlobal < treeMaxY,
+      yHiGlobal - treeBaseY,
+      7.U
+    ) // clipped rectangle in local tree coordinates
 
-    (treeIntersects, treeContainsRect, xLoLocal6(2, 0), xHiLocal6(2, 0), yLoLocal6(2, 0), yHiLocal6(2, 0))
+    (
+      treeIntersects,
+      treeContainsRect,
+      xLoLocal6(2, 0),
+      xHiLocal6(2, 0),
+      yLoLocal6(2, 0),
+      yHiLocal6(2, 0)
+    )
   }
 
-  def computeRouting(current_Packet: Packet,
-                     Packet_valid: Bool,
-                     router_level: UInt,
-                     ingressDir: UInt
-                    ): RoutingDecision = {
+  def computeRouting(
+      current_Packet: Packet,
+      Packet_valid: Bool,
+      router_level: Int,
+      ingressDir: UInt
+  ): RoutingDecision = {
     val decision = Wire(new RoutingDecision)
     for (i <- 0 until 5) {
       decision.output_valid(i) := false.B
@@ -182,30 +200,42 @@ class RoutingLogic(coordinate_x: UInt, coordinate_y: UInt) {
     yLoGlobal := Mux(y0 <= y1, y0, y1)
     yHiGlobal := Mux(y0 <= y1, y1, y0)
 
-    val (treeIntersects, treeContainsRect, xMinLocal, xMaxLocal, yMinLocal, yMaxLocal) =
-      localRectInCurrentTree(router_level, xLoGlobal, xHiGlobal, yLoGlobal, yHiGlobal)
+    val (
+      treeIntersects,
+      treeContainsRect,
+      xMinLocal,
+      xMaxLocal,
+      yMinLocal,
+      yMaxLocal
+    ) =
+      localRectInCurrentTree(
+        router_level,
+        xLoGlobal,
+        xHiGlobal,
+        yLoGlobal,
+        yHiGlobal
+      )
 
     val (localX, localY) = localRouterCoord(router_level)
 
     // projectedDir is the raw child/parent decision before ingress suppression.
     val projectedDir = WireInit(0.U(5.W))
     when(treeIntersects) {
-      switch(router_level) {
-        is(1.U) {
-          projectedDir := projectRectAtLevel(xMinLocal, xMaxLocal, yMinLocal, yMaxLocal, level = 1, localX, localY)
-        }
-        is(2.U) {
-          projectedDir := projectRectAtLevel(xMinLocal, xMaxLocal, yMinLocal, yMaxLocal, level = 2, localX, localY)
-        }
-        is(3.U) {
-          projectedDir := projectRectAtLevel(xMinLocal, xMaxLocal, yMinLocal, yMaxLocal, level = 3, localX, localY)
-        }
-      }
+      projectedDir := projectRectAtLevel(
+        xMinLocal,
+        xMaxLocal,
+        yMinLocal,
+        yMaxLocal,
+        level = router_level,
+        localX,
+        localY
+      )
     }
 
     val projectedNoBack = Wire(Vec(5, Bool()))
     val bypassIngressSuppress =
-      (router_level === 1.U) && (ingressDir =/= 4.U) // L1 keeps same-direction local child delivery
+      if (router_level == 1) ingressDir =/= 4.U
+      else false.B // L1 keeps same-direction local child delivery
     for (i <- 0 until 5) {
       projectedNoBack(i) := projectedDir(i)
       when(!bypassIngressSuppress && (ingressDir === i.U)) {

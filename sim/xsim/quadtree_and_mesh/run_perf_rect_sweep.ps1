@@ -11,6 +11,9 @@ param(
   [int]$PacketGapNs = 20,
   [ValidateRange(0, 1000000)]
   [int]$AckDelayNs = 1,
+  [ValidateRange(1, 8)]
+  [int]$EdgeN = 2,
+  [string]$GeneratedDirName = "generated",
   [ValidateRange(1, 2000000000)]
   [int]$WarmupNs = 20000,
   [ValidateRange(1, 2000000000)]
@@ -74,6 +77,8 @@ foreach ($rectSize in $RectSizes) {
       "-RectH", "$rectSize",
       "-PacketGapNs", "$PacketGapNs",
       "-AckDelayNs", "$AckDelayNs",
+      "-EdgeN", "$EdgeN",
+      "-GeneratedDirName", $GeneratedDirName,
       "-WarmupNs", "$WarmupNs",
       "-MeasureNs", "$MeasureNs"
     )

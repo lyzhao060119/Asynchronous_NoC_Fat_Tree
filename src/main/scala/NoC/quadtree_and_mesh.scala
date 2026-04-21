@@ -2,35 +2,36 @@ package NoC
 
 import DataStruct._
 import Router_Architecture._
-import Router_Architecture.instantiation.RouterTop_param
-import circt.stage.ChiselStage
 import chisel3._
-import chisel3.util._
 
 class quadtree_and_mesh(
-    val quad_num_x: Int = NoCScaleConfig.Verification256.quadNumX,
-    val quad_num_y: Int = NoCScaleConfig.Verification256.quadNumY
+    val scale: NoCScaleConfig = NoCScaleConfig.Verification256
 ) extends Module {
-  private val scale = NoCScaleConfig(quad_num_x, quad_num_y)
-  val quad_num = scale.quadNum
-  val io = IO(new Bundle {
-    val inputs = Vec(quad_num, Vec(64, new HS_Packet))
-    val outputs = Flipped(Vec(quad_num, Vec(64, new HS_Packet)))
-    val East_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_y, Vec(RouterTop_param.child_lane, new HS_Packet)))
-    val North_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_x, Vec(RouterTop_param.child_lane, new HS_Packet)))
-    val West_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_y, Vec(RouterTop_param.child_lane, new HS_Packet)))
-    val South_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_x, Vec(RouterTop_param.child_lane, new HS_Packet)))
+  def this(quad_num_x: Int, quad_num_y: Int) =
+    this(NoCScaleConfig(quad_num_x, quad_num_y))
 
-    val East_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_y, Vec(RouterTop_param.child_lane, new HS_Packet))
-    val North_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_x, Vec(RouterTop_param.child_lane, new HS_Packet))
-    val West_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_y, Vec(RouterTop_param.child_lane,new HS_Packet))
-    val South_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_x, Vec(RouterTop_param.child_lane, new HS_Packet))
+  val quad_num_x = scale.quadNumX
+  val quad_num_y = scale.quadNumY
+  val quad_num = scale.quadNum
+  private val topConfig = scale.channels.top
+  val io = IO(new Bundle {
+    val inputs = Vec(quad_num, Vec(scale.coresPerQuad, new HS_Packet))
+    val outputs = Flipped(Vec(quad_num, Vec(scale.coresPerQuad, new HS_Packet)))
+    val East_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_y, Vec(topConfig.childLanes, new HS_Packet)))
+    val North_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_x, Vec(topConfig.childLanes, new HS_Packet)))
+    val West_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_y, Vec(topConfig.childLanes, new HS_Packet)))
+    val South_fromPEs: Vec[Vec[HS_Packet]] = Flipped(Vec(quad_num_x, Vec(topConfig.childLanes, new HS_Packet)))
+
+    val East_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_y, Vec(topConfig.childLanes, new HS_Packet))
+    val North_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_x, Vec(topConfig.childLanes, new HS_Packet))
+    val West_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_y, Vec(topConfig.childLanes,new HS_Packet))
+    val South_toPEs: Vec[Vec[HS_Packet]] = Vec(quad_num_x, Vec(topConfig.childLanes, new HS_Packet))
   })
 
   val quad_tree = Seq.tabulate(quad_num_x, quad_num_y) { (x, y) =>
-    Module(new three_level_quadtree(x, y))
+    Module(new three_level_quadtree(x, y, scale))
   }
-  val routers_top = Module(new TopLayer(quad_num_x, quad_num_y))
+  val routers_top = Module(new TopLayer(scale))
 
   routers_top.io.East_fromPEs <> io.East_fromPEs
   routers_top.io.North_fromPEs <> io.North_fromPEs
@@ -46,11 +47,9 @@ class quadtree_and_mesh(
       quad_tree(x)(y).io.top_input <> routers_top.io.outputs(x + quad_num_x * y)
       quad_tree(x)(y).io.top_output <> routers_top.io.inputs(x + quad_num_x * y)
 
-      for (y_1 <- 0 until 8) {
-        for (x_1 <- 0 until 8) {
-          quad_tree(x)(y).io.core_inputs(x_1 + 8 * y_1) <> io.inputs(x + quad_num_x * y)(x_1 + 8 * y_1)
-          quad_tree(x)(y).io.core_outputs(x_1 + 8 * y_1) <> io.outputs(x + quad_num_x * y)(x_1 + 8 * y_1)
-        }
+      for (coreIdx <- 0 until scale.coresPerQuad) {
+        quad_tree(x)(y).io.core_inputs(coreIdx) <> io.inputs(x + quad_num_x * y)(coreIdx)
+        quad_tree(x)(y).io.core_outputs(coreIdx) <> io.outputs(x + quad_num_x * y)(coreIdx)
       }
     }
   }
@@ -59,23 +58,19 @@ class quadtree_and_mesh(
 object quadtree_and_mesh extends App {
   val options = NoCGenOptions.parse(args, NoCScaleConfig.Verification256)
 
-  def emitPaperScaleFir(): Unit = {
-    ChiselStage.emitCHIRRTLFile(
-      new quadtree_and_mesh(options.scale.quadNumX, options.scale.quadNumY),
-      Array("-td", options.targetDir)
+  def emitNoCVerilog(): Unit =
+    emitVerilog(
+      new quadtree_and_mesh(options.scale),
+      Array("--target-dir", options.targetDir)
     )
-  }
 
   println(
     s"Multicast NoC generated (${options.scale.quadNumX}x${options.scale.quadNumY} tiles, " +
-      s"${options.scale.totalNodes} cores)"
+      s"L1->L2=${options.scale.channels.l1.parentLanes}, " +
+      s"L2->L3=${options.scale.channels.l2.parentLanes}, " +
+      s"L3->Top=${options.scale.channels.l3.parentLanes}, " +
+      s"meshChild=${options.scale.channels.top.childLanes})"
   )
-  if (options.scale.totalNodes > NoCScaleConfig.Verification256.totalNodes) {
-    emitPaperScaleFir()
-  } else {
-    emitVerilog(
-      new quadtree_and_mesh(options.scale.quadNumX, options.scale.quadNumY),
-      Array("--target-dir", options.targetDir)
-    )
-  }
+  println(s"Writing Verilog output under ${options.targetDir}")
+  emitNoCVerilog()
 }

@@ -1,5 +1,6 @@
 param(
   [int[]]$Seeds = @(12345, 22345, 32345, 42345, 52345),
+  [string]$RunRoot = "",
   [int]$Cases = 24,
   [ValidateRange(1, 3)]
   [int]$MaxPkts = 3,
@@ -39,6 +40,39 @@ Set-Content -Path $summaryCsv -Encoding Ascii -Value "seed,cases,max_pkts,status
 
 $failCount = 0
 $regenThisRun = $Regenerate
+$reuseRunDir = ""
+
+Write-Host "[RAND-SUITE] building reusable snapshot..."
+$buildArgs = @(
+  "-ExecutionPolicy", "Bypass",
+  "-File", $runRand,
+  "-Mode", "batch",
+  "-RunRoot", $RunRoot,
+  "-Seed", "$($Seeds[0])",
+  "-Cases", "$Cases",
+  "-MaxPkts", "$MaxPkts",
+  "-BuildOnly"
+)
+if ($regenThisRun) {
+  $buildArgs += "-Regenerate"
+}
+
+& powershell @buildArgs *>&1 | Tee-Object -Variable buildOutput
+if ($LASTEXITCODE -ne 0) {
+  throw "[RAND-SUITE] snapshot build failed"
+}
+
+$runDirLine = $buildOutput |
+  ForEach-Object { [string]$_ } |
+  Where-Object { $_ -match '^\[QAM-RAND-PATH\] run_dir=(.+)$' } |
+  Select-Object -Last 1
+if (-not $runDirLine) {
+  throw "[RAND-SUITE] could not find reusable run_dir in build output"
+}
+$reuseRunDir = $runDirLine -replace '^\[QAM-RAND-PATH\] run_dir=', ''
+Write-Host "[RAND-SUITE] reusable run_dir:"
+Write-Host "  $reuseRunDir"
+$regenThisRun = $false
 
 foreach ($seed in $Seeds) {
   $logFile = Join-Path $rawDir ("seed_{0}_cases_{1}_maxpkts_{2}.log" -f $seed, $Cases, $MaxPkts)
@@ -54,13 +88,12 @@ foreach ($seed in $Seeds) {
       "-ExecutionPolicy", "Bypass",
       "-File", $runRand,
       "-Mode", "batch",
+      "-ReuseRunDir", $reuseRunDir,
+      "-RunRoot", $RunRoot,
       "-Seed", "$seed",
       "-Cases", "$Cases",
       "-MaxPkts", "$MaxPkts"
     )
-    if ($regenThisRun) {
-      $randArgs += "-Regenerate"
-    }
 
     & powershell @randArgs *>&1 | Tee-Object -FilePath $logFile
     $exitCode = $LASTEXITCODE
@@ -88,7 +121,6 @@ foreach ($seed in $Seeds) {
   }
 
   Write-Host ("[RAND-SUITE] seed={0} status={1} elapsed={2:F3}s" -f $seed, $status, $stopwatch.Elapsed.TotalSeconds)
-  $regenThisRun = $false
 }
 
 Write-Host ""

@@ -1,11 +1,23 @@
 Simulation files are organized by role:
 
 - `sim/testbenches`: reusable SystemVerilog testbenches and helper scripts
-- `sim/modelsim`: ModelSim/Questa `.do` scripts
+- `sim/modelsim`: ModelSim/Questa `.do` scripts and PowerShell wrappers
 - `sim/xsim`: Vivado `xsim` PowerShell/Tcl launch scripts grouped by DUT
 - `sim/work`: generated simulator outputs, logs, waves, and temporary artifacts
 
 If you are planning verification for a paper or thesis, use [SIMULATION_README.md](SIMULATION_README.md) as the main methodology guide. This file focuses on day-to-day script usage.
+
+Current scale convention:
+
+- `NoC.quadtree_and_mesh` defaults to `2x2` tiles (`256` total cores) and is the regression target for Level 1/2 verification.
+- `NoC.TopLayer` defaults to `4x4` tiles and matches the standalone top-mesh testbench.
+- For paper-scale full-NoC runs, regenerate the DUT with `sbt "runMain NoC.quadtree_and_mesh --paper-1024 --target-dir generated_1024"` and point future scripts to that output.
+
+Current simulator convention:
+
+- `256-node + ModelSim` is the default path for Level 1/2 verification, the Level 3.1 single-point smoke, and early script bring-up for Level 3.2/3.4.
+- `1024-node + xsim` is the default path for final Level 3.1 latency-throughput curves, final Level 3.2 multicast scaling, Level 3.3 workloads, and scale-sensitive Level 3.4 studies.
+- On the current machine, `ModelSim Intel FPGA Edition 2020.1` can compile the `1024-node` light performance testbench but fails during `vsim` design load with a memory allocation error, so it is not the default `1024-node` execution path.
 
 ## Key Testbenches
 
@@ -53,6 +65,17 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/toplayer_mesh/launch.ps1 -Mode
 
 All launchers execute inside `sim/work/xsim/<target>`, which keeps generated Vivado outputs out of the repository root.
 
+## ModelSim Usage
+
+`quadtree_and_mesh` 3.1 smoke:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File sim/modelsim/quadtree_and_mesh/run_perf_smoke.ps1
+powershell -ExecutionPolicy Bypass -File sim/modelsim/quadtree_and_mesh/run_perf_smoke.ps1 -Mode gui
+```
+
+This wrapper is intentionally scoped to the verified `256-node + uniform_unicast` single-point smoke. It generates temporary `quadtree_and_mesh_perf_cfg.vh` and `quadtree_and_mesh_dut_inst.vh` files under `sim/work/modelsim/...`, passes that include directory before `sim/testbenches/quadtree_and_mesh`, and leaves the repo-tracked headers untouched.
+
 ## Script Notes
 
 - `sim/xsim/three_level_quadtree/throughput_3flit.tcl`: 4 unicast flows with throughput and head-to-head latency summary
@@ -64,6 +87,7 @@ All launchers execute inside `sim/work/xsim/<target>`, which keeps generated Viv
 - `sim/xsim/quadtree_and_mesh/run_perf_suite.ps1`: multi-gap and multi-seed performance sweep that consolidates child CSV rows; use `-SeedsCsv` and `-PacketGapsCsv` when launching from `powershell -File ...`
 - `sim/xsim/quadtree_and_mesh/run_perf_rect_sweep.ps1`: multi-seed rectangle-size sweep for multicast traffic patterns
 - `sim/xsim/quadtree_and_mesh/run_perf_ack_sweep.ps1`: multi-seed ack-delay sweep for latency and throughput sensitivity studies
+- `sim/modelsim/quadtree_and_mesh/run_perf_smoke.ps1`: `256-node` ModelSim smoke for Level 3.1; emits a one-row summary CSV and uses temporary include headers under `sim/work/modelsim`
 - `sim/xsim/toplayer_mesh/run_all.tcl`: run-to-completion batch flow for the standalone top mesh DUT
 
 ## Cleanup

@@ -9,10 +9,13 @@ param(
   [int]$NumFlows = 1,
   [ValidateRange(0, 1000000)]
   [int]$PacketGapNs = 20,
-  [ValidateRange(1, 16)]
+  [ValidateRange(1, 64)]
   [int]$RectW = 4,
-  [ValidateRange(1, 16)]
+  [ValidateRange(1, 64)]
   [int]$RectH = 4,
+  [ValidateRange(1, 8)]
+  [int]$EdgeN = 2,
+  [string]$GeneratedDirName = "generated",
   [ValidateRange(1, 2000000000)]
   [int]$WarmupNs = 20000,
   [ValidateRange(1, 2000000000)]
@@ -76,6 +79,8 @@ foreach ($ackDelayNs in $AckDelaysNs) {
       "-AckDelayNs", "$ackDelayNs",
       "-RectW", "$RectW",
       "-RectH", "$RectH",
+      "-EdgeN", "$EdgeN",
+      "-GeneratedDirName", $GeneratedDirName,
       "-WarmupNs", "$WarmupNs",
       "-MeasureNs", "$MeasureNs"
     )

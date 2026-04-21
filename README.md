@@ -24,8 +24,13 @@ The design uses request/acknowledge handshakes and supports multi-flit unicast a
 Top-level generators:
 
 - `NoC.three_level_quadtree`: one 8x8 quadtree tile with 64 core ports and 8 top ports
-- `NoC.quadtree_and_mesh`: a 2x2 tile network connected by `TopLayer`
-- `NoC.TopLayer`: a standalone top mesh used by the dedicated mesh testbench
+- `NoC.quadtree_and_mesh`: a tile-network generator connected by `TopLayer`; default is 2x2 tiles = 256 cores
+- `NoC.TopLayer`: a standalone top mesh used by the dedicated mesh testbench; default is 4x4 tiles
+
+Recommended scale split:
+
+- `256-node` (`2x2` tiles): directed and constrained-random verification
+- `1024-node` (`4x4` tiles): paper-scale system simulations
 
 ## Flit Layout (28 bits)
 
@@ -90,7 +95,15 @@ For simulation-specific usage and the paper-oriented verification plan, see:
 sbt "runMain NoC.three_level_quadtree"
 sbt "runMain NoC.quadtree_and_mesh"
 sbt "runMain NoC.TopLayer"
+sbt "runMain NoC.quadtree_and_mesh --paper-1024 --target-dir generated_1024"
 ```
+
+Useful scale-selection flags:
+
+- `--verify-256`: force the default 2x2 tile full-NoC build
+- `--paper-1024`: switch the full-NoC build to 4x4 tiles
+- `--quad-num-x <N> --quad-num-y <M>`: explicitly choose the full-NoC tile array
+- `--grid-x <N> --grid-y <M>`: equivalent aliases for the standalone `TopLayer` generator
 
 ## Run Simulation
 

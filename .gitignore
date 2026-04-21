@@ -1,5 +1,8 @@
 target/
-generated/
+### Hardware Generation Outputs ###
+/generated/
+/generated_*/
+/generated[0-9]*/
 firrtl_black_box_resource_files.f
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -54,7 +57,11 @@ project/metals.sbt
 project/project/
 
 ### Simulation Outputs ###
-sim/work/
+/sim/work/
+/sim/results/
+/sim/modelsim/
+/sim/xsim/
+
 .Xil/
 xsim.dir/
 *.wdb

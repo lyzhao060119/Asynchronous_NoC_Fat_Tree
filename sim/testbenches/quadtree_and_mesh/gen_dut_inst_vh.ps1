@@ -1,14 +1,21 @@
 param(
-  [string]$OutFile = "sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_dut_inst.vh"
+  [string]$OutFile = "sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_dut_inst.vh",
+  [ValidateRange(1, 8)]
+  [int]$EdgeN = 2,
+  [ValidateRange(1, 64)]
+  [int]$NCore = 64,
+  [ValidateRange(1, 16)]
+  [int]$TopLane = 4,
+  [string]$ModuleName = "quadtree_and_mesh"
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$nQuad = 4
-$nCore = 64
-$edgeN = 2
-$topLane = 4
+$nQuad = $EdgeN * $EdgeN
+$nCore = $NCore
+$edgeN = $EdgeN
+$topLane = $TopLane
 
 $connections = New-Object System.Collections.Generic.List[string]
 $connections.Add("    .clock(clock)")
@@ -65,7 +72,7 @@ $lines.Add('`ifndef QUADTREE_AND_MESH_DUT_INST_VH')
 $lines.Add('`define QUADTREE_AND_MESH_DUT_INST_VH')
 $lines.Add('')
 $lines.Add('`define QAM_INSTANTIATE_DUT(DUT_NAME) \')
-$lines.Add('  quadtree_and_mesh DUT_NAME ( \')
+$lines.Add("  $ModuleName DUT_NAME ( \")
 
 for ($i = 0; $i -lt $connections.Count; $i++) {
   $suffix = " \"

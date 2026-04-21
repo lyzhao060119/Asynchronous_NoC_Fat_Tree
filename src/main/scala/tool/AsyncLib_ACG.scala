@@ -1,7 +1,6 @@
 package tool
 
 import chisel3._
-import chisel3.util.HasBlackBoxResource
 
 // ***************************************
 // Asynchronous Handshake Channel
@@ -22,7 +21,7 @@ class HS_Data(val WIDTH: Int) extends Bundle {
 // ***************************************
 // Delay Element for Simulation
 // ***************************************
-class DelayElement(val DelayValue: Int) extends BlackBox(Map("DelayValue" -> DelayValue)) with HasBlackBoxResource {
+class DelayElement(val DelayValue: Int) extends ExtModule(Map("DelayValue" -> DelayValue)) {
   require(DelayValue >= 0)
   val io = IO(new Bundle {
     val I: Bool = Input(Bool())
@@ -35,7 +34,7 @@ class DelayElement(val DelayValue: Int) extends BlackBox(Map("DelayValue" -> Del
 // MrGo unit. For more information about MrGo please refers to
 // M. Roncken et al., "How to think about self-timed systems,"
 // ***************************************
-class MrGo extends BlackBox with HasBlackBoxResource {
+class MrGo extends ExtModule {
   val io = IO(new Bundle {
     val fire: Bool = Input(Bool())
     val En: Bool = Input(Bool())
@@ -44,7 +43,7 @@ class MrGo extends BlackBox with HasBlackBoxResource {
   addResource("/ASYNC/MrGo.v")
 }
 
-class Mutex2 extends BlackBox with HasBlackBoxResource {
+class Mutex2 extends ExtModule {
   val io = IO(new Bundle {
     val req0 = Input(Bool())
     val req1 = Input(Bool())

@@ -1,6 +1,7 @@
 param(
   [ValidateSet("gui", "batch")]
   [string]$Mode = "batch",
+  [string]$RunRoot = "",
   [switch]$Regenerate
 )
 
@@ -27,7 +28,8 @@ function Assert-LastExitCode([string]$Label) {
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 $runStamp = Get-Date -Format "yyyyMMdd_HHmmss_fff"
-$runDir = Join-Path $root "sim\work\xsim\quadtree_and_mesh\$runStamp"
+$resolvedRunRoot = if ([string]::IsNullOrWhiteSpace($RunRoot)) { Join-Path $root ".xsim_qam" } else { $RunRoot }
+$runDir = Join-Path $resolvedRunRoot $runStamp
 $tbDir = Join-Path $root "sim\testbenches\quadtree_and_mesh"
 $tbFile = Join-Path $tbDir "quadtree_and_mesh_tb.sv"
 $instGen = Join-Path $tbDir "gen_dut_inst_vh.ps1"
@@ -66,6 +68,12 @@ $mutexFile = Resolve-FirstExisting @(
 
 Push-Location $runDir
 try {
+  $oldTemp = $env:TEMP
+  $oldTmp = $env:TMP
+  $env:TEMP = $runDir
+  $env:TMP = $runDir
+  Remove-Item -LiteralPath "xsim.dir" -Recurse -Force -ErrorAction SilentlyContinue
+
   xvlog --sv --work work `
     -i $tbDir `
     $generatedNoC `
@@ -75,7 +83,7 @@ try {
     $tbFile
   Assert-LastExitCode "xvlog"
 
-  xelab --timescale 1ns/1ps --debug typical -s quadtree_and_mesh_tb_sim work.quadtree_and_mesh_tb
+  xelab --timescale 1ns/1ps --debug off --mt off --nosignalhandlers -s quadtree_and_mesh_tb_sim work.quadtree_and_mesh_tb
   Assert-LastExitCode "xelab"
 
   if ($Mode -eq "batch") {
@@ -90,6 +98,8 @@ try {
     xsim quadtree_and_mesh_tb_sim -gui
     Assert-LastExitCode "xsim gui"
   }
-} finally {
-  Pop-Location
-}
+  } finally {
+    $env:TEMP = $oldTemp
+    $env:TMP = $oldTmp
+    Pop-Location
+  }

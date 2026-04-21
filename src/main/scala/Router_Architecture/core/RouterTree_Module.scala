@@ -12,8 +12,8 @@ import chisel3._
  * receive its own local copy, while upper levels use strict no-U-turn edges.
  */
 class RouterTree_Module(
-  x_coordinate: UInt,
-  y_coordinate: UInt,
+  x_coordinate: Int,
+  y_coordinate: Int,
   routerLevel: Int,
   childLanes: Int,
   parentLanes: Int,
@@ -32,6 +32,6 @@ class RouterTree_Module(
       ),
       computeHeadRouting = (packet: Packet, inValid: Bool, ingressDir: UInt) =>
         new RoutingLogic(x_coordinate, y_coordinate)
-          .computeRouting(packet, inValid, routerLevel.U(3.W), ingressDir)
+          .computeRouting(packet, inValid, routerLevel, ingressDir)
           .output_valid
     )

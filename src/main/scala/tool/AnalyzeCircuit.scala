@@ -4,18 +4,17 @@ import chisel3.RawModule
 import chisel3.stage.ChiselGeneratorAnnotation
 import circt.stage.ChiselStage
 import firrtl.analyses.{CircuitGraph, ConnectionGraph}
-import firrtl.annotations.{CircuitTarget, InstanceTarget, ModuleTarget}
+import firrtl.annotations.{CircuitTarget, InstanceTarget}
 import firrtl.graph.PathNotFoundException
 import firrtl.options.Dependency
 import firrtl.passes.ExpandWhensAndCheck
-import firrtl.{CircuitState, FileUtils, HighForm, UnknownForm}
+import firrtl.{CircuitState, FileUtils, UnknownForm}
 
 import java.io.PrintWriter
+import scala.annotation.nowarn
 
+@nowarn("cat=deprecation")
 class AnalyzeCircuit(modulename:String,tclfilename:String) extends RawModule{
-  def inputForm = HighForm
-  def outputForm = HighForm
-
   val circuit = new firrtl.stage.transforms.Compiler(Seq(Dependency[ExpandWhensAndCheck]))
     .runTransform(
       CircuitState(FirrtlCompat.parseCircuit(FileUtils.getText("Outputs/"+modulename+"/"+modulename+".fir")), UnknownForm)

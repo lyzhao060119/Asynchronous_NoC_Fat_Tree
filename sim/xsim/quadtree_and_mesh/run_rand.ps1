@@ -1,10 +1,13 @@
 param(
   [ValidateSet("gui", "batch")]
   [string]$Mode = "batch",
+  [string]$RunRoot = "",
+  [string]$ReuseRunDir = "",
   [int]$Seed = 1379260429,
   [int]$Cases = 24,
   [ValidateRange(1, 3)]
   [int]$MaxPkts = 3,
+  [switch]$BuildOnly,
   [switch]$Regenerate
 )
 
@@ -31,7 +34,8 @@ function Assert-LastExitCode([string]$Label) {
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 $runStamp = Get-Date -Format "yyyyMMdd_HHmmss_fff"
-$runDir = Join-Path $root "sim\work\xsim\quadtree_and_mesh_rand\$runStamp"
+$resolvedRunRoot = if ([string]::IsNullOrWhiteSpace($RunRoot)) { Join-Path $root ".xsim_qam_rand" } else { $RunRoot }
+$runDir = if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) { Join-Path $resolvedRunRoot $runStamp } else { $ReuseRunDir }
 $tbDir = Join-Path $root "sim\testbenches\quadtree_and_mesh"
 $tbFile = Join-Path $tbDir "quadtree_and_mesh_rand_tb.sv"
 $cfgFile = Join-Path $tbDir "quadtree_and_mesh_rand_cfg.vh"
@@ -41,24 +45,26 @@ $batchTcl = Join-Path $root "sim\xsim\quadtree_and_mesh\run_rand.tcl"
 
 $generatedNoC = Join-Path $root "generated\quadtree_and_mesh.v"
 
-New-Item -ItemType Directory -Force -Path $runDir | Out-Null
+if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) {
+  New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 
-Push-Location $root
-try {
-  if ($Regenerate -or -not (Test-Path $generatedNoC)) {
-    sbt "runMain NoC.quadtree_and_mesh"
-    Assert-LastExitCode "sbt runMain NoC.quadtree_and_mesh"
+  Push-Location $root
+  try {
+    if ($Regenerate -or -not (Test-Path $generatedNoC)) {
+      sbt "runMain NoC.quadtree_and_mesh"
+      Assert-LastExitCode "sbt runMain NoC.quadtree_and_mesh"
+    }
+
+    @(
+      ('`define RAND_SEED {0}' -f $Seed),
+      ('`define RAND_NUM_CASES {0}' -f $Cases),
+      ('`define RAND_MAX_PKTS {0}' -f $MaxPkts)
+    ) | Set-Content -Path $cfgFile -Encoding Ascii
+
+    & $instGen -OutFile $instVh
+  } finally {
+    Pop-Location
   }
-
-  @(
-    ('`define RAND_SEED {0}' -f $Seed),
-    ('`define RAND_NUM_CASES {0}' -f $Cases),
-    ('`define RAND_MAX_PKTS {0}' -f $MaxPkts)
-  ) | Set-Content -Path $cfgFile -Encoding Ascii
-
-  & $instGen -OutFile $instVh
-} finally {
-  Pop-Location
 }
 
 $delayFile = Resolve-FirstExisting @(
@@ -78,21 +84,38 @@ $mutexFile = Resolve-FirstExisting @(
 
 Push-Location $runDir
 try {
-  xvlog --sv --work work `
-    -i $tbDir `
-    $generatedNoC `
-    $delayFile `
-    $mrgoFile `
-    $mutexFile `
-    $tbFile
-  Assert-LastExitCode "xvlog"
+  $oldTemp = $env:TEMP
+  $oldTmp = $env:TMP
+  $env:TEMP = $runDir
+  $env:TMP = $runDir
+  if ([string]::IsNullOrWhiteSpace($ReuseRunDir)) {
+    Remove-Item -LiteralPath "xsim.dir" -Recurse -Force -ErrorAction SilentlyContinue
 
-  xelab --timescale 1ns/1ps --debug typical -s quadtree_and_mesh_rand_tb_sim work.quadtree_and_mesh_rand_tb
-  Assert-LastExitCode "xelab"
+    xvlog --sv --work work `
+      -i $tbDir `
+      $generatedNoC `
+      $delayFile `
+      $mrgoFile `
+      $mutexFile `
+      $tbFile
+    Assert-LastExitCode "xvlog"
+
+    xelab --timescale 1ns/1ps --debug off --mt off --nosignalhandlers -s quadtree_and_mesh_rand_tb_sim work.quadtree_and_mesh_rand_tb
+    Assert-LastExitCode "xelab"
+
+    Write-Host "[QAM-RAND-PATH] run_dir=$runDir"
+    if ($BuildOnly) {
+      Write-Host "[QAM-RAND] build-only completed"
+      return
+    }
+  }
 
   $xsimArgs = @(
     "quadtree_and_mesh_rand_tb_sim",
-    "--sv_seed", "$Seed"
+    "--sv_seed", "$Seed",
+    "--testplusarg", "RAND_SEED=$Seed",
+    "--testplusarg", "RAND_NUM_CASES=$Cases",
+    "--testplusarg", "RAND_MAX_PKTS=$MaxPkts"
   )
 
   if ($Mode -eq "batch") {
@@ -110,5 +133,7 @@ try {
     Assert-LastExitCode "xsim gui"
   }
 } finally {
+  $env:TEMP = $oldTemp
+  $env:TMP = $oldTmp
   Pop-Location
 }
