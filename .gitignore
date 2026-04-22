@@ -61,6 +61,8 @@ project/project/
 /sim/results/
 /sim/modelsim/
 /sim/xsim/
+/.xsim_perf_1024_smoke/
+/.xsim_perf_1024_smoke_escalated
 
 .Xil/
 xsim.dir/
@@ -78,4 +80,3 @@ modelsim.ini
 vish_stacktrace.vstf
 
 fat_tree_NoC_1024_standard/
-sim/
