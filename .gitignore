@@ -76,3 +76,6 @@ webtalk*.log
 transcript
 modelsim.ini
 vish_stacktrace.vstf
+
+fat_tree_NoC_1024_standard/
+sim/

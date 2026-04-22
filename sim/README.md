@@ -6,6 +6,9 @@ Simulation files are organized by role:
 - `sim/work`: generated simulator outputs, logs, waves, and temporary artifacts
 
 If you are planning verification for a paper or thesis, use [SIMULATION_README.md](SIMULATION_README.md) as the main methodology guide. This file focuses on day-to-day script usage.
+If you want the final locked Chinese experiment plan with fixed traffic patterns, measurement parameters, and the synchronous baseline requirement, use [FINAL_EXPERIMENT_GUIDE_CN.md](FINAL_EXPERIMENT_GUIDE_CN.md).
+If you want the dedicated Chinese addendum for power, batch-size studies, synchronous counterpart fairness, and multicast algorithm baselines, use [POWER_AND_BASELINE_GUIDE_CN.md](POWER_AND_BASELINE_GUIDE_CN.md).
+If you want the paper-derived initialization checklist and the step-by-step simulation protocol that maps the cited papers onto this repository, use [PAPER_DERIVED_SIMULATION_PROTOCOL_CN.md](PAPER_DERIVED_SIMULATION_PROTOCOL_CN.md).
 
 Current scale convention:
 
@@ -63,6 +66,30 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/toplayer_mesh/launch.ps1 -Mode
 powershell -ExecutionPolicy Bypass -File sim/xsim/toplayer_mesh/launch.ps1 -Mode gui -Regenerate
 ```
 
+## Vivado GUI Manual Run For 1024 Perf
+
+If you want to debug the `1024-node` lightweight performance testbench manually in Vivado GUI, first prepare the GUI-editable headers without launching the simulator:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File sim/xsim/quadtree_and_mesh/run_perf.ps1 -PrepareOnly -Pattern uniform_unicast -NumFlows 1 -PacketGapNs 20 -AckDelayNs 1 -EdgeN 4 -GeneratedDirName generated -WarmupNs 100 -MeasureNs 200
+```
+
+After that:
+
+- Edit `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_perf_cfg.vh` if you want to change pattern, timeout, or lock `flow0` to a fixed `(src_q, src_c) -> (dst_q, dst_c)` case.
+- The preparation step auto-detects the actual DUT shape from `generated/quadtree_and_mesh.sv`, so the recommended simulation top may be `quadtree_and_mesh_perf_tb` or `quadtree_and_mesh_perf_1024_light_tb` depending on what is really in `generated/`.
+- Add these files as simulation sources in Vivado GUI:
+  `generated/quadtree_and_mesh.sv`
+  `src/main/resources/ASYNC/MrGo.v`
+  `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_perf_1024_light_tb.sv`
+  `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_perf_cfg.vh`
+  `sim/testbenches/quadtree_and_mesh/quadtree_and_mesh_dut_inst.vh`
+  `sim/testbenches/quadtree_and_mesh/layers-quadtree_and_mesh-Verification.sv`
+- Add include directories:
+  `generated`
+  `sim/testbenches/quadtree_and_mesh`
+- Set simulation top to `quadtree_and_mesh_perf_1024_light_tb`.
+
 All launchers execute inside `sim/work/xsim/<target>`, which keeps generated Vivado outputs out of the repository root.
 
 ## ModelSim Usage
@@ -75,6 +102,17 @@ powershell -ExecutionPolicy Bypass -File sim/modelsim/quadtree_and_mesh/run_perf
 ```
 
 This wrapper is intentionally scoped to the verified `256-node + uniform_unicast` single-point smoke. It generates temporary `quadtree_and_mesh_perf_cfg.vh` and `quadtree_and_mesh_dut_inst.vh` files under `sim/work/modelsim/...`, passes that include directory before `sim/testbenches/quadtree_and_mesh`, and leaves the repo-tracked headers untouched.
+
+## Remote Server Usage
+
+For remote servers, prefer batch simulation instead of GUI:
+
+- Keep the server flow headless and run `run_perf.ps1`, `run_rand.ps1`, or `launch.ps1` inside `tmux`/`screen`.
+- Use a fast local scratch directory for temporary Vivado files via `-RunRoot`, instead of writing large `xelab/xsim` artifacts into the repo.
+- Generate the DUT once, then reuse the same generated directory for multiple seeds and traffic points.
+- Copy back only the CSV and raw log files under `sim/results/simulation`, instead of the full simulator work directory.
+
+If the remote server is Linux and does not have PowerShell, keep the same file set and launch `xvlog/xelab/xsim` directly with the same top module and include directories listed above.
 
 ## Script Notes
 

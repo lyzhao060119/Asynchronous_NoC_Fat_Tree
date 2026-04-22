@@ -1,4 +1,6 @@
 param(
+  [ValidateSet("auto", "light", "full")]
+  [string]$TbVariant = "auto",
   [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast", "uniform_multicast", "mixed_unicast_multicast", "overlapping_multicast")]
   [string]$Pattern = "uniform_unicast",
   [int[]]$Seeds = @(12345, 22345, 32345),
@@ -16,10 +18,15 @@ param(
   [ValidateRange(1, 8)]
   [int]$EdgeN = 2,
   [string]$GeneratedDirName = "generated",
+  [string]$RunRoot = "",
   [ValidateRange(1, 2000000000)]
   [int]$WarmupNs = 100000,
   [ValidateRange(1, 2000000000)]
   [int]$MeasureNs = 500000,
+  [ValidateRange(1, 2000000000)]
+  [int]$HandshakeTimeoutNs = 500000,
+  [ValidateRange(1, 2000000000)]
+  [int]$GlobalTimeoutNs = 8000000,
   [switch]$Regenerate
 )
 
@@ -69,9 +76,11 @@ foreach ($gapNs in $PacketGapsNs) {
     Write-Host ("[QAM-PERF-SUITE] ==== pattern={0} seed={1} gap_ns={2} ====" -f $Pattern, $seed, $gapNs)
 
     $perfArgs = @(
+      "-NoProfile",
       "-ExecutionPolicy", "Bypass",
       "-File", $runPerf,
       "-Mode", "batch",
+      "-TbVariant", $TbVariant,
       "-Pattern", $Pattern,
       "-Seed", "$seed",
       "-NumFlows", "$NumFlows",
@@ -82,8 +91,13 @@ foreach ($gapNs in $PacketGapsNs) {
       "-EdgeN", "$EdgeN",
       "-GeneratedDirName", $GeneratedDirName,
       "-WarmupNs", "$WarmupNs",
-      "-MeasureNs", "$MeasureNs"
+      "-MeasureNs", "$MeasureNs",
+      "-HandshakeTimeoutNs", "$HandshakeTimeoutNs",
+      "-GlobalTimeoutNs", "$GlobalTimeoutNs"
     )
+    if (-not [string]::IsNullOrWhiteSpace($RunRoot)) {
+      $perfArgs += @("-RunRoot", $RunRoot)
+    }
     if ($regenThisRun) {
       $perfArgs += "-Regenerate"
     }

@@ -1,6 +1,8 @@
 param(
   [ValidateSet("gui", "batch")]
   [string]$Mode = "batch",
+  [ValidateSet("auto", "light", "full")]
+  [string]$TbVariant = "auto",
   [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast", "uniform_multicast", "mixed_unicast_multicast", "overlapping_multicast")]
   [string]$Pattern = "uniform_unicast",
   [int]$Seed = 12345,
@@ -22,6 +24,20 @@ param(
   [int]$WarmupNs = 100000,
   [ValidateRange(1, 2000000000)]
   [int]$MeasureNs = 500000,
+  [ValidateRange(1, 2000000000)]
+  [int]$HandshakeTimeoutNs = 500000,
+  [ValidateRange(1, 2000000000)]
+  [int]$GlobalTimeoutNs = 8000000,
+  [switch]$ForceFlow0,
+  [ValidateRange(0, 63)]
+  [int]$Flow0SrcQ = 0,
+  [ValidateRange(0, 63)]
+  [int]$Flow0SrcC = 0,
+  [ValidateRange(0, 63)]
+  [int]$Flow0DstQ = 0,
+  [ValidateRange(0, 63)]
+  [int]$Flow0DstC = 1,
+  [switch]$PrepareOnly,
   [switch]$Regenerate
 )
 
@@ -44,8 +60,8 @@ function Assert-LastExitCode([string]$Label) {
 
 function Resolve-DutTopFile([string]$GeneratedDir) {
   $candidates = @(
-    (Join-Path $GeneratedDir "quadtree_and_mesh.v"),
-    (Join-Path $GeneratedDir "quadtree_and_mesh.sv")
+    (Join-Path $GeneratedDir "quadtree_and_mesh.sv"),
+    (Join-Path $GeneratedDir "quadtree_and_mesh.v")
   )
   foreach ($path in $candidates) {
     if (Test-Path $path) {
@@ -58,6 +74,30 @@ function Resolve-DutTopFile([string]$GeneratedDir) {
 function Test-IsMonolithicTopFile([string]$TopFile) {
   $moduleMatches = Select-String -Path $TopFile -Pattern '^\s*module\s+' | Select-Object -First 2
   return (($moduleMatches | Measure-Object).Count -ge 2)
+}
+
+function Test-ContainsModuleDefinition([string]$SourceFile, [string]$ModuleName) {
+  if (-not (Test-Path $SourceFile)) {
+    return $false
+  }
+  $pattern = '^\s*module\s+' + [regex]::Escape($ModuleName) + '(\s|#|\()'
+  return [bool](Select-String -Path $SourceFile -Pattern $pattern -Quiet)
+}
+
+function Test-ProvidesAllModules([string[]]$SourceFiles, [string[]]$ModuleNames) {
+  foreach ($moduleName in $ModuleNames) {
+    $found = $false
+    foreach ($sourceFile in $SourceFiles) {
+      if (Test-ContainsModuleDefinition -SourceFile $sourceFile -ModuleName $moduleName) {
+        $found = $true
+        break
+      }
+    }
+    if (-not $found) {
+      return $false
+    }
+  }
+  return $true
 }
 
 function Get-DeduplicatedGeneratedSources([string]$GeneratedDir) {
@@ -150,6 +190,50 @@ function Get-DutTopLaneCount([string]$TopFile, [int]$Fallback = 4) {
   return ($maxLane + 1)
 }
 
+function Get-DutCoreCount([string]$TopFile, [int]$Fallback = 64) {
+  if (-not (Test-Path $TopFile)) {
+    return $Fallback
+  }
+
+  $maxCore = -1
+  $corePattern = 'io_inputs_\d+_(\d+)_HS_Req'
+  Get-Content $TopFile | ForEach-Object {
+    if ($_ -match $corePattern) {
+      $coreIdx = [int]$matches[1]
+      if ($coreIdx -gt $maxCore) {
+        $maxCore = $coreIdx
+      }
+    }
+  }
+
+  if ($maxCore -lt 0) {
+    return $Fallback
+  }
+  return ($maxCore + 1)
+}
+
+function Get-DutEdgeCount([string]$TopFile, [int]$Fallback = 2) {
+  if (-not (Test-Path $TopFile)) {
+    return $Fallback
+  }
+
+  $maxEdge = -1
+  $edgePattern = 'io_East_fromPEs_(\d+)_\d+_HS_Req'
+  Get-Content $TopFile | ForEach-Object {
+    if ($_ -match $edgePattern) {
+      $edgeIdx = [int]$matches[1]
+      if ($edgeIdx -gt $maxEdge) {
+        $maxEdge = $edgeIdx
+      }
+    }
+  }
+
+  if ($maxEdge -lt 0) {
+    return $Fallback
+  }
+  return ($maxEdge + 1)
+}
+
 function Resolve-JavaHome() {
   if (-not [string]::IsNullOrWhiteSpace($env:JAVA_HOME)) {
     $javaExe = Join-Path $env:JAVA_HOME "bin\java.exe"
@@ -224,6 +308,56 @@ function Convert-FirToSplitSv([string]$FirFile, [string]$OutDir) {
   }
 }
 
+function Test-FirtoolSplitCompatible([string]$FirFile) {
+  if (-not (Test-Path $FirFile)) {
+    return $false
+  }
+
+  $versionMatch = Select-String -Path $FirFile -Pattern '^\s*FIRRTL version\s+(\d+)\.(\d+)\.(\d+)' | Select-Object -First 1
+  if (-not $versionMatch) {
+    return $false
+  }
+
+  $versionText = [string]$versionMatch.Matches[0].Groups[1].Value
+  $majorVersion = [int]$versionText
+  return ($majorVersion -ge 2)
+}
+
+function Invoke-LoggedProcess([string]$FilePath, [string[]]$ArgumentList, [string]$LogPath) {
+  $stdoutPath = Join-Path $runDir (([System.IO.Path]::GetRandomFileName()) + ".stdout.log")
+  $stderrPath = Join-Path $runDir (([System.IO.Path]::GetRandomFileName()) + ".stderr.log")
+  Remove-Item -LiteralPath $stdoutPath, $stderrPath -ErrorAction SilentlyContinue
+
+  try {
+    $proc = Start-Process -FilePath $FilePath `
+      -ArgumentList $ArgumentList `
+      -NoNewWindow `
+      -Wait `
+      -PassThru `
+      -RedirectStandardOutput $stdoutPath `
+      -RedirectStandardError $stderrPath
+
+    $output = [System.Collections.Generic.List[string]]::new()
+    foreach ($streamPath in @($stdoutPath, $stderrPath)) {
+      if (-not (Test-Path $streamPath)) {
+        continue
+      }
+      foreach ($line in (Get-Content $streamPath)) {
+        $text = [string]$line
+        [void]$output.Add($text)
+        $text | Tee-Object -FilePath $LogPath -Append | Out-Null
+      }
+    }
+
+    return @{
+      ExitCode = $proc.ExitCode
+      Output = $output.ToArray()
+    }
+  } finally {
+    Remove-Item -LiteralPath $stdoutPath, $stderrPath -ErrorAction SilentlyContinue
+  }
+}
+
 function Get-PatternCode([string]$PatternName) {
   switch ($PatternName) {
     "uniform_unicast" { return 0 }
@@ -235,6 +369,15 @@ function Get-PatternCode([string]$PatternName) {
     "overlapping_multicast" { return 6 }
     default { throw "Unsupported pattern: $PatternName" }
   }
+}
+
+function Test-IsUnicastPerfPattern([string]$PatternName) {
+  return ($PatternName -in @(
+    "uniform_unicast",
+    "local_unicast",
+    "cross_tile_unicast",
+    "hotspot_unicast"
+  ))
 }
 
 function Parse-KeyValueLine([string]$Text) {
@@ -259,7 +402,7 @@ $runStamp = Get-Date -Format "yyyyMMdd_HHmmss_fff"
 $resolvedRunRoot = if ([string]::IsNullOrWhiteSpace($RunRoot)) { Join-Path $root ".xsim_perf" } else { $RunRoot }
 $runDir = Join-Path $resolvedRunRoot $runStamp
 $tbDir = Join-Path $root "sim\testbenches\quadtree_and_mesh"
-$tbModule = if ($EdgeN -gt 2) { "quadtree_and_mesh_perf_1024_light_tb" } else { "quadtree_and_mesh_perf_tb" }
+$tbModule = "quadtree_and_mesh_perf_tb"
 $tbFile = Join-Path $tbDir ($tbModule + ".sv")
 $cfgFile = Join-Path $tbDir "quadtree_and_mesh_perf_cfg.vh"
 $instGen = Join-Path $tbDir "gen_dut_inst_vh.ps1"
@@ -275,15 +418,12 @@ $generatedNoC = Resolve-DutTopFile -GeneratedDir $generatedDir
 $dutSources = @()
 $stubIncludeDir = Join-Path $runDir "verification_stubs"
 $topLane = 4
+$nCore = 64
 $useEmbeddedBlackboxes = $false
 
 New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
 New-Item -ItemType Directory -Force -Path $csvDir | Out-Null
-
-if (($EdgeN -gt 2) -and ($Pattern -notin @("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast"))) {
-  throw "[QAM-PERF] The lightweight 1024-node Vivado testbench currently supports only uniform/local/cross_tile/hotspot unicast."
-}
 
 Push-Location $root
 try {
@@ -311,14 +451,69 @@ try {
     }
 
     if ($EdgeN -gt 2) {
-      Convert-FirToSplitSv -FirFile (Join-Path $generatedDir "quadtree_and_mesh.fir") -OutDir $generatedDir
+      $generatedFir = Join-Path $generatedDir "quadtree_and_mesh.fir"
+      if (Test-FirtoolSplitCompatible -FirFile $generatedFir) {
+        Convert-FirToSplitSv -FirFile $generatedFir -OutDir $generatedDir
+      }
     }
   }
+  if ($EdgeN -gt 2) {
+    $generatedFir = Join-Path $generatedDir "quadtree_and_mesh.fir"
+    $splitTop = Join-Path $generatedDir "quadtree_and_mesh.sv"
+    if ((Test-Path $generatedFir) -and (-not (Test-Path $splitTop))) {
+      if (Test-FirtoolSplitCompatible -FirFile $generatedFir) {
+        Convert-FirToSplitSv -FirFile $generatedFir -OutDir $generatedDir
+      } else {
+        $skipMsg = "[QAM-PERF] skipping firtool split because $generatedFir reports FIRRTL < 2.0"
+        Write-Host $skipMsg
+        Add-Content -Path $logFile -Value $skipMsg
+      }
+    }
+    $generatedNoC = Resolve-DutTopFile -GeneratedDir $generatedDir
+  }
   $dutSources = @(Get-DutSourceFiles -GeneratedDir $generatedDir -TopFile $generatedNoC)
+  $EdgeN = Get-DutEdgeCount -TopFile $generatedNoC -Fallback $EdgeN
+  $nCore = Get-DutCoreCount -TopFile $generatedNoC -Fallback 64
   $topLane = Get-DutTopLaneCount -TopFile $generatedNoC -Fallback 4
-  $useEmbeddedBlackboxes = ($dutSources.Count -eq 1) -and (Test-IsMonolithicTopFile -TopFile $dutSources[0])
+  if ($EdgeN -gt 2) {
+    $isUnicastPattern = Test-IsUnicastPerfPattern -PatternName $Pattern
+    switch ($TbVariant) {
+      "light" {
+        if (-not $isUnicastPattern) {
+          throw "[QAM-PERF] TbVariant=light supports only uniform/local/cross_tile/hotspot unicast."
+        }
+        $tbModule = "quadtree_and_mesh_perf_1024_light_tb"
+      }
+      "full" {
+        $tbModule = "quadtree_and_mesh_perf_1024_tb"
+      }
+      default {
+        $tbModule = if ($isUnicastPattern) { "quadtree_and_mesh_perf_1024_light_tb" } else { "quadtree_and_mesh_perf_1024_tb" }
+      }
+    }
+  } else {
+    if ($TbVariant -ne "auto") {
+      throw "[QAM-PERF] TbVariant=$TbVariant requires EdgeN > 2."
+    }
+    $tbModule = "quadtree_and_mesh_perf_tb"
+  }
+  $tbFile = Join-Path $tbDir ($tbModule + ".sv")
+  $useEmbeddedBlackboxes = Test-ProvidesAllModules `
+    -SourceFiles $dutSources `
+    -ModuleNames @("DelayElement", "Mutex2", "MrGo")
+  $exampleFlowSrcQ = 0
+  $exampleFlowSrcC = 0
+  $exampleFlowDstQ = if ($EdgeN -gt 1) { 1 } else { 0 }
+  $exampleFlowDstC = if (($exampleFlowDstQ -eq $exampleFlowSrcQ) -and ($nCore -gt 1)) { 1 } else { 0 }
 
+  if ($ForceFlow0 -and ($tbModule -notin @("quadtree_and_mesh_perf_1024_light_tb", "quadtree_and_mesh_perf_1024_tb"))) {
+    throw "[QAM-PERF] ForceFlow0 is currently supported only with the 1024-node performance testbenches."
+  }
+
+  $cfgLines = [System.Collections.Generic.List[string]]::new()
   @(
+    "// GUI-editable performance configuration for quadtree_and_mesh perf testbenches.",
+    "// Pattern codes: 0=uniform_unicast, 1=local_unicast, 2=cross_tile_unicast, 3=hotspot_unicast, 4=uniform_multicast, 5=mixed_unicast_multicast, 6=overlapping_multicast.",
     ('`define PERF_SEED {0}' -f $Seed),
     ('`define PERF_PATTERN {0}' -f $patternCode),
     ('`define PERF_NUM_FLOWS {0}' -f $NumFlows),
@@ -327,12 +522,34 @@ try {
     ('`define PERF_RECT_W {0}' -f $RectW),
     ('`define PERF_RECT_H {0}' -f $RectH),
     ('`define PERF_EDGE_N {0}' -f $EdgeN),
+    ('`define PERF_N_CORE {0}' -f $nCore),
     ('`define PERF_TOP_LANE {0}' -f $topLane),
+    ('`define PERF_HANDSHAKE_TIMEOUT_NS {0}' -f $HandshakeTimeoutNs),
+    ('`define PERF_GLOBAL_TIMEOUT_NS {0}' -f $GlobalTimeoutNs),
     ('`define PERF_WARMUP_NS {0}' -f $WarmupNs),
     ('`define PERF_MEASURE_NS {0}' -f $MeasureNs)
-  ) | Set-Content -Path $cfgFile -Encoding Ascii
+  ) | ForEach-Object { [void]$cfgLines.Add($_) }
 
-  & powershell -NoProfile -ExecutionPolicy Bypass -File $instGen -OutFile $instVh -EdgeN $EdgeN -TopLane $topLane
+  [void]$cfgLines.Add("")
+  [void]$cfgLines.Add("// Fixed-flow override is supported by the 1024-node performance testbenches.")
+  if ($ForceFlow0) {
+    [void]$cfgLines.Add('`define PERF_FORCE_FLOW0 1')
+    [void]$cfgLines.Add(('`define PERF_FLOW0_SRC_Q {0}' -f $Flow0SrcQ))
+    [void]$cfgLines.Add(('`define PERF_FLOW0_SRC_C {0}' -f $Flow0SrcC))
+    [void]$cfgLines.Add(('`define PERF_FLOW0_DST_Q {0}' -f $Flow0DstQ))
+    [void]$cfgLines.Add(('`define PERF_FLOW0_DST_C {0}' -f $Flow0DstC))
+  } else {
+    [void]$cfgLines.Add("// Uncomment the block below to reproduce a fixed flow in Vivado GUI.")
+    [void]$cfgLines.Add("// `define PERF_FORCE_FLOW0 1")
+    [void]$cfgLines.Add(('// `define PERF_FLOW0_SRC_Q {0}' -f $exampleFlowSrcQ))
+    [void]$cfgLines.Add(('// `define PERF_FLOW0_SRC_C {0}' -f $exampleFlowSrcC))
+    [void]$cfgLines.Add(('// `define PERF_FLOW0_DST_Q {0}' -f $exampleFlowDstQ))
+    [void]$cfgLines.Add(('// `define PERF_FLOW0_DST_C {0}' -f $exampleFlowDstC))
+  }
+
+  $cfgLines | Set-Content -Path $cfgFile -Encoding Ascii
+
+  & powershell -NoProfile -ExecutionPolicy Bypass -File $instGen -OutFile $instVh -EdgeN $EdgeN -NCore $nCore -TopLane $topLane
   Assert-LastExitCode "gen_dut_inst_vh.ps1"
 } finally {
   Pop-Location
@@ -358,6 +575,41 @@ $mutexFile = Resolve-FirstExisting @(
   (Join-Path $root "generated\Mutex2.v"),
   (Join-Path $root "src\main\resources\ASYNC\Mutex2.v")
 ) "Mutex2.v"
+
+$verificationStub = Join-Path $tbDir "layers-quadtree_and_mesh-Verification.sv"
+
+if ($PrepareOnly) {
+  Write-Host ""
+  Write-Host "[QAM-PERF-GUI] prepared GUI-editable headers:"
+  Write-Host "  $cfgFile"
+  Write-Host "  $instVh"
+  Write-Host "[QAM-PERF-GUI] top module:"
+  Write-Host "  $tbModule"
+  Write-Host "[QAM-PERF-GUI] detected DUT shape:"
+  Write-Host "  edge_n=$EdgeN cores_per_quad=$nCore top_lane=$topLane"
+  Write-Host "[QAM-PERF-GUI] active timeouts:"
+  Write-Host "  handshake_timeout_ns=$HandshakeTimeoutNs global_timeout_ns=$GlobalTimeoutNs"
+  if ($ForceFlow0) {
+    Write-Host "[QAM-PERF-GUI] fixed flow override:"
+    Write-Host "  src=(q$Flow0SrcQ,c$Flow0SrcC) dst=(q$Flow0DstQ,c$Flow0DstC)"
+  }
+  Write-Host "[QAM-PERF-GUI] add these simulation sources in Vivado GUI:"
+  Write-Host "  $generatedNoC"
+  if (-not $useEmbeddedBlackboxes) {
+    Write-Host "  $delayFile"
+    Write-Host "  $mrgoFile"
+    Write-Host "  $mutexFile"
+  }
+  Write-Host "  $tbFile"
+  Write-Host "  $cfgFile"
+  Write-Host "  $instVh"
+  Write-Host "  $verificationStub"
+  Write-Host "[QAM-PERF-GUI] add include directories:"
+  Write-Host "  $generatedDir"
+  Write-Host "  $tbDir"
+  Write-Host "[QAM-PERF-GUI] then set simulation top to '$tbModule' and run xsim in GUI mode."
+  return
+}
 
 Push-Location $runDir
 try {
@@ -390,13 +642,15 @@ try {
     -f $xvlogFileList *>&1 | Tee-Object -FilePath $logFile -Append
   Assert-LastExitCode "xvlog"
 
-  $xelabArgs = @(
+  $snapshotNameBase = $tbModule + "_sim"
+  $snapshotName = $snapshotNameBase
+  $xelabBaseArgs = @(
     "--timescale", "1ns/1ps",
     "--debug", "off",
     "--mt", "off"
   )
   if ($EdgeN -gt 2) {
-    $xelabArgs += @(
+    $xelabBaseArgs += @(
       "--O0",
       "--Odisable_cdfg",
       "--Odisable_unused_removal",
@@ -404,16 +658,51 @@ try {
       "--nosignalhandlers"
     )
   }
-  $xelabArgs += @(
-    "-s", ($tbModule + "_sim"),
-    ("work." + $tbModule)
-  )
+  $xelabBaseArgs += @("work." + $tbModule)
 
-  & xelab @xelabArgs *>&1 | Tee-Object -FilePath $logFile -Append
-  Assert-LastExitCode "xelab"
+  $xelabAttempts = if ($EdgeN -gt 2) { 3 } else { 1 }
+  $xelabSucceeded = $false
+  for ($xelabAttempt = 1; $xelabAttempt -le $xelabAttempts; $xelabAttempt++) {
+    $snapshotName = if ($xelabAttempt -eq 1) {
+      $snapshotNameBase
+    } else {
+      "{0}_retry{1}" -f $snapshotNameBase, $xelabAttempt
+    }
+
+    if ($xelabAttempt -gt 1) {
+      $retryMsg = "[QAM-PERF] retrying xelab after archive/rename failure (attempt $xelabAttempt/$xelabAttempts)"
+      Write-Host $retryMsg
+      Add-Content -Path $logFile -Value $retryMsg
+      Remove-Item -LiteralPath "xsim.dir" -Recurse -Force -ErrorAction SilentlyContinue
+      Start-Sleep -Seconds (2 * $xelabAttempt)
+    }
+
+    Remove-Item -LiteralPath (Join-Path "xsim.dir" $snapshotName) -Recurse -Force -ErrorAction SilentlyContinue
+    $xelabArgs = @($xelabBaseArgs + @("-s", $snapshotName))
+    $xelabResult = Invoke-LoggedProcess -FilePath "xelab" -ArgumentList $xelabArgs -LogPath $logFile
+    if ($xelabResult.ExitCode -eq 0) {
+      $xelabSucceeded = $true
+      break
+    }
+
+    $xelabText = ($xelabResult.Output -join "`n")
+    $retryableArchiveError =
+      ($EdgeN -gt 2) -and (
+        ($xelabText -match 'unable to rename') -or
+        ($xelabText -match 'Archive creation was unsuccessful') -or
+        ($xelabText -match 'Permission denied')
+      )
+    if ((-not $retryableArchiveError) -or ($xelabAttempt -eq $xelabAttempts)) {
+      throw "xelab failed with exit code $($xelabResult.ExitCode)"
+    }
+  }
+
+  if (-not $xelabSucceeded) {
+    throw "xelab failed without producing a simulation snapshot."
+  }
 
   $xsimArgs = @(
-    ($tbModule + "_sim"),
+    $snapshotName,
     "--sv_seed", "$Seed"
   )
 

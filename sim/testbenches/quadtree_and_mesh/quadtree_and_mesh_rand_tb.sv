@@ -14,16 +14,36 @@
 `define RAND_MAX_PKTS 3
 `endif
 
+`ifndef RAND_EDGE_N
+`define RAND_EDGE_N 2
+`endif
+
+`ifndef RAND_N_CORE
+`define RAND_N_CORE 64
+`endif
+
+`ifndef RAND_TOP_LANE
+`define RAND_TOP_LANE 4
+`endif
+
+`ifndef RAND_HANDSHAKE_TIMEOUT_NS
+`define RAND_HANDSHAKE_TIMEOUT_NS 500000
+`endif
+
+`ifndef RAND_GLOBAL_TIMEOUT_NS
+`define RAND_GLOBAL_TIMEOUT_NS 8000000
+`endif
+
 module quadtree_and_mesh_rand_tb;
   localparam int FLIT_W = 28;
-  localparam int N_QUAD = 4;      // 2x2 tree tiles
-  localparam int N_CORE = 64;     // per tile
-  localparam int EDGE_N = 2;      // 2 rows / 2 cols
-  localparam int TOP_LANE = 4;
+  localparam int EDGE_N = `RAND_EDGE_N;
+  localparam int N_QUAD = EDGE_N * EDGE_N;
+  localparam int N_CORE = `RAND_N_CORE;
+  localparam int TOP_LANE = `RAND_TOP_LANE;
   localparam int MAX_RX_PER_PORT = 1024;
   localparam int DEFAULT_ACK_DELAY_NS = 1;
-  localparam int HANDSHAKE_TIMEOUT_NS = 500000;
-  localparam int GLOBAL_TIMEOUT_NS = 8000000;
+  localparam int HANDSHAKE_TIMEOUT_NS = `RAND_HANDSHAKE_TIMEOUT_NS;
+  localparam int GLOBAL_TIMEOUT_NS = `RAND_GLOBAL_TIMEOUT_NS;
   localparam int SRC_KIND_CORE = 0;
   localparam int SRC_KIND_WEST = 1;
 

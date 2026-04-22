@@ -1,4 +1,6 @@
 param(
+  [ValidateSet("auto", "light", "full")]
+  [string]$TbVariant = "auto",
   [ValidateSet("uniform_unicast", "local_unicast", "cross_tile_unicast", "hotspot_unicast", "uniform_multicast", "mixed_unicast_multicast", "overlapping_multicast")]
   [string]$Pattern = "uniform_multicast",
   [int[]]$Seeds = @(12345, 22345),
@@ -16,10 +18,15 @@ param(
   [ValidateRange(1, 8)]
   [int]$EdgeN = 2,
   [string]$GeneratedDirName = "generated",
+  [string]$RunRoot = "",
   [ValidateRange(1, 2000000000)]
   [int]$WarmupNs = 20000,
   [ValidateRange(1, 2000000000)]
   [int]$MeasureNs = 50000,
+  [ValidateRange(1, 2000000000)]
+  [int]$HandshakeTimeoutNs = 500000,
+  [ValidateRange(1, 2000000000)]
+  [int]$GlobalTimeoutNs = 8000000,
   [switch]$Regenerate
 )
 
@@ -69,9 +76,11 @@ foreach ($ackDelayNs in $AckDelaysNs) {
     Write-Host ("[QAM-PERF-ACK] ==== pattern={0} seed={1} ack_delay_ns={2} ====" -f $Pattern, $seed, $ackDelayNs)
 
     $perfArgs = @(
+      "-NoProfile",
       "-ExecutionPolicy", "Bypass",
       "-File", $runPerf,
       "-Mode", "batch",
+      "-TbVariant", $TbVariant,
       "-Pattern", $Pattern,
       "-Seed", "$seed",
       "-NumFlows", "$NumFlows",
@@ -82,8 +91,13 @@ foreach ($ackDelayNs in $AckDelaysNs) {
       "-EdgeN", "$EdgeN",
       "-GeneratedDirName", $GeneratedDirName,
       "-WarmupNs", "$WarmupNs",
-      "-MeasureNs", "$MeasureNs"
+      "-MeasureNs", "$MeasureNs",
+      "-HandshakeTimeoutNs", "$HandshakeTimeoutNs",
+      "-GlobalTimeoutNs", "$GlobalTimeoutNs"
     )
+    if (-not [string]::IsNullOrWhiteSpace($RunRoot)) {
+      $perfArgs += @("-RunRoot", $RunRoot)
+    }
     if ($regenThisRun) {
       $perfArgs += "-Regenerate"
     }

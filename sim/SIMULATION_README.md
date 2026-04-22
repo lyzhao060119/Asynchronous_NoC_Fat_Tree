@@ -4,6 +4,9 @@
 
 后续新增测试、性能脚本、统计口径和图表，建议都以这里为准。
 
+如果你要补功耗、`batch_size`、同步 counterpart 公平性、以及“当前算法 vs 最初四叉树多播算法”的对比，优先同时参考 `POWER_AND_BASELINE_GUIDE_CN.md`。
+如果你要把这些实验设定进一步追溯到参考论文，并补齐“初始设定 + 逐步执行流程”，再配合阅读 `PAPER_DERIVED_SIMULATION_PROTOCOL_CN.md`。
+
 ## 目标
 
 整套仿真流程需要回答 4 个问题：

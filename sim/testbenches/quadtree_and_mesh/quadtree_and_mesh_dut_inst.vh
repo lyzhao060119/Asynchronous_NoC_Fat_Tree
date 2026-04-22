@@ -6197,6 +6197,54 @@
     .io_South_toPEs_0_1_HS_Req(south_to_req[0][1]), \
     .io_South_toPEs_0_1_HS_Ack(south_to_ack[0][1]), \
     .io_South_toPEs_0_1_Data_flit(south_to_flit[0][1]), \
+    .io_East_fromPEs_0_2_HS_Req(east_from_req[0][2]), \
+    .io_East_fromPEs_0_2_HS_Ack(east_from_ack[0][2]), \
+    .io_East_fromPEs_0_2_Data_flit(east_from_flit[0][2]), \
+    .io_North_fromPEs_0_2_HS_Req(north_from_req[0][2]), \
+    .io_North_fromPEs_0_2_HS_Ack(north_from_ack[0][2]), \
+    .io_North_fromPEs_0_2_Data_flit(north_from_flit[0][2]), \
+    .io_West_fromPEs_0_2_HS_Req(west_from_req[0][2]), \
+    .io_West_fromPEs_0_2_HS_Ack(west_from_ack[0][2]), \
+    .io_West_fromPEs_0_2_Data_flit(west_from_flit[0][2]), \
+    .io_South_fromPEs_0_2_HS_Req(south_from_req[0][2]), \
+    .io_South_fromPEs_0_2_HS_Ack(south_from_ack[0][2]), \
+    .io_South_fromPEs_0_2_Data_flit(south_from_flit[0][2]), \
+    .io_East_toPEs_0_2_HS_Req(east_to_req[0][2]), \
+    .io_East_toPEs_0_2_HS_Ack(east_to_ack[0][2]), \
+    .io_East_toPEs_0_2_Data_flit(east_to_flit[0][2]), \
+    .io_North_toPEs_0_2_HS_Req(north_to_req[0][2]), \
+    .io_North_toPEs_0_2_HS_Ack(north_to_ack[0][2]), \
+    .io_North_toPEs_0_2_Data_flit(north_to_flit[0][2]), \
+    .io_West_toPEs_0_2_HS_Req(west_to_req[0][2]), \
+    .io_West_toPEs_0_2_HS_Ack(west_to_ack[0][2]), \
+    .io_West_toPEs_0_2_Data_flit(west_to_flit[0][2]), \
+    .io_South_toPEs_0_2_HS_Req(south_to_req[0][2]), \
+    .io_South_toPEs_0_2_HS_Ack(south_to_ack[0][2]), \
+    .io_South_toPEs_0_2_Data_flit(south_to_flit[0][2]), \
+    .io_East_fromPEs_0_3_HS_Req(east_from_req[0][3]), \
+    .io_East_fromPEs_0_3_HS_Ack(east_from_ack[0][3]), \
+    .io_East_fromPEs_0_3_Data_flit(east_from_flit[0][3]), \
+    .io_North_fromPEs_0_3_HS_Req(north_from_req[0][3]), \
+    .io_North_fromPEs_0_3_HS_Ack(north_from_ack[0][3]), \
+    .io_North_fromPEs_0_3_Data_flit(north_from_flit[0][3]), \
+    .io_West_fromPEs_0_3_HS_Req(west_from_req[0][3]), \
+    .io_West_fromPEs_0_3_HS_Ack(west_from_ack[0][3]), \
+    .io_West_fromPEs_0_3_Data_flit(west_from_flit[0][3]), \
+    .io_South_fromPEs_0_3_HS_Req(south_from_req[0][3]), \
+    .io_South_fromPEs_0_3_HS_Ack(south_from_ack[0][3]), \
+    .io_South_fromPEs_0_3_Data_flit(south_from_flit[0][3]), \
+    .io_East_toPEs_0_3_HS_Req(east_to_req[0][3]), \
+    .io_East_toPEs_0_3_HS_Ack(east_to_ack[0][3]), \
+    .io_East_toPEs_0_3_Data_flit(east_to_flit[0][3]), \
+    .io_North_toPEs_0_3_HS_Req(north_to_req[0][3]), \
+    .io_North_toPEs_0_3_HS_Ack(north_to_ack[0][3]), \
+    .io_North_toPEs_0_3_Data_flit(north_to_flit[0][3]), \
+    .io_West_toPEs_0_3_HS_Req(west_to_req[0][3]), \
+    .io_West_toPEs_0_3_HS_Ack(west_to_ack[0][3]), \
+    .io_West_toPEs_0_3_Data_flit(west_to_flit[0][3]), \
+    .io_South_toPEs_0_3_HS_Req(south_to_req[0][3]), \
+    .io_South_toPEs_0_3_HS_Ack(south_to_ack[0][3]), \
+    .io_South_toPEs_0_3_Data_flit(south_to_flit[0][3]), \
     .io_East_fromPEs_1_0_HS_Req(east_from_req[1][0]), \
     .io_East_fromPEs_1_0_HS_Ack(east_from_ack[1][0]), \
     .io_East_fromPEs_1_0_Data_flit(east_from_flit[1][0]), \
@@ -6245,6 +6293,54 @@
     .io_South_toPEs_1_1_HS_Req(south_to_req[1][1]), \
     .io_South_toPEs_1_1_HS_Ack(south_to_ack[1][1]), \
     .io_South_toPEs_1_1_Data_flit(south_to_flit[1][1]), \
+    .io_East_fromPEs_1_2_HS_Req(east_from_req[1][2]), \
+    .io_East_fromPEs_1_2_HS_Ack(east_from_ack[1][2]), \
+    .io_East_fromPEs_1_2_Data_flit(east_from_flit[1][2]), \
+    .io_North_fromPEs_1_2_HS_Req(north_from_req[1][2]), \
+    .io_North_fromPEs_1_2_HS_Ack(north_from_ack[1][2]), \
+    .io_North_fromPEs_1_2_Data_flit(north_from_flit[1][2]), \
+    .io_West_fromPEs_1_2_HS_Req(west_from_req[1][2]), \
+    .io_West_fromPEs_1_2_HS_Ack(west_from_ack[1][2]), \
+    .io_West_fromPEs_1_2_Data_flit(west_from_flit[1][2]), \
+    .io_South_fromPEs_1_2_HS_Req(south_from_req[1][2]), \
+    .io_South_fromPEs_1_2_HS_Ack(south_from_ack[1][2]), \
+    .io_South_fromPEs_1_2_Data_flit(south_from_flit[1][2]), \
+    .io_East_toPEs_1_2_HS_Req(east_to_req[1][2]), \
+    .io_East_toPEs_1_2_HS_Ack(east_to_ack[1][2]), \
+    .io_East_toPEs_1_2_Data_flit(east_to_flit[1][2]), \
+    .io_North_toPEs_1_2_HS_Req(north_to_req[1][2]), \
+    .io_North_toPEs_1_2_HS_Ack(north_to_ack[1][2]), \
+    .io_North_toPEs_1_2_Data_flit(north_to_flit[1][2]), \
+    .io_West_toPEs_1_2_HS_Req(west_to_req[1][2]), \
+    .io_West_toPEs_1_2_HS_Ack(west_to_ack[1][2]), \
+    .io_West_toPEs_1_2_Data_flit(west_to_flit[1][2]), \
+    .io_South_toPEs_1_2_HS_Req(south_to_req[1][2]), \
+    .io_South_toPEs_1_2_HS_Ack(south_to_ack[1][2]), \
+    .io_South_toPEs_1_2_Data_flit(south_to_flit[1][2]), \
+    .io_East_fromPEs_1_3_HS_Req(east_from_req[1][3]), \
+    .io_East_fromPEs_1_3_HS_Ack(east_from_ack[1][3]), \
+    .io_East_fromPEs_1_3_Data_flit(east_from_flit[1][3]), \
+    .io_North_fromPEs_1_3_HS_Req(north_from_req[1][3]), \
+    .io_North_fromPEs_1_3_HS_Ack(north_from_ack[1][3]), \
+    .io_North_fromPEs_1_3_Data_flit(north_from_flit[1][3]), \
+    .io_West_fromPEs_1_3_HS_Req(west_from_req[1][3]), \
+    .io_West_fromPEs_1_3_HS_Ack(west_from_ack[1][3]), \
+    .io_West_fromPEs_1_3_Data_flit(west_from_flit[1][3]), \
+    .io_South_fromPEs_1_3_HS_Req(south_from_req[1][3]), \
+    .io_South_fromPEs_1_3_HS_Ack(south_from_ack[1][3]), \
+    .io_South_fromPEs_1_3_Data_flit(south_from_flit[1][3]), \
+    .io_East_toPEs_1_3_HS_Req(east_to_req[1][3]), \
+    .io_East_toPEs_1_3_HS_Ack(east_to_ack[1][3]), \
+    .io_East_toPEs_1_3_Data_flit(east_to_flit[1][3]), \
+    .io_North_toPEs_1_3_HS_Req(north_to_req[1][3]), \
+    .io_North_toPEs_1_3_HS_Ack(north_to_ack[1][3]), \
+    .io_North_toPEs_1_3_Data_flit(north_to_flit[1][3]), \
+    .io_West_toPEs_1_3_HS_Req(west_to_req[1][3]), \
+    .io_West_toPEs_1_3_HS_Ack(west_to_ack[1][3]), \
+    .io_West_toPEs_1_3_Data_flit(west_to_flit[1][3]), \
+    .io_South_toPEs_1_3_HS_Req(south_to_req[1][3]), \
+    .io_South_toPEs_1_3_HS_Ack(south_to_ack[1][3]), \
+    .io_South_toPEs_1_3_Data_flit(south_to_flit[1][3]), \
     .io_East_fromPEs_2_0_HS_Req(east_from_req[2][0]), \
     .io_East_fromPEs_2_0_HS_Ack(east_from_ack[2][0]), \
     .io_East_fromPEs_2_0_Data_flit(east_from_flit[2][0]), \
@@ -6293,6 +6389,54 @@
     .io_South_toPEs_2_1_HS_Req(south_to_req[2][1]), \
     .io_South_toPEs_2_1_HS_Ack(south_to_ack[2][1]), \
     .io_South_toPEs_2_1_Data_flit(south_to_flit[2][1]), \
+    .io_East_fromPEs_2_2_HS_Req(east_from_req[2][2]), \
+    .io_East_fromPEs_2_2_HS_Ack(east_from_ack[2][2]), \
+    .io_East_fromPEs_2_2_Data_flit(east_from_flit[2][2]), \
+    .io_North_fromPEs_2_2_HS_Req(north_from_req[2][2]), \
+    .io_North_fromPEs_2_2_HS_Ack(north_from_ack[2][2]), \
+    .io_North_fromPEs_2_2_Data_flit(north_from_flit[2][2]), \
+    .io_West_fromPEs_2_2_HS_Req(west_from_req[2][2]), \
+    .io_West_fromPEs_2_2_HS_Ack(west_from_ack[2][2]), \
+    .io_West_fromPEs_2_2_Data_flit(west_from_flit[2][2]), \
+    .io_South_fromPEs_2_2_HS_Req(south_from_req[2][2]), \
+    .io_South_fromPEs_2_2_HS_Ack(south_from_ack[2][2]), \
+    .io_South_fromPEs_2_2_Data_flit(south_from_flit[2][2]), \
+    .io_East_toPEs_2_2_HS_Req(east_to_req[2][2]), \
+    .io_East_toPEs_2_2_HS_Ack(east_to_ack[2][2]), \
+    .io_East_toPEs_2_2_Data_flit(east_to_flit[2][2]), \
+    .io_North_toPEs_2_2_HS_Req(north_to_req[2][2]), \
+    .io_North_toPEs_2_2_HS_Ack(north_to_ack[2][2]), \
+    .io_North_toPEs_2_2_Data_flit(north_to_flit[2][2]), \
+    .io_West_toPEs_2_2_HS_Req(west_to_req[2][2]), \
+    .io_West_toPEs_2_2_HS_Ack(west_to_ack[2][2]), \
+    .io_West_toPEs_2_2_Data_flit(west_to_flit[2][2]), \
+    .io_South_toPEs_2_2_HS_Req(south_to_req[2][2]), \
+    .io_South_toPEs_2_2_HS_Ack(south_to_ack[2][2]), \
+    .io_South_toPEs_2_2_Data_flit(south_to_flit[2][2]), \
+    .io_East_fromPEs_2_3_HS_Req(east_from_req[2][3]), \
+    .io_East_fromPEs_2_3_HS_Ack(east_from_ack[2][3]), \
+    .io_East_fromPEs_2_3_Data_flit(east_from_flit[2][3]), \
+    .io_North_fromPEs_2_3_HS_Req(north_from_req[2][3]), \
+    .io_North_fromPEs_2_3_HS_Ack(north_from_ack[2][3]), \
+    .io_North_fromPEs_2_3_Data_flit(north_from_flit[2][3]), \
+    .io_West_fromPEs_2_3_HS_Req(west_from_req[2][3]), \
+    .io_West_fromPEs_2_3_HS_Ack(west_from_ack[2][3]), \
+    .io_West_fromPEs_2_3_Data_flit(west_from_flit[2][3]), \
+    .io_South_fromPEs_2_3_HS_Req(south_from_req[2][3]), \
+    .io_South_fromPEs_2_3_HS_Ack(south_from_ack[2][3]), \
+    .io_South_fromPEs_2_3_Data_flit(south_from_flit[2][3]), \
+    .io_East_toPEs_2_3_HS_Req(east_to_req[2][3]), \
+    .io_East_toPEs_2_3_HS_Ack(east_to_ack[2][3]), \
+    .io_East_toPEs_2_3_Data_flit(east_to_flit[2][3]), \
+    .io_North_toPEs_2_3_HS_Req(north_to_req[2][3]), \
+    .io_North_toPEs_2_3_HS_Ack(north_to_ack[2][3]), \
+    .io_North_toPEs_2_3_Data_flit(north_to_flit[2][3]), \
+    .io_West_toPEs_2_3_HS_Req(west_to_req[2][3]), \
+    .io_West_toPEs_2_3_HS_Ack(west_to_ack[2][3]), \
+    .io_West_toPEs_2_3_Data_flit(west_to_flit[2][3]), \
+    .io_South_toPEs_2_3_HS_Req(south_to_req[2][3]), \
+    .io_South_toPEs_2_3_HS_Ack(south_to_ack[2][3]), \
+    .io_South_toPEs_2_3_Data_flit(south_to_flit[2][3]), \
     .io_East_fromPEs_3_0_HS_Req(east_from_req[3][0]), \
     .io_East_fromPEs_3_0_HS_Ack(east_from_ack[3][0]), \
     .io_East_fromPEs_3_0_Data_flit(east_from_flit[3][0]), \
@@ -6340,7 +6484,55 @@
     .io_West_toPEs_3_1_Data_flit(west_to_flit[3][1]), \
     .io_South_toPEs_3_1_HS_Req(south_to_req[3][1]), \
     .io_South_toPEs_3_1_HS_Ack(south_to_ack[3][1]), \
-    .io_South_toPEs_3_1_Data_flit(south_to_flit[3][1]) \
+    .io_South_toPEs_3_1_Data_flit(south_to_flit[3][1]), \
+    .io_East_fromPEs_3_2_HS_Req(east_from_req[3][2]), \
+    .io_East_fromPEs_3_2_HS_Ack(east_from_ack[3][2]), \
+    .io_East_fromPEs_3_2_Data_flit(east_from_flit[3][2]), \
+    .io_North_fromPEs_3_2_HS_Req(north_from_req[3][2]), \
+    .io_North_fromPEs_3_2_HS_Ack(north_from_ack[3][2]), \
+    .io_North_fromPEs_3_2_Data_flit(north_from_flit[3][2]), \
+    .io_West_fromPEs_3_2_HS_Req(west_from_req[3][2]), \
+    .io_West_fromPEs_3_2_HS_Ack(west_from_ack[3][2]), \
+    .io_West_fromPEs_3_2_Data_flit(west_from_flit[3][2]), \
+    .io_South_fromPEs_3_2_HS_Req(south_from_req[3][2]), \
+    .io_South_fromPEs_3_2_HS_Ack(south_from_ack[3][2]), \
+    .io_South_fromPEs_3_2_Data_flit(south_from_flit[3][2]), \
+    .io_East_toPEs_3_2_HS_Req(east_to_req[3][2]), \
+    .io_East_toPEs_3_2_HS_Ack(east_to_ack[3][2]), \
+    .io_East_toPEs_3_2_Data_flit(east_to_flit[3][2]), \
+    .io_North_toPEs_3_2_HS_Req(north_to_req[3][2]), \
+    .io_North_toPEs_3_2_HS_Ack(north_to_ack[3][2]), \
+    .io_North_toPEs_3_2_Data_flit(north_to_flit[3][2]), \
+    .io_West_toPEs_3_2_HS_Req(west_to_req[3][2]), \
+    .io_West_toPEs_3_2_HS_Ack(west_to_ack[3][2]), \
+    .io_West_toPEs_3_2_Data_flit(west_to_flit[3][2]), \
+    .io_South_toPEs_3_2_HS_Req(south_to_req[3][2]), \
+    .io_South_toPEs_3_2_HS_Ack(south_to_ack[3][2]), \
+    .io_South_toPEs_3_2_Data_flit(south_to_flit[3][2]), \
+    .io_East_fromPEs_3_3_HS_Req(east_from_req[3][3]), \
+    .io_East_fromPEs_3_3_HS_Ack(east_from_ack[3][3]), \
+    .io_East_fromPEs_3_3_Data_flit(east_from_flit[3][3]), \
+    .io_North_fromPEs_3_3_HS_Req(north_from_req[3][3]), \
+    .io_North_fromPEs_3_3_HS_Ack(north_from_ack[3][3]), \
+    .io_North_fromPEs_3_3_Data_flit(north_from_flit[3][3]), \
+    .io_West_fromPEs_3_3_HS_Req(west_from_req[3][3]), \
+    .io_West_fromPEs_3_3_HS_Ack(west_from_ack[3][3]), \
+    .io_West_fromPEs_3_3_Data_flit(west_from_flit[3][3]), \
+    .io_South_fromPEs_3_3_HS_Req(south_from_req[3][3]), \
+    .io_South_fromPEs_3_3_HS_Ack(south_from_ack[3][3]), \
+    .io_South_fromPEs_3_3_Data_flit(south_from_flit[3][3]), \
+    .io_East_toPEs_3_3_HS_Req(east_to_req[3][3]), \
+    .io_East_toPEs_3_3_HS_Ack(east_to_ack[3][3]), \
+    .io_East_toPEs_3_3_Data_flit(east_to_flit[3][3]), \
+    .io_North_toPEs_3_3_HS_Req(north_to_req[3][3]), \
+    .io_North_toPEs_3_3_HS_Ack(north_to_ack[3][3]), \
+    .io_North_toPEs_3_3_Data_flit(north_to_flit[3][3]), \
+    .io_West_toPEs_3_3_HS_Req(west_to_req[3][3]), \
+    .io_West_toPEs_3_3_HS_Ack(west_to_ack[3][3]), \
+    .io_West_toPEs_3_3_Data_flit(west_to_flit[3][3]), \
+    .io_South_toPEs_3_3_HS_Req(south_to_req[3][3]), \
+    .io_South_toPEs_3_3_HS_Ack(south_to_ack[3][3]), \
+    .io_South_toPEs_3_3_Data_flit(south_to_flit[3][3]) \
   );
 
 `endif

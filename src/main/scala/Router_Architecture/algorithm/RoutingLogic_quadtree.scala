@@ -53,38 +53,48 @@ class RoutingLogic(coordinate_x: Int, coordinate_y: Int) {
       projectedDir(0) := (xMax > 3.U) && (yMax > 3.U)
       projectedDir(4) := false.B
     } else if (level == 2) {
-      val coords_00_x = coordinate_x
-      val coords_00_y = coordinate_y
-      val coords_01_x = coordinate_x | 0x2
-      val coords_01_y = coordinate_y
-      val coords_10_x = coordinate_x
-      val coords_10_y = coordinate_y | 0x2
-      val coords_11_x = coordinate_x | 0x2
-      val coords_11_y = coordinate_y | 0x2
+      // L2 routers are indexed globally across the whole NoC, but the clipped
+      // rectangle we compare against is always local to the current 8x8 tree.
+      // Project each child L1 subtree using the router's local (0..1, 0..1)
+      // coordinate inside that tree rather than the absolute router index.
+      val baseX = Cat(localRouterX(0), 0.U(2.W))
+      val baseY = Cat(localRouterY(0), 0.U(2.W))
+      val coords_00_x = baseX
+      val coords_00_y = baseY
+      val coords_01_x = baseX | 0x2.U
+      val coords_01_y = baseY
+      val coords_10_x = baseX
+      val coords_10_y = baseY | 0x2.U
+      val coords_11_x = baseX | 0x2.U
+      val coords_11_y = baseY | 0x2.U
       projectedDir(
         3
-      ) := ((coords_00_x.U | 0x1.U) >= xMin) && (coords_00_x.U <= xMax) && ((coords_00_y.U | 0x1.U) >= yMin) && (coords_00_y.U <= yMax)
+      ) := ((coords_00_x | 0x1.U) >= xMin) && (coords_00_x <= xMax) && ((coords_00_y | 0x1.U) >= yMin) && (coords_00_y <= yMax)
       projectedDir(
         1
-      ) := ((coords_01_x.U | 0x1.U) >= xMin) && (coords_01_x.U <= xMax) && ((coords_01_y.U | 0x1.U) >= yMin) && (coords_01_y.U <= yMax)
+      ) := ((coords_01_x | 0x1.U) >= xMin) && (coords_01_x <= xMax) && ((coords_01_y | 0x1.U) >= yMin) && (coords_01_y <= yMax)
       projectedDir(
         2
-      ) := ((coords_10_x.U | 0x1.U) >= xMin) && (coords_10_x.U <= xMax) && ((coords_10_y.U | 0x1.U) >= yMin) && (coords_10_y.U <= yMax)
+      ) := ((coords_10_x | 0x1.U) >= xMin) && (coords_10_x <= xMax) && ((coords_10_y | 0x1.U) >= yMin) && (coords_10_y <= yMax)
       projectedDir(
         0
-      ) := ((coords_11_x.U | 0x1.U) >= xMin) && (coords_11_x.U <= xMax) && ((coords_11_y.U | 0x1.U) >= yMin) && (coords_11_y.U <= yMax)
+      ) := ((coords_11_x | 0x1.U) >= xMin) && (coords_11_x <= xMax) && ((coords_11_y | 0x1.U) >= yMin) && (coords_11_y <= yMax)
       projectedDir(
         4
-      ) := !((xMin >= coords_00_x.U) && (xMax <= (coords_01_x.U | 0x1.U)) && (yMin >= coords_00_y.U) && (yMax <= (coords_10_y.U | 0x1.U)))
+      ) := !((xMin >= coords_00_x) && (xMax <= (coords_01_x | 0x1.U)) && (yMin >= coords_00_y) && (yMax <= (coords_10_y | 0x1.U)))
     } else if (level == 1) {
-      val coords_00_x = coordinate_x.U
-      val coords_00_y = coordinate_y.U
-      val coords_01_x = coordinate_x.U | 0x1.U
-      val coords_01_y = coordinate_y.U
-      val coords_10_x = coordinate_x.U
-      val coords_10_y = coordinate_y.U | 0x1.U
-      val coords_11_x = coordinate_x.U | 0x1.U
-      val coords_11_y = coordinate_y.U | 0x1.U
+      // L1 routers are also globally indexed; convert back to the current
+      // tree-local 2x2 core window before comparing against local coordinates.
+      val baseX = Cat(localRouterX, 0.U(1.W))
+      val baseY = Cat(localRouterY, 0.U(1.W))
+      val coords_00_x = baseX
+      val coords_00_y = baseY
+      val coords_01_x = baseX | 0x1.U
+      val coords_01_y = baseY
+      val coords_10_x = baseX
+      val coords_10_y = baseY | 0x1.U
+      val coords_11_x = baseX | 0x1.U
+      val coords_11_y = baseY | 0x1.U
       projectedDir(
         3
       ) := (coords_00_x >= xMin) && (coords_00_x <= xMax) && (coords_00_y >= yMin) && (coords_00_y <= yMax)

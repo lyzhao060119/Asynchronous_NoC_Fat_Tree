@@ -1,16 +1,37 @@
 `timescale 1ns/1ps
 `default_nettype none
+`include "quadtree_and_mesh_tb_cfg.vh"
+
+`ifndef QAM_TB_EDGE_N
+`define QAM_TB_EDGE_N 2
+`endif
+
+`ifndef QAM_TB_N_CORE
+`define QAM_TB_N_CORE 64
+`endif
+
+`ifndef QAM_TB_TOP_LANE
+`define QAM_TB_TOP_LANE 4
+`endif
+
+`ifndef QAM_TB_HANDSHAKE_TIMEOUT_NS
+`define QAM_TB_HANDSHAKE_TIMEOUT_NS 500000
+`endif
+
+`ifndef QAM_TB_GLOBAL_TIMEOUT_NS
+`define QAM_TB_GLOBAL_TIMEOUT_NS 8000000
+`endif
 
 module quadtree_and_mesh_tb;
   localparam int FLIT_W = 28;
-  localparam int N_QUAD = 4;      // 2x2 tree tiles
-  localparam int N_CORE = 64;     // per tile
-  localparam int EDGE_N = 2;      // 2 rows / 2 cols
-  localparam int TOP_LANE = 4;
+  localparam int EDGE_N = `QAM_TB_EDGE_N;
+  localparam int N_QUAD = EDGE_N * EDGE_N;
+  localparam int N_CORE = `QAM_TB_N_CORE;
+  localparam int TOP_LANE = `QAM_TB_TOP_LANE;
   localparam int MAX_RX_PER_PORT = 1024;
   localparam int DEFAULT_ACK_DELAY_NS = 1;
-  localparam int HANDSHAKE_TIMEOUT_NS = 500000;
-  localparam int GLOBAL_TIMEOUT_NS = 8000000;
+  localparam int HANDSHAKE_TIMEOUT_NS = `QAM_TB_HANDSHAKE_TIMEOUT_NS;
+  localparam int GLOBAL_TIMEOUT_NS = `QAM_TB_GLOBAL_TIMEOUT_NS;
 
   logic clock;
   logic reset;
