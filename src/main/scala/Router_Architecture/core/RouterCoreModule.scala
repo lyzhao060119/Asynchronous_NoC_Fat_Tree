@@ -22,6 +22,12 @@ class RouterCoreModule(
   private val ipm = Module(new RouterIPM(config, computeHeadRouting))
   private val opm = Module(new RouterOPM(config))
 
+  private def outPort(idx: Int): HS_Packet = {
+    val d = config.dirOfPhys(idx)
+    val l = config.laneOfPhys(idx)
+    if (d < 4) io.outputs.child(d)(l) else io.outputs.parent(l)
+  }
+
   ipm.io.inputs <> io.inputs
   opm.io.outputs <> io.outputs
 
@@ -31,5 +37,8 @@ class RouterCoreModule(
   }
 
   ipm.io.opmHolder := opm.io.holder
-  ipm.io.opmAnyPending := opm.io.anyPending
+  for (o <- 0 until config.totalPorts) {
+    // Toggle handshake: channel empty when Req and Ack share the same phase.
+    ipm.io.opmOutEmpty(o) := outPort(o).HS.Req === outPort(o).HS.Ack
+  }
 }

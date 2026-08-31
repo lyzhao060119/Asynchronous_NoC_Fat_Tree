@@ -3,6 +3,7 @@ package Router_Architecture.ipm
 import DataStruct._
 import Router_Architecture.common.AsyncFork
 import chisel3._
+import tool.AsyncDelay
 
 /** Paper-aligned request-generator block for one input port.
   *
@@ -17,6 +18,7 @@ class InputRequestGeneratorModule(forkWidth: Int) extends Module {
   val io = IO(new Bundle {
     val in = new HS_Packet
     val destMask = Input(Vec(forkWidth, Bool()))
+    val canLaunch = Input(Bool())
     val forkOutputs = Vec(forkWidth, Flipped(new HS_Packet))
 
     val packetLaunch = Output(Bool())
@@ -25,10 +27,13 @@ class InputRequestGeneratorModule(forkWidth: Int) extends Module {
     val packetCompleteClock = Output(Clock())
   })
 
-  private val fork = Module(new AsyncFork(forkWidth))
+  private val fork = Module(
+    new AsyncFork(forkWidth, launchDelayRole = AsyncDelay.ReqGenLaunch)
+  )
 
   fork.io.in <> io.in
   fork.io.destMask := io.destMask
+  fork.io.canLaunch := io.canLaunch
   io.forkOutputs <> fork.io.out
 
   io.packetLaunch := fork.io.launch

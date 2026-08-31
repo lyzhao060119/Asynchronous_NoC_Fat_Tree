@@ -13,6 +13,7 @@ final case class RouterModuleConfig(
   childLanes: Int,
   parentLanes: Int,
   fifoDepth: Int = 1,
+  vcCount: Int = 2,
   isHeadIndex: Int = PacketLayout.IsHeadIndex,
   isTailIndex: Int = PacketLayout.IsTailIndex,
   nDirs: Int = 5,
@@ -22,12 +23,15 @@ final case class RouterModuleConfig(
 ) {
   require(childLanes > 0)
   require(parentLanes > 0)
+  require(vcCount >= 1)
 
   val totalPorts: Int = 4 * childLanes + parentLanes
   val maxLanes: Int = math.max(childLanes, parentLanes)
   val laneW: Int = math.max(1, log2Ceil(maxLanes))
   val holderW: Int = math.max(1, log2Ceil(totalPorts + 1))
   val noneValue: Int = totalPorts
+
+  def physOfInput(logicalIdx: Int): Int = logicalIdx
 
   def lanesPerDir(d: Int): Int =
     if (d < 4) childLanes else parentLanes

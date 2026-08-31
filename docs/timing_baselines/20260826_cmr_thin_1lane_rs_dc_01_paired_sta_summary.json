@@ -1,0 +1,84 @@
+{
+  "baseline": "20260826_cmr_thin_1lane_rs_dc_01",
+  "run_id": "20260827_003240_cmr_thin_paired_sta",
+  "report_dir": "results\\20260827_003240_cmr_thin_paired_sta\\sta",
+  "csv": "results\\20260827_003240_cmr_thin_paired_sta\\sta\\paired_catalog.csv",
+  "production_sdc": false,
+  "delay_cells_changed": false,
+  "row_count": 400,
+  "ids": {
+    "CMR-OPM-01": {
+      "rows": 150,
+      "instances": 25,
+      "no_path_count": 0,
+      "status": "measured",
+      "tdata_max_ns": 0.047318,
+      "tctrl_min_ns": 0.214944,
+      "worst_rtm_pct": 354.257,
+      "worst_shortfall_ns": 0.0,
+      "worst": {
+        "instance": "routerL1_0_0/OutputPortModules_0",
+        "site": "tail",
+        "edge": "fall",
+        "tdata_max_ns": 0.047318,
+        "tctrl_min_ns": 0.214944,
+        "rtm_pct": 354.257,
+        "shortfall_ns": 0.0,
+        "no_path": false,
+        "loop_cut": "disable DataReg latch_cell (D endpoint); disable L1_L4 latch_cell; disable L5.E (keep L5 D?Q); disable DataReg.D"
+      },
+      "loop_cut": "disable DataReg latch_cell (D endpoint); disable L1_L4 latch_cell; disable L5.E (keep L5 D?Q); disable DataReg.D"
+    },
+    "CMR-OPM-01-CE": {
+      "rows": 50,
+      "instances": 25,
+      "no_path_count": 50,
+      "status": "segment_pin_miss",
+      "tdata_max_ns": null,
+      "tctrl_min_ns": null,
+      "worst_rtm_pct": null,
+      "worst_shortfall_ns": null,
+      "worst": null,
+      "loop_cut": "disable L1_L4 and DataReg latch cells for Q startpoints; CE is a segment check, not an inner-loop ID"
+    },
+    "CMR-RCU-01": {
+      "rows": 200,
+      "instances": 25,
+      "no_path_count": 0,
+      "status": "measured",
+      "tdata_max_ns": 0.341418,
+      "tctrl_min_ns": 0.884294,
+      "worst_rtm_pct": 159.146,
+      "worst_shortfall_ns": 0.0,
+      "worst": {
+        "instance": "routerL1_1_1/InputPortModules_0/RouteComputationUnit",
+        "site": "bit2",
+        "edge": "rise",
+        "tdata_max_ns": 0.341418,
+        "tctrl_min_ns": 0.884771,
+        "rtm_pct": 159.146,
+        "shortfall_ns": 0.0,
+        "no_path": false,
+        "loop_cut": "disable AddressRegister LatchReg latch_cell (dest/req Q startpoints)"
+      },
+      "loop_cut": "disable AddressRegister LatchReg latch_cell (dest/req Q startpoints)"
+    }
+  },
+  "catalog_coverage": {
+    "CMR-AR-01": "not_measured_this_run",
+    "CMR-RCU-01": "measured",
+    "CMR-OPM-01": "measured",
+    "CMR-OPM-01-CE": "measured_segment",
+    "CMR-TP-01": "not_measured_this_run",
+    "CMR-LANE-01": "n_a_thin",
+    "CMR-HS-01": "not_measured_this_run",
+    "CMR-HS-02": "not_measured_this_run",
+    "CMR-WP-01": "not_measured_this_run",
+    "CMR-XOR-01": "corollary_of_wp01",
+    "CMR-RP-01": "not_measured_this_run",
+    "CMR-MTX-01": "not_delay_rtm",
+    "CMR-FIFO-01": "not_measured_this_run"
+  },
+  "done_marker": false,
+  "markdown_table": "| ID | Status | Sites | Tdata_max (ns) | Tctrl_min (ns) | Worst RTM % | Shortfall (ns) | no-path | Loop cut |\n|---|---|---:|---:|---:|---:|---:|---:|---|\n| CMR-AR-01 | not_measured_this_run | - | - | - | - | - | - | - |\n| CMR-RCU-01 | measured | 200 | 0.3414 | 0.8843 | 159.146 | 0.0000 | 0 | disable AddressRegister LatchReg latch_cell (dest/req Q startpoints) |\n| CMR-OPM-01 | measured | 150 | 0.0473 | 0.2149 | 354.257 | 0.0000 | 0 | disable DataReg latch_cell (D endpoint); disable L1_L4 latch_cell; disable L5.E (keep L5 D?Q); disable DataReg.D |\n| CMR-OPM-01-CE | segment_pin_miss | 50 | - | - | - | - | 50 | disable L1_L4 and DataReg latch cells for Q startpoints; CE is a segment check, not an inner-loop ID |\n| CMR-TP-01 | not_measured_this_run | - | - | - | - | - | - | - |\n| CMR-LANE-01 | n_a_thin | - | - | - | - | - | - | - |\n| CMR-HS-01 | not_measured_this_run | - | - | - | - | - | - | - |\n| CMR-HS-02 | not_measured_this_run | - | - | - | - | - | - | - |\n| CMR-WP-01 | not_measured_this_run | - | - | - | - | - | - | - |\n| CMR-XOR-01 | corollary_of_wp01 | - | - | - | - | - | - | - |\n| CMR-RP-01 | not_measured_this_run | - | - | - | - | - | - | - |\n| CMR-MTX-01 | not_delay_rtm | - | - | - | - | - | - | - |\n| CMR-FIFO-01 | not_measured_this_run | - | - | - | - | - | - | - |\n"
+}

@@ -9,8 +9,9 @@ module Mutex2(
     wire q0;
     wire q1;
 
-    assign #(0.1) q0 = ~(req0 & q1);
-    assign #(0.1) q1 = ~(req1 & q0);
-    assign gnt0 = ~q0;
-    assign gnt1 = ~q1;
+    assign q0 = ~(req0 & q1);
+    assign q1 = ~(req1 & q0);
+
+    nor nor_4_gnt0(gnt0, q0, q0, q0, q0);
+    nor nor_4_gnt1(gnt1, q1, q1, q1, q1);
 endmodule

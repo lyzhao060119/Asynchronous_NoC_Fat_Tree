@@ -1,0 +1,50 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "R-U5",
+  "title": "Isolated router 5-flit unicast, empty net, no contention",
+  "traffic": "r_u5",
+  "packet_flits": 5,
+  "multicast": false,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": null,
+  "spread_S": null,
+  "multicast_fraction": null,
+  "destination_set_samples": null,
+  "warmup_original_events": 0,
+  "measurement_original_events": 1,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": false,
+    "coarse_then_fine": false,
+    "saturation_rule": "n/a"
+  },
+  "metrics": [
+    "head_ns",
+    "body_ns",
+    "tail_ns",
+    "cycle_ns",
+    "mflit_s",
+    "area_um2",
+    "energy_j",
+    "idle_w",
+    "active_w"
+  ],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": [
+    "ASYNC_THIN_1X1",
+    "SYNC_THIN_1X1",
+    "ASYNC_FAT_1X2",
+    "ASYNC_PROP_2X2",
+    "SYNC_PROP_2X2",
+    "ASYNC_TOPMESH_2X2",
+    "ASYNC_FLATMESH_1X1",
+    "ASYNC_PFAT_2X4",
+    "ASYNC_PFAT_4X8"
+  ],
+  "paper_figures": [
+    "Table I"
+  ],
+  "notes": "Also run continuous 5-flit stream, idle window, and contention sanity. Not a network load sweep."
+}

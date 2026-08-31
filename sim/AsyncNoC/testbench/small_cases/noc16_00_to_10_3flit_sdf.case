@@ -1,0 +1,13 @@
+# NoC16 SDF localization: core0 (0,0) to core1 (1,0), same L1 router.
+case noc16_00_to_10_3flit_sdf
+group CMR_LOCALIZE
+timeout_cycles 20000
+reset_cycles 20
+out_ack_delay_cycles 0
+event_map      0      0
+input      0  0      0 8004004
+input     50  0      0 0004004
+input    100  0      0 4004004
+expect 00002      0 0 8004004
+expect 00002      0 0 0004004
+expect 00002      0 1 4004004

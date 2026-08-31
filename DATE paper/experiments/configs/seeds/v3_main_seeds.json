@@ -1,0 +1,12 @@
+{
+  "schema": "date-v3-seeds-v1",
+  "seed_set_id": "v3_main_seeds",
+  "frozen": true,
+  "seeds": [
+    202701,
+    202702,
+    202703
+  ],
+  "arb_seed_offset": 10007,
+  "notes": "Traffic seeds are design-independent. Arbitration RNG is a separate recorded stream."
+}

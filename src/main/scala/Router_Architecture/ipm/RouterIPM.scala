@@ -20,7 +20,7 @@ class RouterIPM(
     val toOpm = Vec(config.edgeCount, Flipped(new HS_Packet))
 
     val opmHolder = Input(Vec(config.totalPorts, UInt(config.holderW.W)))
-    val opmAnyPending = Input(Vec(config.totalPorts, Bool()))
+    val opmOutEmpty = Input(Vec(config.totalPorts, Bool()))
   })
 
   private def inPort(idx: Int): HS_Packet = {
@@ -46,13 +46,19 @@ class RouterIPM(
     control.io.isHead(i) := inputPorts(i).io.isHead
     control.io.storedDir(i) := inputPorts(i).io.storedDir
     control.io.storedLane(i) := inputPorts(i).io.storedLane
+    control.io.storedMask(i) := inputPorts(i).io.storedMask
   }
   control.io.opmHolder := io.opmHolder
-  control.io.opmAnyPending := io.opmAnyPending
+  control.io.opmOutEmpty := io.opmOutEmpty
+  for (i <- 0 until config.totalPorts) {
+    control.io.headLaunch(i) := inputPorts(i).io.headLaunch
+  }
 
   for (i <- 0 until config.totalPorts) {
     inputPorts(i).io.nextDir := control.io.nextDir(i)
     inputPorts(i).io.nextLane := control.io.nextLane(i)
+    inputPorts(i).io.nextMask := control.io.destMask(i)
+    inputPorts(i).io.canLaunch := control.io.canLaunch(i)
     for ((edgeId, localIdx) <- config.edgesByInput(i).zipWithIndex) {
       // Convert dense physical output indexing into the local sparse fork index.
       inputPorts(i).io.destMask(localIdx) := control.io.destMask(i)(

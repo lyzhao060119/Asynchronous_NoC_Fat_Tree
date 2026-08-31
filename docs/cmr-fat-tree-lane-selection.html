@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CMR Fat-tree：IPM 到多 Lane OPM 的选择逻辑</title>
+  <style>
+    :root {
+      --page: #f5f7fa;
+      --surface: #ffffff;
+      --ink: #172033;
+      --muted: #566273;
+      --line: #ccd5e0;
+      --data: #1f2937;
+      --request: #c66b15;
+      --ack: #6c52c9;
+      --control: #2367ad;
+      --state: #41834f;
+      --group: #edf4fb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+    header {
+      max-width: 1580px;
+      margin: 0 auto;
+      padding: 28px 30px 12px;
+    }
+    h1 { margin: 0 0 8px; font-size: 25px; }
+    header p { margin: 0; color: var(--muted); line-height: 1.6; }
+    main {
+      max-width: 1580px;
+      margin: 0 auto;
+      padding: 8px 30px 30px;
+    }
+    .diagram {
+      overflow: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    svg { display: block; min-width: 1480px; width: 100%; }
+    .group { fill: var(--group); stroke: #7da5cf; stroke-width: 2; }
+    .module { fill: #fff; stroke: #425d7b; stroke-width: 2; }
+    .opm { fill: #fbfff8; stroke: var(--state); stroke-width: 2; }
+    .title { font-size: 18px; font-weight: 700; fill: var(--ink); text-anchor: middle; }
+    .subtitle { font-size: 13px; fill: var(--muted); text-anchor: middle; }
+    .group-title { font-size: 20px; font-weight: 700; fill: #294f77; }
+    .label { font-size: 11px; font-weight: 700; text-anchor: middle; }
+    .note { font-size: 13px; fill: var(--muted); }
+    .data { fill: none; stroke: var(--data); stroke-width: 2.8; marker-end: url(#data-arrow); }
+    .req { fill: none; stroke: var(--request); stroke-width: 2.5; stroke-dasharray: 8 6; marker-end: url(#req-arrow); }
+    .ack { fill: none; stroke: var(--ack); stroke-width: 2.5; stroke-dasharray: 8 6; marker-end: url(#ack-arrow); }
+    .ctrl { fill: none; stroke: var(--control); stroke-width: 2.3; stroke-dasharray: 4 5; marker-end: url(#ctrl-arrow); }
+    .state { fill: none; stroke: var(--state); stroke-width: 2.3; marker-end: url(#state-arrow); }
+    .data-text { fill: var(--data); }
+    .req-text { fill: var(--request); }
+    .ack-text { fill: var(--ack); }
+    .ctrl-text { fill: var(--control); }
+    .state-text { fill: var(--state); }
+    .legend { fill: #fff; stroke: var(--line); stroke-width: 1.4; }
+    .summary {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 15px 18px;
+    }
+    h2 { margin: 0 0 8px; font-size: 17px; }
+    ol, ul { margin: 8px 0 0; padding-left: 22px; line-height: 1.6; }
+    code { color: #294f77; font-family: Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CMR Fat-tree：一个 IPM direction branch 到多条物理 OPM lane</h1>
+    <p>示例为 L1 Router 的 child 输入发往 parent 方向：parent 有 lane 0、lane 1。IPM / OPM 内部细节省略，只画中间扩展互联、两级仲裁和两相相位适配。</p>
+  </header>
+  <main>
+    <div class="diagram">
+      <svg viewBox="0 0 1480 925" height="925" role="img" aria-label="CMR fat-tree multi-lane IPM to OPM transfer and lane arbitration">
+        <defs>
+          <marker id="data-arrow" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto">
+            <path d="M1 1L7 4L1 7" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+          </marker>
+          <marker id="req-arrow" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto">
+            <path d="M1 1L7 4L1 7" fill="none" stroke="#c66b15" stroke-width="1.5"/>
+          </marker>
+          <marker id="ack-arrow" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto">
+            <path d="M1 1L7 4L1 7" fill="none" stroke="#6c52c9" stroke-width="1.5"/>
+          </marker>
+          <marker id="ctrl-arrow" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto">
+            <path d="M1 1L7 4L1 7" fill="none" stroke="#2367ad" stroke-width="1.5"/>
+          </marker>
+          <marker id="state-arrow" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto">
+            <path d="M1 1L7 4L1 7" fill="none" stroke="#41834f" stroke-width="1.5"/>
+          </marker>
+        </defs>
+
+        <rect class="legend" x="24" y="20" width="710" height="62" rx="8"/>
+        <path class="data" d="M48 48H115"/><text class="label data-text" x="157" y="53">Data</text>
+        <path class="req" d="M218 48H285"/><text class="label req-text" x="336" y="53">Req</text>
+        <path class="ack" d="M397 48H464"/><text class="label ack-text" x="514" y="53">Ack</text>
+        <path class="ctrl" d="M574 48H641"/><text class="label ctrl-text" x="690" y="53">控制 / 仲裁</text>
+
+        <rect class="group" x="35" y="125" width="255" height="670" rx="16"/>
+        <text class="group-title" x="62" y="160">IPM direction branch</text>
+        <rect class="module" x="72" y="325" width="182" height="150" rx="10"/>
+        <text class="title" x="163" y="360">IPM</text>
+        <text class="subtitle" x="163" y="388">已选输出方向</text>
+        <text class="subtitle" x="163" y="415">PathEnabled / Reqout</text>
+        <text class="subtitle" x="163" y="440">Dataout / Ackin / TailPassed</text>
+
+        <rect class="group" x="340" y="125" width="360" height="670" rx="16"/>
+        <text class="group-title" x="365" y="160">lane allocation</text>
+        <rect class="module" x="405" y="255" width="230" height="155" rx="10"/>
+        <text class="title" x="520" y="290">ContinuousLaneSelector(2)</text>
+        <text class="subtitle" x="520" y="320">CMRMutexN(2)</text>
+        <text class="subtitle" x="520" y="347">request[i] = PathEnabled</text>
+        <text class="subtitle" x="520" y="369">AND NOT OtherGrant[i]</text>
+
+        <rect class="module" x="405" y="510" width="230" height="160" rx="10"/>
+        <text class="title" x="520" y="545">LanePhaseAdapter(2)</text>
+        <text class="subtitle" x="520" y="575">OffsetLatch + AckLatch</text>
+        <text class="subtitle" x="520" y="602">锁定选中 lane 的相位</text>
+        <text class="subtitle" x="520" y="627">未 commit lane 保持 idle</text>
+
+        <rect class="group" x="770" y="125" width="675" height="670" rx="16"/>
+        <text class="group-title" x="795" y="160">parent direction：两条物理 output lane</text>
+
+        <rect class="opm" x="1010" y="230" width="335" height="175" rx="10"/>
+        <text class="title" x="1177" y="266">OPM parent / lane 0</text>
+        <text class="subtitle" x="1177" y="297">PktPathEnable[source]</text>
+        <text class="subtitle" x="1177" y="322">CMRMutexN(SourceCount) → Grant[source]</text>
+        <text class="subtitle" x="1177" y="347">Reqin[source] / Datain[source] / Ackout[source]</text>
+
+        <rect class="opm" x="1010" y="535" width="335" height="175" rx="10"/>
+        <text class="title" x="1177" y="571">OPM parent / lane 1</text>
+        <text class="subtitle" x="1177" y="602">PktPathEnable[source]</text>
+        <text class="subtitle" x="1177" y="627">CMRMutexN(SourceCount) → Grant[source]</text>
+        <text class="subtitle" x="1177" y="652">Reqin[source] / Datain[source] / Ackout[source]</text>
+
+        <!-- Control: first arbitration -->
+        <path class="ctrl" d="M254 354H405"/>
+        <text class="label ctrl-text" x="330" y="341">ipm.io.PathEnabled(branch) → selector.io.PathEnabled</text>
+        <path class="ctrl" d="M635 310H860V270H1010"/>
+        <text class="label ctrl-text" x="846" y="255">selector.io.LaneSelect(0) → OutputPortModules(4).io.PktPathEnable(source)</text>
+        <path class="ctrl" d="M635 355H900V575H1010"/>
+        <text class="label ctrl-text" x="862" y="558">selector.io.LaneSelect(1) → OutputPortModules(5).io.PktPathEnable(source)</text>
+
+        <!-- Data broadcast -->
+        <path class="data" d="M254 420H815V330H1010"/>
+        <text class="label data-text" x="745" y="316">ipm.io.Dataout(branch) → OutputPortModules(4).io.Datain(source)</text>
+        <path class="data" d="M254 440H840V635H1010"/>
+        <text class="label data-text" x="758" y="658">ipm.io.Dataout(branch) → OutputPortModules(5).io.Datain(source)</text>
+
+        <!-- Req through adapter -->
+        <path class="req" d="M254 395H370V585H405"/>
+        <text class="label req-text" x="330" y="575">ipm.io.Reqout(branch) → adapter.io.Reqin</text>
+        <path class="req" d="M635 580H900V365H1010"/>
+        <text class="label req-text" x="830" y="381">adapter.io.Reqout[0] → OutputPortModules(4).io.Reqin(source)</text>
+        <path class="req" d="M635 615H925V670H1010"/>
+        <text class="label req-text" x="840" y="692">adapter.io.Reqout[1] → OutputPortModules(5).io.Reqin(source)</text>
+
+        <!-- Second arbitration commit -->
+        <path class="state" d="M1010 350H720V625H635"/>
+        <text class="label state-text" x="785" y="609">OutputPortModules(4).io.Grant(source) → commits(0)</text>
+        <path class="state" d="M1010 655H745V650H635"/>
+        <text class="label state-text" x="775" y="668">OutputPortModules(5).io.Grant(source) → commits(1)</text>
+        <path class="ctrl" d="M635 645H680V450H735V430"/>
+        <text class="label ctrl-text" x="720" y="416">commits[i] → adapter.io.Commit[i]</text>
+        <path class="ctrl" d="M735 430V550H635"/>
+
+        <!-- OtherGrant return to selector -->
+        <path class="ctrl" d="M1010 290H930V210H660V255H635"/>
+        <text class="label ctrl-text" x="795" y="198">OutputPortModules(4).io.Grant(j≠source) → selector.io.OtherGrant(0)</text>
+        <path class="ctrl" d="M1010 595H950V735H675V405H635"/>
+        <text class="label ctrl-text" x="808" y="755">OutputPortModules(5).io.Grant(j≠source) → selector.io.OtherGrant(1)</text>
+
+        <!-- Ack return and tail release -->
+        <path class="ack" d="M1010 375H875V545H635"/>
+        <path class="ack" d="M1010 680H900V640H635"/>
+        <path class="ack" d="M405 645H325V455H254"/>
+        <text class="label ack-text" x="328" y="473">adapter.io.Ackout → ipm.io.Ackin(branch)</text>
+        <text class="label ack-text" x="760" y="530">OutputPortModules(4/5).io.Ackout(source) → adapter.io.Ackin[0/1]</text>
+        <path class="state" d="M1010 395H955V770H290V455H254"/>
+        <text class="label state-text" x="620" y="787">OutputPortModules(4/5).io.TailPassed(source) → ipm.io.TailPassed(branch)</text>
+
+        <text class="note" x="50" y="850">关键：Dataout 可以扇出到同方向所有 lane；真正使某条 OPM 采样/发送的是 LaneSelect → OPM Grant → Commit → PhaseAdapter。</text>
+        <text class="note" x="50" y="880">同一 packet 在 Commit 后固定使用一条物理 lane；下一 packet 才可重新进行 lane 选择。</text>
+      </svg>
+    </div>
+
+    <div class="summary">
+      <section>
+        <h2>选择顺序</h2>
+        <ol>
+          <li>IPM 的 RCU 已为一个方向置位 <code>PathEnabled</code>。</li>
+          <li>Selector 排除被其他 source 占用的 lane，并以 <code>CMRMutexN(2)</code> 选出 one-hot <code>LaneSelect</code>。</li>
+          <li>所选 lane 的 OPM 在所有 ingress 竞争者中给出 <code>Grant[source]</code>。</li>
+          <li><code>Commit = LaneSelect AND Grant</code> 后，Adapter 才让该 lane 看见转换后的 Req。</li>
+        </ol>
+      </section>
+      <section>
+        <h2>释放顺序</h2>
+        <ul>
+          <li>选中 OPM 检测到 Tail 后，对该 source 产生 <code>TailPassed</code>。</li>
+          <li>只允许 committed lane 的 TailPassed 回到该 IPM direction branch。</li>
+          <li>IPM 清除该方向的 <code>PathEnabled</code>，进而释放 OPM / lane 资源。</li>
+          <li>下一个 packet 才能重新选择 lane；这正是 CMR-TP-01 要约束的时序边界。</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

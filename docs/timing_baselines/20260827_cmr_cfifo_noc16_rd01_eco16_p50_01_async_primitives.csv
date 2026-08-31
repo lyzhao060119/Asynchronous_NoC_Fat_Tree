@@ -1,0 +1,17 @@
+primitive,count
+DelayElement_hier,0
+DEL_delay,125
+DEL050_delay,0
+DEL075_delay,0
+DEL100_delay,0
+DEL150_delay,100
+DEL250_delay,25
+Mutex2_hier,0
+ND2D1_mutex_q0,75
+ND2D2_mutex_q1,75
+ND2D1_mutex,150
+NR4D1_mutex_filter,150
+LHCNDQD_resettable_latch,6669
+V2CloseEvent_hier,0
+RouteSelAnd2_hier,100
+RouteSel_AN2D0,100

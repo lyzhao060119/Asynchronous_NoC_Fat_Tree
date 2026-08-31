@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Router IPM/OPM 综合内部互联框图</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --panel: #ffffff;
+      --group: #edf4ff;
+      --group-border: #6f9fd0;
+      --subgroup: #f5f9ff;
+      --module: #ffffff;
+      --module-border: #315f8f;
+      --data: #1d1d1f;
+      --req: #d9822b;
+      --ack: #7b61ff;
+      --ctrl: #3976d3;
+      --state: #5a8c2b;
+      --text: #172033;
+      --muted: #5f6b7a;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    header {
+      padding: 24px 32px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .canvas {
+      margin: 16px 32px 32px;
+      padding: 18px;
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid #d7e0ea;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(30, 60, 90, 0.08);
+    }
+
+    svg {
+      display: block;
+      min-width: 3200px;
+      background: #fbfdff;
+      border-radius: 10px;
+    }
+
+    .group {
+      fill: var(--group);
+      stroke: var(--group-border);
+      stroke-width: 2.4;
+      rx: 20;
+      ry: 20;
+    }
+
+    .subgroup {
+      fill: var(--subgroup);
+      stroke: var(--group-border);
+      stroke-width: 2;
+      rx: 16;
+      ry: 16;
+    }
+
+    .group-title {
+      fill: #1f4d7a;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .subgroup-title {
+      fill: #315f8f;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .module {
+      fill: var(--module);
+      stroke: var(--module-border);
+      stroke-width: 2.4;
+      rx: 12;
+      ry: 12;
+      filter: drop-shadow(0 3px 5px rgba(20, 50, 80, 0.12));
+    }
+
+    .state-module {
+      fill: #fbfff6;
+      stroke: var(--state);
+      stroke-width: 2.4;
+      rx: 12;
+      ry: 12;
+      filter: drop-shadow(0 3px 5px rgba(20, 80, 50, 0.12));
+    }
+
+    .module-title {
+      fill: var(--text);
+      font-size: 17px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .module-subtitle {
+      fill: var(--muted);
+      font-size: 14px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .data-line {
+      fill: none;
+      stroke: var(--data);
+      stroke-width: 3.1;
+      marker-end: url(#arrow-data);
+    }
+
+    .req-line {
+      fill: none;
+      stroke: var(--req);
+      stroke-width: 2.3;
+      stroke-dasharray: 9 8;
+      marker-end: url(#arrow-req);
+    }
+
+    .ack-line {
+      fill: none;
+      stroke: var(--ack);
+      stroke-width: 2.3;
+      stroke-dasharray: 9 8;
+      marker-end: url(#arrow-ack);
+    }
+
+    .ctrl-line {
+      fill: none;
+      stroke: var(--ctrl);
+      stroke-width: 2.1;
+      stroke-dasharray: 6 7;
+      marker-end: url(#arrow-ctrl);
+    }
+
+    .ctrl-solid {
+      fill: none;
+      stroke: var(--ctrl);
+      stroke-width: 2.1;
+      marker-end: url(#arrow-ctrl);
+    }
+
+    .state-line {
+      fill: none;
+      stroke: var(--state);
+      stroke-width: 2.3;
+      marker-end: url(#arrow-state);
+    }
+
+    .label {
+      font-size: 14px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .label.data { fill: var(--data); }
+    .label.req { fill: var(--req); }
+    .label.ack { fill: var(--ack); }
+    .label.ctrl { fill: var(--ctrl); }
+    .label.state { fill: var(--state); }
+
+    .note {
+      fill: var(--muted);
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Router IPM/OPM 综合内部互联框图</h1>
+    <p>两侧使用统一色调。实线表示 <strong>data</strong>；虚线表示 <strong>req</strong> 和 <strong>ack</strong>。外层只保留 RouterIPM 与 RouterOPM，大框内部只保留 datapath 级子框。</p>
+  </header>
+
+  <main class="canvas">
+    <svg viewBox="0 0 3200 1650" width="3200" height="1650" role="img" aria-label="Router IPM and OPM integrated interconnect diagram">
+      <defs>
+        <marker id="arrow-data" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#1d1d1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-req" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#d9822b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-ack" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#7b61ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-ctrl" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#3976d3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-state" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#5a8c2b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+      </defs>
+
+      <!-- Legend -->
+      <rect class="module" x="80" y="70" width="690" height="150"></rect>
+      <text class="module-title" x="160" y="105">图例</text>
+      <path class="data-line" d="M 120 145 L 260 145"></path>
+      <text class="label data" x="330" y="145">data 实线</text>
+      <path class="req-line" d="M 120 183 L 260 183"></path>
+      <text class="label req" x="330" y="183">req 虚线</text>
+      <path class="ack-line" d="M 435 183 L 575 183"></path>
+      <text class="label ack" x="505" y="145">ack 虚线</text>
+      <path class="state-line" d="M 435 145 L 575 145"></path>
+      <text class="label state" x="635" y="145">holder/context</text>
+
+      <!-- Outer groups: only RouterIPM and RouterOPM -->
+      <rect class="group" x="260" y="300" width="1280" height="1050"></rect>
+      <text class="group-title" x="300" y="345">RouterIPM</text>
+
+      <rect class="group" x="1740" y="300" width="1280" height="1050"></rect>
+      <text class="group-title" x="1780" y="345">RouterOPM</text>
+
+      <!-- Datapath subgroups -->
+      <rect class="subgroup" x="360" y="455" width="1080" height="410"></rect>
+      <text class="subgroup-title" x="400" y="500">InputDatapathModule(i)</text>
+
+      <rect class="subgroup" x="1840" y="455" width="1080" height="410"></rect>
+      <text class="subgroup-title" x="1880" y="500">OutputDatapathModule(o)</text>
+
+      <!-- External modules -->
+      <rect class="module" x="70" y="615" width="200" height="95"></rect>
+      <text class="module-title" x="170" y="652">上游输入</text>
+      <text class="module-subtitle" x="170" y="682">inPort(i)</text>
+
+      <rect class="module" x="3030" y="615" width="150" height="95"></rect>
+      <text class="module-title" x="3105" y="652">下游输出</text>
+      <text class="module-subtitle" x="3105" y="682">outPort(o)</text>
+
+      <!-- IPM datapath modules -->
+      <rect class="module" x="410" y="615" width="165" height="95"></rect>
+      <text class="module-title" x="492" y="650">InputVcBuffer</text>
+      <text class="module-subtitle" x="492" y="680">VC demux + FIFO</text>
+
+      <rect class="module" x="665" y="615" width="210" height="95"></rect>
+      <text class="module-title" x="770" y="650">AsyncMaskedArbiter</text>
+      <text class="module-subtitle" x="770" y="680">VC selector</text>
+
+      <rect class="module" x="965" y="615" width="215" height="95"></rect>
+      <text class="module-title" x="1072" y="650">InputRequestGenerator</text>
+      <text class="module-subtitle" x="1072" y="680">fork launch/complete</text>
+
+      <rect class="module" x="1270" y="615" width="160" height="95"></rect>
+      <text class="module-title" x="1350" y="650">AsyncFork</text>
+      <text class="module-subtitle" x="1350" y="680">sparse edges</text>
+
+      <rect class="module" x="570" y="1010" width="230" height="92"></rect>
+      <text class="module-title" x="685" y="1044">InputControlModule</text>
+      <text class="module-subtitle" x="685" y="1074">route/lane/mask/eligibility</text>
+
+      <rect class="state-module" x="980" y="990" width="250" height="105"></rect>
+      <text class="module-title" x="1105" y="1030">PacketContextModule</text>
+      <text class="module-subtitle" x="1105" y="1062">storedDir/lane/mask</text>
+
+      <!-- OPM datapath modules -->
+      <rect class="module" x="1870" y="615" width="235" height="95"></rect>
+      <text class="module-title" x="1988" y="650">OutputRequestSelector</text>
+      <text class="module-subtitle" x="1988" y="680">local legal inputs</text>
+
+      <rect class="module" x="2190" y="615" width="185" height="95"></rect>
+      <text class="module-title" x="2282" y="650">AsyncArbiter</text>
+      <text class="module-subtitle" x="2282" y="680">winner select</text>
+
+      <rect class="module" x="2460" y="615" width="205" height="95"></rect>
+      <text class="module-title" x="2562" y="650">AsyncOutputBuffer</text>
+      <text class="module-subtitle" x="2562" y="680">register data</text>
+
+      <rect class="module" x="2755" y="615" width="150" height="95"></rect>
+      <text class="module-title" x="2830" y="650">Output HS</text>
+      <text class="module-subtitle" x="2830" y="680">req/ack/data</text>
+
+      <rect class="state-module" x="2180" y="990" width="270" height="105"></rect>
+      <text class="module-title" x="2315" y="1030">OutputPathState</text>
+      <text class="module-subtitle" x="2315" y="1062">holder(o)</text>
+
+      <!-- HS: upstream -> IPM input datapath -->
+      <path class="data-line" d="M 270 662 L 410 662"></path>
+      <path class="req-line" d="M 270 630 L 410 630"></path>
+      <path class="ack-line" d="M 410 695 L 270 695"></path>
+      <text class="label data" x="340" y="650">data</text>
+      <text class="label req" x="340" y="610">req</text>
+      <text class="label ack" x="340" y="720">ack</text>
+
+      <!-- IPM internal HS -->
+      <path class="data-line" d="M 575 662 L 665 662"></path>
+      <path class="req-line" d="M 575 630 L 665 630"></path>
+      <path class="ack-line" d="M 665 695 L 575 695"></path>
+
+      <path class="data-line" d="M 875 662 L 965 662"></path>
+      <path class="req-line" d="M 875 630 L 965 630"></path>
+      <path class="ack-line" d="M 965 695 L 875 695"></path>
+
+      <path class="data-line" d="M 1180 662 L 1270 662"></path>
+      <path class="req-line" d="M 1180 630 L 1270 630"></path>
+      <path class="ack-line" d="M 1270 695 L 1180 695"></path>
+
+      <!-- Sparse edge HS: IPM -> OPM -->
+      <path class="data-line" d="M 1430 642 C 1545 565, 1695 565, 1870 642"></path>
+      <path class="req-line" d="M 1430 602 C 1555 505, 1700 505, 1870 602"></path>
+      <path class="ack-line" d="M 1870 695 C 1700 795, 1555 795, 1430 695"></path>
+      <text class="label data" x="1650" y="575">data: toOpm(edge)</text>
+      <text class="label req" x="1650" y="485">req</text>
+      <text class="label ack" x="1650" y="820">ack</text>
+
+      <!-- OPM internal HS -->
+      <path class="data-line" d="M 2105 662 L 2190 662"></path>
+      <path class="req-line" d="M 2105 630 L 2190 630"></path>
+      <path class="ack-line" d="M 2190 695 L 2105 695"></path>
+
+      <path class="data-line" d="M 2375 662 L 2460 662"></path>
+      <path class="req-line" d="M 2375 630 L 2460 630"></path>
+      <path class="ack-line" d="M 2460 695 L 2375 695"></path>
+
+      <path class="data-line" d="M 2665 662 L 2755 662"></path>
+      <path class="req-line" d="M 2665 630 L 2755 630"></path>
+      <path class="ack-line" d="M 2755 695 L 2665 695"></path>
+
+      <!-- OPM -> downstream -->
+      <path class="data-line" d="M 2905 662 L 3030 662"></path>
+      <path class="req-line" d="M 2905 630 L 3030 630"></path>
+      <path class="ack-line" d="M 3030 695 L 2905 695"></path>
+      <text class="label data" x="2968" y="650">data</text>
+      <text class="label req" x="2968" y="610">req</text>
+      <text class="label ack" x="2968" y="720">ack</text>
+
+      <!-- IPM control/context links -->
+      <path class="ctrl-solid" d="M 770 710 C 770 850, 710 915, 685 1010"></path>
+      <text class="label ctrl" x="790" y="850">inBits/isHead/inValid</text>
+
+      <path class="ctrl-solid" d="M 685 1010 C 745 900, 1170 820, 1350 710"></path>
+      <text class="label ctrl" x="1010" y="880">destMask</text>
+
+      <path class="ctrl-line" d="M 685 1010 C 720 900, 735 810, 770 710"></path>
+      <text class="label ctrl" x="650" y="865">vcAllow</text>
+
+      <path class="state-line" d="M 1350 710 C 1310 835, 1210 910, 1120 990"></path>
+      <text class="label state" x="1285" y="850">launch/complete</text>
+
+      <path class="state-line" d="M 1105 990 C 985 930, 800 940, 685 1010"></path>
+      <text class="label state" x="900" y="950">storedDir/storedMask</text>
+
+      <path class="ctrl-solid" d="M 685 1102 C 780 1180, 980 1185, 1105 1095"></path>
+      <text class="label ctrl" x="890" y="1210">nextDir/nextLane/nextMask</text>
+
+      <!-- OPM state/control links -->
+      <path class="ctrl-solid" d="M 2282 710 C 2282 835, 2295 920, 2315 990"></path>
+      <text class="label ctrl" x="2365" y="850">fireClock/chosen</text>
+
+      <path class="data-line" d="M 2562 710 C 2510 850, 2415 940, 2335 990"></path>
+      <text class="label data" x="2520" y="850">chosenData</text>
+
+      <path class="state-line" d="M 2315 1095 C 2130 1240, 1705 1275, 1240 1120 C 1020 1045, 830 1030, 800 1048"></path>
+      <text class="label state" x="1660" y="1305">holder(o) feedback to IPM eligibility</text>
+
+      <path class="ctrl-line" d="M 1988 615 C 1900 395, 1280 395, 685 1010"></path>
+      <text class="label ctrl" x="1325" y="390">anyPending / output status feedback</text>
+
+      <!-- Sparse edge notes -->
+      <rect class="module" x="1510" y="910" width="180" height="92"></rect>
+      <text class="module-title" x="1600" y="945">Sparse Edge</text>
+      <text class="module-subtitle" x="1600" y="975">edgeId: input i -> output o</text>
+
+      <path class="ctrl-solid" d="M 1510 955 C 1450 870, 1435 760, 1430 675"></path>
+      <path class="ctrl-solid" d="M 1690 955 C 1750 870, 1815 760, 1870 675"></path>
+
+      <!-- Notes -->
+      <text class="note" x="80" y="1490">说明：图中只展开一个输入端口 i 到一个输出端口 o 的代表性路径；其他 input/output lane 按相同结构复制。</text>
+      <text class="note" x="80" y="1525">RouterIPM 根据 route/lane/mask/eligibility 发起 multicast sparse edges；RouterOPM 对每个 output lane 独立仲裁，并通过 holder(o) 反馈路径占用状态。</text>
+      <text class="note" x="80" y="1560">所有 HS_Packet 链路均拆成 data、req、ack 三条边：data 和 req 从 source 到 sink，ack 从 sink 返回 source。</text>
+    </svg>
+  </main>
+</body>
+</html>

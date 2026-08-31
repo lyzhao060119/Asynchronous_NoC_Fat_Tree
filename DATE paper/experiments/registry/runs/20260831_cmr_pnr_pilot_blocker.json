@@ -1,0 +1,46 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260831_cmr_pnr_pilot_blocker",
+  "status": "fail",
+  "design_id": "ASYNC_THIN_1X1",
+  "benchmark_id": null,
+  "seed": null,
+  "adapter": "pnr_pilot",
+  "git": {
+    "sha": "04f0e55135c59894532624a9b87e9434bf94091e",
+    "dirty": true,
+    "describe": "04f0e55-dirty"
+  },
+  "config_hash": "7fa61e002c9afb0a7ca902980b3654c4d47aad625bb337b7f7bbbc685dfda4c6",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": null,
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "run_remote_cmr_pnr_pilot.py"
+  ],
+  "env": {},
+  "lsf_jobs": [],
+  "frozen_structure_ok": null,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "locked_tool": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_pnr/cmr/locked_tool.json",
+    "gate_report": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_pnr/cmr/pilot_gate_report.json"
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T06:50:58+00:00",
+  "updated_utc": "2026-08-31T06:50:58+00:00",
+  "notes": "Phase 1 P&R Gate FAIL. No tech LEF/NDM. Paper path frozen to post-synthesis MAXIMUM-SDF."
+}

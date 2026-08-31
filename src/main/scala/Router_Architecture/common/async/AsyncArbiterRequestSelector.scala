@@ -3,7 +3,7 @@ package Router_Architecture.common
 import DataStruct._
 import chisel3._
 import chisel3.util._
-import tool.{ACG, AsyncClock, Mutex2}
+import tool.{ACG, AsyncClock, AsyncDelay, Mutex2}
 
 /**
  * Request-selection front end of the asynchronous arbiter.
@@ -13,7 +13,10 @@ import tool.{ACG, AsyncClock, Mutex2}
  * dedicated module so the architecture matches the paper's selector/buffer
  * split more closely.
  */
-class AsyncArbiterRequestSelector(val nIn: Int) extends Module {
+class AsyncArbiterRequestSelector(
+    val nIn: Int,
+    dfireDelayRole: String = AsyncDelay.DefaultRole
+) extends Module {
   require(nIn >= 1)
   private val idxW = math.max(1, log2Ceil(nIn))
 
@@ -35,7 +38,8 @@ class AsyncArbiterRequestSelector(val nIn: Int) extends Module {
     "InNum" -> 0,
     "OutNum" -> 1,
     "OutEnFF" -> 0,
-    "MrGoEn" -> 0
+    "MrGoEn" -> 0,
+    "DfireDelayRole" -> dfireDelayRole
   )))
 
   private case class Candidate(valid: Bool, ready: Bool, idx: UInt, data: Packet)
@@ -50,7 +54,6 @@ class AsyncArbiterRequestSelector(val nIn: Int) extends Module {
     val bothValid = left.valid && right.valid
     val onlyLeft = left.valid && !right.valid
     val onlyRight = !left.valid && right.valid
-    val mutexResolved = mutex.io.gnt0 ^ mutex.io.gnt1
 
     val outValid = Wire(Bool())
     val outReady = Wire(Bool())
@@ -74,16 +77,22 @@ class AsyncArbiterRequestSelector(val nIn: Int) extends Module {
       outIdx := right.idx
       outData := right.data
     }.elsewhen(bothValid) {
-      outReady := mutexResolved && ((mutex.io.gnt0 && left.ready) || (mutex.io.gnt1 && right.ready))
-      when(mutex.io.gnt0) {
+      // Mutex2 can settle with gnt0=gnt1=1 in simulation when both sides request.
+      // Treat that as unresolved and fall back to left-priority so the arbiter
+      // cannot deadlock with multiple pending sparse inputs (e.g. fan-in).
+      val exclusiveGrant = mutex.io.gnt0 ^ mutex.io.gnt1
+      val pickLeft = !exclusiveGrant || mutex.io.gnt0
+      outReady := Mux(
+        exclusiveGrant,
+        (mutex.io.gnt0 && left.ready) || (mutex.io.gnt1 && right.ready),
+        left.ready
+      )
+      when(pickLeft) {
         outIdx := left.idx
         outData := left.data
-      }.elsewhen(mutex.io.gnt1) {
+      }.otherwise {
         outIdx := right.idx
         outData := right.data
-      }.otherwise {
-        outIdx := left.idx
-        outData := left.data
       }
     }
 

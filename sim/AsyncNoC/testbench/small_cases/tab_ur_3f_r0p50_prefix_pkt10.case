@@ -1,0 +1,12 @@
+# Prefix of TAB-NET-UR-3f-r0p50 containing its first offered packet only.
+# It isolates the first cross-L1/L2 packet before later traffic can interfere.
+case tab_ur_3f_r0p50_prefix_pkt10
+group CMR_LOCALIZE
+timeout_cycles 20000
+reset_cycles 10
+input      4  0     10 820820a
+input      5  0     10 020820a
+input      6  0     10 420820a
+expect 00400     10 0 820820a
+expect 00400     10 0 020820a
+expect 00400     10 1 420820a

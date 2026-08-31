@@ -1,0 +1,43 @@
+{
+  "schema": "date-v3-pnr-pilot-gate-v1",
+  "updated_utc": "2026-08-31T06:46:00+00:00",
+  "gate": "FAIL",
+  "physical_class": "post-synthesis",
+  "locked_tool": null,
+  "summary": "Phase 1 P&R pilot did not pass. Paper path frozen to post-synthesis MAXIMUM-SDF.",
+  "what_worked": [
+    "ICC2 V-2023.12 license checkout on LSF (not login node)",
+    "Innovus 21.35 license checkout on LSF (invs)",
+    "PrimeTime V-2023.12 binary present",
+    "Cell LEF, MW frame_only_VHV_0d5_0, GDS, CCS SS liberty/db, QRC.config present for tcbn28hpcplusbwp12t30p140",
+    "Frozen hop netlists exist: 20260830_cmr_thin_l1_hop_del050_ackin050 and 20260830_cmr_fat_l2_hop_del050_ackin050",
+    "Async preserve + paired RTC data-check Tcl written and uploaded"
+  ],
+  "what_failed": [
+    "Cell LEF has no LAYER table (LEFR-012 / IMPLF-26)",
+    "No tech.lef / *.tf / *.ndm under CLN28HPC+ digital kit in prior probes",
+    "ICC2 create_lib -use_technology_lib MW looks for lib.ndm (LIB-027)",
+    "Innovus IMPLF-53: pin layer M1 not defined",
+    "ICC classic: SEC-51 Galaxy-ICC not licensed",
+    "icc2_lm_shell generate_frame_from_mw -mw_lib <mw> <libname> needs a valid Milkyway/ICC executable; icc_shell is on PATH but unlicensed"
+  ],
+  "pilot_gate_checklist": {
+    "route_complete_no_short_open": false,
+    "structure_counts": false,
+    "gtech_seqgen_zero": false,
+    "del050_mutex_latch_kept": false,
+    "post_route_rtc_positive": false,
+    "post_route_sdf_smoke": false,
+    "spef_sdf_def_gds_sta_drc_area_power": false
+  },
+  "scripts_kept_for_recovery": [
+    "tech_t28hpc_pnr.tcl",
+    "async_preserve.tcl",
+    "async_rtc_data_checks.tcl",
+    "icc2/run_icc2_cmr_router.tcl",
+    "icc2/dump_tech_lef.tcl",
+    "innovus/run_innovus_cmr_router.tcl",
+    "pt/run_pt_post_route.tcl",
+    "run_remote_cmr_pnr_pilot.py"
+  ]
+}

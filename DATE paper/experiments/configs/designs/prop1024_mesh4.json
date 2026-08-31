@@ -1,0 +1,61 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "PROP1024_MESH4",
+  "kind": "network",
+  "family": "MESH_SANITY",
+  "nodes": 1024,
+  "async": true,
+  "routing": "quadtree_topmesh",
+  "lane_profile": "1-2-2-2",
+  "top_mesh_lanes": 4,
+  "cluster_grid": 4,
+  "router_primitives": [
+    {
+      "primitive_id": "async_fat_1x2",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 2,
+      "use_mesh_routing": false,
+      "count": 256
+    },
+    {
+      "primitive_id": "async_prop_2x2",
+      "level": 2,
+      "child_lanes": 2,
+      "parent_lanes": 2,
+      "use_mesh_routing": false,
+      "count": 64
+    },
+    {
+      "primitive_id": "async_prop_2x2",
+      "level": 3,
+      "child_lanes": 2,
+      "parent_lanes": 2,
+      "use_mesh_routing": false,
+      "count": 16
+    }
+  ],
+  "expected_structure": {
+    "routers": 336,
+    "interlevel_fifos": 0
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "bypass",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "adapter": null,
+  "paper_role": "Optional Mesh4 sanity; backup only",
+  "paper_eligible_default": true,
+  "notes": ""
+}

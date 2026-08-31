@@ -1,0 +1,150 @@
+{
+  "schema": "date-v3-registry-v1",
+  "updated_utc": "2026-08-31T06:50:58+00:00",
+  "notes": "Empty index; populated by run_experiment.py plan.",
+  "runs": [
+    {
+      "run_id": "20260828_cmr_cfifo_tp_nogrant_p50",
+      "design_id": "THIN64",
+      "benchmark_id": null,
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "bb90fd2d0942ee0a4a68287f8508e6361d1827d7c431f6c9520578bc0b2915b5",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260828_cmr_cfifo_tp_nogrant_p50.json",
+      "notes": "CFifo/BUFFD0 laboratory netlist."
+    },
+    {
+      "run_id": "20260830_095259_cmr_noc64_p50_1222",
+      "design_id": "PROP64",
+      "benchmark_id": null,
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "1c07c8941271eb9d4fe726a96b03b55725a1983c6552b3e986e3075184d5cb21",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_095259_cmr_noc64_p50_1222.json",
+      "notes": "Must not enter curated or Table I/Fig A delay comparison."
+    },
+    {
+      "run_id": "20260830_cmr_fat_l1_hop_del050_ackin050",
+      "design_id": "ASYNC_FAT_1X2",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "8849608fb02b6e5b6bad7cebc29a32844a2d2bf8a1183c740f0b2af58826db72",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_fat_l1_hop_del050_ackin050.json",
+      "notes": "Fat L1 hop MAXIMUM SDF; paper-eligible as post-synthesis calibrated hop (DATE V3 does not replace with post-route)."
+    },
+    {
+      "run_id": "20260830_cmr_fat_l2_hop_del050_ackin050",
+      "design_id": "ASYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "48c34384ee22d1a7d633ede9a704455e5d320fac4c072f2b009ff85ba42cb522",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_fat_l2_hop_del050_ackin050.json",
+      "notes": "PROP L2 hop MAXIMUM SDF; paper-eligible as post-synthesis calibrated hop (DATE V3 does not replace with post-route)."
+    },
+    {
+      "run_id": "20260830_cmr_fat_l3_hop_del050_ackin050",
+      "design_id": "ASYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "48c34384ee22d1a7d633ede9a704455e5d320fac4c072f2b009ff85ba42cb522",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_fat_l3_hop_del050_ackin050.json",
+      "notes": "PROP L3 hop MAXIMUM SDF; paper-eligible as post-synthesis calibrated hop (DATE V3 does not replace with post-route)."
+    },
+    {
+      "run_id": "20260830_cmr_router_level_baseline_del050",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "16622d0f290b02497bb915f2a92c5faa3aa9593eda9b0eedef79a0109ecd4162",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_router_level_baseline_del050.json",
+      "notes": "Hop PPA summary folder. Do not overwrite."
+    },
+    {
+      "run_id": "20260830_cmr_thin_l1_hop_del050_ackin050",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "16622d0f290b02497bb915f2a92c5faa3aa9593eda9b0eedef79a0109ecd4162",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_thin_l1_hop_del050_ackin050.json",
+      "notes": "Thin L1 hop MAXIMUM SDF; paper-eligible as post-synthesis calibrated hop (DATE V3 does not replace with post-route)."
+    },
+    {
+      "run_id": "20260830_cmr_thin_l2_hop_del050_ackin050",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "16622d0f290b02497bb915f2a92c5faa3aa9593eda9b0eedef79a0109ecd4162",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_thin_l2_hop_del050_ackin050.json",
+      "notes": "Thin L2 hop MAXIMUM SDF; paper-eligible as post-synthesis calibrated hop (DATE V3 does not replace with post-route)."
+    },
+    {
+      "run_id": "20260830_cmr_thin_l3_hop_del050_ackin050",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "16622d0f290b02497bb915f2a92c5faa3aa9593eda9b0eedef79a0109ecd4162",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260830_cmr_thin_l3_hop_del050_ackin050.json",
+      "notes": "Thin L3 hop MAXIMUM SDF; paper-eligible as post-synthesis calibrated hop (DATE V3 does not replace with post-route)."
+    },
+    {
+      "run_id": "20260831_014622_cmr_sync_noc64_thin_p50",
+      "design_id": "SYNC_THIN_1X1",
+      "benchmark_id": null,
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "dc9518b1460d83c12331802d0a02198484ca92ba1bf51b631ea90b97bf745c06",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_014622_cmr_sync_noc64_thin_p50.json",
+      "notes": "Clocked Thin SyncNoC64 1.0 ns SS ZeroWireload."
+    },
+    {
+      "run_id": "20260831_084457_cmr_sync_noc64_fat1222_p50",
+      "design_id": "SYNC_PROP_2X2",
+      "benchmark_id": null,
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "d143f8b05387580c3088f71180c041141263dfa28b3a15e8952ae60b7f6b01da",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_084457_cmr_sync_noc64_fat1222_p50.json",
+      "notes": "Clocked Fat 1-2-2-2 SyncNoC64 1.0 ns."
+    },
+    {
+      "run_id": "20260831_cmr_pnr_pilot_blocker",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": null,
+      "status": "fail",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "7fa61e002c9afb0a7ca902980b3654c4d47aad625bb337b7f7bbbc685dfda4c6",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_pnr_pilot_blocker.json",
+      "notes": "Phase 1 P&R Gate FAIL. No tech LEF/NDM. Paper path frozen to post-synthesis MAXIMUM-SDF."
+    },
+    {
+      "run_id": "cmr_mesh64_current",
+      "design_id": "FM64",
+      "benchmark_id": null,
+      "status": "imported_readonly",
+      "paper_eligible": false,
+      "physical_class": "unknown",
+      "config_hash": "1f0471cafaf9e37b45ab057bb1995c014338185b723e7e88b93c4afefb9b878b",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/cmr_mesh64_current.json",
+      "notes": "Placeholder for the in-flight mesh64 run. Replace run_id with CMR_MESH64_RUN_ID when DC/GLS finishes. Not curated."
+    }
+  ]
+}

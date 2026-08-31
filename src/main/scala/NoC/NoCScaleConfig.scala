@@ -1,6 +1,8 @@
 package NoC
 
-final case class NoCRouterLevelConfig(
+final /** Per-level channel geometry. Default fifoDepth=1 targets latency (GLS/E2E);
+  * raise depth separately when scanning deadlock / high injection rate. */
+case class NoCRouterLevelConfig(
   childLanes: Int,
   parentLanes: Int,
   fifoDepth: Int = 1
@@ -17,7 +19,7 @@ final case class NoCRouterChannelConfig(
   l2ParentLanes: Int = 4,
   l3ParentLanes: Int = 8,
   topChildLanes: Int = 4,
-  l1FifoDepth: Int = 4,
+  l1FifoDepth: Int = 1,
   l2FifoDepth: Int = 1,
   l3FifoDepth: Int = 1,
   topFifoDepth: Int = 1
@@ -63,7 +65,61 @@ final case class NoCScaleConfig(
 }
 
 object NoCScaleConfig {
-  val DefaultRouterChannels: NoCRouterChannelConfig = NoCRouterChannelConfig()
+  /** Fat 1-2-4-8: L1 1→2, L2 2→4, L3 4→8, eight top parent lanes. */
+  val FatLane1248: NoCRouterChannelConfig = NoCRouterChannelConfig()
+
+  /** Fat 1-2-2-2: L1 1→2, L2 and L3 both 2→2, two top parent lanes. */
+  val FatLane1222: NoCRouterChannelConfig = NoCRouterChannelConfig(
+    l1ChildLanes = 1,
+    l1ParentLanes = 2,
+    l2ParentLanes = 2,
+    l3ParentLanes = 2,
+    topChildLanes = 2
+  )
+
+  /** Thin (1,1) at L1/L2/L3: one child lane, one parent lane, one top port.
+    * Sync 64-core counterpart only; async Fat stays on FatLane1222/1248.
+    */
+  val ThinLane111: NoCRouterChannelConfig = NoCRouterChannelConfig(
+    l1ChildLanes = 1,
+    l1ParentLanes = 1,
+    l2ParentLanes = 1,
+    l3ParentLanes = 1,
+    topChildLanes = 1
+  )
+
+  val DefaultRouterChannels: NoCRouterChannelConfig = FatLane1222
+
+  def fatLaneProfileName: String = {
+    val raw = sys.env.getOrElse("CMR_FAT_LANE_PROFILE", "1222").trim
+    raw.toLowerCase.replace("-", "").replace("_", "") match {
+      case "1248" | "fatlane1248" => "1248"
+      case "1222" | "fatlane1222" => "1222"
+      case _ =>
+        throw new IllegalArgumentException(
+          s"Unknown CMR_FAT_LANE_PROFILE='$raw'. Supported: 1248, 1222."
+        )
+    }
+  }
+
+  def fatLaneChannels: NoCRouterChannelConfig =
+    fatLaneProfileName match {
+      case "1248" => FatLane1248
+      case "1222" => FatLane1222
+    }
+
+  def fatLaneTopLanes: Int = fatLaneChannels.l3.parentLanes
+
+  /** One 64-core quadtree tile using the selected Fat lane profile. */
+  def fatTree64: NoCScaleConfig = NoCScaleConfig(1, 1, fatLaneChannels)
+
+  /** One 64-core Thin quadtree: 16 L1 + 4 L2 + 1 L3, all (1,1). */
+  def thinTree64: NoCScaleConfig = NoCScaleConfig(1, 1, ThinLane111)
+
+  /** Sync Fat 1-2-2-2 64-core tile.  Pinned so CMR_FAT_LANE_PROFILE cannot
+    * silently switch this DUT to 1-2-4-8.
+    */
+  def syncFatTree64_1222: NoCScaleConfig = NoCScaleConfig(1, 1, FatLane1222)
 
   // Default full-NoC regression scale: 2x2 quadtree tiles = 256 cores.
   val Verification256: NoCScaleConfig = NoCScaleConfig(2, 2, DefaultRouterChannels)

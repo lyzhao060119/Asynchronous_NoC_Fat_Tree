@@ -1,0 +1,58 @@
+{
+  "schema": "date-v3-pnr-lock-v1",
+  "updated_utc": "2026-08-31T06:46:00+00:00",
+  "pilot_run_id": "20260831_063658_cmr_pnr_pilot",
+  "freeze": "post-synthesis-only",
+  "locked_tool": null,
+  "mixed_tools_forbidden": true,
+  "physical_class": "post-synthesis",
+  "decision": "DATE V3 paper path is post-synthesis MAXIMUM-SDF only. Do not call any number post-layout. DATE V3 does not run P&R.",
+  "pdk": {
+    "tsmc_home": "/process/tsmc/CLN28HPC+/TSMCHOME",
+    "cell": "tcbn28hpcplusbwp12t30p140",
+    "lef": "/process/tsmc/CLN28HPC+/TSMCHOME/digital/Back_End/lef/tcbn28hpcplusbwp12t30p140_170a/lef/tcbn28hpcplusbwp12t30p140.lef",
+    "mw": "/process/tsmc/CLN28HPC+/TSMCHOME/digital/Back_End/milkyway/tcbn28hpcplusbwp12t30p140_170a/frame_only_VHV_0d5_0",
+    "liberty_ss": "/process/tsmc/CLN28HPC+/TSMCHOME/digital/Front_End/timing_power_noise/CCS/tcbn28hpcplusbwp12t30p140_180a/tcbn28hpcplusbwp12t30p140ssg0p81v125c_ccs.lib",
+    "db_ss": "/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140ssg0p81v125c_ccs.db",
+    "tech_lef": null,
+    "tech_tf": null,
+    "ndm": null
+  },
+  "tools": {
+    "icc2": "/soft/synopsys/icc2/V-2023.12/bin/icc2_shell",
+    "icc": "/soft/synopsys/icc/V-2023.12-SP5/bin/icc_shell",
+    "innovus": "/soft/cadence/INNOVUS21/bin/innovus",
+    "pt": "/soft/synopsys/prime/V-2023.12/bin/pt_shell"
+  },
+  "async_preservation": [
+    "DelayElement/DEL050",
+    "Mutex feedback",
+    "Muller-C",
+    "LHCNDQD/LHSNDQD",
+    "V2CloseEvent",
+    "LanePhaseAdapter"
+  ],
+  "license": {
+    "icc2": true,
+    "innovus": true,
+    "icc_classic": false
+  },
+  "implementation": {
+    "icc2_thin_1x1": {"pass": false, "blocker": "LEFR-012 / LIB-027: cell LEF has no technology; create_lib cannot use MW as NDM"},
+    "innovus_thin_1x1": {"pass": false, "blocker": "IMPLF-53 / IMPLF-26: M1 undefined; tech LEF must be first"},
+    "icc_classic": {"pass": false, "blocker": "SEC-51 Galaxy-ICC not licensed at this site"},
+    "generate_frame_from_mw": {"pass": false, "blocker": "requires licensed Milkyway/ICC executable; icc_shell present but Galaxy-ICC unlicensed"}
+  },
+  "evidence_runs": [
+    "20260831_054314_cmr_pnr_probe",
+    "20260831_060430_cmr_pnr_pilot",
+    "20260831_060914_cmr_pnr_pilot",
+    "20260831_061852_cmr_pnr_pilot",
+    "20260831_062543_cmr_pnr_pilot",
+    "20260831_062922_cmr_pnr_pilot",
+    "20260831_063658_cmr_pnr_pilot"
+  ],
+  "reason": "Definitive blocker: CLN28HPC+ digital kit has cell LEF + MW FRAM + GDS + CCS + QRC, but no technology LEF, Synopsys .tf, or NDM. ICC2 and Innovus licenses checkout on LSF. ICC classic Galaxy-ICC is not licensed, so generate_frame_from_mw cannot export MW FRAM. Place/route never started. Main evaluation is post-synthesis MAXIMUM SDF. Do not call results post-layout.",
+  "paper_rule": "Table I, Fig. A/B/C, and the DES must be labelled post-synthesis calibrated. DATE V3 does not run P&R. A later TSMC APR/PRTF kit would be a separate project, not a V3 Phase.",
+  "lift_freeze": "Out of DATE V3 scope. Do not invoke these scripts from the V3 orchestrator."
+}

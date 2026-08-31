@@ -1,0 +1,13 @@
+# NoC16 SDF smoke: same packet as noc16_00_to_33_3flit_smoke with wider flit gaps.
+case noc16_00_to_33_3flit_sdf
+group SMOKE_16
+timeout_cycles 20000
+reset_cycles 20
+out_ack_delay_cycles 0
+event_map      0      0
+input      0  0      0 830c30c
+input     50  0      0 030c30c
+input    100  0      0 430c30c
+expect 08000      0 0 830c30c
+expect 08000      0 0 030c30c
+expect 08000      0 1 430c30c

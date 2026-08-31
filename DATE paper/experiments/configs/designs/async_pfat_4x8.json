@@ -1,0 +1,55 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "ASYNC_PFAT_4X8",
+  "kind": "router_primitive",
+  "family": "PFAT",
+  "nodes": null,
+  "async": true,
+  "routing": "quadtree",
+  "lane_profile": "4-8",
+  "top_mesh_lanes": null,
+  "cluster_grid": null,
+  "router_primitives": [
+    {
+      "primitive_id": "async_pfat_4x8",
+      "level": 3,
+      "child_lanes": 4,
+      "parent_lanes": 8,
+      "use_mesh_routing": false,
+      "count": 1
+    }
+  ],
+  "expected_structure": {
+    "routers": 1,
+    "ports": 24,
+    "adapters": 96,
+    "interlevel_fifos": 0,
+    "top_ports": 0,
+    "max_opm_fanin": 20,
+    "mutex_widths": [
+      4,
+      8,
+      16,
+      20
+    ]
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "n/a",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "adapter": "dc_cmr_router",
+  "paper_role": "Fig. A PFAT L3 cost",
+  "paper_eligible_default": true,
+  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only."
+}

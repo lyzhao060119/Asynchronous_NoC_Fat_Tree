@@ -1,0 +1,2 @@
+group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail
+VCTM_16,VCTM-NoMC-1f-r0p02,1000,1000,1000,1000,0,0,0,0,4099,0.243962,30.635,39.200,36.000,37.600,PASS

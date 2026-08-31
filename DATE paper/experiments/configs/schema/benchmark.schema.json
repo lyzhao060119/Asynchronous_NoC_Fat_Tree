@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/benchmark.schema.json",
+  "title": "DATE V3 benchmark configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "benchmark_id",
+    "packet_flits",
+    "warmup_original_events",
+    "measurement_original_events",
+    "seed_set_id",
+    "paired_trace",
+    "metrics",
+    "paper_figures"
+  ],
+  "properties": {
+    "schema": { "const": "date-v3-benchmark-v1" },
+    "benchmark_id": { "type": "string" },
+    "title": { "type": "string" },
+    "traffic": {
+      "type": "string",
+      "enum": [
+        "r_u5",
+        "bf_stress64",
+        "topo_ur",
+        "xmc_f16",
+        "xmc10_g",
+        "mesh_intercluster_ur",
+        "fpga_directed",
+        "fpga_ur",
+        "fpga_multicast"
+      ]
+    },
+    "packet_flits": { "type": "integer", "enum": [1, 5] },
+    "multicast": { "type": "boolean" },
+    "src_neq_dst": { "type": "boolean" },
+    "dst_not_same_l2_subtree": { "type": "boolean" },
+    "fanout_F": { "type": ["integer", "null"] },
+    "spread_S": { "type": ["array", "null"], "items": { "type": "integer" } },
+    "multicast_fraction": { "type": ["number", "null"] },
+    "destination_set_samples": { "type": ["integer", "null"] },
+    "warmup_original_events": { "type": "integer", "minimum": 0 },
+    "measurement_original_events": { "type": "integer", "minimum": 0 },
+    "seed_set_id": { "type": "string" },
+    "paired_trace": {
+      "type": "boolean",
+      "description": "Paired designs must share the same canonical event JSONL."
+    },
+    "load_sweep": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "coarse_then_fine": { "type": "boolean" },
+        "saturation_rule": { "type": "string" }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tmax_definition": {
+      "type": "string",
+      "description": "last destination tail minus source header injection"
+    },
+    "applies_to_designs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "paper_figures": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": { "type": "string" }
+  }
+}

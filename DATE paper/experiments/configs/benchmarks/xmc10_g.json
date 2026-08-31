@@ -1,0 +1,39 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "XMC10-G",
+  "title": "90% UR + 10% multicast F=16, pre-registered S=4",
+  "traffic": "xmc10_g",
+  "packet_flits": 5,
+  "multicast": true,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": 16,
+  "spread_S": [
+    4
+  ],
+  "multicast_fraction": 0.1,
+  "destination_set_samples": null,
+  "warmup_original_events": 1000,
+  "measurement_original_events": 10000,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": true,
+    "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load"
+  },
+  "metrics": [
+    "tmax_at_0.25_hrep_saturation_load",
+    "saturation_throughput",
+    "mean_latency"
+  ],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": [
+    "PROP1024",
+    "HREP1024"
+  ],
+  "paper_figures": [
+    "Fig. C"
+  ],
+  "notes": "Tmax is read at 0.25 x H-REP saturation offered load for both designs. S=16 is backup."
+}

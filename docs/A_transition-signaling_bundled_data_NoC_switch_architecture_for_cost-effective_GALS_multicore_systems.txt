@@ -1,0 +1,609 @@
+        A Transition-Signaling Bundled Data NoC Switch
+     Architecture for Cost-Effective GALS Multicore Systems
+       Alberto Ghiribaldi                         Davide Bertozzi                                     Steven M. Nowick
+    ENDIF, University of Ferrara              ENDIF, University of Ferrara               Dept. of Computer Science, Columbia University
+          Ferrara, Italy                            Ferrara, Italy                                   New York, NY, USA
+
+   Ahstract- Asynchronous networks-on-chip (NoCs) are an                        data approach, circuit timing must be carefully specified
+appealing solution to tackle the synchronization challenge in mod­              and controlled to ensure correct operation. At the same
+ern multlcore systems through the implementation of a GALS                      time, transition-signaling (i.e., two-phase communication pro­
+paradigm. However, they have found only limited applicability so
+far due to two main reasons: the lack of proper design tool flows
+                                                                                tocol) is gaining momentum as a preferred match for high­
+as well as their significant area footprint over their synchronous              performance asynchronous systems [9], especially for signal­
+counterparts. This paper proposes a largely unexplored design                   ing across inter-router links [ 10]. Inside routers, four-phase
+point for asynchronous Noes, relying on transition-signaling                    protocols are still generally preferred since most existing two­
+bundled data, which contributes to break the above barriers.                    phase asynchronous pipeline components are complex, with
+Compared to an existing lightweight synchronous switch archi­                   large latency, area and power overheads.
+tecture, xpipesLite, the post-layout asynchronous switch achieved
+a 71 % reduction in area, up to 85 % reduction in overall power
+                                                                                   The objective of this paper is to materialize a new design
+consumption, and a 44% average reduction in energy-per-f1it,                    point for NoC switch architectures, bringing the benefits of
+while mastering the more stringent timing assumptions of this                   asynchronous communication within reach of cost-constrained
+solution with a semi-automated synthesis flow.                                  multicore systems. To the best of our knowledge, this is the
+                        I. IN TRODUC TION                                       first time a full 5-ported asynchronous switch is designed with
+   There is today little doubt on the fact that a high­                         a transition-signaling bundled data protocol. Our main target
+performance and cost-effective network-on-chip (NoC) can                        is twofold. On the one hand, we aim at a switch architecture
+only be designed in nanoscale technologies under relaxed syn­                   that largely outperforms its synchronous counterpart with re­
+chronization assumptions. On the other hand, such relaxation                    spect to area footprint, energy-per-bit and power consumption,
+is even desirable for the upper design layers, since modern                     while maintaining roughly comparable performance. In many
+systems are typically structured into multiple, highly power­                   previous quasi delay-insensitive (QDI) implementations, with
+manageable voltage and frequency domains. The Globally                          delay-insensitive channels, while lower overall power is deliv­
+Asynchronous Locally Synchronous (GALS) design paradigm                         ered, there are significant overheads in area and energy-per-bit.
+can effectively support this architectural trend [ 1], [2]. Absorb­             To validate our claim, we compare with one of the most cost­
+ing the heterogeneity of timing assumptions in such systems is                  effective synchronous switch architectures for the multicore
+ultimately a burden of the system interconnect, which serves                    domain, called xpipesLite [ 1 1]. On the other hand, we aim to
+as the global integration framework.                                            be fully compatible with a standard cell design methodology
+   Asynchronous NoCs are the best candidates to take on                         and with a mainstream CAD tool flow for synchronous design.
+this role, since they rely on clockless handshaking for inter­                  More specific contributions of this work are the following:
+domain cOlmnunication. These designs come with a number                            • we take on the challenge of using two-phase bundled data
+of potential advantages: average-case instead of worst-case                            not only on inter-switch links but also inside the switch
+performance, no switching power of a clock tree, easier                               microarchitecture, to obtain high performance while not
+convergence of hierarchical design flows, robustness to pro­                           missing the low-complexity target;
+cess/voltage/temperature variations, and efficient delivery of                     • while a promising trade-off between cost and perfor­
+differentiated per-link performance. However, asynchronous                             mance with transition-signaling bundled data has been
+NoCs are not yet at the stage of a mature interconnect tech­                           previously been obtained with simple routing and arbi­
+nology for widespread industrial uptake, and their exploitation                        tration primitives, this work is practically extended to a
+in real systems turns out to be slower than expected.                                  more intricate full 5-ported switch architecture;
+   There are two fundamental barriers that prevent asyn­                           • we aim at design convergence and high performance                -
+
+chronous NoCs from becoming a mainstream technology.                                   above 900 Mflitlsec      in low-power standard-Vth 40nm
+                                                                                                                -
+
+First, they suffer from poor CAD tool support, in that design                          technology;
+methods and tools for synchronous design cannot be directly                        • we introduce two novel, highly-concurrent and efficient
+applied. Many rely on a full-custom approach for the design of                         asynchronous components, a transition-signaling circular
+such circuits [3]. Some recent work holds the promise of bridg­                        FIFO and a 4-way arbiter, each of which can be useful
+ing this gap to some extent [4], [5]. However, asynchronous                            in other domains;
+NoC components are still typically delivered as rigid hard                         • we present a semi-automated design flow specific for
+macrocells [6]. Second, the vast majority of previous work                             transition-signaling bundled data design, which exploits
+makes use of four-phase return-to-zero (RZ) protocols, in­                             conunercial synchronous tools, and allows the creation of
+volving two complete round-trip channel communications per                             partially-reconfigurable macros;
+transaction, as well as delay-insensitive (DI) data encodings                      • we compare quality metrics of a post-layout design of
+(namely dual-rail, l-of-4 or m-of-n) [7]. These design choices                         the new asynchronous switch with a lightweight syn­
+have typically resulted in an overly large area and energy-per­                        chronous switch architecture (xpipesLite [llj), in order
+bit overhead with respect to their synchronous counterparts [8].                       to prove that through the selected asynchronous design
+   More recently, the above considerations have raised the                             style it is possible to provide an even more competi­
+interest in single-rail bundled data asynchronous protocols [7],                       tive design point, thus aiming to bring the benefits of
+which in principle provide designs with a lower timing                                 asynchronous interconnect technology within reach of
+robustness while significantly reducing area, wire-per-link                            resource-constrained multicore systems;
+and energy-per-bit overhead. In practice, with a bundled                           • in the comparison framework with the synchronous
+
+  This work was supported in part by NSF awards CCF-1219013                            switch, we consider link parasitic effects, which are of
+and CCF-081150 4, and by NaNoC and vlrtical European Projects                          key importance in nanoscale technologies and whose
+(FP7-ICT-2 48972 and FP7-ICT-288574).
+                                                                                       implications on asynchronous switch performance are
+                              978-3-9815370-0-0IDATE13/@2013 EDAA                      typically overlooked.
+
+
+
+
+         Authorized licensed use limited to: Tsinghua University. Downloaded on March 28,2026 at 08:49:46 UTC from IEEE Xplore. Restrictions apply.
+                                                                                          r---�==�l- �QO
+                       II. PREV IOUS WOR K                                                                                                  PacketPathEnabledo
+
+   There has been a surge of interest in recent years in                                                                                ..:.- TailPassedO
+                                                                                                                        :a;;-==---:"'i.l-                        =
+GALS and asynchronous design [ 1], [2]. Several GALS NoC                                                          r-------__� DATAO                              �
+solutions have been proposed to enable structured system                                                                ,---�L-L �Ql                             �
+                                                                                                                                            PacketPathEnabledl   �
+design. Several of these approaches have been highly effec­
+tive, especially for low- and moderate-performance distributed                                                    I��==:S#:j:;
+                                                                                                                  i-=
+                                                                                                                                            TailPassedl
+                                                                                                                                            DATAl
+                                                                                                                                                                 �
+multicore systems [6], [ 12], thus targeting a different point                                                                                                   �
+                                                                                                                        ,---�L-L �Q2                             .flo
+in the design space than the proposed work. Some have low                                                                                   PacketPathEnabled2   5
+throughput (e.g., 200-250 MHz) LI3], while those with moder­
+                                                                                 DATAIN
+ate throughput (e.g., near 500 MHz [6], [ 14], [ 15], [ 16]) often
+have significant overheads in router node latency/area/energy­
+                                                                                 input
+per-bit. Almost all use four-phase return-to-zero protocols,                    channel
+involving two complete roundtrip channel communications per
+transaction (rather than the single roundtrip communication
+targeted in our work), and delay-insensitive data encoding,
+resulting in lower coding efficiency than the single-rail bundled
+encoding used in this paper [ 14], [ 15], [ 12], [ 13], [ 17].
+   Closer to our work is a promising recent approach targeting                                          Fig. l.     Input Port Module
+a two-phase protocol using a cOlmnercial computer-aided
+design (CAD) flow [ 18]. However, it has overheads due to                       B.   Input Port Module Architecture
+a delay-insensitive (LEDR) data encoding and flipflop-based                         Input Port Modules route the packet to the correct Output
+registers, and is not currently even suitable as a NoC. The                     Port Module, comparing the internal switch address with the
+GALS neural network system of [ 13] also includes two-phase                     destination address contained in the header flit. The microar­
+channels between chips, with four-phase channels on chip, but                   chitecture of an IPM is presented in Fig. 1.
+uses delay-insensitive encoding.                                                    The single-latch input register is normally transparent, as
+   The proposed NoC is based on MOUSETRAP pipelines                             in MOUSETRAP pipelines, and the four Request Generator
+[7], [ 19], which use a low-overhead single-latch-based archi­                  blocks are initially inactive. The basic operation of the module
+tecture. This paper delivers a previously unexplored design                     begins with a head flit arriving from the input channel,
+point for asynchronous NoC architectures, relying on two­                       signalled by REQIN (soon after DAT AIN arrives). The flit
+phase bundled data encoding. We propose a more aggressive                       passes directly though the the input register, which then makes
+approach than [ 10], who limits the two-phase protocol to                       itself opaque, safely storing the data. It also sends the request
+inter-switch links. The proposed solution builds on the work                    (REQx) to all four Request Generator blocks, and an ac­
+of [9] and [20], which demonstrate that transition-signaling                    knowledge (AC KIN) on the input channel. The head flit also
+single-rail bundled data can be efficiently employed in basic                   indicates to the Packet Route Selector to compute the single
+routing and arbitration functions. However, [9] and [20] target                 target output port, and to assert the corresponding one of four
+only simple tree-based switch architectures, while this work                    RouteSelected signals high. This signal sets the corresponding
+addresses the intricacy of a full 5-ported switch design.                       Request Generator to packet processing mode, which asserts
+                  III. SWI TCH ARCHI TE C TURE                                  its PacketPathEnabledi output high and sends it to the
+   The proposed switch architecture is highly modular and                       target Output Port Module. In tandem, the Reqx signal is
+can support the connection of an arbitrary number of input                      broadcast to all four Request Generator modules, which result
+ports (Input Port Modules, IPMs) with output ports (Output                      in transitions on all four output requests (REQo to REQ3,
+Port Modules, OPMs). While the design space is potentially                      one to each of the four Output Port Modules); however, only
+quite large, this paper analyzes and characterizes a specific                   the one targeted Output Port Module will be activated, and the
+design point with the following features: 5 input and 5 output                  other requests are ignored (see details below).'
+ports, 32-bit flit width, wormhole switching and algorithmic                        The target Output Port Module, after receiving both
+dimension-order routing. The ultimate goal is in fact to assess                 PacketPathEnabledi and Reqi, sends acknowledgment
+the quality metrics that transition-signaling bundled data can                  AC Ki to the Input Port Module. The Ack Generator then
+achieve on a specific design point of practical interest.                       makes a transition on output AC Kx, causing the input register
+   The switch architecture is inspired by the xpipesLite archi­                 to become transparent again. It is also sent to the Packet Route
+tecture [ 1 1], which represents an ultra-low complexity design                 Selector, which deasserts the Route Selected output.
+point in the space of fully-synchronous NoCs. Given this,                           As long as the Request Generator Block is still in packet
+coming up with an asynchronous switch consisting of the same                    processing mode, its PacketPathEnabledi output remains
+building blocks while further cutting down on area and power                    high, and all the flits of the packet are directly transferred to
+is the challenge that this paper takes on. xpipesLite will be                   the corresponding Output Port Module. Finally, when a tail
+retained as reference design point to prove the claim of low                    flit is received, TailPassedi is asserted by the Output Port
+implementation overhead and competitive design point.                           Module, which resets the Request Generator to inactive mode
+                                                                                and deasserts the PacketPathEnabledi signal.
+A. Mousetrap Pipelines
+                                                                                    Details of the Packet Route Selector are shown in Fig. 2.
+   The new asynchronous switch introduced in the following
+                                                                                The XOR2 converts the two-phase signals Req and Ack to a
+sections, is based on an existing asynchronous pipeline called
+                                                                                level signal, and a matching delay line enforces hazard-free
+MOUSETRAP [7], [ 19], which provides high-throughput op­
+                                                                                operation of the combinational routing logic.
+eration with low hardware overhead. Each MOUSETRAP
+stage uses a single register based on level-sensitive latches                       The implementation of the Request Generator associated
+(rather than edge-triggered flipflops) to store data, and simple                with Output Port 0 is shown in Fig. 3. The Route Selectedo,
+stage control (replacing the clock) consisting of only a single                 TailPassedo and PacketPathEnabledo signals are all four­
+combinational gate. These designs use single-rail bundled                       phase (i.e. level) and active-high; when the block is inactive,
+data encoding, where a synchronous-style data channel is                        these signals are deasserted low. In contrast, the Req and Ack
+augmented with an extra req wire, and a single transition on
+the req accompanying the data bundle indicates the data is                        I Note that, since a two-phase signaling protocol is used. a REQi signal
+valid. The req wire has a simple one-sided timing constraint                   may at times have the opposite polarity of the incoming request REQx,
+                                                                               depending on the number of flits that have been transmitted in previous
+that its delay is always slightly greater than the data channel.               transfers, and to which of the four Output Port Modules.
+For further details, see [7], [ 19].
+
+
+
+         Authorized licensed use limited to: Tsinghua University. Downloaded on March 28,2026 at 08:49:46 UTC from IEEE Xplore. Restrictions apply.
+     �..
+     .�
+      In
+         �
+         CD       Routelnfo
+     .� ctrl information
+     ....        from cla.tapath
+
+     .   ;
+         II,
+     .."
+      �
+     .�
+                         ACKX
+
+      9                  REQx
+     .::
+                                   Fig. 2.   Packet Route Selector                                          Grantl   Granto           Grant2   Grantl
+                                                     TailPu.ado
+                Rout.Select.do                     frOlll TaJ.l Detector                               Fig. 5.   Microarchitecture of new 4-input arbiter
+                     from Packet
+                  Route Selector
+                                                                                       assuming no congestion, similar to a basic MOUSETRAP
+                         Ack, -" ,- ��
+                         Ack2 -+-+--11
+                                                                                     j pipeline register.
+                                                                                          A new transfer begins when a header flit arrives
+                                                   �1C==�P�.C�k�et�p.�t��n�1�ed�O�
+                       Ack3
+               ackno.l.�s frOll!
+                  other Channel.
+                                                                                       from one of the IPMs, concurrently with the associated
+                                                                                       PacketPathEnabledi signal asserted high. The 4-way mutex
+         --
+                �� ��-����
+                                             ���-f        b�q�O             ---t
+                                                                           __
+                                                                             "
+                                                                                       arbitrates requests from multiple IPM's trying to access to
+                                                                                       the same output channel, granting access to exactly one of
+              ! �l:t'�;'
+               pipe1in
+                         r
+                                                                             2         them. Once the mutex is resolved, it performs two concurrent
+            Fig. 3. Request Generator for Output Port Module 0                         actions: it (i) selects the correct data input of the mult�plexer,
+                                                                                       and (ii) forwards the winning request to the output register by
+                   ACK3
+                                                                -JFf,]..               making the corresponding latch (Ll to L4) transp�t.:nt. The
+                   ACK2                                           FF;t
+                                                                  n-a                  4-input XOR gate functions as a . merg� elemen�, JOining four
+
+
+                                                        �'U�l ���
+                   ACK1
+                                                                  FF-;j.
+                   ACKo                                                                mutually-exclusive two-phase Signals Into a single request.
+                                                                                 �t1
+           Tail.Passed3
+           TailPassed2                                                                 This latch and the multiplexer are progratmned once at th.e
+           TailPa8sedl                                                           fr�   start of a packet transmission, and remain unchanged until
+1:!        TailPassedo                                          _    .
+                                                                                 g �
+.£ �:��:�i:�=:i:��                                  Pi- F- �C ,,"                      after the tail flit arrives.
+� �:�::��:���:t��
+                                                                                .•
+                                                  no� � �                �                After the output channel request, REQout, makes a transi­
+                                IIIP
+�                                    rr"" L'EX                                 ACKotJT
+                                                                                       tion, the data register and latch LS are made opaque. They b�­
+                                       1            �
+                                                                  = 1'-""
+                                                                   EnQ      1          come transparent again when the acknowledge, ACKoUT, IS
+                   REQO) -
+                   REO 1-
+                                    �
+                              Ll DEn2Q En
+                                   L
+                                                        1 �
+                                                          rFr [f, D LS
+                                                                               REQotJT
+
+
+
+                                                                       这里也是一个mousetrap
+                                                                                       received, indicating that the flit has been received downstream.
+                                                                                       When data and request are safely stored (ReqEnable g.oes
+                                                                                       low), the unit sends an acknowledge, ACKi, to. the. appropnate
+                   RE02
+                   REQ3
+                                       DL3:lDEnQl                                      IPM, completing the left handshakIng commUnlcatlOn. As each
+                  DATAo
+                                              L4
+                  DATA1                                         M�             DATAo   subsequent body flit of the packet arrives, as long a.n ac�o�l­
+                  DATA2
+                                                      U         D Q                    edgment ACKoUT has been received for the prevlOus fllt, ItS
+                                                      X          Dli:�
+                  DATA3
+                                                                                       data D AT Ai propagates directly through the �ultiplexer and
+                           Fig. 4. Output Port Module
+                                                                                       data register, and its request REQi propagates directly through
+                                                                                       the corresponding latch (Ll to L4), to th� o�tput �hannel.
+signals are two-phase. Whenever a request transition arrives                              Packet transmission ends after the tatl fllt amves. When
+on Reqx, it causes a transition on Reqo.                                               the flit is sent on the output channel, the TailPass�di
+    There are two cases of operation. If this is the Re­ signal (asserted high) is sent to the source IPM, along with
+quest Generator for the target <?utput port, the unit re­ the transition-signaling acknowledge, AC Ki: Once asserted,
+ceives RouteSelectedo asserted high. It then enters packet TailPassedi will also cause the correspondIng request latch
+processing mode, and asserts PacketPc:thEnabledo high. (Ll to L4) to become opaque. In turn, the correspond�ng
+The XOR2 is used as a programmable Inverter, where the IPM will deassert PacketPathEnabledi, thereby releaSIng
+correct polarity of the Reqo output is selected by the XOR? the mutex, and the Tail Detector then deasserts TailPassedi.
+gate (i.e. phase converter logic). Eventually, wh�n the tall
+flit arrives, the Output Port Module asserts �atlF!assedo D. 4-Input Mutex Design
+high, which resets the Request Generator to an In�ctlve state                             The microarchitecture of the new 4-input mutex is presented
+while deasserting PacketPathEnabledo low. Finally, the in Fig. S. While a previous widely-used 4-input mutex design
+TailPassedo signal is deasserted low.                                                  [ 16], [2 1] uses 6 two-input mutex elements and has a se�Lal
+    Alternatively, if this is not the Request Generator for th.e critical path through 3 mutex elements, the propost.:� solutlOn
+target output port, i.e. RouteSelectedo is not asser�ed, the umt uses 3 two-input mutex elements and has a cntlcal path
+is not activated and PacketPathEnabledo remaInS low. As through only 1 mutex element.                                                     .
+each flit arrives, the Reqx transition causes a Reqo transition,                          In this design, the left mutex element arbitrates between
+which is ignored by the corresponding Outpu.t . Port �odule. requests 0 and 1, the right mutex element arbitrates be�ween
+In fact, in this case, Reqo makes two transltlOns for each requests 2 and 3, and the center mutex element arbitrates
+flit: the XOR3 observes the flit acknowledgment from every between requests from the right a�d lef� pairs. . C-elements
+other Output Port Module (i.e. ACK1, ACK2 or ACK3), are used to synchronize the operatlOn of the middle mutex
+thus always returning Reqo to its original value.                                      with the side ones, both during the acquire and rel.ease phases.
+                                                                                       Whenever a grant is given, any other request comIng from the
+C. Output Port Module Architecture
+                                                                       .   .      .    channel on the same side of the winning one will be killed. The
+    Output Port Modules arbitrate between multlple                         IncomIng    rationale is that, when the winning request will be deasserted,
+requests trying to access the �ssociated o�tpu� channel. The the middle mutex has to be released, so no other requests
+microarchitecture of an OPM IS presented In Fig. 4.                                    must be coming from th<? sam� side. This b�havior provides
+    Initially, all PacketfathEnabledi a!1? Ta.iIPa.ssedi sig ­ fair arbitration between IncomIng requests: In fact, requests
+nals are low, and the wires of each transltlOn-slgnahng REG.!i from the other side will now have an advantage in acquiring
+and ACKi pair have the same value�. Latches Ll . to L4 the middle mutex. In other words, the policy implemented is
+are opaque, blocking new requests unttl they are arbitrated. a round robin between left and right side, and round robin
+Latch LS and the Data Register are normally transparent, between requests within the same side.
+
+
+
+
+                   Authorized licensed use limited to: Tsinghua University. Downloaded on March 28,2026 at 08:49:46 UTC from IEEE Xplore. Restrictions apply.
+                                                                                                 Writepointeri
+
+                                                                                    AckOUT                                   ReaciPointeri
+
+
+                                                                                   Fu11i+l
+
+
+
+
+                                                                                     ReqIN
+
+
+                                                                                    to register I s control por
+
+                                                                                        (a) Write Control Block          (b) Read Control Block
+                                                                                           Fig. 7. Schematic of Write and Read Control Blocks
+DATA,.                                            1-  __     ---+-... DATAo.n      One is the matching delay inside the PacketRouteSelector
+                                                                                block, in order to provide glitch-free operation.
+                                                                                   A second constraint is in the Output Port Module: data
+                                                                                must be stable long enough before latches are closed inside
+                 Fig. 6.   Circular FIFO: top-level view                        the output register, i.e. to meet the latches' setup time. This
+                                                                                constraint applies to both head flit path setup and body flit
+E. Transition-Signaling Circular FIFO                                           propagation, and requires constraining the control path (latches
+   FIFOs can be useful to provide additional storage capacity,                  Ll-4 and XOR gates) over the multiplexer delay.
+so to improve system-level performance. Multiple MOUSE­                            Finally, a subtle failure condition can occur during mutex
+TRAP registers can be placed one after the other, so to build                   release after a tail flit has passed. The first path starts in the
+a serial FIFO, but this introduces severe latency penalty. To                   Output Port Module, when acknowledge is generated. This
+overcome this issue, a new circular FIFO is here proposed.                      path goes to the Input Port Module, through the acknowledge
+Unlike [22], which uses a bus-based interface, the proposed                     merge block, through the input register control gate, making
+design can provide much lower latency and cycle time.                           the register transparent and allowing a request eventually
+   The microarchitecture of the transition-signaling circular                   pushing at its input to enter the module, to propagate through
+FIFO is shown in Fig. 6. The FIFO uses a two-phase protocol                     the RequestControl Block, and to reach the Output Port
+with single-rail bundled data. Write and Read Pointers are 1-                   Module. The AND gates above latches Ll-4 ensures that once
+hot level signals, selecting the active Write or Read Control                   TailPassed signal is asserted, these are closed when the new
+Blocks. A new transfer begins when new Data arrives, stabi­                     request comes, reducing the otherwise longer path through
+lizes and is then followed by ReqIN signal assertion (high in                   PacketPathEnabled deassertion and mutex release.
+the case under analysis). A new data can be stored in a buffer                     Other relative timing constraints exist inside the 4-input
+slot only if: (a) the write pointer selects that slot, and (b) that             mutex, the Request Control Block and the circular FIFO, but
+slot is empty (Fulli is at the same logic level of EmptYi)' This                they are typically satisfied in normal operation of the switch.
+condition is detected in the Write Control Block by an AND
+gate merging the two conditions, as can be seen in Fig. 7(a).                               IV. SE MI -AuTO MATED DESIGN FLO W
+The 2-input XOR in the Write Control block implements a                            All the previously mentioned constraints, plus other delay
+phase conversion, to provide the correct polarity of the Request                requirements needed to increase performance, have been en­
+signal at the input of the Request Latch, similar to the strategy               forced across all the steps from logical synthesis to layout de­
+used in the PacketRouteSelector in the Input Port Module.                       sign by means of mainstream CAD tools in a semi-automated
+The new request causes the active Write Control block to assert                 design methodology. We use a Low-Power Standard-Vt 40nm
+Fullo, close the corresponding register to store the coming                     Industrial Technology library, Normal Process, 1.2V Supply
+Data (by deasserting Eno), and assert the acknowledge to the                    Voltage and 300K Nominal Temperature.
+input. This acknowledge will be merged by the N-input XOR                          Entry level - The various blocks have been described with
+to generate the AckoUT signal upstream. Finally, when ReqIN                     low-level RTL models: their functionality has been specified
+and AckoUT are at the same logical value, the Write Counter                     using logical operators, with only few exceptions when imple­
+selects the following buffer position for the next operation.                   menting specific asynchronous cells. Our technology library
+This concludes data storage.                                                    does not include C-elements nor mutexes, therefore we use
+   When Fullo and Emptyo are at different logic levels, it                      their standard-cell equivalent implementations [23], [24].
+means that new data is available in the corresponding buffer                       Logic Synthesis - The design is synthesized and mapped to
+position. If this is the case and the read pointer selects that                 the target library using the Synopsys Design Compiler. When
+position, the Read Control Block (see Fig. 7(b» will assert                     using asynchronous design style, not only functionality, but
+a Request, which will be merged with all the other signals                      also dynamic behavior is important. In order to ensure glitch­
+outgoing from the other Read Blocks to generate the output                      free operation, the tool must be prevented from applying logic
+Request ReqOUT, together with data from the selected posi­                      optimizations to the design. On the other hand, automatic
+tion. After this event (now ReqOUT and AckIN are at different                   buffer insertion is a useful optimization option that we would
+logic values), the ReadPointero is immediately deasserted, to                   like to exploit. This behavior can be achieved by using the
+safely freeze the current value of the output request. In more                  seccompile_directives and secstructure directives of the tool.
+detail, request latches inside the Read Control Blocks are now                  While Design Compiler does not understand relative timing
+closed, while the active Read Control Block makes its internal                  constraints, they can be enforced through multiple iterations:
+acknowledge latch transparent, to route the incoming signal to                  in a first run, only max delays are enforced, in order to
+the correct buffer position. Next, an acknowledge signal comes                  meet a generic target (max performance, minimum area);
+from the downstream environment, causing Emptyo to make                         then, in a second run, the delay of the paths that have to be
+a transition and ReadPointerl to be asserted high, thereby                      matched can be extracted from the netlist (gectimingyath,
+concluding data transmission.                                                   gecattribute timing_path arrival) and assigned to the required
+   This FIFO is an important element, not yet exploited in                      path (set_min_delay). The same procedure can be used to
+this paper, but necessary when considering complete NoC                         check whether the given constraints have been fulfilled, and
+topologies where larger queues might be required.                               iterate again if necessary.
+                                                                                   Physical Switch Design - For this purpose we used Synop­
+F  Timing Constraints                                                           sys IC Compiler. As in the technology mapping procedure, it is
+  To work properly, the proposed architecture requires some                     possible to enforce, extract and compare the delays between
+one-sided timing constraints to be enforced.                                    different paths, and automatically verify if constraints have
+
+
+
+
+         Authorized licensed use limited to: Tsinghua University. Downloaded on March 28,2026 at 08:49:46 UTC from IEEE Xplore. Restrictions apply.
+                                                                                                                 Asynchronous          Synchronous
+been fulfilled. If not, it is possible to update constraints and                     Area                       4691/-im"L             16035/-im"
+iterate place and route again.                                                       Latency {Head I:<llt)       11\/) ps                l\/bU ps
+   Top-Level Implementation - Again, the Synopsys IC Com­                            lycle TIme (Avg.)            \/UJ ps                \/�U ps
+piler functionality is leveraged. The placed and routed switch                       Area Efficiency         236 M fps/mm"         63.63 M fps/mm"L
+netlist is saved as a hard macro and then instantiated in the top                                        TABLE I
+level description of the system. This is a typical hierarchical                            ASYNCHRONOUSVS. SYNCHRONOUS SWITCH
+design methodology, which achieves reduced runtimes and                            Latency metric is evaluated as the time interval        from a
+faster convergence. Since this hard macro is generated with the                 request being asserted at the input port to a request asserted
+standard methodology described above, it still presents some                    at the output port, assuming the switch is initially empty and
+degrees of freedom: data width is parameterizable, as well                      there is no congestion. Latency varies depending on the flit
+as its floorplan aspect ratio and the position of input-output                  position inside the packet. Head flits experience the highest
+ports. For this reason, this is different from a fixed hard macro               latency since they have to set up the path from input to
+designed with a full custom approach.                                           output port. Latency will be evaluated focusing on head flits,
+   In order to route interconnection wires between any two                      since they are responsible of packet propagation through the
+switches, we choose to give maximum delay constraints over                      network. Cycle time is the interval between two successive
+the link, while keeping the same max capacitance and max                        acknowledgments received at the switch output port.
+transition time constraints given inside the switch. After a first                 As far as the synchronous switch is concerned, the imple­
+routing and buffer insertion, we freeze placement and driving                   mentation allocates one clock cycle to traverse the switch and
+strength of data wires along them (so that their delay will no                  one clock cycle to traverse the link connecting two switches.
+longer change), and give minimum delay constraints over the                     For this reason, cycle time is one clock period, while latency
+request signal to satisfy the bundled data protocol requirement                 amounts to two clock periods.
+(i.e. a request must arrive always after the corresponding data                    Area efficiency is a metric that evaluates how much area
+has stabilized). Then, incremental physical optimization and
+routing are performed. A different approach has been adopted
+when implementing links with pipeline stages. A pipeline stage
+                                                                                is necessary to provide a defined performance. It is calculated
+                                                                                as:
+                                                                                    Area
+                                                                                          Eff..zczency
+                                                                                                           DeliveredThroughput
+                                                                                                             =
+                                                                                                                                               [MfPS]
+                                                                                                                                                ---
+
+
+
+can help reduce cycle time over the link, at the cost of some                                                  AreaOccupancy            mm2
+additional forward latency. As before, switches were imple­                        2) Comparative Analysis: Table I presents the measured
+mented as hard macros and placed a few millimeters apart.                       metrics. The asynchronous switch requires 7 1% less area, and
+Architectural repeaters (i.e. MOUSETRAP FIFO stages) are                        delivers 39% lower latency and comparable throughput. For
+described as soft macros, inferring their placement boundaries                  this reason, the Area Efficiency metric is 3.7x higher for the
+in order to have a regular floorplan and guide tool decisions.                  asynchronous implementation. It should be observed that part
+The tool is then allowed to size pipeline cells and insert buffers              of the area savings come from the different minimum buffering
+to reduce propagation delay.                                                    requirements of the two switches. Both of them are latched at
+   Even though the previously described methodology could                       inputs and outputs. However, the synchronous switch needs
+produce a valid outcome, the performance results were not                       two slot buffers to properly support the stall/go flow control
+satisfactory. This is because simply setting of max delays on                   protocol (i.e., not to lose data upon stall assertion). Vice versa,
+wires does not take into account the internal timing arcs of                    flow control is inherently implemented in the asynchronous
+the latches. This issue prevents the tool to correctly estimate                 clockless handshaking, therefore only a single slot latching
+the time spent on link traversal. In order to optimize our                      stage is sufficient for the asynchronous switch.
+procedure, we exploited a similar method to [6], adapting it                       3) NoC Link Effect: A typically overlooked issue is the
+for the single-rail bundled data case. Through IC Compiler                      effect of the inter-switch links on performance, which are
+commands, we disabled the path through the feedback loop                        assumed ideal in Table I. In order to account for this aspect,
+of register control logic, from input to output pin of latches                  we implement a complete layout of two switches, placed a few
+inside repeaters, and defined the reset signal as a dummy                       millimeters apart, and route interconnections between them.
+clock. This approach makes latches similar to flip flops, and                      Fig. 8 shows how head latency and cycle time degrade
+the clock period gives a constraint on the maximum forward                      for synchronous and asynchronous switches when varying the
+delay. This leaves the acknowledge signal propagating back                      inter-switch distance. Having an entire clock cycle reserved
+from each pipeline stage to the previous one unbounded (we                      for link traversal, the synchronous switch maintains a stable
+disabled the timing path through register control logic), so a                  performance up to 4 mm link length. From there on, the critical
+maximum delay constraint has been enforced on it in order                       path moves from inside the switch into the link, thus reducing
+to speed the path through it. Again, multiple iterations are                    the maximum clock frequency. On the other hand, performance
+required to enforce bundling constraint on a request signal.                    of asynchronous switch gracefully degrades when increasing
+We found that this approach is more suitable when dealing                       link length. Latency is always lower when compared with
+with pipelined links, since it reduces tool run times and the                   the synchronous counterpart, while cycle time has a steeper
+number of iterations required to satisfy matching constraints                   degradation, due to the signal roundtrip over the interconnect.
+with respect to the nrevious methodology.                                          It is well-known that link pipelining is the way to reduce
+                  V. EXPERIMENTAL RE"SULTS                                      cycle time at the expense of additional latency. This holds
+   In order to evaluate our implementation choice, we com­                      for both synchronous and asynchronous design styles, but the
+pared the proposed SxS asynchronous switch with the baseline                    implications are completely different. Adding a pipeline stage
+fully synchronous xpipesLite switch.                                            in synchronous logic always implies one additional clock cycle
+   I) Experimental Setup: While constraints required for cor­                   latency and full retiming and flow control stages, while in
+rect functionality can be checked and fixed during synthesis                    asynchronous logic the latency is affected by only a few gates
+and place and route procedures, performance evaluation must                     delay since pipeline stages consist of simple latching stages.
+be assessed through simulation. In order to assess performance                     Exploiting the procedure described in section IV, effects of
+of the asynchronous switch, the following experimental setup                    link pipelining are analyzed. The number of pipeline stages is
+has been exploited. The switch under test receives packets                      selected in order to obtain the same cycle time as the one mea­
+from injector modules and forwards them to absorber modules;                    sured for ideal link. As shown in Fig. 9, the additional pipeline
+injector and absorber are simply other instances of the same                    stages negatively affect asynchronous latency, although for link
+switch, with fast loops at their boundaries (i.e., maximum                      lengths below 2.S mm performance is always better or equal
+injection rate). This environment permits to assess the real­                   to that of the synchronous switch. For longer link lengths, the
+istic handshaking mechanism between neighboring switches,                       asynchronous solution suffers the most from link parasitics
+thereby avoiding overly-optimistic results.                                     due to the roundtrip delay of its handshaking protocol.
+
+
+
+
+         Authorized licensed use limited to: Tsinghua University. Downloaded on March 28,2026 at 08:49:46 UTC from IEEE Xplore. Restrictions apply.
+         4000
+                                  Analysis on Unpipelined Link
+                                                                                         25
+
+                                                                                    1 20�---1
+                      ...Iatency
+         3500    -
+
+                      +cycle time
+         3000    -
+                           lock cycle                                               �c 15 �------------------'-�-----1                             • Asynch 3flits
+                      +switch traversal                                             Q.                                                             • Asynch 8 flits
+         2500    -
+                                                                                    E
+                                                                         .-:::a
+   -.;
+   oS 2000
+                                                                                     � 10 �----------��----;                                         Synch 3flits
+                                                                                     c                                                             • Synch 8 flits
+   ..                                                                                o
+   E 1500                           -                                               () 5 i.-+---j                                                  .CG 3flits
+   j:
+         1000         �
+                      ...                                                           � O �����-- ���-- u.�
+                                                                                    �
+                                                                                                                                                   .CG 8 flits
+
+          500                                                                                     L e ak ag e   Idle       Hotspot      Parallel
+            0                                                                                          Traffic Pattern
+                     Omm       Imm       2mm      3mm        4mm   Smm     6mm    Fig. 10. Power consumption of the different switch architectures, varying
+                                               Link Length                        the traffic injected        Energy per Flit
+                Fig. 8.    Performance results with unpipelined links
+                                                                                              5
+                               Analysis on Link with Plpellnlng
+                                                                                            4,5
+         4000
+                                                                                               4
+         3500        ...Iatency                                             ...
+                                                                                            3,5
+         3000
+                     +cycle time
+                                                    �                                    ,. 3
+         2500
+                     -clock cycle
+                                                �/                                       oS 25
+                                                                                             '
+                                               � /'
+                     +switch traversal
+   on
+                                                                                         �     2
+   oS 2000
+    ..                                                                                   �  1,5
+    E 1500                    ..-
+   j:                                                                                          1
+         1000
+                      �                                                                     0,5
+                                                                                              o
+          500                                                                                          Asynch 8 flits      Synch 8 flits          CG 8 flits
+           0                                                                                  Asynch 3 flits     Synch 3 flits         CG 3 flits
+                     Omm       Imm       2mm      3mm        4mm   Smm     6mm                                          Packet Length
+
+                                               Link Length                        Fig. 11.         Average energy required to propagate a Flit form input to output
+                 Fig. 9.     Performance results with link pipelining                                                  REFERENCES
+                                                                                   [I] P. Teehan et aI., "A survey and taxonomy of GALS design styles", IEEE
+   4) Power Analysis: Power consumption of the switches                                Des. Test Comput., vol. 24.5,pp. 418-428,2007.
+is analyzed under different conditions, using Prime Time                           [2] D. Chapiro, "Globally-asynchronous locally-synchronous systems",
+                                                                                       Ph.D. dIssertation, Dept. CS, Stanford University, 1984.
+on post-layout implementations. For these experiments, the                         [3] S. Hollis and S. W. Moore, "RasP: An area-efficient, on-chip network",
+synchronous switch has been implemented in two versions,                               in IEEE Proc. Int. Conf. Compo Design, Oct. 2007,pp. 63-69.
+one without and one with clock gating.                                             [4] K. S. Stevens et aI., "Characterization of asynchronous templates for
+                                                                                       integration into clocked CAD flows", ASYNC 2009.
+   Four different case analysis are presented in Fig. 10.                          [5] Y Thonnart et aI., "A pseudo-synchronous implementation flow for
+Leakage power is smaller in asynchronous design, given the                             WCHB QDI asynchronous circuits", ASYNC 2012.
+reduced area occupancy. Idle power is analyzed considering                         [6] YThonnart, P.Vivet, FClermidy, "A fully-asynchronous low-power
+clock tree power consumption: even if clock gating technique                           framework for GALS NOC integration", DATE 2010.
+                                                                                   [7] S.M. Nowic� and M. Singh, "High-performance asynchronous pipelines:
+can provide evident benefits with almost no performance                                an overVIew , IEEE Des. Test Comput., vol. 28.5,pp. 8-22,2011.
+penalty with respect to baseline synchronous switch, the asyn­                     [8] D. Lattard et aI., "A reconfi *urable baseband platform based on an
+chronous switch, being completely clockless, requires 90%                              asynchronous network-on-chip , ISSCC, Jan. 2008.
+                                                                                   [9] M.N.Horak, S.Nowick, M.Carlberg, U.Vishkin, "A low-overhead asyn­
+and 97% less power than clock gated switch and baseline                                chronous interconnection network for GALS chip multiprocessors",
+switch, respectively. The remaining two cases use two different                        IEEE TCAD, vol. 30:4,pp. 494-507,2011.
+traffic benchmarks, with packets composed by 3 and 8 flits. For                   [l0] D.Gebhardt et aI., "Comparing energy and latency of asynchronous and
+                                                                                       synchronous NoCs for embedi:led SoCs", NoCs 2010,pp. 115-122.
+hotspot (a single output channel is accessed by packets coming                    [11] S.Stergiou et aI., "xpipesLite: a synthesis-oriented design flow for
+from every other input channel), the asynchronous switch has                           networks on chip", DATE 2005,pp. 1188-1193.
+an average of 85% less power requirement than synchronous                         [l2] J. Bainbridge and S. Furber, "CHAIN: A delay-insensitive chip area
+and and 73% less than synchronous with clock gating. For the                           interconnect", IEEE Micro, vol. 22:5,pp. 16-23,2002.
+                                                                                  [l3] L. Plana et aI., "A GALS infrastructure for a massively parallel
+parallel benchmark (all input ports competing for 5 different                          multiprocessor", IEEE Des. Test Comput., vol. 24:5,pp. 454-463,2007.
+output ports, no contention), power consumption is reduced on                     [14] T. Bjerregaard and J. Sparsoe, "A router architecture for connection­
+average by 60% with respect to synchronous and 45% with                                oriented service guarantees in the MANGO clockless network-on-chip",
+                                                                                       in Proc. DATE, Mar. 2005,pp. 1226-1231.
+respect to synchronous with clock gating. Overall the small                       [l5] A. Sheibanyrad, A. Greiner, and I. Miro-Panades, " Multisynchronous
+difference between 3 and 8 flits packets is due to the extra                           and fully asynchronous NoCs for GALS", IEEE Design Test Comput.,
+power required during arbitration process. Power savings not                           vol. 25:6,pp. 572-580,Nov. 2008.
+                                                                                  [16] R. Dobkin, Y. Vishnyakov, E. Friedman, and R. Ginosar, "An asyn­
+only come from the clockless architecture of the asynchronous                          chronous router for multiple service levels networks on chip", ASYNC
+switch but also from its lower complexity and footprint. In fact,                      2005,pp. 44-53.
+observing the energy-per-flit in Fig.l1, there is a 44% average                   [l7] A. Lines, "Asynchronous interconnect for synchronous SoC design",
+                                                                                       IEEE MICro Mag., vol. 24.1,. pp. 32-41,2004.
+reduction with respect to the two synchronous switches.                           [18] B. Quinton, M. Greenstreet, and S. Wilton, "Practical asynchronous
+                       V I. CONCLUSIONS                                                interconnect network design", IEEE Trans. on VLSI, vol. 16:5, pp.
+   This paper delivers a largely unexplored design point in                            579-588,2008.
+asynchronous NoC switch architectures. It relies on transition­                   [19] M. Singh and S. M. Nowick, " MOUSETRAP: high-speed transition
+signaling bundled data to produce a low overhead design,                               signaling asynchronous pipelines", IEEE Tran. on VLSI, vol. 15:6,pp.
+which at the same time meets the performance of synchronous                            684-698,2007.
+                                                                                  [20] G. Gill, S.S. Attarde, G. Lacourba, S. M. Nowick, "A low-latency
+counterparts. Post-layout results indicate that area is reduced                        adaptive asynchronous interconnection network using bi-modal router
+by 7 1%, idle power by 90%, and energy-per-flit by 45%.                                nodes", NOCS 2011,pp. 193-200.
+Throughput is roughly comparable with the synchronous                             [21] R. Dobkin, R. Ginosar, A. Kolodny "QNoC asynchronous router",
+                                                                                       Integration, the VLSI Journal, vol. 42:2,pp. 103-115,2009.
+switch, while latency is actually better up to link lengths                       [22] T. Chelcea and S. M. Nowick, "Low-latency asynchronous FIFO's using
+of 2.5mm in 40nm technology. Overall area efficiency is                                token rings", IEEE Async Symposium (2000).
+superior (3.7x). Finally, the switch is delivered as a partially­                 [23] van Berkel et al. " Stretching quasi delay insensitivity by means of
+                                                                                       extended isochronic forks", WCAD M, 1995,pp. 99-106.
+reconfigurable hard macro for hierarchical design flows. Tim­                                                                               �
+                                                                                  [24] L.A.Plana et aI., "SpiNl"i!lker: design and imp ementation of a GALS
+ing constraints are tightly controlled through a semi-automatic                        multIcore system-on-chlp , AC M JETC, vol. 7.4,art. 17, 2011.
+design flow relying on mainstream synchronous CAD tools.
+
+
+
+           Authorized licensed use limited to: Tsinghua University. Downloaded on March 28,2026 at 08:49:46 UTC from IEEE Xplore. Restrictions apply.
+

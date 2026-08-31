@@ -1,0 +1,34 @@
+# DATE V3 experiment bulky artifacts — keep the control plane in Git.
+DATE paper/experiments/raw/
+DATE paper/experiments/intermediate/
+DATE paper/experiments/model/work/
+DATE paper/experiments/**/*.vcd
+DATE paper/experiments/**/*.fsdb
+DATE paper/experiments/**/*.sdf
+DATE paper/experiments/**/*.spef
+DATE paper/experiments/**/*.gds
+DATE paper/experiments/**/*.gds.gz
+DATE paper/experiments/**/*.oas
+DATE paper/experiments/**/*.def
+DATE paper/experiments/**/*.ndm/
+DATE paper/experiments/**/*.nlib/
+DATE paper/experiments/**/*.ddc
+DATE paper/experiments/**/*.vpd
+DATE paper/experiments/scripts/**/__pycache__/
+scripts/asic_pnr/cmr/results/
+scripts/asic_pnr/**/__pycache__/
+
+# Local Chisel/FIRRTL throwaways
+test_run_dir/
+
+# Keep registry, curated tables, figures, configs, and frozen manifests.
+!DATE paper/experiments/registry/
+!DATE paper/experiments/registry/**
+!DATE paper/experiments/curated/
+!DATE paper/experiments/curated/**
+!DATE paper/experiments/figures/
+!DATE paper/experiments/figures/**
+!DATE paper/experiments/configs/
+!DATE paper/experiments/configs/**
+!DATE paper/experiments/scripts/
+!DATE paper/experiments/scripts/**

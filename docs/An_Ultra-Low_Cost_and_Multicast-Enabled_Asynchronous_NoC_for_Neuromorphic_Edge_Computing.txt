@@ -1,0 +1,1044 @@
+IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024                                        409
+
+
+
+
+              An Ultra-Low Cost and Multicast-Enabled
+               Asynchronous NoC for Neuromorphic
+                         Edge Computing
+              Zhe Su , Simone Ramini, Demetra Coffen Marcolin, Alessandro Veronesi , Milos Krstic ,
+                    Giacomo Indiveri , Senior Member, IEEE, Davide Bertozzi , Member, IEEE,
+                                             and Steven M. Nowick
+
+
+
+   Abstract— Biological brains are increasingly taken as a guide                                      I. I NTRODUCTION
+toward more efficient forms of computing. The latest frontier
+considers the use of spiking neural-network-based neuromorphic
+processors for near-sensor data processing, in order to fit the tight
+power and resource budgets of edge computing devices. However,
+                                                                               T     HERE is a growing interest in neurobiologically inspired
+                                                                                     computing methods for their potential efficiency gains.
+                                                                               Spiking neural networks (SNNs) are particularly notable for
+a prevailing focus on brain-inspired computing and storage                     their ability to emulate the behavior of biological neurons,
+primitives in the design of neuromorphic systems is currently                  where neuron activity is triggered by stimuli, resulting in
+bringing a fundamental bottleneck to the forefront: chip-scale                 the firing of spikes when a threshold is reached [1]. This
+communications. While communication architectures (typically,
+a network-on-chip) are generally inspired by, or even borrowed
+                                                                               event-based computational model is highly energy-efficient
+from, general purpose computing, neuromorphic communications                   due to the infrequent occurrence (i.e., sparsity) of spikes in
+exhibit unique characteristics: they consist of the event-driven               both time and space.
+routing of small amounts of information to a large number of                      Neuromorphic engineering aims at efficiently implementing
+destinations within tight area and power budgets. This article                 SNNs in hardware, leveraging properties such as process-
+aims at an inflection point in network-on-chip design for brain-
+inspired communications, revolving around the combination of
+                                                                               ing and memory co-location, event-driven processing, and
+cost-effective and robust asynchronous design, architecture spe-               low-precision computation with binary spike encoding. The
+cialization for short messaging and lightweight hardware support               steady growth in this field, following the pioneering work of
+for tree-based multicast. When validated with functional spiking               C.Mead in the late 1980s [2], has led to the development
+neural network traffic, the proposed NoC delivers energy savings               of large-scale neuromorphic computing systems [3], [4], [5],
+ranging from 42% to 71% over a state-of-the-art NoC used in
+a real multi-core neuromorphic processor for edge computing                    [6], which are currently pursuing further breakthroughs in
+applications.                                                                  scalability and system integration [7], [8], [9].
+                                                                                  More recently, there has been a growing momentum in
+   Index Terms— NoC, neuromorphic, asynchronous.
+                                                                               developing neuromorphic processors to endow decentralized
+                                                                               edge computing devices with intelligence [10], [11], [12]. This
+  Manuscript received 25 March 2024; revised 30 May 2024 and 16 July
+2024; accepted 16 July 2024. Date of publication 25 July 2024; date of         surge is justified by the excessive power consumption associ-
+current version 13 September 2024. This work was supported in part by          ated with data communication in centralized cloud-based AI
+the European Union under Grant GA 101147319 (EBRAINS 2.0), Grant GA            methods, propelled by the considerable potential of neuromor-
+101160314 (TWIN-RELECT), Grant GA 101160182 (TAICHIP), and Grant
+GA 101160293 (AIDA4Edge); in part by the European Research Council             phic computing in applications like smart sensors, bio-signal
+(ERC) under the European Union’s Horizon 2020 Research and Innovation          processing, and neuromorphic robots. Nonetheless, hardware
+Program under Grant 724295 (NeuroAgents); in part by the Electronic            platforms for biologically-inspired edge computing are not as
+Component Systems for European Leadership (ECSEL) Joint Undertaking
+under Agreement 876925 (ANDANTE); and in part by NSF under Grant               consolidated as their large-scale counterparts, but are still in
+CCF-1527796. This article was recommended by Guest Editor A. Das.              the early stage of design space exploration. This is primarily
+(Corresponding author: Zhe Su.)                                                due to the stringent power and resource constraints that must
+  Zhe Su and Giacomo Indiveri are with the Institute of Neuroinformatics,
+University of Zurich, 8006 Zürich, Switzerland, and also with ETH Zürich,      be met when designing low-to-medium scale systems with
+8057 Zürich, Switzerland (e-mail: zhesu@ini.ethz.ch).                          hundreds or thousands of neurons. In particular, while it is
+  Simone Ramini is with the University of Ferrara, 44121 Ferrara, Italy.       relatively easy to place tens of thousands of neuron-equivalent
+  Demetra Coffen Marcolin and Davide Bertozzi are with The University of
+Manchester, M13 9PL Manchester, U.K.                                           circuits on a chip, the millions of interconnections between
+  Alessandro Veronesi is with the IHP–Leibniz Institute for High Performance   these neurons are impractical to fabricate in silicon. As a
+Microelectronics, 15236 Frankfurt, Germany.                                    workaround, neuromorphic platforms use a virtual wiring
+  Milos Krstic is with the IHP–Leibniz Institute for High Performance
+Microelectronics, 15236 Frankfurt, Germany, and also with the University       scheme called Address Event Representation (AER), whereby
+of Potsdam, 14469 Potsdam, Germany.                                            computational units (i.e., neurons) are given an address,
+  Steven M. Nowick is with Columbia University, New York, NY 10027 USA.        encoded as a digital word, which is transmitted to destination
+  Color versions of one or more figures in this article are available at
+https://doi.org/10.1109/JETCAS.2024.3433427.                                   synapse circuits as soon as an event occurs (i.e., when a neuron
+  Digital Object Identifier 10.1109/JETCAS.2024.3433427                        spikes).
+                             © 2024 The Authors. This work is licensed under a Creative Commons Attribution 4.0 License.
+                                        For more information, see https://creativecommons.org/licenses/by/4.0/
+410                            IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+   Not surprisingly, a major source of overhead in neuro-            By coherently and systematically developing the impli-
+morphic edge computing platforms is represented by the            cations of these principles, the paper comes up with an
+on-chip communication infrastructure used for AER routing,        ultra-low cost NoC architecture for the efficient delivery of
+which is always digital regardless the neuron and synapse         spike messages, with built-in and lightweight support for the
+circuit implementations (analog, mixed-signal or digital) [13].   parallel tree-based multicast of single-flit packets. The switch
+Because of their highly distributed and concurrent computa-       is made available through efficient and robust asynchronous
+tions, cutting-edge neuromorphic platforms are interconnected     design, thus enabling spikes to be generated, routed, and
+via conventional network-on-chip (NoC) architectures, which       consumed in an event-driven manner with maximal activity
+have been often force-fitted into the new environment with        gating during idle periods, and with no overhead for global
+poor specialization for its specific messaging requirements.      clock distribution, tuning and management.
+As a result, the energy cost of the digital AER routing              The proposed NoC can be used either standalone, in those
+infrastructure turns out to be a major hurdle in neuromorphic     platforms where short messaging is prevalent, or as a dedicated
+platforms, exacerbated either by the limited computational        network plane oriented to short messages in the presence of
+requirements for digital neuron simulation or by the low-power    high traffic diversity.
+sub-threshold analog circuits used for neuron emulation [10].        It should be observed that developing an asynchronous
+   There are two fundamental limitations in current neuromor-     NoC architecture around single-flit packets is far from a
+phic NoCs. On the one hand, they often draw inspiration           simple streamlining exercise of conventional architectures, but
+from their counterparts in traditional computing domains,         comes with daunting challenges that have no straightforward
+where the focus is on transferring large amounts of data with     equivalence with synchronous design:
+high bandwidth across the memory hierarchy. In contrast,             Challenge A: robust concurrency of internal micro-
+a brain-inspired communication fabric should be optimized         operations. The use of a performance-driven asynchronous
+for sending a large number of very small payloads to              design style pushing for rapid processing of successive pack-
+many destinations following statically-configured multicast       ets, combined with the short transmission window of compact
+paths [14]. On the other hand, SNN-based neuromorphic             single-flit packets, leads to timing robustness issues that must
+systems use biological inspiration and obtain energy efficiency   be safely handled. In particular, with multi-flit packets the
+by exploiting asynchronous event-driven computation and           entire packet transmission time is available to safely reset
+communication. As a result, asynchronous NoCs are more            switch components (e.g., the routing logic) before the new
+biologically-plausible than their synchronous counterparts,       packet arrives. In contrast, with compact single-flit packets the
+although more difficult to design efficiently. The asynchronous   internal reset operations of the switch from a previous packet
+NoCs used in current neuromorphic systems can hardly unfold       might end up partially overlapping with the admission of a
+their energy-saving potential due to either a design style        new one, potentially leading to data overrun conditions. Our
+oriented to extreme robustness and ease-of-design at the cost     solution (Section VI-B) consists of a conservative prevention
+of implementation efficiency [15], or to the use of behavioural   of new re-activations of critical switch subblocks too early
+synthesis methodologies that end up in sub-optimal circuit        (i.e., before they have safely reset), while only marginally
+realizations [16], [17].                                          affecting performance.
+   Paper Contribution This paper targets a major innovation          Challenge B: lightweight completion detection of mul-
+in interconnection networks for on-chip communication in          ticast transactions. An asynchronous multicast switch must
+neuromorphic edge computing platforms, which relies on two        be able to correctly detect completion of operations across a
+fundamental pillars:                                              wide range of multicast transmission patterns, in the presence
+   • Motivated by the short payloads of spiking messages          of arbitrary downstream traffic delays, without the use of a
+     (essentially, only neuron addressing information, in the     fixed-rate strobing clock. This challenge is tackled by this
+     order of only a few tens of bits [18]) and by the wide       paper with trivial circuit overhead by taking advantage of
+     physical links increasingly falling within reach of scaled   the inherent properties of high-speed asynchronous signalling
+     process nodes, this paper advocates compact single-flit      protocols (Section VI-D).
+     (i.e., one-word) packets as the most efficient network          Challenge C: robustness issues with asynchronous
+     encoding format for spike messages. They mix header          arbiters. In asynchronous NoCs, implementing fair, high-
+     information and payload into a single word for low-          performance and robust arbitration mechanisms is challenging,
+     latency transmission, and hold promise of radical switch     since inputs may compete and request at arbitrary points
+     architecture streamlining, especially when it comes to       in continuous time, unaligned to clock cycles. Two well-
+     hardware support for multicast.                              known challenges deserve special attention in light of the
+   • The conservative asynchronous design style used in           high-frequency activations generated by single-flit packets:
+     most state-of-the-art neuromorphic NoCs, emphasizing            Challenge C1: asynchronous arbiters come with variable
+     robustness over lightweight implementation, can result       resolution times, which leads to operational robustness issues.
+     in overdesign for many practical systems [15]. Follow-          Challenge C2: under high contention, during transitory
+     ing this intuition, the proposed design instead targets      operations, real asynchronous arbiters may exhibit two
+     cost-effective realizations, delivering major overall cost   grants concurrently high for a limited time (a deasserting
+     benefits, at the price of handling moderate timing con-      and a newly-asserting one), potentially leading to switch
+     straints through an automated synthesis toolflow.            malfunctions.
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                        411
+
+
+
+   For the first time, this paper addresses the above arbiter           XY), deadlock may still arise as a result of the interde-
+issues at the level of the switch architecture rather than              pendences among the various multicast branches (i.e., at the
+of the arbiter circuit, where such problems can be typically            multicast-replication level). There are several known solutions
+alleviated but not entirely removed. Our approach to variable           to this problem, which all come with relevant overhead:
+resolution times consists of conditioning the activation of             buffer-hungry virtual cut-through (VCT) switching [24], [25],
+new input requests from the same input port to the successful           low-performance circuit-switching approaches [26], or costly
+deassertion of the associated grant (Section VI-C). In a similar        deadlock recovery schemes [27].
+vein, we avoid grant overlapping by preliminarily masking                  In the synchronous domain, it has been observed that
+the deasserting grant before removing the corresponding input           single-flit packets make the routing of each multicast branch
+request, which causes a competing request to safely take over           independent, and their switching is, by construction, deadlock-
+the arbiter (Sections VI-C and VI-E).                                   free. This attribute has been exploited by many synchronous
+   The efficiency and practical relevance of the proposed               switches [28], [29], [30] to build deadlock-free and/or simpli-
+NoC are validated by comparing it against a state-of-the-art            fied multicast-enabled NoC architectures.
+asynchronous one used for spike routing in a real multi-core               In the asynchronous domain, no specialized architecture has
+neuromorphic processor for edge computing applications.                 been developed so far to take advantage of single-flit packets.
+When put at work with a Keyword Spotting task, the proposed             As a result, it comes as no surprise that many neuromorphic
+NoC outperforms the state-of-the-art one with energy savings            computing platforms still take a naive approach to multicast
+ranging from 42% to 71%, respectively.                                  where multiple unicast copies of a multicast packet are serially
+                                                                        injected and independently routed to their destinations [3], [5],
+                      II. R ELATED W ORK                                [13].
+A. The Communication Bottleneck in Neuromorphic                            A few neuromorphic NoCs provide hardware support for
+Computing                                                               multicast, but stay away from the high complexity intrin-
+                                                                        sic to crossbar-based switch designs by trading flexibility
+   A comprehensive overview comparing most of the
+                                                                        and/or performance for lightweight implementation. The router
+approaches that have been proposed for AER routing in
+                                                                        in [31] takes advantage of tree topologies to simplify mul-
+literature so far is provided in [13]. As a matter of fact, the effi-
+                                                                        ticast addressing, and implements deadlock-free multicast as
+ciency and scalability of neuromorphic computing platforms,
+                                                                        regional broadcast during the downward routing phase. This
+regardless their scale or implementation style, are strongly
+                                                                        approach is topology-specific and limits mapping flexibility.
+limited by their on-chip interconnection networks. Whenever
+                                                                        The solution in [11] advocates a hierarchical topology, where
+ultra-low power subthreshold analog design is used for the
+                                                                        multicast is enabled only in the tree subnetworks while packet
+neurosynaptic framework, the energy per synaptic operation
+                                                                        replication is used in the top-level 2D mesh topology. The
+can be improved by at least one order of magnitude by simply
+                                                                        approach taken by [32] exhibits limited internal concurrency,
+porting the digital communication fabric to a more scaled
+                                                                        both because the target output ports of a multicast packet
+process node [10]. In a similar vein, the substantial data trans-
+                                                                        cannot read it concurrently and independently and because
+fers required by solver-based digital implementations pose
+                                                                        all input ports are merged into a unique processing pipeline.
+challenges in aligning them with a low-power event-driven
+                                                                        Deadlock freedom is guaranteed at the large overhead of
+neuromorphic approach [19]. Last but not least, some of the
+                                                                        capacity detection mechanisms, emergency routing and even
+main bottlenecks in the construction of large-scale reconfig-
+                                                                        packet dropping.
+urable neuromorphic computing platforms are the bandwidth,
+                                                                           In this paper, we leverage the properties of single-flit packets
+latency and memory requirements for routing address-events
+                                                                        to deliver cost-effective and deadlock-free packet replication
+among neurons [3], [4]. Several large-scale neuromorphic
+                                                                        for efficient multicast in asynchronous NoCs.
+computing approaches have therefore restricted the space of
+possible network connectivity schemes to optimize bandwidth             C. Asynchronous Design Challenges
+usage while minimizing power and latency [3], [6]. In all
+                                                                           In the vast majority of neuromorphic NoCs (and in all
+cases, the capability of many neuromorphic platforms to target
+                                                                        multicast-enabled ones), the choice of communication proto-
+acceleration factors of neural process simulations/emulations
+                                                                        cols and data encoding schemes aims to simplify hardware
+compared to biological time may quickly lead to saturating
+                                                                        design (e.g., using four-phase, or “return-to-zero,” protocols)
+the network bandwidth.
+                                                                        and to enforce extreme timing robustness (e.g., using “delay-
+                                                                        insensitive” data encoding), at the cost of low throughput, high
+B. Hardware Support for Parallel Tree-Based Multicast                   area occupancy, poor coding efficiency, and high energy-per-
+   Unlike classical digital logic circuits, SNNs are typically          bit [15], [33]. This approach is at odds with the ultra-low cost
+characterized by very large fan-in and fan-out numbers. For             computing targets of neuromorphic platforms.
+example, in cortical networks neurons project on average                   Moreover, asynchronous circuit design faces challenges due
+to about 10000 destinations. Hardware support for parallel              to the absence of native support in standard industrial CAD
+tree-based multicast typically comes with significant cost [20],        tools. Consequently, all neuromorphic systems incorporating
+[21], [22], [23]. A major source of overhead consists of                asynchronous logic depend on some extent on custom tool
+deadlock avoidance techniques. It is well known that even               flows, which prolong the design process and necessitate assis-
+when a deadlock-free multicast routing algorithm is used (e.g.,         tance from a team proficient in asynchronous logic design.
+412                             IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+A common approach consists of using the CHP hardware
+description language [16] and handshaking expansions [17]
+for high-level description. Then, asynchronous circuits toolk-
+its evolved from [34] are used to aid in transforming the
+high-level logic into silicon. The issue when these methods are
+applied to NoCs is that there is typically a large abstraction gap
+between design entry and low-level circuit implementation,
+with a refinement process mainly driven by the functional
+specification and constrained by the semantics of the mod-
+                                                                     Fig. 1.   The primary distinction between a) ANN and b) SNN.
+elling tools. The frequent outcome is a sub-optimal circuit
+implementation of NoC switches that appears unnatural to
+expert NoC designers.                                                This shift calls for applications that are not only close to the
+   This paper targets a major improvement in the area and            source of data but are also efficient in terms of energy use and
+energy efficiency of multicast-enabled neuromorphic NoCs by          quick in processing, all the while being robust and flexible
+means of an RTL-equivalent design entry, enabling microar-           enough to adapt to any changes. The key challenge lies in
+chitecture optimization, and of an efficient data encoding           having processors that can handle continuous, real-time sensor
+scheme using standard synchronous-style single-rail data             data processing, extracting the necessary information while
+channels with binary data encoding.                                  keeping energy use to a minimum.
+                                                                        A promising approach to meet these demands involves the
+D. General-Purpose Asynchronous NoCs                                 use of event-based spiking neural networks (SNNs). Neu-
+                                                                     romorphic processors utilize event-based architectures that
+   To address the inefficiencies outlined above, one poten-
+                                                                     blend in-memory computing with the computational concepts
+tial solution would be to adopt the latest generation of
+                                                                     inspired by the human brain, specifically for the deployment of
+asynchronous NoC switches designed for general-purpose
+                                                                     SNNs. These processors are distinctive for their asynchronous,
+computing, especially [24], [35]. These switches offer promis-
+                                                                     spike-based processing technique, promising exceptional effi-
+ing improvements in overall cost metrics, including coding
+                                                                     ciency and minimal power use, making them particularly adept
+efficiency, area, power, and performance, in addition to a
+                                                                     at handling analog signals over noisy channels, enhancing
+growing ecosystem of design and synthesis tools [15].
+                                                                     noise resistance, and reducing both bandwidth and energy
+   However, to fully realize the benefits of these solutions in
+                                                                     needs.
+the neuromorphic computing domain, thorough customization
+                                                                        Fig. 1 illustrates the fundamental distinction in computing
+is required. Existing general-purpose architectures prioritize
+                                                                     operations between Artificial Neural Networks (ANNs) and
+the efficient data transfer of large volumes of data with
+                                                                     SNNs. In ANNs, as depicted in Fig. 1(a), computation and the
+high bandwidth, typically utilizing long (i.e., multi-flit) packet
+                                                                     propagation of neural activities across each layer occur syn-
+formats which split a packet into serialized head, payload
+                                                                     chronously. Conversely, SNNs operate on an event-triggered
+and tail flits. This approach is less suited for brain-inspired
+                                                                     basis, as shown in Fig. 1(b). This event-driven approach to
+communication fabrics [14], [36]. At the same time, such
+                                                                     computation offers the benefit of energy efficiency, owing to
+general-purpose switches geared towards long packets incur
+                                                                     the typically sparse occurrence of spikes (illustrated by red
+a large cost to deliver hardware support for deadlock-free
+                                                                     arrows) within the network, both temporally and spatially.
+multicast [24], [32], [37].
+                                                                        Considering that moving data around is a major energy drain
+   Last but not least, traditional one-size-fits-all approaches to
+                                                                     in electronic systems, the best strategy for reducing power
+NoC design hinder efficiency in spike routing when additional
+                                                                     usage in event-based SNNs is to implement them within highly
+types of traffic, such as configuration, debug and monitoring,
+                                                                     parallel, in(near)-memory computing frameworks. Owing to
+need to be conveyed. Instead, a more promising alternative
+                                                                     memory’s inherent physical constraints, endlessly enlarging
+involves multi-plane NoC architectures with specialized sets
+                                                                     the core size of processors is not feasible. An effective
+of routers and links, each optimized for the efficient delivery
+                                                                     strategy for developing extensive SNN systems is to utilize
+of a specific message type [38].
+                                                                     a multi-core architectural design. This approach streamlines
+   This paper documents substantial efficiency improvements
+                                                                     both the planning and operational phases, making it more
+when specializing NoCs for the messaging requirements of
+                                                                     manageable to construct and deploy large-scale SNN systems
+AER routing, rather than force-fitting general-purpose archi-
+                                                                     within the tight resource budgets of edge devices. Each core
+tectures into the new environment.
+                                                                     within such a system is equipped with a neuro-synaptic array
+                                                                     that includes synapse and neuron circuits.
+ III. BACKGROUND : E DGE N EUROMORPHIC P ROCESSORS                      Regardless of whether the circuits within these cores,
+   The specific focus of this paper is on addressing the com-        designed to mimic the behavior of neurons and synapses, are
+munication bottleneck in neuromorphic processors for decen-          realized through time-division multiplexed digital circuits [3],
+tralized near-sensor data processing (i.e., edge computing).         [4], [5] (offering the benefit of smaller area requirements at
+   With the progression of technology, there’s been a notable        the expense of higher power usage) or through fine-grained
+rise in the need to process sensory data directly where it’s         fully parallel analog circuits that emulate real-time physical
+collected, at the edge, rather than relying on distant servers.      phenomena [6], [9], [11] (achieving lower energy consumption
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                             413
+
+
+
+
+Fig. 2.   The contrasting characteristics of NoCs within (a) ANN accelerators and (b) Neuromorphic processors.
+
+
+but at the cost of larger area requirements), the communi-                      IV. L OW-C OST D ESIGN G OALS OF THE P ROPOSED N O C
+cation strategies employed to facilitate interaction between
+                                                                                 The main goal of this paper is to come up with an ultra-low
+different cores coincidentally utilize digital NoC techniques.
+                                                                              cost switch for AER routing in edge neuromorphic processors,
+These NoCs implement a communication protocol known
+                                                                              with lightweight hardware support for packet replication,
+as Address-Event Representation (AER). With this protocol,
+                                                                              through which packets can be routed through the distinct
+computational units, such as neurons, are allocated addresses
+                                                                              outputs of a switch according to each output’s own rate,
+encoded as digital words. These addresses are transmitted
+                                                                              in parallel, and in continuous time (i.e., not aligned to clock
+asynchronously using digital circuits as soon as neuron firing
+                                                                              cycles). The ultra low-cost design goal is pursued through the
+events occur. Consequently, information is encoded based on
+                                                                              following course of action:
+the timing of these address-events. In event-based neural net-
+works, the analog data is represented by inter-spike intervals,                  • A less conservative asynchronous design style than the
+which refer to the duration between successive address events                      one used in most neuromorphic NoCs, aiming at high
+from the same neuron. Neural computation is then achieved                          coding efficiency, low area and energy-per-bit, at the
+by forming connections between multiple neurons through a                          cost of exposing moderate one-sided relative timing con-
+variety of connectivity schemes.                                                   straints. The timing closure for the latter is delivered in a
+   The architecture of the NoC used for AER communication                          fully automated way by using scripting on top of standard
+in neuromorphic processors is significantly distinct from those                    industrial CAD tools [15], [40].
+NoC designs that are conventionally employed in multi-core                       • Specializing the architecture for single-flit packets and
+processors, especially in comparison to those utilized in ANN                      exploiting the resulting architecture streamlining oppor-
+accelerators. Illustrated in Fig. 2(a), the process of ANN                         tunities, that range from flattening the control hierarchy
+inference (and training) demands that the NoC synchronously                        to the deadlock-free routing of multicast branches by
+relays the neuron activities (or gradients) from the upstream                      construction.
+(downstream) layer to the downstream (upstream) layer for                        • Removing the overhead that state-of-the-art switches
+computation. To accommodate the escalating data flow as                            in similar asynchronous design style incur for the
+the neural network enlarges, the NoC’s bandwidth must be                           low-latency transmission of body flits (e.g., speculation
+sufficiently large. Conversely, as depicted in Fig. 2(b), within                   techniques [35]). In the proposed architecture there are
+multi-core neuromorphic processors, the data packets intro-                        no body flits.
+duced into the NoC are finely asynchronous with dynamically                      • Tailoring the multicast protocol to single-flit packets,
+varying injection rates. These packets often require multicas-                     so that packets can be replicated in parallel to all
+ting or even broadcasting to numerous target cores, reflecting                     required output ports of a switch by simply leveraging the
+the extensive fan-out connectivity seen in the human brain.                        native parallel replication support that is readily available
+Additionally, these packets primarily include neuron address                       through the crossbar of each NoC switch. Instead, state-
+information, leading to compact data packet sizes in the order                     of-the-art switches incur the significant control overhead
+of a few tens of bits. Importantly, SNN utilize spikes to convey                   and management of multiple independent read point-
+temporal data, an essential element in neural computation. This                    ers from input buffers, thus leading to large buffering
+feature is particularly crucial for continuous analog neuron                       requirements and serious wiring congestion issues during
+computing, emphasizing the NoC’s latency requirements in                           physical design [24].
+neuromorphic systems.                                                         The challenge will be not to trade robust operation for
+   Above all, the NoC is a critical factor in minimizing                      architectural complexity. In fact, state-of-the-art asynchronous
+energy consumption in neuromorphic processors. For instance,                  switches can in principle carry single-flit packets as a special
+in [11], the NoC’s power consumption accounts for over 80%                    case of multi-flit ones, however they overlook the decreased
+of the total energy usage [39].                                               operation robustness incurred when using this packet format.
+414                               IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+                                                                         information from the buffered input packet and selects the
+                                                                         productive output port(s) toward the destination(s) by driving
+                                                                         signals RSi accordingly. The activated Request Generator
+                                                                         blocks generate a dedicated request signal Reqi for the
+                                                                         associated OPMs with the correct polarity.
+                                                                            OPMs arbitrate between multiple incoming requests trying
+                                                                         to access the associated output channel. A key OPM com-
+                                                                         ponent is the four-way arbiter, mediating between competing
+Fig. 3.    Basic design choices. (a) Bundled-data asynchronous design.   input requests in continuous time, without any reference clock.
+(b) Mousetrap pipeline.
+                                                                         Grant overlapping (GO), i.e., the simultaneous assertion of
+                                                                         two grants for some time, affects all asynchronous arbiters to
+In particular, in high-performance switch designs the concur-            an extent which depends on circuit topology and number of
+rency of internal micro-operations may give rise to an inherent          clients. Thus, a Masking Stage is used to constantly enforce
+window of vulnerability, between the end of a packet and                 the one-hot encoding of arbiter decisions.
+the arrival of the next packet at the same input port, which                The filtered grant signals MGs concurrently select the
+may lead to data overrun conditions. This window gets                    correct data input of the Crossbar Multiplexer and enable
+more frequently activated by single-flit packets and is thus             only the winning request to propagate through the Request
+a fundamental concern of this work.                                      Selection block. As a result, a new valid packet is presented
+                                                                         to the OPM buffer. The latter is an extended Mousetrap stage
+                  V. BASIC D ESIGN C HOICES                              that differs from the baseline version in Fig. 3(b) mainly
+                                                                         for the capability to handle the handshaking protocol with
+   The proposed switch architecture has been designed lever-             all possible transmitting IPMs through dedicated couples of
+aging a bundled-data asynchronous design style (Fig. 3(a)).              Req,Ack signals.
+Whenever data are sent, a Req signal “bundled” with the                     In multicast transactions, each addressed OPM eventually
+data serves as a local strobe for the receiver, which then               grants the requesting IPM, and consumes the associated data
+completes the handshaking by toggling Ack [41]. In our                   concurrently and independently of the other OPMs, acknowl-
+design, these control signals toggle only once per data transfer         edging successful data capture into their output Mousetrap
+(i.e., a 2-phase non-return-to-zero communication protocol),             registers. An Ack Generator block in each source IPM is in
+thus enabling high throughput but potentially making switch              charge of signaling completion of packet processing through
+design more complex [41].                                                signal AckX, regardless of the number of activated output
+   For correct operation, a single one-sided relative timing             channels and their delays. Finally, the Packet Route Selector
+constraint (RTC) must be satisfied by the synthesis tool,                is safely reset before allowing a new packet to enter through
+that the Req delay is always longer than worst case data                 the PRSReady signal.
+transmission (Fig. 3(a)). This bundling constraint is typically             The proposed architecture can easily implement alternative
+met by inserting a small matched delay on the control line,              state-of-the-art encoding formats for multicast destinations.
+when needed.                                                             In this paper, the popular bit string addressing for multicast
+   Another foundational choice for the switch concerns the               over generic 2D mesh topologies is used, wherein the address
+asynchronous pipeline on the datapath. The switch revolves               field has a single bit for each node in the network, which is
+around Mousetrap [42], a high-performance asynchronous                   set to 1 if the node is a destination, 0 otherwise. XY routing
+pipeline using 2-phase protocol and bundled-data encoding.               is then used by the routing logic to forward the multicast flit
+Its stages use very simple control circuits (a single exclusive-         on the appropriate output ports.
+NOR gate) and data registers (a single bank of level-sensitive
+D-latches), with low area and delay overheads (Fig. 3(b)).               B. Input Buffering and Routing Stage
+Unlike in synchronous design, single-latch registers are nor-
+                                                                            The IPM admission stage stores incoming packets and
+mally transparent, closing only transiently to protect data
+                                                                         routes them to the intended OPMs (Fig. 5(a)). A fundamen-
+immediately after it enters a stage. Once data enters the next
+                                                                         tal innovation is the enforced robust operation during the
+cascaded stage, the current register is reopened.
+                                                                         transition between any two consecutive packets, since with
+                                                                         single-flit packets the switch control path cannot rely on a
+          VI. N EW M ULTICAST-E NABLED S WITCH
+                                                                         relatively long multi-flit transmission time to reset for a new
+A. High-Level Structure and Operation                                    packet. The vulnerability of operating with single-flit packets
+   The proposed design is modular and connects an arbitrary              is largely overlooked in previous work. In this paper, the
+number of input port modules (IPMs) with output port modules             robustness guarantee is achieved through a modified input
+(OPMs). The high-level structure of a 4×4 switch is illustrated          Mousetrap stage that incurs the trivial overhead of only one
+in Fig. 4, including an expanded view of an IPM (left) and of            additional AND2 gate.
+an OPM (right).                                                             The basic operation of the IPM is as follows. A new
+   Two modified versions of the Mousetrap pipeline are placed,           incoming packet, signalled by ReqIn soon after DataIn
+as buffers, at the input of each IPM and at the output of each           arrives, makes the Mousetrap register temporarily opaque,
+OPM, respectively. A Packet Route Selector reads in header               thus safely storing data. Concurrently, the Packet Route
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                                 415
+
+
+
+
+Fig. 4. Top level view. The design is modular with an arbitrary number of input port modules (IPMs) and output port modules (OPMs). A 4 × 4 switch is
+illustrated here.
+
+
+
+
+Fig. 5. New components: (a) The input buffering, the routing stage, the req generator and the ack generator in IPM (b) The grant masking and the req
+selection in OPM.
+
+
+
+Selector processes the packet header and activates the Request              the proposed architecture fulfils these requirements nonspec-
+Generators of the productive output ports. The routing logic                ulatively (unlike the general-purpose architecture in [35]) and
+is a synchronous-style, i.e. hazardous, computation block.                  with marginal area overhead (just 3 logic gates), while at the
+For this reason, during the routing computation delay the                   same time protecting the control path from the race conditions
+propagation of glitches downstream is prevented by a barrier                originating from its frequent flit-, instead of packet-, level
+of AND2 gates. The enabling input of the gates is generated by              activation.
+a matched delay line cascaded with a XOR2 gate converting                      From an operational viewpoint, when the route selection
+the 2-phase signals ReqX and AckX to a level signal.                        signal RSi from the Packet Route Selector is asserted, the
+   Safe reopening of the input Mousetrap needs to deal with a               request signal ReqI toggles, indicating data availability to an
+potential race condition between i) AckX (indicating transac-               OPM. When an AckI transition will eventually arrive from the
+tion completion at target OPMs) driving the Mousetrap control               associated OPM, transaction completion on that output port
+circuit to reopen the input register (path A in Fig. 5(a)), and             will be notified to the Ack Generator via the level-signal
+ii) AckX masking routing selection signals RSi for a new                    Done.
+hazard-free routing computation phase (path B). The newly                      Finally, a twofold course of action is taken to deliver robust
+added AND2 control gate in the Mousetrap allows the safe                    interaction with the OPM and guarantee predictable arbiter
+reopening of the input register only when both transients have              operation. First, a robust 4-phase handshaking is implemented
+completed, hence no fast data bit can propagate through the                 between the Request Generator and the OPM at each packet
+routing logic and tunnel the AND2 barrier before it gets shut               through the signals PPE and Grant. The latter is a monitoring
+off.                                                                        signal provided by the new OPM (Fig. 5(b)), and carries
+                                                                            the state of the arbiter output associated with the Request
+C. Request Generator                                                        Generator at hand. The handshaking ensures safe arbiter reset
+  The Request Generator (see Fig. 5(a)) generates the correct               (detected by a low value on the associated arbiter Grant)
+polarity of the request signal Reqi toward the associated                   before asserting the next request ( PPE) from the same IPM.
+output port, and sends switch allocation requests to OPM asyn-              For this purpose, the inverted Grant signal is connected to
+chronous arbiters. Thanks to its focus on single-flit packets,              the asymmetric plus input of an asymmetric C-element.
+416                            IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+   Second, before deasserting a previously-granted arbiter         the latter would be the only one entitled to take control of the
+request, the new design makes sure that the associated arbiter     OPM.
+output has been masked in the OPM to protect against GO.
+This is indicated by the monitoring signal MaskedGrant(MG)          VII. D ESIGN E NTRY AND T IMING O PTIMIZATION F LOW
+from the OPM. This way, should the deasserting grant be slow          This section describes the hardware model of the switch and
+and transiently overlap with the assertion of another grant        the timing optimization flow to gain tight control over absolute
+from another pending arbiter request, only the latter would        and relative timing paths through mainstream commercial
+be allowed to take control of the OPM. For this purpose,           clocked CAD tools.
+another asymmetric C-element driven by PPE and MG (the                Our technology library lacks asynchronous special cells
+asymmetric minus input) is used. From an implementation            such as Muller C-elements and mutexes. Consequently,
+standpoint, the two C-elements can be merged into a unified        we have utilized standard-cell equivalents for these compo-
+3-way one, as illustrated in Fig. 5(a). To our knowledge, this     nents [43], [44]. Additionally, other asynchronous circuits
+is the first time that the variable arbiter resolution times and   within the design necessitate a detailed specification to
+the GO concern are both addressed at the switch architecture       ensure predictable logic behavior and hazard-free operation.
+level, thus enabling the safe integration of any arbiter circuit   To achieve this level of specification while maintaining
+into the switch.                                                   technology independence, we employ the generic GTECH
+                                                                   Synopsys library. While certain parts of the design, such as
+D. Ack Generator                                                   routing logic, can be specified using conventional hardware
+                                                                   description language (HDL) behavioral models, we integrate
+   A key challenge in designing a multicast-enabled switch
+                                                                   these with the GTECH library to create a hybrid HDL-GTECH
+is to provide an appropriate Ack Generator, signaling com-
+                                                                   RTL-equivalent specification. This specification remains fully
+pletion of multicast packet processing in continuous time,
+                                                                   synthesizable and portable to any technology library. After
+regardless of the number of activated output channels and their
+                                                                   reading in the entry-level netlist for technology-independent
+delays, yet retaining simple hardware.
+                                                                   mapping, logic manipulations are prevented by setting appro-
+   A radical circuit simplification is achieved in this paper
+                                                                   priate compile directives: only gate sizing and buffer insertion
+by leveraging the original intuition that in a two-phase com-
+                                                                   options are enabled.
+munication protocol Ack is always a delayed version of
+                                                                      The design is then fed to the timing optimization flow
+Req. Thus, in a specific IPM that has started a multicast
+                                                                   (Fig. 6), which handles the convergence of all the rela-
+transaction toward multiple OPMs, upon successful routing
+                                                                   tive timing constraints (RTCs) in parallel. The design is
+of all multicast branches (indicated by all Done signals
+                                                                   first constrained for max. performance, by enforcing the
+coming from the Request Generators going to zero), signal
+                                                                   set_max_delay command to all the timing paths in the design.
+ReqX is simply sampled into AckX. The resulting circuit
+                                                                   In the initial incremental synthesis runs, the difference between
+is as lightweight as the cascade of a NOR gate with an
+                                                                   the request delay and the datapath delay to be matched is com-
+edge-triggered D flip-flop (see Fig. 5(a)).
+                                                                   pared with a threshold called relative timing margin (RTM),
+                                                                   set e.g. to 10%. If the constraint is violated (e.g., request
+E. Output Port Module                                              slower than the data delay), or the margin is not enough,
+   OPMs arbitrate between multiple incoming requests trying        an incremental synthesis is performed. It is important to notice
+to access the associated output channel (Fig. 5(b)). Basic OPM     that an additional set_max_delay constraint is imposed on
+structure and operation, as well as the arbiter implementation,    the request signal (margin max_d in Fig. 6) to avoid largely
+are pretty aligned with state-of-the-art [24], [35]. However,      exceeding the bundling constraint, which would lead to a waste
+there are fundamental innovations. First, the proposed switch      of performance.
+avoids packet completion signaling to the connected IPM,              When several bundling constraints are handled in parallel,
+since with single-flit packets it would be redundant with flit     the tool may struggle to converge on them all. In this case,
+completion signaling and become the source of subtle race          convergence is facilitated by leaving more freedom to the tool,
+conditions.                                                        for instance by progressively increasing the margin max_d by
+   Second, it delivers guarantees in operation robustness by       small extra_slack increments or, at some point, or even by
+collaborating with the Request Generator to fix the GO             changing cost priorities. Whenever the bundling constraint is
+issue with minor circuit overhead. For this purpose, the new       overdesigned, an attempt is made to make it tighter (right
+design uses an intermediate level of control against GO            branch in Fig. 6) by largely relaxing the max_d constraint.
+between arbiter outputs ( Grant) and input signals of the          Empirically, we found that this degree of freedom is exploited
+Request Selector ( MG) through a barrier of AND2 gates             by the incremental synthesis to come up with less conservative
+(Fig. 5(b)). Such gates are by default transparent for the grant   relative timing margins.
+signals. However, when a packet is captured into the output           This flow was sufficient for the effective convergence of
+Mousetrap, a flip flop is toggled by RegEnable, which masks        our designs. In other cases, the synthesis process becomes
+the deasserting grant. Only when the corresponding MG              more challenging, for instance when all the point-to-point
+masked grant goes to zero, the Request Generator will release      links of an entire topology have to be synthesized, placed and
+the associated arbiter input, so that an eager grant assertion     routed concurrently. In order to handle the scale and optimiza-
+by a competing arbiter input request would be harmless, since      tion challenge of complex switches and network topologies,
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                       417
+
+
+
+                                                                         intermediate or target RTM can be optionally expedited by
+                                                                         selectively introducing small delay elements on control paths
+                                                                         that are violating timing constraints through an ECO step.
+
+                                                                           VIII. VALIDATING THE B ENEFITS OF S PECIALIZATION
+                                                                            In this section, the quality metrics of the proposed NoC
+                                                                         architecture are assessed in comparison with state-of-the-art
+                                                                         general-purpose asynchronous switches handling single-flit
+                                                                         packets as a special case.
+                                                                            The following NoC switches are compared in terms of
+                                                                         communication efficiency when carrying short payloads:
+                                                                            Baseline Unicast. This is a leading general-purpose asyn-
+                                                                         chronous switch from [35] for unicast traffic. Short payloads
+                                                                         are carried through a conventional 2-flit packet: one head flit
+                                                                         and one body flit.
+                                                                            Optimized Baseline. This is again the Baseline Unicast
+                                                                         switch with minor modifications to support single-flit packets
+                                                                         (header and payload mixed in the same flit).
+                                                                            Proposed Unicast. The proposed specialized architecture
+                                                                         for single-flit packets, restricted to unicast communication. For
+                                                                         this, packet headers were modified to carry unicast addresses
+                                                                         only, and algorithmic xy routing was implemented in the
+                                                                         routing logic.
+                                                                            Baseline Multicast. A leading general-purpose asyn-
+                                                                         chronous switch with hardware support for parallel multicast
+                                                                         from [24].
+                                                                            Proposed Multicast. The proposed specialized architec-
+                                                                         ture for single-flit packets with the full support for parallel
+Fig. 6.   Timing optimization flow. Values M, T and X are user-defined
+parameters.
+                                                                         multicast.
+                                                                            For Baseline Multicast, quality metrics were taken or
+                                                                         extrapolated from the original paper, since they are referred
+                                                                         to the same technology feature size considered in this paper.
+                                                                         All other designs have been modelled in synthesizable RTL,
+                                                                         then synthesized, placed and routed on a 40nm industrial
+                                                                         technology library with commercial tools (Synopsys Design
+                                                                         Compiler and IC Compiler). All bundling constraints have
+                                                                         been fulfilled with at least a 10% timing margin. To assess
+                                                                         post-layout performance, we evaluated the quality metrics
+                                                                         under typical corner conditions by Cadence Innovus.
+
+                                                                         A. Unicast Switches
+                                                                            At first, all designs capable only of unicast communications
+                                                                         are compared (Tab. Ia). For fair analysis, all architectures have
+                                                                         been tuned for carrying the same compact payload, while
+                                                                         keeping all other parameters the same (5 × 5 switches, 1 input
+Fig. 7.   Nested timing optimization loop.                               and output Mousetrap, 4-bit unicast addresses for a 4 × 4 2-D
+                                                                         mesh, xy routing). We have chosen a constant payload size of
+                                                                         28 bits, which is in the ballpark of the typical requirements
+the illustrated methodology is extended with an engineering              for edge neuromorphic computing [11], [18]. As a result, the
+change order (ECO) step, and becomes the inner loop of a                 bitwidth slightly changes across configurations depending on
+nested timing optimization flow (Fig. 7).                                the specific packet format requirements (see notes in Tab. Ia).
+   The outer nested loop hits RTMs gradually: the RTM is                    Proposed Unicast consistently outperforms Baseline Uni-
+not immediately set to its final target, but to more relaxed             cast, especially in energy efficiency (67% less energy-per-bit)
+intermediate values (e.g., no margin, then 5%, 7%, and finally           and performance (52% lower packet latency and 24% higher
+10% of the datapath delay to be matched), which the syn-                 throughput). This is fundamentally due to the fact that with
+thesis and the P&R tool can more easily fulfill. Finally, the            short payloads the overhead of a 2-flit packet format becomes
+simultaneous convergence of numerous control signals on the              sensitive. An optimized alternative consists of fitting the
+418                            IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+                                                               TABLE I
+                          C OMPARISON W ITH S TATE - OF - THE -A RT G ENERAL -P URPOSE A SYNCHRONOUS S WITCHES
+
+
+
+
+payload into the head flit ( Optimized Baseline). With respect       reasons. On the one hand, differently from latency, Baseline
+to this solution, Proposed Unicast still saves 8.6% area             Multicast’s cycle time does not benefit from route computation
+and 38.5% energy-per-bit due to architecture specialization.         in parallel with input buffering. On the other hand, the more
+From the performance viewpoint, an expected small penalty            complex architecture of Baseline Multicast determines a
+is measured (+3.2% latency, -9.8% throughput), which is              longer time both to receive the acknowledgement from the
+the price to pay for the delivered safe reset guarantees of          output ports and to reopen the input circular FIFO.
+control path components between any two consecutive packets.
+We experimentally verified via post-layout simulation that                       IX. VALIDATING THE S CALABILITY OF
+Optimized Baseline relies on worst-case timing margins of                               S INGLE -F LIT S WITCH
+205 and 118 psec for the safe reset of its routing logic
+and arbiters, respectively. The work in [45] shows that for              To further validate the scalability of the NoC using single-
+a similar 40nm process, path delay variations from hundreds          flit packets, we gradually increased the bit-width of the
+of psec to several nsec can be expected, depending on supply         payload to be delivered, resulting in five groups: 28 bits,
+voltage, logic depth, slew and load capacitance. This justifies      84 bits, 120 bits, 252 bits, and 504 bits. These groups
+the small performance overhead incurred by Proposed Unicast          cover use cases ranging from extreme-edge neuromorphic
+to deliver robust operation guarantees.                              computing devices to ultra-large neuromorphic clusters. Each
+                                                                     group included six design points. In addition to the Proposed
+                                                                     Unicast and Optimized Baseline design points analyzed in
+B. Multicast Switches                                                Section VIII, we configured the Baseline Unicast switch
+   Proposed Multicast is compared with Baseline Multicast            to support multi-flit packets ranging from one body flit to
+in Tab. Ib for a matched architecture configuration from             four body flits, supporting the same payload through reduced
+the original paper in [24]: 128 bits, 5 I/O ports and 5-slot         bitwidth/bandwidth and longer packets (Fig. 8). The exper-
+input buffers (we instantiated the same circular FIFOs for           imental setup was the same as described in Section VIII.
+fair analysis). Even in this buffer-dominated configuration,         Random and uniform unicast data packets were injected, and
+Proposed Multicast exhibits significant area and energy-per-bit      the energy per bit was measured under post-layout simulation.
+savings (37.8% and 26%, respectively). Proposed Multicast                As shown in Fig. 8, during the stage of short payloads,
+preserves its superior energy efficiency across N-way multicast      the energy consumption clearly increases with the number of
+transactions too (see last column in Tab. Ib). Latency is only       flits. This energy difference is attributed to the 4-phase control
+apparently higher because Baseline Multicast performs input          signal in both the input and output Mousetrap buffers. Energy
+buffering concurrently with routing computation, a latency           consumption is more sensitive to the number of toggles of this
+optimization technique that could be equally implemented in          control signal rather than to the slight increase in buffer width
+Proposed Multicast as well, which would likely lead to latency       in minimum-buffered realizations.
+equalization.                                                            As the payload size increases, the advantage of the single-flit
+   Proposed Multicast exhibits a packet rate improvement over        switch over the multi-flit variants diminishes but remains
+Baseline Multicast by 32.2%. There are two fundamental               significant. This is because the complexity of the “virtual
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                                     419
+
+
+
+
+Fig. 8. Post-layout simulations measured the energy per bit for different design points across various payload sizes. The design points labeled Base.MF-n
+refer to the Baseline Unicast multi-flit switch with n body flits.
+
+
+
+clock tree” in the control signal gradually increases, making                 GlobalFoundries 22FDX FD-SOI technology. However, the
+the energy corresponding to the buffer width more apparent.                   DYNAP-SE switch was realized as a hard macro, employing
+A turning point occurs at around 504-bit payloads, where the                  the original 180nm manufacturing process. This implemen-
+design with two body flits achieves better energy efficiency                  tation involved a full custom design process within Cadence
+than the one with one body flit.                                              Virtuoso. In the case of both switches, the NoC was created
+   Thanks to a carefully specialized architectural design, the                within Cadence Innovus. To assess post-layout performance,
+Proposed Unicast always achieves better energy efficiency                     we evaluated the quality metrics of the trace run under typical
+not only of all multi-flit variants, but also of the Optimized                corner conditions. We used Cadence Innovus for the pro-
+Baseline, and remains the most energy-efficient option across                 posed design and Cadence AMS Simulator for the DYNAP-SE
+all benchmarks. The Proposed Unicast achieves from 2.7x to                    switch. All experimental results have already been normal-
+1.5x higher packet rate than the Baseline Unicast with four                   ized in 22nm technology. The energy report below includes
+body flits as we increase the payload size, even though the                   dynamic and static power consumption. Three different SNNs
+saturation point of the single-flit switch was never reached in               were used for evaluation, as hereafter explained.
+all simulation groups. These results point to single-flit packets
+as the most energy efficient payload encoding format even
+when channel widths exceed 500 bits.                                          A. sWTA Experiment
+                                                                                 In the first experiment, we incorporated soft Winner-Take-
+            X. VALIDATING W ITH N EUROMORPHIC                                 All (sWTA) networks in our SNN model. These sWTA
+                   C OMPUTING T RAFFIC                                        networks exhibit dynamic attractor characteristics, crucial in
+   To validate the potential of the proposed NoC in the target                various cognitive processes such as decision-making. We used
+edge neuromorphic domain, this section encompasses three                      real spike data recorded from DYNAP-SE, as detailed in [46],
+experiments that utilize SNNs to assess and compare the                       to replicate authentic population-coded neuronal activities
+energy efficiency and latency of the proposed design with                     change within the network from the removal of external
+the state-of-the-art asynchronous NoC within the mixed-signal                 input. While various NoC configurations lead to distinct spike
+neuromorphic processor referred to as DYNAP-SE as detailed                    transmission latencies, consequently influencing the generation
+in reference [11]. The first experiment involves the SNN                      of spike data trains (data packet injection into the NoC) due
+running in continuous time through direct emulation on                        to the network operating in continuous time, our primary
+DYNAP-SE. In contrast, the last two experiments utilize a                     emphasis is on assessing the NoC’s performance using actual
+discrete time approach through simulation, showcasing the                     spike traces. The impact of NoC latency on neural dynamics
+inclusion of various types of neuromorphic hardware in our                    falls outside the scope of our research paper.
+investigations.                                                                  The sWTA network and NoC mapping are as depicted
+   DYNAP-SE R2 switch. This switch enables the multicast                      in Fig. 9(a) and Fig. 9(b), respectively. The sWTA model
+of single-flit packets among multiple neurocores through a bit                consists of 16 clusters. Each cluster contains 8 excitatory
+string-based tree hierarchy.                                                  neurons, along with a global inhibitory cluster comprising
+   DYNAP-SE R3 switch. This switch is tailored for unicast                    20 neurons. Input nodes evenly stimulate all neurons within
+single-flit packets among multiple neurocores, using XY rout-                 a given cluster, following the standard sWTA connectivity
+ing within a 2D-mesh network.                                                 described in [46]. Given the sparsity of neuron spikes, a single
+   Optimized DYNAP-SE R3 switch. An optimized version                         5 × 5 data switch suffices in this context. We established
+of the R3 switch that we extended for multicast transactions                  five virtual cores of equal size, with four of them evenly
+using bit string addressing within a 2D-mesh network.                         distributing the 16 excitatory neuron clusters, and one core
+   Proposed Unicast and Proposed Multicast. Our architec-                     dedicated to the inhibitory neuron cluster. During synthesis,
+ture with matched configurations to the DYNAP-SE NoCs.                        the virtual core lacked functional circuitry, generating only the
+   The proposed design was constructed following the                          previously mentioned spike trace during simulation. External
+same design methodology as previously outlined but using                      stimuli were injected from the core that mapped to inhibitory
+420                                IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+
+Fig. 9.   Network mapping. (a) sWTA. (b) sWTA mapping. (c) RSNN. (d) RSNN mapping.
+
+
+
+                              TABLE II                                 comprehensive examination of the impact of multicast end
+           P OST-L AYOUT C OMPARISON OF S WTA E XPERIMENT              nodes on energy is presented in the subsequent experiments.
+
+                                                                       B. NAV and KWS Experiment
+                                                                          In the remaining experiments, we employed a three-layer
+                                                                       Recurrent Spiking Neural Network (RSNN), as depicted in
+                                                                       Fig. 9(c). The first experiment involved a binary-decision
+                                                                       navigation task(NAV) as referenced in [47]. In the second
+neurons. In this experiment, we instantiated the DYNAP-                experiment, we illustrated 1-word Key Word Spotting (KWS)
+SE R2 multicast switch, Proposed Unicast, and Proposed                 as mentioned in [47]. RSNN was trained using Backpropaga-
+Multicast. The multicast switch employs a bit string routing           tion Through Time (BPTT), followed by the extraction of spike
+method with a 13-bit width, while the unicast switch utilizes          traces during the whole inference phase of simulation. The
+the XY routing method with an 11-bit width. It’s worth noting          network’s performance remains unaffected by NoC latency
+that all architectures were optimized for the same number of           only if all spikes can reach the target core within the current
+I/O ports (5) and featured a consistent buffering strategy with        time step.
+6 Mousetrap stages in each output port.                                   In the first experiment, the RSNN had 40 external neurons in
+   1) Latency Analysis of sWTA Experiment: The observed                the input layer, while the second experiment had 512 neurons
+latency represents the average time it takes for a spike data          in its input layer. Both experiments employed 512 Adaptive
+packet to travel from the moment it’s introduced into the              Leaky Integrated and Fire (ALIF) neurons in the recurrent
+NoC to its arrival at the designated core. As illustrated in           layer to capture temporal dependencies. In both cases, a 3 × 3
+Table II, the Proposed Unicast reduces latency by 45.9%                2-D mesh NoC was used, as shown in Fig. 9(d). Input layer
+when compared to the DYNAP-SE R2 switch. This improve-                 spikes were injected from the top-left switch, and the hidden
+ment can be attributed to its streamlined architecture, even           layer neurons were evenly distributed across eight neural cores.
+though it involves the extra step of replicating the data packet       Output neurons were assigned to the bottom-right core for
+for multiple destinations. However, it does result in a slight         obtaining classification results.
+increase in latency by 7.2% when compared to the Proposed                 We instantiated four types of switches in these two exper-
+Multicast. This latency increase can be attributed to the              iments: DYNAP-SE R3 switch, Optimized DYNAP-SE R3
+specific conditions of this experiment, where the traffic pattern      switch, Proposed Unicast, and Proposed Multicast, each
+is multicast but the absence of data packet conflicts due to           with different configurations. Optimized DYNAP-SE R3 switch
+sparse neural activity leads to every packet experiencing zero-        and Proposed Multicast utilized bit string addressing for
+load one-hop latency. This reduces the impact of multicast             routing logic, resulting in a single-flit data packet with
+traffic on latency.                                                    18 bits (comprising 9 bits for routing address and 9 bits
+   2) Energy and Area Analysis of sWTA Experiment: This                for neuron address). In contrast, DYNAP-SE R3 switch and
+section provides an overview of the energy consumption for a           Proposed Unicast employed algorithmic XY routing, generat-
+7-second spike trace and the area cost of the switch. Table II         ing a single-flit data packet with 13 bits (comprising 4 bits
+illustrates that the Proposed Multicast exhibits the highest           for routing address and 9 bits for neuron address) to manage
+level of energy efficiency, with a 61.7% reduction compared            unicast-based multicast data traffic.
+to the DYNAP-SE R2 switch. This improvement is attributed                 (a) Varying network connections. To investigate the
+to the use of a quasi-delay insensitive (QDI) design style,            trade-offs between two alternative methods of supporting
+in contrast to the bundled-data style employed in the proposed         multicast transactions, namely packet replication (i.e., unicast-
+design, which results in substantial cost savings. As a result,        based multicast) and hardware support for parallel tree-based
+the Proposed Multicast also achieves an area efficiency that is        multicast, a cost function was introduced into network con-
+3.8x greater compared to the DYNAP-SE R2 switch. Addition-             nectivity during training. This resulted in a weight matrix
+ally, the Proposed Multicast reduces energy by 54.8% when              with small-world connectivity [48]. The approach involved
+compared to the Proposed Unicast, which incurs overhead due            retaining all-to-all connectivity within the local neural core
+to replicating data packets for multiple destinations. A more          while gradually pruning long-distance connections to achieve
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                                     421
+
+
+
+
+Fig. 10. Simulation results at the network level for NAV and KWS tasks. The average spike latency varies with an increase in neuron update frequency, and
+energy consumption changes with varying network sparsity.
+
+
+
+a specified sparsity level. Five target sparsity levels were set at           significantly improved energy efficiency when compared to the
+10%, 20%, 40%, 80%, and 100%, representing the remaining                      Optimized DYNAP-SE R3 switch, with energy savings ranging
+long-range connectivity after pruning.                                        from 41.1% to 59.2%. To a first approximation, this means that
+   (b) Varying time steps. To evaluate the NoC’s bandwidth,                   the overall energy saving of the whole neuromorphic system
+spike traces were extracted under different accelerated times,                will also be around 60% as an effect of the more efficient NoC.
+corresponding to varying neuron update frequencies (time                      Interestingly, the Optimized DYNAP-SE R3 switch exhibits
+steps). Six different update frequencies were configured for                  lower energy efficiency compared to Proposed Unicast at
+NAV and KWS tasks, affecting the spike packet injection rate                  a 10% sparsity level, while achieving a 6.3% reduction in
+into the NoC.                                                                 energy consumption at full connectivity. This underscores that
+   1) Latency Analysis of NAV and KWS Experiment: This                        hardware support for parallel tree-based multicast proves to be
+section examines the average spike latency in both experi-                    more energy-efficient than unicast-based multicast when there
+ments. The target sparsity level was consistently set at an                   are multiple multicast end nodes. This trend is further validated
+intermediate value of 40% for all cases. As depicted in Fig. 10a              by the fact that the increase in energy consumption for the
+and Fig. 10b, the Proposed Multicast clearly outperforms in                   unicast design surpasses that of the multicast design, primarily
+terms of saturating injection rate. It exhibits a 27.4% (42.7%)               due to the added workload of replicating data packets. This
+higher rate compared to the Proposed Unicast and a 31.4%                      contrast becomes even more pronounced in the context of
+(63.3%) higher rate compared to the Optimized DYNAP-SE                        KWS tasks, where the average neuron firing rate is higher.
+R3 switch in the NAV(KWS) task. This performance advantage                    Overall, the choice between the two solutions under test
+becomes even more evident due to the increased spike data                     depends on the actual traffic patterns of the network at hand,
+in the KWS task. The DYNAP-SE R3 unicast switch fails                         with hardware multicast paying off already with a relatively
+to compete with multicast traffic due to the overhead of                      large number of multicast end nodes.
+replicating packets to multiple target end nodes and its QDI
+design style. When we combine the within-core latency results                       XI. C OMPARISON W ITH S YNCHRONOUS S WITCH
+from [5] with the findings from our experiments about NoC                        We conducted a comparison between synchronous and
+performance, after technology equalization we observe that                    asynchronous NoC architectures using a highly optimized
+Proposed Multicast could potentially achieve a 20% shorter                    single-cycle synchronous baseline switch, referred to as
+time step for SNN simulation compared to DYNAP-SE R3                          “xpipes”. This switch was modified to implement the same
+unicast switch. This reduction indicates a decrease in SNN                    design techniques for optimized single-flit multicast packet
+latency.                                                                      transmission as the proposed asynchronous switch. Specifi-
+   2) Energy Analysis of NAV and KWS Experiment: This                         cally, the arbiter FSM was simplified to avoid differentiating
+section delves into the topic of average energy usage per                     between the transmission states of head, body, and tail flits.
+inference sample when dealing with varying connectivity                       Additionally, each input port was enhanced with a simple
+constraints, as visualized in Fig. 10c and Fig. 10d. Pro-                     “request generator” for each possible output port, functionally
+posed Unicast is the best candidate when the SNN strictly                     equivalent to the asynchronous request generators. This allows
+follow a small world network with sparse (10%) long-                          the output ports involved in a multicast transaction to read out
+distance connectivity because a substantial energy reduction                  a packet from the input buffer independently and concurrently
+of 41.2% compared to DYNAP-SE R3 unicast switch. The                          at their own rate, synchronized to clock cycles.
+energy-saving threshold at which Proposed Multicast becomes                      Both the synchronous and asynchronous switches were
+more energy-efficient than Proposed Unicast is observed                       instantiated with minimal buffering while still maintaining full
+to be at a 20% sparsity level, which translates to 20%                        throughput operation. The asynchronous switch includes one
+remaining connectivity, in both experiments. To elaborate, the                input and one output Mousetrap stage for path retiming and
+energy savings range from 31.3% to 68.7%, corresponding to                    flow control, which is integrated into the req-ack handshak-
+long-distance connectivity sparsity levels ranging from 20%                   ing mechanism of Mousetrap. In contrast, the synchronous
+to 100%. The Proposed Multicast solution also demonstrates                    baseline switch implements a simple “stall/go” flow control
+422                                   IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+                                TABLE III                                        [7] C. Mayr, S. Hoeppner, and S. Furber, “SpiNNaker 2: A 10 million
+      P OST-L AYOUT C OMPARISON W ITH S YNCHRONOUS S WITCH                           core processor system for brain simulation and machine learning,” 2019,
+                                                                                     arXiv:1911.02385.
+                                                                                 [8] G. Orchard et al., “Efficient neuromorphic signal processing with Loihi
+                                                                                     2,” in Proc. IEEE Workshop Signal Process. Syst. (SiPS), Oct. 2021,
+                                                                                     pp. 254–259.
+                                                                                 [9] A. Neckar et al., “Braindrop: A mixed-signal neuromorphic architecture
+                                                                                     with a dynamical systems-based programming model,” Proc. IEEE,
+                                                                                     vol. 107, no. 1, pp. 144–164, Jan. 2019.
+                                                                                [10] C. Frenkel, D. Bol, and G. Indiveri, “Bottom-up and top-down
+                                                                                     approaches for the design of neuromorphic processing systems: Trade-
+protocol. To ensure the most lightweight implementation, the                         offs and synergies between natural and artificial intelligence,” Proc.
+synchronous baseline was configured with 2-slot input and                            IEEE, vol. 111, no. 6, pp. 623–652, Jun. 2023.
+                                                                                [11] S. Moradi, N. Qiao, F. Stefanini, and G. Indiveri, “A scalable multicore
+output buffers, which is the minimum required to cover the                           architecture with heterogeneous memory structures for dynamic neu-
+round-trip latency in clock cycles and guarantee full through-                       romorphic asynchronous processors (DYNAPs),” IEEE Trans. Biomed.
+put operation [49]. The comparison was conducted in terms                            Circuits Syst., vol. 12, no. 1, pp. 106–122, Feb. 2018.
+                                                                                [12] C. Mayr et al., “A biological-realtime neuromorphic system in 28 nm
+of area, latency, and energy per bit following placement and                         CMOS using low-leakage switched capacitor circuits,” IEEE Trans.
+routing in 22nm industrial technology.                                               Biomed. Circuits Syst., vol. 10, no. 1, pp. 243–254, Feb. 2016.
+   The asynchronous switch is 52% more area efficient, mainly                   [13] J. Park, T. Yu, S. Joshi, C. Maier, and G. Cauwenberghs, “Hierarchi-
+due to the more lightweight Mousetrap registers compared                             cal address event routing for reconfigurable large-scale neuromorphic
+                                                                                     systems,” IEEE Trans. Neural Netw. Learn. Syst., vol. 28, no. 10,
+with synchronous ones, and to the higher number of buffer                            pp. 2408–2422, Oct. 2017.
+slots needed to deliver full throughput operation (i.e., flow                   [14] S. Furber, “Large-scale neuromorphic computing systems,” J. Neural
+control is built-in in asynchronous design).                                         Eng., vol. 13, no. 5, Oct. 2016, Art. no. 051001. [Online]. Available:
+                                                                                     https://api.semanticscholar.org/CorpusID:45136509
+   The energy-per-bit of the synchronous switch is 69% higher.                  [15] D. Bertozzi et al., “Cost-effective and flexible asynchronous interconnect
+Most of the asynchronous savings are due to the use of single-                       technology for GALS systems,” IEEE Micro, vol. 41, no. 1, pp. 69–81,
+latch-based Mousetrap registers (with small area footprint, and                      Jan. 2021.
+                                                                                [16] C. A. R. Hoare, Communicating Sequential Processes.
+low energy and critical-path latency), lack of global clock                          Upper Saddle River, NJ, USA: Prentice-Hall, 1985.
+distribution, and on-demand activation.                                         [17] A. J. Martin and M. Nystrom, “Asynchronous techniques for system-
+   Finally, the asynchronous switch pays a small 5% latency                          on-chip design,” Proc. IEEE, vol. 94, no. 6, pp. 1089–1120, Jun. 2006.
+overhead due to RTM, the phase conversion circuits and the                      [18] A. R. Young, M. E. Dean, J. S. Plank, and G. S. Rose, “A review of
+                                                                                     spiking neuromorphic hardware communication systems,” IEEE Access,
+gates for glitch-free operation.                                                     vol. 7, pp. 135606–135620, 2019.
+                                                                                [19] A. S. Cassidy, J. Georgiou, and A. G. Andreou, “Design of
+                          XII. C ONCLUSION                                           silicon brains in the nano-CMOS era: Spiking neurons, learn-
+                                                                                     ing synapses and neural architecture optimization,” Neural Netw.,
+   AER routing messages in neuromorphic NoCs can often                               vol. 45, pp. 4–26, Sep. 2013. [Online]. Available: https://www.
+                                                                                     sciencedirect.com/science/article/pii/S0893608013001597
+fit easily within a single-flit packet. Building on this evi-
+                                                                                [20] N. E. Jerger, L.-S. Peh, and M. Lipasti, “Virtual circuit tree multicasting:
+dence, this paper reports on the design of a lightweight NoC                         A case for on-chip hardware multicast support,” in Proc. Int. Symp. Com-
+switch that uses an ultra-low power asynchronous design style                        put. Archit., Jun. 2008, pp. 229–240.
+(2-phase bundled-data) to model a streamlined architecture                      [21] L. Wang, Y. Jin, H. Kim, and E. J. Kim, “Recursive partitioning
+                                                                                     multicast: A bandwidth-efficient routing for Networks-on-Chip,” in Proc.
+specialized for short messaging. Benefits have been validated                        3rd ACM/IEEE Int. Symp. Netw.-on-Chip, May 2009, pp. 64–73.
+through the model of a real neuromorphic processor for edge                     [22] S. Park, T. Krishna, C.-H. Chen, B. Daya, A. Chandrakasan, and
+computing, and include not only a superior energy efficiency                         L.-S. Peh, “Approaching the theoretical limits of a mesh NoC with a
+                                                                                     16-node chip prototype in 45 nm SOI,” in Proc. Design Autom. Conf.,
+in unicast communications, but also a radical simplification                         Jun. 2012, pp. 398–405.
+of the multicast routing protocol and of its packet replication                 [23] T. Krishna and L.-S. Peh, “Single-cycle collective communication over
+mechanism in hardware. Future work will target applicability                         a shared network fabric,” in Proc. 8th IEEE/ACM Int. Symp. Netw.-on-
+of this NoC to large-scale neuromorphic computing platforms                          Chip (NoCS), Sep. 2014, pp. 1–8.
+                                                                                [24] K. Bhardwaj and S. M. Nowick, “A continuous-time replication strategy
+as well, by focusing on a scalable multicast addressing scheme.                      for efficient multicast in asynchronous NoCs,” IEEE Trans. Very Large
+                                                                                     Scale Integr. (VLSI) Syst., vol. 27, no. 2, pp. 350–363, Feb. 2019.
+                             R EFERENCES                                        [25] W. Hu, Z. Lu, A. Jantsch, and H. Liu, “Power-efficient tree-based
+                                                                                     multicast support for networks-on-chip,” in Proc. 16th Asia South Pacific
+ [1] J. D. Nunes, M. Carvalho, D. Carneiro, and J. S. Cardoso, “Spiking neu-         Design Autom. Conf. (ASP-DAC), Jan. 2011, pp. 363–368.
+     ral networks: A survey,” IEEE Access, vol. 10, pp. 60738–60764, 2022.      [26] R. A. Stefan, A. Molnos, and K. Goossens, “DAElite: A TDM NoC
+ [2] C. Mead, Analog VLSI and Neural Systems. Reading, MA, USA:                      supporting QoS, multicast, and fast connection set-up,” IEEE Trans.
+     Addison-Wesley, 1989.                                                           Comput., vol. 63, no. 3, pp. 583–594, Mar. 2014.
+ [3] F. Akopyan et al., “TrueNorth: Design and tool flow of a 65 mW 1 mil-      [27] M. P. Malumbres, J. Duato, and J. Torrellas, “An efficient implemen-
+     lion neuron programmable neurosynaptic chip,” IEEE Trans. Comput.-              tation of tree-based multicast routing for distributed shared-memory
+     Aided Design Integr. Circuits Syst., vol. 34, no. 10, pp. 1537–1557,            multiprocessors,” in Proc. 8th IEEE Symp. Parallel Distrib. Process.
+     Oct. 2015.                                                                      (SPDP), Oct. 1996, pp. 186–189.
+ [4] S. B. Furber, F. Galluppi, S. Temple, and L. A. Plana, “The SpiNNaker      [28] T. Krishna, L.-S. Peh, B. M. Beckmann, and S. K. Reinhardt, “Towards
+     project,” Proc. IEEE, vol. 102, no. 5, pp. 652–665, May 2014.                   the ideal on-chip fabric for 1-to-many and many-to-1 communication,”
+ [5] M. Davies et al., “Loihi: A neuromorphic manycore processor with on-            in Proc. 44th Annu. IEEE/ACM Int. Symp. Microarchitecture (MICRO),
+     chip learning,” IEEE Micro, vol. 38, no. 1, pp. 82–99, Jan. 2018.               Dec. 2011, pp. 71–82.
+ [6] B. V. Benjamin et al., “Neurogrid: A mixed-analog-digital multichip        [29] S. Ma, N. E. Jerger, and Z. Wang, “Supporting efficient collective
+     system for large-scale neural simulations,” Proc. IEEE, vol. 102, no. 5,        communication in NoCs,” in Proc. IEEE Int. Symp. High-Perform. Comp
+     pp. 699–716, May 2014.                                                          Archit., Feb. 2012, pp. 1–12.
+SU et al.: ULTRA-LOW COST AND MULTICAST-ENABLED ASYNCHRONOUS NoC                                                                                            423
+
+
+
+[30] F. A. Samman, T. Hollstein, and M. Glesner, “Adaptive and deadlock-                                  Zhe Su received the M.Sc. degree in integrated
+     free tree-based multicast routing for networks-on-chip,” IEEE Trans.                                 circuits engineering from Tsinghua University,
+     Very Large Scale Integr. (VLSI) Syst., vol. 18, no. 7, pp. 1067–1080,                                China, in 2020. He is currently pursuing the Ph.D.
+     Jul. 2010.                                                                                           degree with the Institute of Neuroinformatics,
+[31] P. Merolla, J. Arthur, R. Alvarez, J.-M. Bussat, and K. Boahen,                                      University of Zurich, and ETH Zürich, Zürich.
+     “A multicast tree router for multichip neuromorphic systems,” IEEE                                     His research interests is the algorithm-hardware
+     Trans. Circuits Syst. I, Reg. Papers, vol. 61, no. 3, pp. 820–833,                                   co-design for ultra-low power neuromorphic
+     Mar. 2014.                                                                                           processors.
+[32] J. Navaridas, M. Luján, L. A. Plana, S. Temple, and S. B. Furber,
+     “SpiNNaker: Enhanced multicast routing,” Parallel Comput.,
+     vol. 45, pp. 49–66, Jun. 2015. [Online]. Available: https://www.
+     sciencedirect.com/science/article/pii/S0167819115000095
+[33] M. T. Moreira, W. Koven, T. F. Wu, H. E. Sumbul, and E. Beigne,
+     “A QDI interconnect for 3D systems using industry standard EDA and
+     cell libraries,” in Proc. 28th IEEE Int. Symp. Asynchronous Circuits Syst.
+     (ASYNC), Jul. 2023, pp. 58–59.                                                                       Simone Ramini received the M.Sc. degree in elec-
+[34] A. J. Martin and M. Nystrom, “CAST: Caltech asynchronous synthesis                                   trical engineering from the University of Ferrara,
+     tools,” in Proc. 4th Asynchronous Circuit Design Work. Group Workshop,                               Ferrara, Italy, in 2022.
+     USA, 2004.                                                                                              He is currently a Physical Design Engineer with
+[35] A. Ghiribaldi, D. Bertozzi, and S. M. Nowick, “A transition-signaling                                Infineon Technologies, Graz, Austria. His work is
+     bundled data NoC switch architecture for cost-effective GALS multicore                               mainly focused on power integrity in industrial
+     systems,” in Proc. Design, Autom. Test Eur. Conf. Exhib. (DATE),                                     microcontrollers, ensuring robustness, and reliability
+     Mar. 2013, pp. 332–337.                                                                              in power distribution networks.
+[36] S. Moradi and R. Manohar, “The impact of on-chip communication
+     on memory technologies for neuromorphic systems,” J. Phys. D, Appl.
+     Phys., vol. 52, no. 1, Jan. 2019, Art. no. 014003.
+[37] V. Nori, B. Chauviere, M. J. Wibbels, and K. S. Stevens, “A novel asyn-
+     chronous network-on-chip based on source asynchronous signaling,” in
+     Proc. 28th IEEE Int. Symp. Asynchronous Circuits Syst. (ASYNC). Los
+     Alamitos, CA, USA: IEEE Computer Society, Jul. 2023, pp. 71–77, doi:
+     10.1109/ASYNC58294.2023.10239625.
+[38] T. Fischer, M. Rogenmoser, M. Cavalcante, F. K. Gürkaynak, and                                       Demetra Coffen Marcolin received the master’s
+     L. Benini, “FlooNoC: A multi-Tb/s wide NoC for heterogeneous AXI4                                    degree in electrical engineering from the University
+     traffic,” IEEE Design Test, vol. 40, no. 6, pp. 7–17, Dec. 2023, doi:                                of Ferrara in 2023. She is currently pursuing the
+     10.1109/MDAT.2023.3306720.                                                                           Ph.D. degree in computer science with The Univer-
+[39] Z. Su, H. Hwang, T. Torchet, and G. Indiveri, “Core interface                                        sity of Manchester.
+     optimization for multi-core neuromorphic processors,” in Proc. 28th                                    The main focus of her research is on asynchronous
+     IEEE Int. Symp. Asynchronous Circuits Syst. (ASYNC), Jul. 2023,                                      interconnection networks for ultra-low power com-
+     pp. 89–98.                                                                                           munication in neuromorphic computing systems.
+[40] H. Wu, Z. Su, J. Zhang, S. Wei, Z. Wang, and H. Chen, “A design flow
+     for click-based asynchronous circuits design with conventional EDA
+     tools,” IEEE Trans. Comput.-Aided Design Integr. Circuits Syst., vol. 40,
+     no. 11, pp. 2421–2425, Nov. 2021.
+[41] S. M. Nowick and M. Singh, “Asynchronous design—Part 1: Overview
+     and recent advances,” IEEE Design Test, vol. 32, no. 3, pp. 5–18,
+     Mar. 2015.
+[42] M. Singh and S. M. Nowick, “MOUSETRAP: High-speed transition-                                        Alessandro Veronesi received the master’s degree
+     signaling asynchronous pipelines,” IEEE Trans. Very Large Scale Integr.                              in electrical engineering from the University of
+     (VLSI) Syst., vol. 15, no. 6, pp. 684–698, Jun. 2007.                                                Ferrara in March 2020. He is currently pursuing
+[43] K. van Berkel, F. Huberts, and A. Peeters, “Stretching quasi                                         the Ph.D. degree in computer science with the
+     delay insensitivity by means of extended isochronic forks,” in                                       University of Potsdam in collaboration with IHP
+     Proc. 2nd Work. Conf. Asynchronous Design Methodol., 1995,                                           Microelectronics.
+     pp. 99–106.                                                                                            His main research focuses on embedded DNN
+[44] C. Yan and M. R. Greenstreet, “Verifying an arbiter circuit,” in Proc.                               architectures and dependable DNN systems for
+     Formal Methods Comput.-Aided Design, Nov. 2008, pp. 1–9.                                             mission-critical applications.
+[45] Y. Cui, W. Shan, W. Dai, X. Liu, J. Guo, and P. Cao, “An improved
+     path delay variability model via multi-level fan-out-of-4 metric for wide-
+     voltage-range digital CMOS circuits,” Chin. J. Electron., vol. 32, no. 2,
+     pp. 375–388, Mar. 2023.
+[46] D. Zendrikov, S. Solinas, and G. Indiveri, “Brain-inspired methods for
+     achieving robust computation in heterogeneous mixed-signal neuromor-
+     phic processing systems,” Neuromorphic Comput. Eng., vol. 3, no. 3,                                   Milos Krstic received the Dr.-Ing. degree in elec-
+     Jul. 2023, Art. no. 034002.                                                                           tronics from Brandenburg University of Technology,
+[47] C. Frenkel and G. Indiveri, “ReckOn: A 28 nm sub-mm2 task-agnostic                                    Cottbus, Germany, in 2006.
+     spiking recurrent neural network processor enabling on-chip learning                                    Since 2001, he has been with IHP, Frankfurt
+     over second-long timescales,” in IEEE Int. Solid-State Circuits Conf.                                 (Oder), Germany, where he leads the Department
+     (ISSCC) Dig. Tech. Papers, vol. 65, Feb. 2022, pp. 1–3.                                               of System Architectures. Since 2016, he has been
+[48] V. R. C. Leite, Z. Su, A. M. Whatley, and G. Indiveri, “Cortical-inspired                             a Professor of design and test methodology with the
+     placement and routing: Minimizing the memory resources in multi-core                                  University of Potsdam. For the last few years, his
+     neuromorphic processors,” in Proc. IEEE Biomed. Circuits Syst. Conf.                                  work was mainly focused on fault tolerant architec-
+     (BioCAS), Oct. 2022, pp. 364–368.                                                                     tures and design methodologies for digital systems
+[49] A. Pullini, F. Angiolini, D. Bertozzi, and L. Benini, “Fault toler-                                   integration. He has been managing many interna-
+     ance overhead in network-on-chip flow control schemes,” in Proc.             tional and national research and development projects at IHP (GALAXY,
+     18th Annu. Symp. Integr. Circuits Syst. Design. New York, NY,                EMPHASE, IC-NAO, ENROL, RTU-ASIC, SEPHY, DIFFERENT, VHiSSi,
+     USA: Association for Computing Machinery, 1145, pp. 224–229, doi:            RESCUE, MORAL, and BB-KI Chips). He has published more than 300 jour-
+     10.1145/1081081.1081138.                                                     nals and conference papers and registered 12 patents.
+424                                      IEEE JOURNAL ON EMERGING AND SELECTED TOPICS IN CIRCUITS AND SYSTEMS, VOL. 14, NO. 3, SEPTEMBER 2024
+
+
+
+                          Giacomo Indiveri (Senior Member, IEEE) is a                                           Steven M. Nowick received the B.A. degree from
+                          leading Researcher in the field of neuromorphic                                       Yale University and the Ph.D. degree in computer
+                          engineering, bridging the gap between natural and                                     science from Stanford University.
+                          artificial intelligence. As the Director of the Institute                               He is a Professor Emeritus of computer science
+                          of Neuroinformatics, University of Zurich (UZH)                                       with Columbia University and the former Chair
+                          and ETH Zürich; and a dual Professor of neuro-                                        and a Co-Founder of the Computer Engineering
+                          morphic cognitive systems with both institutions,                                     Program. He was the Founding Chair with the
+                          he leverages his expertise in electrical engineer-                                    Center for Computing Systems for Data-Driven Sci-
+                          ing, computer science, neuroscience, and machine                                      ence, Columbia’s Data Science Institute. He holds
+                          learning to understand the brain’s principles of                                      13 issued U.S. patents. His main research is on
+                          computation. His research focuses on building low-                                    design methodologies and CAD tools for synthesis
+power mixed-signal circuits, that emulate the dynamics of biological neurons          and optimization of asynchronous and GALS digital systems. His particular
+and synapses. He explores how these circuits can perform efficient neu-               interests include scalable and low-latency on-chip interconnection networks
+ral computation, shedding light on the fundamental principles governing               for shared-memory parallel processors and embedded systems, extreme
+spike-based information processing in the brain. By validating brain-inspired         low-energy digital systems, neuromorphic computing, hardware accelerators,
+computational paradigms in real-world scenarios, his research holds the               and variation-tolerant global communication. He received the Columbia
+potential to unlock the tremendous learning capabilities of simple animals,           Engineering School Alumni Distinguished Faculty Teaching Award. He was a
+surpassing even the most advanced deep learning solutions while overcoming            recipient of the Alfred P. Sloan Research Fellowship and the NSF CAREER
+their limitations in energy requirements.                                             and RIA Awards. He received two Best Paper Awards at the IEEE International
+                                                                                      Conference on Computer Design and one at the IEEE Async Symposium.
+                                                                                      He has co-founded the IEEE Async Symposia series, and served as the
+                                                                                      Program Co-Chair and the General Co-Chair. He was the Program Chair
+                                                                                      of the IEEE/ACM International Workshop on Logic and Synthesis; and the
+                         Davide Bertozzi (Member, IEEE) is a Reader in                Program Track/Subcommittee Chair at DAC, DATE, and ICCD conferences.
+                         advanced processing technologies with The Univer-            He was the Selection Committee Chair of the ACM/SIGDA Outstanding
+                         sity of Manchester, U.K. He has been a Visiting              Dissertation in Electronic Design Automation Award and a member of the
+                         Researcher with Stanford University and several              Best Paper Award Committees of DAC and ICCAD conferences. He served
+                         semiconductor industries (STMicroelectronics, NEC            on the editorial boards of IEEE Design and Test, ACM Journal on Emerging
+                         America Labs, NXP, and Samsung). The mission                 Technologies in Computer Systems, IEEE T RANSACTIONS ON V ERY L ARGE
+                         of his research is to stay at the forefront of               S CALE I NTEGRATION (VLSI) S YSTEMS, and IEEE T RANSACTIONS ON
+                         system innovation by leveraging the enabling prop-           C OMPUTER -A IDED D ESIGN.
+                         erties of interconnection architectures and emerging
+                         technologies. He contributes to the activities for neu-
+                         roscience simulation acceleration within the flagship
+EBRAINS 2.0 project, and takes part to a collaborative effort to bring the
+celebrated SpiNNaker large-scale neuromorphic computing platform to the
+next generations of technology, implementation, and architecture. Finally,
+he is deeply involved in EU-funded projects (TAICHIP, TWIN-RELECT,
+and AIDA4Edge) to enhance networking between research institutions of the
+widening countries and top-class leading counterparts, encompassing joint
+research, knowledge transfer, and exchange of best practices in the fields of
+AI chip design, EDA tool flows for reliable electronics, and hybrid SNN-ANN
+models for adaptive edge AI, respectively. His scientific activity has led
+to roughly 200 publications, with five best paper awards, three best paper
+award nominations, and one high-impact paper award for one of the five
+most cited papers in the first 30 years of the International Conference on
+Computer Design. Dr. Bertozzi received the Wolfgang Mehr Award from
+IHP Microelectronics, a Leibniz Institute for Innovative Microelectronics in
+Germany, in 2018, for his interdisciplinary research on photonically-integrated
+systems.
+

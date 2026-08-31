@@ -1,0 +1,17 @@
+# Small AXI/BRAM smoke case for TX_DEPTH=8, RX_DEPTH=16.
+case noc16_axi_smoke_small
+group SMOKE_16
+timeout_cycles 2000
+reset_cycles 20
+out_ack_delay_cycles 0
+event_map     14     14
+event_map     33     33
+event_map     42     42
+# input  <cycle> <port> <pkt_seq> <flit_hex>
+# expect <mask_hex> <pkt_seq> <is_tail> <flit_hex>
+input      0  0     14 c004006 # from VCTM-NoMC-1f-r0p02 evt14
+input      1  0     33 c10c10d # from VCTM-NoMC-1f-r0p02 evt33
+input      2  0     42 c20c20e # from VCTM-NoMC-1f-r0p02 evt42
+expect 00002     14 1 c004006
+expect 00080     33 1 c10c10d
+expect 00800     42 1 c20c20e

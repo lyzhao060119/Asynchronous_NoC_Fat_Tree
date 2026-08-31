@@ -1,7 +1,7 @@
 package Router_Architecture.common
 
 import chisel3._
-import tool.{AsyncClock, DelayElement}
+import tool.{AsyncClock, AsyncDelay, DelayElement}
 
 /**
  * Completion-side acknowledge join for a sparse asynchronous fork.
@@ -9,7 +9,9 @@ import tool.{AsyncClock, DelayElement}
  * Once all launched branches finish, it toggles the input acknowledge and emits
  * a packet-complete pulse.
  */
-class AsyncForkAckJoinBlock extends Module {
+class AsyncForkAckJoinBlock(
+    completeDelayRole: String = AsyncDelay.DefaultRole
+) extends Module {
   val io = IO(new Bundle {
     val inReq = Input(Bool())
     val forkBusy = Input(Bool())
@@ -20,7 +22,12 @@ class AsyncForkAckJoinBlock extends Module {
     val fire_clock = Output(Clock())
   })
 
-  private val completePulse = Module(new DelayElement(1))
+  private val completePulse = Module(
+    new DelayElement(
+      AsyncDelay.steps(1, completeDelayRole),
+      AsyncDelay.unitPs(completeDelayRole)
+    )
+  )
   private val completeCond = WireDefault(false.B)
 
   completePulse.io.I := completeCond

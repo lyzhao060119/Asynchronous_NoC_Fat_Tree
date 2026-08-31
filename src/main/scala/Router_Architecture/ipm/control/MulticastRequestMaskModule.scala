@@ -5,8 +5,8 @@ import chisel3._
 
 /** Extra multicast-aware request mask builder for this project.
   *
-  * This design adds multicast fan-out, packet-level atomic lane ownership, and
-  * multi-lane body bypass.
+  * Head flits build a direction/lane mask; body and tail flits reuse the stored
+  * mask from packet context. Holder filtering is done in InputEligibilityModule.
   */
 class MulticastRequestMaskModule(config: RouterModuleConfig) extends Module {
   val io = IO(new Bundle {
@@ -16,76 +16,32 @@ class MulticastRequestMaskModule(config: RouterModuleConfig) extends Module {
       Input(Vec(config.totalPorts, Vec(config.nDirs, Bool())))
     val headSelLane =
       Input(Vec(config.totalPorts, Vec(config.nDirs, UInt(config.laneW.W))))
-    val storedLane =
-      Input(Vec(config.totalPorts, Vec(config.nDirs, UInt(config.laneW.W))))
-    val holder = Input(Vec(config.totalPorts, UInt(config.holderW.W)))
+    val storedMask =
+      Input(Vec(config.totalPorts, Vec(config.totalPorts, Bool())))
     val headAllocOk = Input(Vec(config.totalPorts, Bool()))
 
     val destMask =
       Output(Vec(config.totalPorts, Vec(config.totalPorts, Bool())))
   })
 
-  private def anyDest(v: Vec[Bool]): Bool = v.asUInt.orR
-
   private val headWantedMask = Wire(
     Vec(config.totalPorts, Vec(config.totalPorts, Bool()))
   )
-  private val bodyWantedMask = Wire(
-    Vec(config.totalPorts, Vec(config.totalPorts, Bool()))
-  )
-  private val bodyGrantedMask = Wire(
-    Vec(config.totalPorts, Vec(config.totalPorts, Bool()))
-  )
-  private val bodyAtomicOk = Wire(Vec(config.totalPorts, Bool()))
+  private val zeroMask = VecInit(Seq.fill(config.totalPorts)(false.B))
 
   for (i <- 0 until config.totalPorts) {
     for (o <- 0 until config.totalPorts) {
-      headWantedMask(i)(o) := false.B
-      bodyWantedMask(i)(o) := false.B
-      bodyGrantedMask(i)(o) := false.B
+      val dir = config.dirOfPhys(o)
+      val lane = config.laneOfPhys(o)
+      headWantedMask(i)(o) :=
+        io.currentDestVec(i)(dir) &&
+          (io.headSelLane(i)(dir) === lane.U(config.laneW.W))
     }
 
-    for (d <- 0 until config.nDirs) {
-      for (l <- 0 until config.lanesPerDir(d)) {
-        val outIdx = config.physIndex(d, l)
-        when(io.currentDestVec(i)(d) && (io.headSelLane(i)(d) === l.U)) {
-          headWantedMask(i)(outIdx) := true.B
-        }
-      }
-    }
-
-    for (d <- 0 until config.nDirs) {
-      for (l <- 0 until config.lanesPerDir(d)) {
-        val outIdx = config.physIndex(d, l)
-        when(io.currentDestVec(i)(d) && (io.storedLane(i)(d) === l.U)) {
-          bodyWantedMask(i)(outIdx) := true.B
-        }
-      }
-    }
-
-    for (o <- 0 until config.totalPorts) {
-      bodyGrantedMask(i)(o) := bodyWantedMask(i)(o) && (io.holder(o) === i.U(
-        config.holderW.W
-      ))
-    }
-
-    bodyAtomicOk(i) := true.B
-    for (o <- 0 until config.totalPorts) {
-      when(bodyWantedMask(i)(o) =/= bodyGrantedMask(i)(o)) {
-        bodyAtomicOk(i) := false.B
-      }
-    }
-
-    when(io.inValid(i) && io.isHead(i) && io.headAllocOk(i)) {
-      io.destMask(i) := headWantedMask(i)
-    }.elsewhen(
-      io.inValid(i) && !io.isHead(i) && anyDest(
-        io.currentDestVec(i)
-      ) && bodyAtomicOk(i)
-    ) {
-      io.destMask(i) := bodyGrantedMask(i)
-    }.otherwise {
-      io.destMask(i) := VecInit(Seq.fill(config.totalPorts)(false.B))
-    }
+    val useHead = io.inValid(i) && io.isHead(i) && io.headAllocOk(i)
+    val useStore =
+      io.inValid(i) && !io.isHead(i) && io.storedMask(i).asUInt.orR
+    io.destMask(i) :=
+      Mux(useHead, headWantedMask(i), Mux(useStore, io.storedMask(i), zeroMask))
   }
 }

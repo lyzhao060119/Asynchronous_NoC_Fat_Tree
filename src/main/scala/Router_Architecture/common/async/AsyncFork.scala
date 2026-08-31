@@ -2,6 +2,7 @@ package Router_Architecture.common
 
 import DataStruct._
 import chisel3._
+import tool.AsyncDelay
 
 /**
  * Replicates one input packet to a masked set of output channels.
@@ -9,12 +10,17 @@ import chisel3._
  * The fork launches all selected outputs together and only acknowledges the
  * input once every selected branch has completed its handshake.
  */
-class AsyncFork(val outN: Int) extends Module {
+class AsyncFork(
+    val outN: Int,
+    launchDelayRole: String = AsyncDelay.DefaultRole,
+    completeDelayRole: String = AsyncDelay.ForkComplete
+) extends Module {
   require(outN >= 1)
 
   val io = IO(new Bundle {
     val in         = new HS_Packet
     val destMask   = Input(Vec(outN, Bool())) // one bit per legal output edge
+    val canLaunch  = Input(Bool())
     val out        = Vec(outN, Flipped(new HS_Packet))
     val launch     = Output(Bool()) // launch pulse seen by route-state logic
     val launch_clock = Output(Clock())
@@ -22,12 +28,14 @@ class AsyncFork(val outN: Int) extends Module {
     val fire_clock = Output(Clock())
   })
 
-  private val requestBlock = Module(new AsyncForkRequestBlock(outN))
-  private val ackJoin = Module(new AsyncForkAckJoinBlock)
+  private val requestBlock =
+    Module(new AsyncForkRequestBlock(outN, launchDelayRole))
+  private val ackJoin = Module(new AsyncForkAckJoinBlock(completeDelayRole))
 
   requestBlock.io.inReq := io.in.HS.Req
   requestBlock.io.inAck := ackJoin.io.inAck
   requestBlock.io.destMask := io.destMask
+  requestBlock.io.canLaunch := io.canLaunch
 
   for (j <- 0 until outN) {
     requestBlock.io.outAck(j) := io.out(j).HS.Ack

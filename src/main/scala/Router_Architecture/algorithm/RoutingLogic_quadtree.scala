@@ -13,174 +13,209 @@ class RoutingDecision extends Bundle {
 
 /** Computes routing decisions for one quadtree router.
   *
-  * The logic first clips the global rectangle to the current tree, projects the
-  * relevant region onto the current router level, and then decides which child
-  * quadrants and/or parent port should receive the packet.
+  * All three levels compare the unordered global rectangle against compile-
+  * time AABB constants so the Mat cone does not serialize a 6-bit x0-vs-x1
+  * sort or a tree-local subtract clip.
   */
 class RoutingLogic(coordinate_x: Int, coordinate_y: Int) {
-  private def childDirBit(xSel: Int, ySel: Int): Int = {
-    // (x,y)=00 -> child3, 01 -> child2, 10 -> child1, 11 -> child0
-    3 - ((xSel << 1) | ySel)
-  }
-
-  private def projectRectAtLevel(
-      xMin: UInt,
-      xMax: UInt,
-      yMin: UInt,
-      yMax: UInt,
-      level: Int,
-      localRouterX: UInt,
-      localRouterY: UInt
-  ): UInt = {
-    require(level >= 1 && level <= 3)
-
-    val xLo = Wire(UInt(3.W))
-    val xHi = Wire(UInt(3.W))
-    val yLo = Wire(UInt(3.W))
-    val yHi = Wire(UInt(3.W))
-
-    xLo := Mux(xMin <= xMax, xMin, xMax)
-    xHi := Mux(xMin <= xMax, xMax, xMin)
-    yLo := Mux(yMin <= yMax, yMin, yMax)
-    yHi := Mux(yMin <= yMax, yMax, yMin)
-
-    val projectedDir = Wire(Vec(5, Bool()))
-
-    if (level == 3) {
-      projectedDir(3) := (xMin <= 3.U) && (yMin <= 3.U)
-      projectedDir(1) := (xMax > 3.U) && (yMin <= 3.U)
-      projectedDir(2) := (xMin <= 3.U) && (yMax > 3.U)
-      projectedDir(0) := (xMax > 3.U) && (yMax > 3.U)
-      projectedDir(4) := false.B
-    } else if (level == 2) {
-      // L2 routers are indexed globally across the whole NoC, but the clipped
-      // rectangle we compare against is always local to the current 8x8 tree.
-      // Project each child L1 subtree using the router's local (0..1, 0..1)
-      // coordinate inside that tree rather than the absolute router index.
-      val baseX = Cat(localRouterX(0), 0.U(2.W))
-      val baseY = Cat(localRouterY(0), 0.U(2.W))
-      val coords_00_x = baseX
-      val coords_00_y = baseY
-      val coords_01_x = baseX | 0x2.U
-      val coords_01_y = baseY
-      val coords_10_x = baseX
-      val coords_10_y = baseY | 0x2.U
-      val coords_11_x = baseX | 0x2.U
-      val coords_11_y = baseY | 0x2.U
-      projectedDir(
-        3
-      ) := ((coords_00_x | 0x1.U) >= xMin) && (coords_00_x <= xMax) && ((coords_00_y | 0x1.U) >= yMin) && (coords_00_y <= yMax)
-      projectedDir(
-        1
-      ) := ((coords_01_x | 0x1.U) >= xMin) && (coords_01_x <= xMax) && ((coords_01_y | 0x1.U) >= yMin) && (coords_01_y <= yMax)
-      projectedDir(
-        2
-      ) := ((coords_10_x | 0x1.U) >= xMin) && (coords_10_x <= xMax) && ((coords_10_y | 0x1.U) >= yMin) && (coords_10_y <= yMax)
-      projectedDir(
-        0
-      ) := ((coords_11_x | 0x1.U) >= xMin) && (coords_11_x <= xMax) && ((coords_11_y | 0x1.U) >= yMin) && (coords_11_y <= yMax)
-      projectedDir(
-        4
-      ) := !((xMin >= coords_00_x) && (xMax <= (coords_01_x | 0x1.U)) && (yMin >= coords_00_y) && (yMax <= (coords_10_y | 0x1.U)))
-    } else if (level == 1) {
-      // L1 routers are also globally indexed; convert back to the current
-      // tree-local 2x2 core window before comparing against local coordinates.
-      val baseX = Cat(localRouterX, 0.U(1.W))
-      val baseY = Cat(localRouterY, 0.U(1.W))
-      val coords_00_x = baseX
-      val coords_00_y = baseY
-      val coords_01_x = baseX | 0x1.U
-      val coords_01_y = baseY
-      val coords_10_x = baseX
-      val coords_10_y = baseY | 0x1.U
-      val coords_11_x = baseX | 0x1.U
-      val coords_11_y = baseY | 0x1.U
-      projectedDir(
-        3
-      ) := (coords_00_x >= xMin) && (coords_00_x <= xMax) && (coords_00_y >= yMin) && (coords_00_y <= yMax)
-      projectedDir(
-        1
-      ) := (coords_01_x >= xMin) && (coords_01_x <= xMax) && (coords_01_y >= yMin) && (coords_01_y <= yMax)
-      projectedDir(
-        2
-      ) := (coords_10_x >= xMin) && (coords_10_x <= xMax) && (coords_10_y >= yMin) && (coords_10_y <= yMax)
-      projectedDir(
-        0
-      ) := (coords_11_x >= xMin) && (coords_11_x <= xMax) && (coords_11_y >= yMin) && (coords_11_y <= yMax)
-      projectedDir(
-        4
-      ) := !((xMin >= coords_00_x) && (xMax <= coords_01_x) && (yMin >= coords_00_y) && (yMax <= coords_10_y))
-    }
-    
-    projectedDir.asUInt
-  }
-
   private def currentTreeCoord(router_level: Int): (Int, Int) = {
     require(router_level >= 1 && router_level <= 3)
 
     router_level match {
       case 1 => ((coordinate_x >> 2) & 0x3, (coordinate_y >> 2) & 0x3)
       case 2 => ((coordinate_x >> 1) & 0x3, (coordinate_y >> 1) & 0x3)
-      case 3 => (coordinate_x & 0x3, coordinate_y & 0x3)
+      case 3 => (coordinate_x & 0x3, (coordinate_y & 0x3))
     }
-  } // identify the enclosing 8x8 tree instance in the top layer
+  }
 
-  private def localRouterCoord(router_level: Int): (UInt, UInt) = {
-    require(router_level >= 1 && router_level <= 3)
-
-    router_level match {
-      case 1 => ((coordinate_x & 0x3).U(2.W), (coordinate_y & 0x3).U(2.W))
-      case 2 => ((coordinate_x & 0x1).U(2.W), (coordinate_y & 0x1).U(2.W))
-      case 3 => (0.U(2.W), 0.U(2.W))
+  /** 6-bit <= compile-time constant without a variable-vs-variable ripple.
+    * Power-of-two-minus-one bounds collapse to a high-bit zero test.
+    */
+  private def leU6(a: UInt, c: Int): Bool = {
+    require(c >= 0 && c <= 63)
+    val aa = a.asTypeOf(UInt(6.W))
+    if (c >= 63) true.B
+    else if (c == 0) aa === 0.U
+    else if (((c + 1) & c) == 0) {
+      val k = Integer.numberOfTrailingZeros(c + 1)
+      if (k >= 6) true.B else aa(5, k) === 0.U
+    } else {
+      aa <= c.U(6.W)
     }
-  } // identify this router's subtree coordinate inside the current tree
+  }
 
-  private def localRectInCurrentTree(
+  /** 6-bit >= compile-time constant.  Power-of-two bounds collapse to orR. */
+  private def geU6(a: UInt, c: Int): Bool = {
+    require(c >= 0 && c <= 63)
+    val aa = a.asTypeOf(UInt(6.W))
+    if (c <= 0) true.B
+    else if ((c & (c - 1)) == 0) {
+      val k = Integer.numberOfTrailingZeros(c)
+      aa(5, k).orR
+    } else {
+      aa >= c.U(6.W)
+    }
+  }
+
+  /** Unordered 6-bit interval vs compile-time [cMin, cMax]. */
+  private def overlapsU6(ax: UInt, bx: UInt, cMin: Int, cMax: Int): Bool = {
+    require(cMin >= 0 && cMax >= cMin && cMax <= 63)
+    val bothBelow =
+      if (cMin <= 0) false.B else !geU6(ax, cMin) && !geU6(bx, cMin)
+    val bothAbove =
+      if (cMax >= 63) false.B else geU6(ax, cMax + 1) && geU6(bx, cMax + 1)
+    !(bothBelow || bothAbove)
+  }
+
+  private def rectOverlaps(
+      x0: UInt,
+      y0: UInt,
+      x1: UInt,
+      y1: UInt,
+      xMin: Int,
+      xMax: Int,
+      yMin: Int,
+      yMax: Int
+  ): Bool =
+    overlapsU6(x0, x1, xMin, xMax) && overlapsU6(y0, y1, yMin, yMax)
+
+  private def bothInU6(a: UInt, b: UInt, cMin: Int, cMax: Int): Bool =
+    geU6(a, cMin) && geU6(b, cMin) && leU6(a, cMax) && leU6(b, cMax)
+
+  /** L1 Mat bits: four core constants vs the unordered rectangle.
+    *
+    * Covering a core in this L1 already implies tree overlap, and both
+    * corners inside this L1 already implies tree containment, so the Mat
+    * cone does not mux on treeIntersects / treeContainsRect.  Ingress is a
+    * per-RCU constant and folds.
+    */
+  private def routeMaskL1(
+      x0: UInt,
+      y0: UInt,
+      x1: UInt,
+      y1: UInt,
+      packetValid: Bool,
+      ingressDir: UInt
+  ): UInt = {
+    val (treeX, treeY) = currentTreeCoord(1)
+    val localX = coordinate_x & 0x3
+    val localY = coordinate_y & 0x3
+    val treeBaseX = treeX << 3
+    val treeBaseY = treeY << 3
+    val l1MinX = treeBaseX + (localX << 1)
+    val l1MaxX = l1MinX + 1
+    val l1MinY = treeBaseY + (localY << 1)
+    val l1MaxY = l1MinY + 1
+
+    def covers(ax: UInt, bx: UInt, p: Int): Bool =
+      (leU6(ax, p) && geU6(bx, p)) || (leU6(bx, p) && geU6(ax, p))
+
+    def coreHit(gx: Int, gy: Int): Bool =
+      covers(x0, x1, gx) && covers(y0, y1, gy)
+
+    val bypass = ingressDir =/= 4.U
+    val clippedInL1 =
+      geU6(x0, l1MinX) && geU6(x1, l1MinX) &&
+        leU6(x0, l1MaxX) && leU6(x1, l1MaxX) &&
+        geU6(y0, l1MinY) && geU6(y1, l1MinY) &&
+        leU6(y0, l1MaxY) && leU6(y1, l1MaxY)
+
+    val bits = Wire(Vec(5, Bool()))
+    bits(3) := coreHit(l1MinX, l1MinY) && (bypass || (ingressDir =/= 3.U))
+    bits(1) := coreHit(l1MaxX, l1MinY) && (bypass || (ingressDir =/= 1.U))
+    bits(2) := coreHit(l1MinX, l1MaxY) && (bypass || (ingressDir =/= 2.U))
+    bits(0) := coreHit(l1MaxX, l1MaxY) && (bypass || (ingressDir =/= 0.U))
+    bits(4) := bypass && !clippedInL1
+    Mux(packetValid, bits.asUInt, 0.U(5.W))
+  }
+
+  /** L2 Mat: four 2x2 L1 AABBs plus containment in this 4x4.  No ingress
+    * u-turn.  Overlapping a child in this tree already implies tree overlap.
+    */
+  private def routeMaskL2(
+      x0: UInt,
+      y0: UInt,
+      x1: UInt,
+      y1: UInt,
+      packetValid: Bool,
+      ingressDir: UInt
+  ): UInt = {
+    val (treeX, treeY) = currentTreeCoord(2)
+    val localX = coordinate_x & 0x1
+    val localY = coordinate_y & 0x1
+    val treeBaseX = treeX << 3
+    val treeBaseY = treeY << 3
+    val l2MinX = treeBaseX + (localX << 2)
+    val l2MaxX = l2MinX + 3
+    val l2MinY = treeBaseY + (localY << 2)
+    val l2MaxY = l2MinY + 3
+
+    def childHit(xMin: Int, xMax: Int, yMin: Int, yMax: Int, dir: Int): Bool =
+      rectOverlaps(x0, y0, x1, y1, xMin, xMax, yMin, yMax) && (ingressDir =/= dir.U)
+
+    val contained =
+      bothInU6(x0, x1, l2MinX, l2MaxX) && bothInU6(y0, y1, l2MinY, l2MaxY)
+
+    val bits = Wire(Vec(5, Bool()))
+    bits(3) := childHit(l2MinX, l2MinX + 1, l2MinY, l2MinY + 1, 3)
+    bits(1) := childHit(l2MinX + 2, l2MinX + 3, l2MinY, l2MinY + 1, 1)
+    bits(2) := childHit(l2MinX, l2MinX + 1, l2MinY + 2, l2MinY + 3, 2)
+    bits(0) := childHit(l2MinX + 2, l2MinX + 3, l2MinY + 2, l2MinY + 3, 0)
+    bits(4) := (ingressDir =/= 4.U) && !contained
+    Mux(packetValid, bits.asUInt, 0.U(5.W))
+  }
+
+  /** L3 Mat: four 4x4 quadrants of the current 8x8 tree.  Parent is only
+    * "not fully inside this tree".
+    */
+  private def routeMaskL3(
+      x0: UInt,
+      y0: UInt,
+      x1: UInt,
+      y1: UInt,
+      packetValid: Bool,
+      ingressDir: UInt
+  ): UInt = {
+    val (treeX, treeY) = currentTreeCoord(3)
+    val treeBaseX = treeX << 3
+    val treeBaseY = treeY << 3
+    val treeMaxX = treeBaseX + 7
+    val treeMaxY = treeBaseY + 7
+    val midX = treeBaseX + 3
+    val midY = treeBaseY + 3
+
+    def childHit(xMin: Int, xMax: Int, yMin: Int, yMax: Int, dir: Int): Bool =
+      rectOverlaps(x0, y0, x1, y1, xMin, xMax, yMin, yMax) && (ingressDir =/= dir.U)
+
+    val contained =
+      bothInU6(x0, x1, treeBaseX, treeMaxX) && bothInU6(y0, y1, treeBaseY, treeMaxY)
+
+    val bits = Wire(Vec(5, Bool()))
+    bits(3) := childHit(treeBaseX, midX, treeBaseY, midY, 3)
+    bits(1) := childHit(treeBaseX + 4, treeMaxX, treeBaseY, midY, 1)
+    bits(2) := childHit(treeBaseX, midX, treeBaseY + 4, treeMaxY, 2)
+    bits(0) := childHit(treeBaseX + 4, treeMaxX, treeBaseY + 4, treeMaxY, 0)
+    bits(4) := (ingressDir =/= 4.U) && !contained
+    Mux(packetValid, bits.asUInt, 0.U(5.W))
+  }
+
+  /** Five-bit direction mask, bit i = output_valid(i). */
+  def routeMask(
+      x0: UInt,
+      y0: UInt,
+      x1: UInt,
+      y1: UInt,
+      packetValid: Bool,
       router_level: Int,
-      xLoGlobal: UInt,
-      xHiGlobal: UInt,
-      yLoGlobal: UInt,
-      yHiGlobal: UInt
-  ): (Bool, Bool, UInt, UInt, UInt, UInt) = {
-    val (treeX, treeY) = currentTreeCoord(
-      router_level
-    ) // identify the current tree id
-
-    val treeBaseX = (treeX << 3).U(6.W)
-    val treeBaseY = (treeY << 3).U(6.W)
-    val treeMaxX = ((treeX << 3) + 7).U(6.W)
-    val treeMaxY = ((treeY << 3) + 7).U(6.W) // bounds of the current 8x8 tree
-
-    val xIntersects = (xHiGlobal >= treeBaseX) && (xLoGlobal <= treeMaxX)
-    val yIntersects = (yHiGlobal >= treeBaseY) && (yLoGlobal <= treeMaxY)
-    val treeIntersects =
-      xIntersects && yIntersects // rectangle overlaps this tree at all
-    val treeContainsRect =
-      (xLoGlobal >= treeBaseX) && (xHiGlobal <= treeMaxX) &&
-        (yLoGlobal >= treeBaseY) && (yHiGlobal <= treeMaxY) // rectangle is fully contained in this tree
-
-    val xLoLocal6 = Wire(UInt(6.W))
-    val xHiLocal6 = Wire(UInt(6.W))
-    val yLoLocal6 = Wire(UInt(6.W))
-    val yHiLocal6 = Wire(UInt(6.W))
-
-    xLoLocal6 := Mux(xLoGlobal > treeBaseX, xLoGlobal - treeBaseX, 0.U)
-    yLoLocal6 := Mux(yLoGlobal > treeBaseY, yLoGlobal - treeBaseY, 0.U)
-    xHiLocal6 := Mux(xHiGlobal < treeMaxX, xHiGlobal - treeBaseX, 7.U)
-    yHiLocal6 := Mux(
-      yHiGlobal < treeMaxY,
-      yHiGlobal - treeBaseY,
-      7.U
-    ) // clipped rectangle in local tree coordinates
-
-    (
-      treeIntersects,
-      treeContainsRect,
-      xLoLocal6(2, 0),
-      xHiLocal6(2, 0),
-      yLoLocal6(2, 0),
-      yHiLocal6(2, 0)
-    )
+      ingressDir: UInt
+  ): UInt = {
+    require(router_level >= 1 && router_level <= 3)
+    if (router_level == 1)
+      routeMaskL1(x0, y0, x1, y1, packetValid, ingressDir)
+    else if (router_level == 2)
+      routeMaskL2(x0, y0, x1, y1, packetValid, ingressDir)
+    else
+      routeMaskL3(x0, y0, x1, y1, packetValid, ingressDir)
   }
 
   def computeRouting(
@@ -190,96 +225,15 @@ class RoutingLogic(coordinate_x: Int, coordinate_y: Int) {
       ingressDir: UInt
   ): RoutingDecision = {
     val decision = Wire(new RoutingDecision)
-    for (i <- 0 until 5) {
-      decision.output_valid(i) := false.B
-      decision.output_ports(i) := false.B
-      decision.output_packets(i) := DontCare
-    }
-
     val x0 = current_Packet.flit(PacketLayout.X0Hi, PacketLayout.X0Lo)
     val y0 = current_Packet.flit(PacketLayout.Y0Hi, PacketLayout.Y0Lo)
     val x1 = current_Packet.flit(PacketLayout.X1Hi, PacketLayout.X1Lo)
     val y1 = current_Packet.flit(PacketLayout.Y1Hi, PacketLayout.Y1Lo)
-
-    val xLoGlobal = Wire(UInt(6.W))
-    val xHiGlobal = Wire(UInt(6.W))
-    val yLoGlobal = Wire(UInt(6.W))
-    val yHiGlobal = Wire(UInt(6.W))
-    xLoGlobal := Mux(x0 <= x1, x0, x1)
-    xHiGlobal := Mux(x0 <= x1, x1, x0)
-    yLoGlobal := Mux(y0 <= y1, y0, y1)
-    yHiGlobal := Mux(y0 <= y1, y1, y0)
-
-    val (
-      treeIntersects,
-      treeContainsRect,
-      xMinLocal,
-      xMaxLocal,
-      yMinLocal,
-      yMaxLocal
-    ) =
-      localRectInCurrentTree(
-        router_level,
-        xLoGlobal,
-        xHiGlobal,
-        yLoGlobal,
-        yHiGlobal
-      )
-
-    val (localX, localY) = localRouterCoord(router_level)
-
-    // projectedDir is the raw child/parent decision before ingress suppression.
-    val projectedDir = WireInit(0.U(5.W))
-    when(treeIntersects) {
-      projectedDir := projectRectAtLevel(
-        xMinLocal,
-        xMaxLocal,
-        yMinLocal,
-        yMaxLocal,
-        level = router_level,
-        localX,
-        localY
-      )
-    }
-
-    val projectedNoBack = Wire(Vec(5, Bool()))
-    val bypassIngressSuppress =
-      if (router_level == 1) ingressDir =/= 4.U
-      else false.B // L1 keeps same-direction local child delivery
+    val dir = routeMask(x0, y0, x1, y1, Packet_valid, router_level, ingressDir)
     for (i <- 0 until 5) {
-      projectedNoBack(i) := projectedDir(i)
-      when(!bypassIngressSuppress && (ingressDir === i.U)) {
-        projectedNoBack(i) := false.B
-      }
-    }
-
-    val dir = WireInit(0.U(5.W))
-    when(Packet_valid) {
-      when(treeIntersects) {
-        dir := projectedNoBack.asUInt
-        // If the global rectangle is only partially covered by the current subtree,
-        // keep a copy moving upward so ancestors can fan out into sibling subtrees
-        // or other tiles. Limiting this to the root traps packets whose local slice
-        // stays inside the source-side subtree.
-        when(!treeContainsRect && (ingressDir =/= 4.U)) {
-          dir := projectedNoBack.asUInt | "b10000".U
-        }
-      }.otherwise {
-        // Not this tree: keep going up, except packet coming from parent (drop to avoid bounce).
-        when(ingressDir =/= 4.U) {
-          dir := "b10000".U
-        }.otherwise {
-          dir := 0.U
-        }
-      }
-    }
-
-    for (i <- 0 until 5) {
-      when(dir(i)) {
-        decision.output_packets(i) := current_Packet
-        decision.output_ports(i) := true.B
-        decision.output_valid(i) := true.B
-      }
+      decision.output_valid(i) := dir(i)
+      decision.output_ports(i) := dir(i)
+      decision.output_packets(i) := Mux(dir(i), current_Packet, 0.U.asTypeOf(new Packet))
     }
     decision
   }

@@ -1,0 +1,400 @@
+{
+  "schema": "cmr-thin-timing-baseline-v1",
+  "created_utc": "2026-08-26T16:20:33.012799+00:00",
+  "baseline_run_id": "20260826_cmr_thin_1lane_rs_dc_01",
+  "role": "rollback point for thin NoC16 timing steps C–F; do not mutate this netlist",
+  "dut": {
+    "topology": "thin NoC16",
+    "lanes": 1,
+    "circular_fifo": false,
+    "lane_phase_adapter": 0,
+    "interlevel_fifo": "AsyncFifo depth-3",
+    "library": "T28SS tcbn28hpcplus BWP12T30P140",
+    "pvt_sta_gls": "ssg0p81v125c / SDF MAXIMUM",
+    "sdc": "async_cmr_router.sdc is a clock stub; NoC16 DC does not source a production RTC SDC"
+  },
+  "git_head_at_archive": "5c6a0f34436c60f9ca80b0f4de6736c2bd227982",
+  "remote": {
+    "root": "/home/ghy19/Asynchronous_Router_CMR",
+    "dc_log": "/home/ghy19/Asynchronous_Router_CMR/logs/dc/20260826_cmr_thin_1lane_rs_dc_01.log",
+    "reports_dc": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20260826_cmr_thin_1lane_rs_dc_01",
+    "outputs": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260826_cmr_thin_1lane_rs_dc_01"
+  },
+  "artifact_paths": {
+    "post_v": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260826_cmr_thin_1lane_rs_dc_01/NoC_16nodes_post.v",
+    "ddc": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260826_cmr_thin_1lane_rs_dc_01/NoC_16nodes.ddc",
+    "sdf": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260826_cmr_thin_1lane_rs_dc_01/NoC_16nodes.sdf",
+    "sdc_out": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260826_cmr_thin_1lane_rs_dc_01/NoC_16nodes.sdc",
+    "local_dc_reports": "scripts/asic_dc/cmr/results/20260826_cmr_thin_1lane_rs_dc_01/reports_dc"
+  },
+  "post_artifact_sha256": {
+    "NoC_16nodes.ddc": "0d02e1295e1c937f0c35295a0e5da0b851cf833704ad4efedefac2509a9c1cc5",
+    "NoC_16nodes_post.v": "d7311c0632e2aa6cc8dffc32b0adcdb5b3b0495f557b8af075c9cdff21d3dac9",
+    "NoC_16nodes.sdf": "aa01bebafb8ecd69ab19deba36916ac9494b9e2e26607abd1e9bcbe733fddb68"
+  },
+  "dc_job_id": "11419801",
+  "dc_log_keys": [
+    "Subject: Job 11419801: <cmr_noc16_dc_20260826_cmr_thin_1lane_rs_dc_01> Done",
+    "Job <cmr_noc16_dc_20260826_cmr_thin_1lane_rs_dc_01> was submitted from host <login2> by user <ghy19>.",
+    "CMR_NOC16_LATCH_PRE CLEAR=5725 SET=450 SR=0 PATH_CLEAR=100 PATH_DUAL=0 CIRCULAR_FIFO=0 EXPECTED_CLEAR=5625 EXPECTED_SET=450",
+    "CMR_WP_REQ_DEL250 disabled (clean baseline)",
+    "CMR_NOC16_STRUCTURE ROUTER=5 FIFO=8 EXPECTED_FIFO=8 ASYNC_FIFO=8 CIRCULAR_FIFO=0 IPM=25 OPM=25 MUTEX4=25 MUTEX2=75 ADAPTER=0 CLEAR=5725 SET=450 SR=0 CLOSE=50 COMPLETE=0 RCU_DE=25 RCU_DEL150=100 OPM_ACKIN_DE=25 OPM_ACKIN_DEL250=25 WP_DEL250=0 HS01_HEAD_BUF=0 HS01_TAIL_BUF=0 ACK_FEEDBACK_SCOPE=all ACK_FEEDBACK_STAGES=0 ACK_FEEDBACK_BUF=0",
+    "CMR_NOC16_DC_PASS output=/home/ghy19/Asynchronous_Router_CMR/outputs/20260826_cmr_thin_1lane_rs_dc_01"
+  ],
+  "structure_counts": {
+    "ROUTER": 5,
+    "FIFO": 8,
+    "EXPECTED_FIFO": 8,
+    "ASYNC_FIFO": 8,
+    "CIRCULAR_FIFO": 0,
+    "IPM": 25,
+    "OPM": 25,
+    "MUTEX4": 25,
+    "MUTEX2": 75,
+    "ADAPTER": 0,
+    "RCU_DE": 25,
+    "RCU_DEL150": 100,
+    "OPM_ACKIN_DE": 25,
+    "OPM_ACKIN_DEL250": 25,
+    "FIFO_DEL150": 24,
+    "FIFO_DFIRE_DEL150": 24,
+    "DEL150_TOTAL": 148,
+    "WP_REQ_DEL250": 0,
+    "HS01_HEAD_BUF": 0,
+    "HS01_TAIL_BUF": 0,
+    "ACK_FEEDBACK_BUF": 0,
+    "CLEAR": 5725,
+    "SET": 450,
+    "SR": 0,
+    "PATH_LATCH_CLEAR": 100,
+    "V2_CLOSE_EVENT": 50,
+    "HANDSHAKE_COMPLETE": 0
+  },
+  "structure_rpt_raw": {
+    "ROUTER_COUNT": "5",
+    "INTERLEVEL_FIFO_COUNT": "8",
+    "EXPECTED_INTERLEVEL_FIFO_COUNT": "8",
+    "ASYNC_FIFO_COUNT": "8",
+    "CIRCULAR_FIFO_COUNT": "0",
+    "IPM_COUNT": "25",
+    "OPM_COUNT": "25",
+    "MUTEX4_COUNT": "25",
+    "MUTEX2_COUNT": "75",
+    "LANE_PHASE_ADAPTER_COUNT": "0",
+    "RESET_LATCH_COUNT": "5725",
+    "SET_RESET_LATCH_COUNT": "450",
+    "SR_LATCH_COUNT": "0",
+    "PATH_LATCH_CLEAR_COUNT": "100",
+    "PATH_LATCH_DUAL_COUNT": "0",
+    "V2_CLOSE_EVENT_COUNT": "50",
+    "HANDSHAKE_COMPLETE_COUNT": "0",
+    "RCU_DELAY_ELEMENT_COUNT": "25",
+    "RCU_DEL150_COUNT": "100",
+    "OPM_ACKIN_DELAY_ELEMENT_COUNT": "25",
+    "OPM_ACKIN_DEL250_COUNT": "25",
+    "WP_REQ_DEL250_COUNT": "0",
+    "HS01_HEAD_BUFFER_COUNT": "0",
+    "HS01_TAIL_BUFFER_COUNT": "0",
+    "ACK_FEEDBACK_BUFFER_STAGES": "0",
+    "ACK_FEEDBACK_BUFFER_COUNT": "0"
+  },
+  "async_primitives": {
+    "DelayElement_hier": 0,
+    "DEL_delay": 173,
+    "DEL050_delay": 0,
+    "DEL075_delay": 0,
+    "DEL100_delay": 0,
+    "DEL150_delay": 148,
+    "DEL250_delay": 25,
+    "Mutex2_hier": 0,
+    "ND2D1_mutex_q0": 75,
+    "ND2D2_mutex_q1": 75,
+    "ND2D1_mutex": 150,
+    "NR4D1_mutex_filter": 150,
+    "LHCNDQD_resettable_latch": 5725,
+    "V2CloseEvent_hier": 0,
+    "RouteSelAnd2_hier": 100,
+    "RouteSel_AN2D0": 100
+  },
+  "post_v_cell_scan": {
+    "DEL150_INST": 148,
+    "DEL250_INST": 25,
+    "OUTREQDELAY": 24,
+    "MATCHEDDELAY": 100,
+    "ACKINDELAY": 100,
+    "DFIRE": 72,
+    "ADAPTER": 0,
+    "CIRCULAR": 0,
+    "WP_ECO": 0
+  },
+  "workspace_inputs_sha256": {
+    "generated_cmr/noc16/NoC_16nodes.v": "75dd102a418c4fd7b1817b7fad5c1ea18cb2b2f3e9f28558bebce3e81f31c076",
+    "generated_cmr/noc16/AddressRegisterUnit.v": "80279ca0886304a4e4b91df273543947cdcb8b2e3ca20b5354919e4dcc7da0a1",
+    "generated_cmr/noc16/RouteSelAnd2.v": "40127f57bfc6dd44ec175fbcafc37d36fda983c2c41d319debaf31d09aa893fb",
+    "generated_cmr/noc16/OPMSelector.v": "2fa79c16c12380e461886da6d9f7f94cd0e5cb07070b17e4836e5825506900db",
+    "generated_cmr/noc16/HeadPredictor.v": "20acb2f80a6e149de03e116941898896e49d2e588e20ac92ac8be8b89dc4812a",
+    "generated_cmr/noc16/WriteCounter.v": "4cc7b450a67d003c95388972133c6b544acda3fb7eb9303b58f297a1e67c67c4",
+    "generated_cmr/noc16/DelayElement_ASIC.v": "6912d4b0d17507248519d5c84e86a632c354c587c9aa580875c446cd1aa02f05",
+    "generated_cmr/noc16/Mutex2_ASIC.v": "3e0f7ab889f04eb4fac176a5ceace60e1eeaf7bc67fe45cd2bdb48e563a1e84e",
+    "generated_cmr/noc16/Mutex4.v": "b0697f11118d7d74ac62b985dbdc310d918b1e6dbd271d197d445c1bdadaf958",
+    "src/main/scala/Router_Architecture/CMR/CMRRouter.scala": "a0ef74a878f15998c272f99612ae3249d180d4892de37ed4b01d8749a2eade9b",
+    "src/main/scala/Router_Architecture/CMR/RCU.scala": "7e7bde2efc3aa6b99f42e4a77804745bd5235cbe6c354b64dccd31e52c9c5755",
+    "src/main/scala/Router_Architecture/CMR/OPM.scala": "8066255a41bcb875b8fbc20077bce3d301eef3e437c66fbb7c2d1c9b05ce415e",
+    "src/main/scala/Router_Architecture/CMR/CMRTypes.scala": "d7a3926e6e7ca526b6d51a9cd4e18dd7f7a885ef2d7bb4fe01e182033e41d0fd",
+    "src/main/scala/Router_Architecture/common/async/AsyncStage.scala": "13148617f6d4858eea6ffafeb9855f3969c3c2e44e9c8f7d414b98f7c0961efc",
+    "src/main/resources/ASYNC/DelayElement_ASIC.v": "6912d4b0d17507248519d5c84e86a632c354c587c9aa580875c446cd1aa02f05",
+    "src/main/resources/ASYNC/Mutex2_ASIC.v": "3e0f7ab889f04eb4fac176a5ceace60e1eeaf7bc67fe45cd2bdb48e563a1e84e",
+    "scripts/asic_dc/cmr/run_dc_cmr_noc16.tcl": "ae37d8a3c3f8f6874ab01b012e6dad348b4859e9e161c374748bbf14c121a0d6",
+    "scripts/asic_dc/cmr/async_cmr_router.sdc": "438f77b8021d7fdcfc571d9c6b753af195f5c7e8b8da644c0726817aa57c6aef",
+    "scripts/asic_dc/async_primitives.tcl": "b85b57196bc558a50c4fdf07e111689f70860dcb98e92c1f09e8f21e234b4b14",
+    "scripts/asic_dc/assert_no_gtech.tcl": "81d23d34c16ead67059f4a540711f2bdec88760e4290e8028aeda3e41c73d417",
+    "scripts/asic_dc/tech_t28ss.tcl": "d7ba639deac25e2da52190f7148082998db4935ce6829938d00c2ce4dd5243f9",
+    "scripts/asic_dc/cmr/run_gls_cmr_noc16.sh": "69bbf19809f08c9815ac3823416324d911f4cd4e56ed9c7b065d4736e1c79175",
+    "scripts/asic_dc/cmr/tb_cmr_noc16_async_boundary_failfast.sv": "b212fb2e9a40294dd7e2608ebe232179b35798962819d6ad6b1e9d1e9c4d3027",
+    "sim/AsyncNoC/testbench/tb_noc16_async_boundary.sv": "6d5a9f11f7f672b6ab2ed0c1ed6003ec4ae4277f5bdbf8957dae6a7dd4679de4"
+  },
+  "missing_inputs": [],
+  "equivalence_policy": {
+    "rollback_identity": "remote post.v / ddc / sdf SHA-256 for this run_id",
+    "required_structure": [
+      "ROUTER=5 FIFO=8 ASYNC_FIFO=8 CIRCULAR_FIFO=0 IPM=25 OPM=25",
+      "MUTEX4=25 MUTEX2=75 ADAPTER=0",
+      "RCU_DEL150=100 OPM_ACKIN_DEL250=25 FIFO_DEL150=24 (outReqDelay)",
+      "FIFO_DFIRE_DEL150=24 (ACG default Dfire, P150_BASELINE; not a catalog RTC)",
+      "DEL150_TOTAL=148 WP_REQ_DEL250=0 ACK_FEEDBACK_BUF=0"
+    ],
+    "required_gls": "strict SDF MAXIMUM TAB p50 + VCTM p50 PASS, annotation_errors=0, timing_violation_count=0",
+    "note": "workspace_inputs_sha256 is the archive-time source tree; later edits do not change the frozen netlist. Failed timing candidates must reuse this DDC, not a new emit."
+  },
+  "gls": {
+    "canonical_tab_p50": {
+      "gls_run_id": "20260826_cmr_thin_1lane_rs_tab_p02p80_01",
+      "case": "TAB-NET-UR-3f-r0p50",
+      "case_sha256": "dd114d8944c7995378cebeaa962591b4627a6f25807c907718a9dd5274d97b53",
+      "job_id": "11421401",
+      "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+      "tb_pass": true,
+      "annotation_errors": 0,
+      "timing_violation_count": 0,
+      "stall_failure": false,
+      "unexpected_failure": false,
+      "harness": "async_failfast",
+      "rx_capture_ns": "5",
+      "sim_args": "+ACK_TO_NEXT_REQ_GUARD_NS=0.20",
+      "structural_endpoints": false,
+      "local_summary": "scripts/asic_dc/cmr/results/20260826_cmr_thin_1lane_rs_tab_p02p80_01/summary.json"
+    },
+    "canonical_vctm_p50": {
+      "gls_run_id": "20260826_cmr_thin_1lane_rs_vctm_02",
+      "case": "VCTM-MC5-NM-3f-r0p50",
+      "case_sha256": "e7772a11f981f5f33096f89c853f185c36821eee8b41de5b66278b72cea2e669",
+      "job_id": "11420001",
+      "result_line": "TB_RESULT PASS injected=3000 delivered=3366 missing=0 unexpected=0 timeout=0",
+      "tb_pass": true,
+      "annotation_errors": 0,
+      "timing_violation_count": 0,
+      "stall_failure": false,
+      "unexpected_failure": false,
+      "harness": "async_failfast",
+      "rx_capture_ns": "5",
+      "sim_args": "+ACK_TO_NEXT_REQ_GUARD_NS=0.20",
+      "structural_endpoints": false,
+      "local_summary": "scripts/asic_dc/cmr/results/20260826_cmr_thin_1lane_rs_vctm_02/summary.json"
+    },
+    "tab_rate_sweep_p02_p80": {
+      "run_id": "20260826_cmr_thin_1lane_rs_tab_p02p80_01",
+      "all_pass": true,
+      "cases": [
+        {
+          "case": "TAB-NET-UR-3f-r0p02",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "71bf1b4bc881191fe3563485097505accb456a04a851e0307eee922e6f04185c",
+          "job_id": "11420901"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p10",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "01bdfb723f6935270a5a73711a4935240a0258490e7b11db2affdd9af3dfb172",
+          "job_id": "11421001"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p20",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "3b2dec1d96ee3fb1130d3bea852450fc3fc10c71458dc69853a98a0f8b1f14d3",
+          "job_id": "11421101"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p30",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "030e8d029d0ad8810a9088910813b63f710d483da31965dc2818f82b4dee054a",
+          "job_id": "11421201"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p40",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "b1c31bad6c0162e08071b2443a40d7d5f2adb2a8bb4cec0a20d2aacd25d5c621",
+          "job_id": "11421301"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p50",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "dd114d8944c7995378cebeaa962591b4627a6f25807c907718a9dd5274d97b53",
+          "job_id": "11421401"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p60",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "fc98f5b9d6b781171cbf8011aa6be636f3f9f51d774b0a0123d5c9cf75245d44",
+          "job_id": "11421501"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p70",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "20f62f44ed71111488034482ac8d6a107e250fcc918eddb3bff99db68e845964",
+          "job_id": "11421601"
+        },
+        {
+          "case": "TAB-NET-UR-3f-r0p80",
+          "pass": true,
+          "delivered": 3000,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "3c1f125303127bcedcb53b0efa0f16a4ac0724a2c1ed4212b7ad1120a4d387f3",
+          "job_id": "11421701"
+        }
+      ]
+    },
+    "vctm_rate_sweep_p02_p90": {
+      "run_id": "20260826_cmr_thin_1lane_rs_vctm_p02p90_01",
+      "all_pass": true,
+      "cases": [
+        {
+          "case": "VCTM-MC5-NM-3f-r0p02",
+          "pass": true,
+          "delivered": 3405,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3405 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "12bacd074b07f360701caf3d05bbe1dc413ce42bbb4d9968c0aa11bbe662e5ce",
+          "job_id": "11421801"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p10",
+          "pass": true,
+          "delivered": 3303,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3303 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "95a457c1c1cf97731b8f10b11394bc4f9fe1169cb165fd019588ec64ad2b9856",
+          "job_id": "11421901"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p20",
+          "pass": true,
+          "delivered": 3378,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3378 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "dd5035b5e467960f0539dd8b4b53d9a1a8c7212fef51fe089bfed569f6f08d7b",
+          "job_id": "11422001"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p30",
+          "pass": true,
+          "delivered": 3285,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3285 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "2bc105992b0ed658b5883d58450dd8a24acb2847245c25699d9cc9d542a500be",
+          "job_id": "11422101"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p40",
+          "pass": true,
+          "delivered": 3390,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3390 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "b79f2dbebfe58103f6bac05a4a5545d4cce7c9cc5a2aa2443d8132ffe20f26bd",
+          "job_id": "11422201"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p50",
+          "pass": true,
+          "delivered": 3366,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3366 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "e7772a11f981f5f33096f89c853f185c36821eee8b41de5b66278b72cea2e669",
+          "job_id": "11422301"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p60",
+          "pass": true,
+          "delivered": 3210,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3210 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "a8013d37e2fceefe3ddc7c5170c20c74c3f2550cd966b72e1e97a7ba03f60ab5",
+          "job_id": "11422401"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p70",
+          "pass": true,
+          "delivered": 3324,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3324 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "defc18b4b6bb7ca088cef6922502de2b000fe4e03f95e9a4b3910de028d4328d",
+          "job_id": "11422501"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p80",
+          "pass": true,
+          "delivered": 3351,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3351 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "6f44446a6da00502f332a96cd093c84cb283a23692fb97cbbaa8aabca6d1b78f",
+          "job_id": "11422601"
+        },
+        {
+          "case": "VCTM-MC5-NM-3f-r0p90",
+          "pass": true,
+          "delivered": 3330,
+          "result_line": "TB_RESULT PASS injected=3000 delivered=3330 missing=0 unexpected=0 timeout=0",
+          "case_sha256": "12b7da7cd49556443ae8059cbb872f2853aaf4e832c17153b352a91f7c04bbd2",
+          "job_id": "11422701"
+        }
+      ]
+    },
+    "not_evidence": [
+      "20260826_cmr_thin_1lane_rs_vctm_01 compile-failed (stale L2AX probe bound missing adapter_20); not a DUT fail"
+    ]
+  },
+  "gls_input_sha256": {
+    "vctm_p50": {
+      "VCTM-MC5-NM-3f-r0p50.case": "e7772a11f981f5f33096f89c853f185c36821eee8b41de5b66278b72cea2e669",
+      "NoC_16nodes_post.v": "d7311c0632e2aa6cc8dffc32b0adcdb5b3b0495f557b8af075c9cdff21d3dac9",
+      "NoC_16nodes.sdf": "aa01bebafb8ecd69ab19deba36916ac9494b9e2e26607abd1e9bcbe733fddb68",
+      "async_noc16_port_adapter.sv": "2a74590c2bcc40c7f92c1fe2d4b3b000ad97ab9f5e9fddd524f7b21f07b94b98",
+      "tb_noc16_async_boundary.sv": "6d5a9f11f7f672b6ab2ed0c1ed6003ec4ae4277f5bdbf8957dae6a7dd4679de4",
+      "tb_cmr_noc16_async_boundary_failfast.sv": "b212fb2e9a40294dd7e2608ebe232179b35798962819d6ad6b1e9d1e9c4d3027"
+    },
+    "tab_p50": {
+      "TAB-NET-UR-3f-r0p50.case": "dd114d8944c7995378cebeaa962591b4627a6f25807c907718a9dd5274d97b53",
+      "NoC_16nodes_post.v": "d7311c0632e2aa6cc8dffc32b0adcdb5b3b0495f557b8af075c9cdff21d3dac9",
+      "NoC_16nodes.sdf": "aa01bebafb8ecd69ab19deba36916ac9494b9e2e26607abd1e9bcbe733fddb68",
+      "async_noc16_port_adapter.sv": "2a74590c2bcc40c7f92c1fe2d4b3b000ad97ab9f5e9fddd524f7b21f07b94b98",
+      "tb_noc16_async_boundary.sv": "6d5a9f11f7f672b6ab2ed0c1ed6003ec4ae4277f5bdbf8957dae6a7dd4679de4",
+      "tb_cmr_noc16_async_boundary_failfast.sv": "b212fb2e9a40294dd7e2608ebe232179b35798962819d6ad6b1e9d1e9c4d3027"
+    }
+  },
+  "dc_env": {
+    "ASYNC_PRIMITIVES": "asic",
+    "ASYNC_DELAY_PROFILE": "P150_BASELINE (unset; AsyncDelay default)",
+    "CMR_USE_CIRCULAR_FIFO": "0",
+    "CMR_BYPASS_INTERLEVEL_FIFO": "0",
+    "CMR_ACK_FEEDBACK_BUFFER_STAGES": "0",
+    "CMR_WP_REQ_DEL250_ENABLE": "0",
+    "CMR_FORCE_EMIT": "1",
+    "CMR_NOC16_SKIP_SDF": "1"
+  }
+}

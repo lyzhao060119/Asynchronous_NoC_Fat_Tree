@@ -4,6 +4,7 @@ import DataStruct._
 import Router_Architecture.common.{AsyncArbiter, RouterModuleConfig}
 import chisel3._
 import chisel3.util.log2Ceil
+import tool.AsyncDelay
 
 /**
  * Paper-aligned output request selector / arbitration front end.
@@ -29,7 +30,8 @@ class RouterOutputRequestSelectorModule(
     val fireClock = Output(Clock())
   })
 
-  private val arbiter = Module(new AsyncArbiter(legalInputs.length))
+  private val arbiter =
+    Module(new AsyncArbiter(legalInputs.length, AsyncDelay.OpmArbiterDfire))
 
   arbiter.io.in <> io.inputs
   arbiter.io.out <> io.out

@@ -1,7 +1,7 @@
 package Router_Architecture.common
 
 import chisel3._
-import tool.{AsyncClock, DelayElement}
+import tool.{AsyncClock, AsyncDelay, DelayElement}
 
 /**
  * Launch-side request block for a sparse asynchronous fork.
@@ -9,13 +9,17 @@ import tool.{AsyncClock, DelayElement}
  * It decides when a new packet can start, toggles the selected branch requests,
  * and exposes the branch-pending status used by the completion join logic.
  */
-class AsyncForkRequestBlock(val outN: Int) extends Module {
+class AsyncForkRequestBlock(
+    val outN: Int,
+    launchDelayRole: String = AsyncDelay.DefaultRole
+) extends Module {
   require(outN >= 1)
 
   val io = IO(new Bundle {
     val inReq = Input(Bool())
     val inAck = Input(Bool())
     val destMask = Input(Vec(outN, Bool()))
+    val canLaunch = Input(Bool())
     val outAck = Input(Vec(outN, Bool()))
 
     val outReq = Output(Vec(outN, Bool()))
@@ -26,23 +30,28 @@ class AsyncForkRequestBlock(val outN: Int) extends Module {
     val launch_clock = Output(Clock())
   })
 
-  private val launchPulse = Module(new DelayElement(1))
+  private val launchPulse = Module(
+    new DelayElement(
+      AsyncDelay.steps(1, launchDelayRole),
+      AsyncDelay.unitPs(launchDelayRole)
+    )
+  )
   private val launchCond = WireDefault(false.B)
 
   launchPulse.io.I := launchCond
 
   private val launchClock = launchPulse.io.Z.asClock
 
-  private val launchPhase = AsyncClock(launchClock, reset) {
+  private val launchedReq = AsyncClock(launchClock, reset) {
     val reg = RegInit(false.B)
-    reg := !reg
+    reg := io.inReq
     reg
   }
 
   private val outReqReg = Seq.tabulate(outN) { j =>
     AsyncClock(launchClock, reset) {
       val reg = RegInit(false.B)
-      when(io.destMask(j)) {
+      when(io.destMask(j) && (launchedReq =/= io.inReq)) {
         reg := !reg
       }
       reg
@@ -56,10 +65,9 @@ class AsyncForkRequestBlock(val outN: Int) extends Module {
   }
 
   private val inputFull = io.inReq ^ io.inAck
-  private val hasDest = io.destMask.asUInt.orR
-  private val forkBusy = launchPhase ^ io.inAck
+  private val forkBusy = launchedReq ^ io.inAck
 
-  launchCond := inputFull && hasDest && !forkBusy
+  launchCond := inputFull && io.canLaunch && !forkBusy
 
   io.pendingAny := outPending.asUInt.orR
   io.forkBusy := forkBusy

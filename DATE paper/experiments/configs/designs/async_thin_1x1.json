@@ -1,0 +1,52 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "ASYNC_THIN_1X1",
+  "kind": "router_primitive",
+  "family": "THIN",
+  "nodes": null,
+  "async": true,
+  "routing": "quadtree",
+  "lane_profile": "1-1",
+  "top_mesh_lanes": null,
+  "cluster_grid": null,
+  "router_primitives": [
+    {
+      "primitive_id": "async_thin_1x1",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 1,
+      "use_mesh_routing": false,
+      "count": 1
+    }
+  ],
+  "expected_structure": {
+    "routers": 1,
+    "ports": 5,
+    "adapters": 0,
+    "interlevel_fifos": 0,
+    "top_ports": 0,
+    "max_opm_fanin": 4,
+    "mutex_widths": [
+      4
+    ]
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "n/a",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "adapter": "dc_cmr_router",
+  "paper_role": "Table I Thin / FM leaf",
+  "paper_eligible_default": true,
+  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only."
+}

@@ -1,0 +1,2 @@
+group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail
+SMOKE_16,noc16_00_to_33_3flit_sdf,1,1,3,3,0,0,0,0,1124,0.002669,2001.800000,2001.800000,2001.800000,2001.800000,PASS

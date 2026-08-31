@@ -1,0 +1,40 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "BF-STRESS64",
+  "title": "64-node bounded-fat stress: dst not in same L2 subtree",
+  "traffic": "bf_stress64",
+  "packet_flits": 5,
+  "multicast": false,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": true,
+  "fanout_F": null,
+  "spread_S": null,
+  "multicast_fraction": null,
+  "destination_set_samples": null,
+  "warmup_original_events": 1000,
+  "measurement_original_events": 10000,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": true,
+    "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load"
+  },
+  "metrics": [
+    "saturation_throughput",
+    "mean_latency",
+    "p50",
+    "p95",
+    "p99"
+  ],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": [
+    "THIN64",
+    "PROP64",
+    "PFAT64"
+  ],
+  "paper_figures": [
+    "Fig. A"
+  ],
+  "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT."
+}

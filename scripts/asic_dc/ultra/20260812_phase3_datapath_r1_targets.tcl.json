@@ -1,0 +1,19 @@
+{
+  "scale": 0.95,
+  "targets_ns": {
+    "OPM": 4.608,
+    "V1": 0.051,
+    "PRS": 0.744,
+    "HEADCAP": 0.827,
+    "ATOMIC": 0.878
+  },
+  "baseline_ps": {
+    "V1_CAPTURE": 54.0,
+    "PRS_DESCRIPTOR": 783.0,
+    "HEADCAP_DESCRIPTOR": 870.0,
+    "ATOMIC_DESCRIPTOR": 924.0,
+    "OPM_V2_D": 4562.0,
+    "OPM_V2_Q": 4615.0,
+    "OPM_V2": 4851.0
+  }
+}

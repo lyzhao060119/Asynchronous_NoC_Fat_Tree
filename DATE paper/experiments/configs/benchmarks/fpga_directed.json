@@ -1,0 +1,38 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "FPGA-DIRECTED",
+  "title": "FPGA 4032 directed src-dst pairs, 5 flit",
+  "traffic": "fpga_directed",
+  "packet_flits": 5,
+  "multicast": false,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": null,
+  "spread_S": null,
+  "multicast_fraction": null,
+  "destination_set_samples": null,
+  "warmup_original_events": 0,
+  "measurement_original_events": 4032,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": false,
+    "coarse_then_fine": false,
+    "saturation_rule": "n/a"
+  },
+  "metrics": [
+    "errors",
+    "timeouts",
+    "drops"
+  ],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": [
+    "FPGA_ASYNC_PROP64",
+    "FPGA_SYNC_PROP64"
+  ],
+  "paper_figures": [
+    "Table I",
+    "fpga_validation"
+  ],
+  "notes": "Zero errors/loss/timeout required."
+}

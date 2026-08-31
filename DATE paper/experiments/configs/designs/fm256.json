@@ -1,0 +1,47 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "FM256",
+  "kind": "network",
+  "family": "FM",
+  "nodes": 256,
+  "async": true,
+  "routing": "mesh",
+  "lane_profile": "mesh-1",
+  "top_mesh_lanes": 0,
+  "cluster_grid": null,
+  "router_primitives": [
+    {
+      "primitive_id": "async_flatmesh_1x1",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 1,
+      "use_mesh_routing": true,
+      "count": 256
+    }
+  ],
+  "expected_structure": {
+    "routers": 256,
+    "adapters": 0,
+    "interlevel_fifos": 0,
+    "max_opm_fanin": 4
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "bypass",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "adapter": null,
+  "paper_role": "Fig. B 16x16 flat mesh",
+  "paper_eligible_default": true,
+  "notes": ""
+}

@@ -1,0 +1,3 @@
+primitive,count,notes
+DelayElement_LUT1,4608,post-route timing report required for per-chain values
+Mutex2_LUT2,712,mutex resolution time must be characterized separately

@@ -1,0 +1,2 @@
+group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail
+TAB_16,TAB-NET-UR-3f-r0p02,18,18,54,54,0,0,0,0,1225,0.044082,42.456,60.000,60.000,60.000,PASS

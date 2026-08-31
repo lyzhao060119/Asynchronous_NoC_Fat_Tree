@@ -1,0 +1,2 @@
+port,pkt_seq,tail_flit,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,network_latency_ns
+15,0,430c30c,410050,2411850,2411900,2001.800000

@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/manifest.schema.json",
+  "title": "date-experiment-run-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "status",
+    "design_id",
+    "benchmark_id",
+    "git",
+    "config_hash",
+    "case_hash",
+    "frozen_structure_ok",
+    "paper_eligible",
+    "physical_class",
+    "created_utc"
+  ],
+  "properties": {
+    "schema": { "const": "date-experiment-run-v1" },
+    "run_id": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "running",
+        "pass",
+        "fail",
+        "archived",
+        "imported_readonly",
+        "stale"
+      ]
+    },
+    "design_id": { "type": ["string", "null"] },
+    "benchmark_id": { "type": ["string", "null"] },
+    "seed": { "type": ["integer", "null"] },
+    "adapter": { "type": ["string", "null"] },
+    "git": {
+      "type": "object",
+      "required": ["sha", "dirty"],
+      "properties": {
+        "sha": { "type": ["string", "null"] },
+        "dirty": { "type": "boolean" },
+        "describe": { "type": ["string", "null"] }
+      }
+    },
+    "config_hash": { "type": ["string", "null"] },
+    "case_hash": { "type": ["string", "null"] },
+    "trace_hash": { "type": ["string", "null"] },
+    "netlist_hash": { "type": ["string", "null"] },
+    "sdf_hash": { "type": ["string", "null"] },
+    "spef_hash": { "type": ["string", "null"] },
+    "model_version": { "type": ["string", "null"] },
+    "calibration_hash": { "type": ["string", "null"] },
+    "tool_versions": { "type": "object" },
+    "pvt": { "type": "object" },
+    "command": { "type": "array", "items": { "type": "string" } },
+    "env": { "type": "object" },
+    "lsf_jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "job_id": { "type": "string" },
+          "label": { "type": "string" },
+          "queue": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "frozen_structure_ok": { "type": ["boolean", "null"] },
+    "paper_eligible": { "type": "boolean" },
+    "physical_class": {
+      "type": "string",
+      "enum": [
+        "post-layout",
+        "post-synthesis",
+        "rtl",
+        "fpga",
+        "model",
+        "archive-only",
+        "unknown"
+      ]
+    },
+    "archive_only_reason": { "type": ["string", "null"] },
+    "remote_root": { "type": ["string", "null"] },
+    "artifacts": { "type": "object" },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "status": { "type": "string" },
+          "hash": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "created_utc": { "type": "string" },
+    "updated_utc": { "type": ["string", "null"] },
+    "notes": { "type": "string" }
+  }
+}

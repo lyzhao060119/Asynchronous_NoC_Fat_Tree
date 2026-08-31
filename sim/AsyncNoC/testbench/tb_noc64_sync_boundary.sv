@@ -1,0 +1,412 @@
+`timescale 1ns/1ps
+
+// Clocked valid/ready 64-core quadtree boundary.
+// Same .case format as tb_noc64_async_boundary; handshake is valid/ready.
+// TOP_LANES=1 Thin (1,1); TOP_LANES=2 Fat 1-2-2-2 (`CMR_SYNC64_TOP2).
+// Closed-loop is MAXIMUM SDF.
+module noc64_sync_boundary_core #(
+  parameter integer NUM_CORES = 64,
+  parameter integer TOP_LANES = 1
+);
+  localparam integer FLIT_W = 28;
+  localparam integer NUM_PORTS = NUM_CORES + TOP_LANES;
+  localparam integer MAX_INPUT_FLITS = 131072;
+  localparam integer MAX_EXPECT_FLITS = 262144;
+  localparam integer MAX_RX_PER_PORT = 8192;
+  localparam integer MAX_PKT_SEQ = 262144;
+  localparam integer STR_CHARS = 256;
+  localparam integer MASK_W = 128;
+
+  initial begin
+    if (NUM_CORES != 64) begin
+      $display("TB_FATAL NUM_CORES must be 64, got %0d", NUM_CORES);
+      $finish;
+    end
+    if ((TOP_LANES != 1) && (TOP_LANES != 2)) begin
+      $display("TB_FATAL TOP_LANES must be 1 (Thin) or 2 (Fat 1-2-2-2), got %0d", TOP_LANES);
+      $finish;
+    end
+  end
+
+  reg clock;
+  reg reset;
+  reg [NUM_PORTS-1:0] tb_in_valid;
+  wire [NUM_PORTS-1:0] tb_in_ready;
+  reg [NUM_PORTS*FLIT_W-1:0] tb_in_data;
+  wire [NUM_PORTS-1:0] tb_out_valid;
+  reg [NUM_PORTS-1:0] tb_out_ready;
+  wire [NUM_PORTS*FLIT_W-1:0] tb_out_data;
+
+  wire [NUM_PORTS-1:0] noc_in_valid, noc_in_ready;
+  wire [NUM_PORTS*FLIT_W-1:0] noc_in_data;
+  wire [NUM_PORTS-1:0] noc_out_valid, noc_out_ready;
+  wire [NUM_PORTS*FLIT_W-1:0] noc_out_data;
+
+  assign noc_in_valid = tb_in_valid;
+  assign noc_in_data = tb_in_data;
+  assign tb_in_ready = noc_in_ready;
+  assign tb_out_valid = noc_out_valid;
+  assign tb_out_data = noc_out_data;
+  assign noc_out_ready = tb_out_ready;
+
+`ifndef CMR_SYNC64_TOP2
+  sync_noc64_port_adapter_top1 noc (
+    .clock(clock),
+    .reset(reset),
+    .in_valid(noc_in_valid),
+    .in_ready(noc_in_ready),
+    .in_data(noc_in_data),
+    .out_valid(noc_out_valid),
+    .out_ready(noc_out_ready),
+    .out_data(noc_out_data)
+  );
+`else
+  sync_noc64_port_adapter_top2 noc (
+    .clock(clock),
+    .reset(reset),
+    .in_valid(noc_in_valid),
+    .in_ready(noc_in_ready),
+    .in_data(noc_in_data),
+    .out_valid(noc_out_valid),
+    .out_ready(noc_out_ready),
+    .out_data(noc_out_data)
+  );
+`endif
+
+  reg [NUM_PORTS-1:0] input_done;
+  reg running, timed_out, finish_requested;
+
+  integer reset_cycles, timeout_cycles;
+  integer inject_max_rate;
+  real clock_period_ns, case_tick_ns, rx_capture_ns, timeout_scale;
+  real case_epoch_ns, timeout_ns, drain_ns;
+  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file;
+  reg [STR_CHARS*8-1:0] case_name, case_group;
+  reg [2047:0] dump_vcd;
+
+  integer input_count, expected_count;
+  integer input_cycle [0:MAX_INPUT_FLITS-1];
+  integer input_port [0:MAX_INPUT_FLITS-1];
+  integer input_pkt_seq [0:MAX_INPUT_FLITS-1];
+  reg [FLIT_W-1:0] input_flit [0:MAX_INPUT_FLITS-1];
+  integer input_offer_ps [0:MAX_INPUT_FLITS-1];
+  integer input_req_ps [0:MAX_INPUT_FLITS-1];
+  integer input_ack_ps [0:MAX_INPUT_FLITS-1];
+  reg input_accepted [0:MAX_INPUT_FLITS-1];
+  integer active_input [0:NUM_PORTS-1];
+
+  integer expected_port_index [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  integer expected_port_count [0:NUM_PORTS-1];
+  integer expected_cursor [0:NUM_PORTS-1];
+  integer expected_pkt_seq [0:MAX_EXPECT_FLITS-1];
+  reg expected_is_tail [0:MAX_EXPECT_FLITS-1];
+  reg [MASK_W-1:0] expected_mask [0:MAX_EXPECT_FLITS-1];
+  reg [FLIT_W-1:0] expected_flit [0:MAX_EXPECT_FLITS-1];
+  reg expected_seen [0:MAX_EXPECT_FLITS-1];
+
+  integer rx_count [0:NUM_PORTS-1];
+  integer rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  integer rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  integer rx_expected_index [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  reg [FLIT_W-1:0] rx_flit [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  reg rx_match [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  integer last_egress_ps [0:NUM_PORTS-1];
+  integer packet_head_ack_ps [0:MAX_PKT_SEQ-1];
+  integer unexpected_flits, missing_flits, injected_flits, delivered_flits;
+  integer delivered_packets, latency_count;
+  integer latency_ps [0:MAX_EXPECT_FLITS-1];
+  event rx_activity;
+
+  function integer now_ps;
+    real t;
+    begin
+      t = $realtime * 1000.0;
+      now_ps = $rtoi(t + 0.5);
+    end
+  endfunction
+
+  function integer total_rx;
+    integer p, total;
+    begin
+      total = 0;
+      for (p = 0; p < NUM_PORTS; p = p + 1) total = total + rx_count[p];
+      total_rx = total;
+    end
+  endfunction
+
+  function integer total_expected;
+    integer p, total;
+    begin
+      total = 0;
+      for (p = 0; p < NUM_PORTS; p = p + 1) total = total + expected_port_count[p];
+      total_expected = total;
+    end
+  endfunction
+
+  task automatic parse_case;
+    integer fd, n, p, cyc, pkt, idx, line_no;
+    reg [STR_CHARS*8-1:0] line, tag, word;
+    reg [MASK_W-1:0] mask_word;
+    reg [FLIT_W-1:0] flit;
+    begin
+      input_count = 0; expected_count = 0;
+      reset_cycles = 32; timeout_cycles = 5000000;
+      case_name = ""; case_group = "";
+      for (p = 0; p < NUM_PORTS; p = p + 1) begin
+        expected_port_count[p] = 0; expected_cursor[p] = 0; rx_count[p] = 0;
+        last_egress_ps[p] = -1; active_input[p] = -1;
+      end
+      for (idx = 0; idx < MAX_PKT_SEQ; idx = idx + 1) packet_head_ack_ps[idx] = -1;
+      fd = $fopen(case_file, "r");
+      if (fd == 0) begin $display("TB_FATAL cannot open CASE_FILE=%0s", case_file); $finish; end
+      line_no = 0;
+      while (!$feof(fd)) begin
+        line = "";
+        if ($fgets(line, fd) != 0) begin
+          line_no = line_no + 1; tag = ""; word = "";
+          if ($sscanf(line, "%s", tag) == 1 && tag != "#") begin
+            if (tag == "case") n = $sscanf(line, "%s %s", tag, case_name);
+            else if (tag == "group") n = $sscanf(line, "%s %s", tag, case_group);
+            else if (tag == "reset_cycles") n = $sscanf(line, "%s %d", tag, reset_cycles);
+            else if (tag == "timeout_cycles") n = $sscanf(line, "%s %d", tag, timeout_cycles);
+            else if (tag == "input") begin
+              n = $sscanf(line, "%s %d %d %d %h", tag, cyc, p, pkt, flit);
+              if (n != 5 || p < 0 || p >= NUM_PORTS || input_count >= MAX_INPUT_FLITS) begin
+                $display("TB_FATAL malformed input at line %0d", line_no); $finish;
+              end
+              input_cycle[input_count] = cyc; input_port[input_count] = p;
+              input_pkt_seq[input_count] = pkt; input_flit[input_count] = flit;
+              input_offer_ps[input_count] = -1; input_req_ps[input_count] = -1;
+              input_ack_ps[input_count] = -1; input_accepted[input_count] = 1'b0;
+              input_count = input_count + 1;
+            end else if (tag == "expect") begin
+              n = $sscanf(line, "%s %h %d %d %h", tag, mask_word, pkt, cyc, flit);
+              if (n != 5 || expected_count >= MAX_EXPECT_FLITS) begin
+                $display("TB_FATAL malformed expect at line %0d", line_no); $finish;
+              end
+              expected_mask[expected_count] = mask_word[MASK_W-1:0];
+              expected_pkt_seq[expected_count] = pkt; expected_is_tail[expected_count] = cyc[0];
+              expected_flit[expected_count] = flit; expected_seen[expected_count] = 1'b0;
+              for (p = 0; p < NUM_PORTS; p = p + 1) if (mask_word[p]) begin
+                if (expected_port_count[p] >= MAX_RX_PER_PORT) begin $display("TB_FATAL expected queue overflow p=%0d", p); $finish; end
+                expected_port_index[p][expected_port_count[p]] = expected_count;
+                expected_port_count[p] = expected_port_count[p] + 1;
+              end
+              expected_count = expected_count + 1;
+            end
+          end
+        end
+      end
+      $fclose(fd);
+      if (total_expected() != expected_count) begin
+        $display("TB_FATAL expected masks must be one-hot: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
+      end
+    end
+  endtask
+
+  task automatic drive_port(input integer port);
+    integer i;
+    real due_ns;
+    begin
+      wait (running);
+      for (i = 0; i < input_count; i = i + 1) if (input_port[i] == port) begin
+        if (!inject_max_rate) begin
+          due_ns = case_epoch_ns + input_cycle[i] * case_tick_ns;
+          while ($realtime < due_ns) @(posedge clock);
+        end
+        @(posedge clock);
+        while (reset) @(posedge clock);
+        input_offer_ps[i] = now_ps();
+        active_input[port] = i;
+        tb_in_data[port*FLIT_W +: FLIT_W] <= input_flit[i];
+        tb_in_valid[port] <= 1'b1;
+        input_req_ps[i] = now_ps();
+        @(posedge clock);
+        while (!(tb_in_ready[port] === 1'b1)) @(posedge clock);
+        input_ack_ps[i] = now_ps();
+        input_accepted[i] = 1'b1;
+        if (input_flit[i][27] && input_pkt_seq[i] >= 0 && input_pkt_seq[i] < MAX_PKT_SEQ)
+          packet_head_ack_ps[input_pkt_seq[i]] = input_ack_ps[i];
+        tb_in_valid[port] <= 1'b0;
+        active_input[port] = -1;
+      end
+      input_done[port] = 1'b1;
+    end
+  endtask
+
+  task automatic capture_rx(input integer port);
+    integer slot, exp_idx, scan;
+    reg found;
+    reg [FLIT_W-1:0] captured;
+    begin
+      captured = tb_out_data[port*FLIT_W +: FLIT_W];
+      slot = rx_count[port];
+      if (slot >= MAX_RX_PER_PORT) begin $display("TB_FATAL RX overflow port=%0d", port); $finish; end
+      rx_time_ps[port][slot] = now_ps();
+      rx_egress_ps[port][slot] = last_egress_ps[port];
+      rx_flit[port][slot] = captured;
+      exp_idx = -1; found = 1'b0;
+      for (scan = 0; scan < expected_count; scan = scan + 1)
+        if (!found && !expected_seen[scan] && expected_mask[scan][port] && (captured === expected_flit[scan])) begin
+          exp_idx = scan; found = 1'b1; expected_seen[scan] = 1'b1;
+        end
+      rx_expected_index[port][slot] = exp_idx;
+      rx_match[port][slot] = found;
+      if (rx_match[port][slot]) expected_cursor[port] = expected_cursor[port] + 1;
+      else unexpected_flits = unexpected_flits + 1;
+      rx_count[port] = slot + 1;
+      -> rx_activity;
+    end
+  endtask
+
+  task automatic write_results;
+    integer p, s, i, j, tmp, fd_summary, fd_events, fd_latency;
+    integer lat_sum, max_lat, p95_lat, p99_lat, rank95, rank99, packet, lat, injected_packets;
+    real avg_lat_ns, elapsed_ns, throughput;
+    reg pass_ok;
+    begin
+      injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();
+      delivered_packets = 0; latency_count = 0; lat_sum = 0; max_lat = 0;
+      for (i = 0; i < input_count; i = i + 1) if (input_accepted[i]) begin
+        injected_flits = injected_flits + 1;
+        if (input_flit[i][27]) injected_packets = injected_packets + 1;
+      end
+      for (p = 0; p < NUM_PORTS; p = p + 1) begin
+        for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s]) begin
+          i = rx_expected_index[p][s];
+          if (expected_is_tail[i]) begin
+            packet = expected_pkt_seq[i];
+            if (packet >= 0 && packet < MAX_PKT_SEQ && packet_head_ack_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0) begin
+              lat = rx_egress_ps[p][s] - packet_head_ack_ps[packet];
+              latency_ps[latency_count] = lat; latency_count = latency_count + 1;
+              lat_sum = lat_sum + lat; if (lat > max_lat) max_lat = lat;
+              delivered_packets = delivered_packets + 1;
+            end
+          end
+        end
+      end
+      for (i = 0; i < expected_count; i = i + 1) if (!expected_seen[i]) missing_flits = missing_flits + 1;
+      for (i = 0; i < latency_count; i = i + 1) for (j = i + 1; j < latency_count; j = j + 1)
+        if (latency_ps[j] < latency_ps[i]) begin tmp = latency_ps[i]; latency_ps[i] = latency_ps[j]; latency_ps[j] = tmp; end
+      if (latency_count > 0) begin
+        rank95 = (95 * latency_count + 99) / 100; if (rank95 > latency_count) rank95 = latency_count;
+        rank99 = (99 * latency_count + 99) / 100; if (rank99 > latency_count) rank99 = latency_count;
+        p95_lat = latency_ps[rank95-1]; p99_lat = latency_ps[rank99-1];
+      end else begin p95_lat = 0; p99_lat = 0; end
+      avg_lat_ns = latency_count ? (lat_sum * 1.0 / latency_count / 1000.0) : 0.0;
+      elapsed_ns = $realtime - case_epoch_ns;
+      throughput = elapsed_ns > 0.0 ? (delivered_flits * case_tick_ns / elapsed_ns) : 0.0;
+      pass_ok = !timed_out && (injected_flits == input_count) && (missing_flits == 0) && (unexpected_flits == 0);
+
+      fd_summary = $fopen(csv_file, "w");
+      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail\n");
+      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0,%0d,%f,%f,%f,%f,%f,%0s\n", case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, $rtoi(elapsed_ns/case_tick_ns), throughput, avg_lat_ns, max_lat/1000.0, p95_lat/1000.0, p99_lat/1000.0, pass_ok ? "PASS" : "FAIL");
+      $fclose(fd_summary);
+
+      fd_events = $fopen(event_csv_file, "w");
+      $fwrite(fd_events, "kind,port,pkt_seq,flit,offer_ps,req_ps,ack_ps,egress_req_ps,capture_ps,matched\n");
+      for (i = 0; i < input_count; i = i + 1)
+        $fwrite(fd_events, "TX,%0d,%0d,%h,%0d,%0d,%0d,-1,-1,%0d\n", input_port[i], input_pkt_seq[i], input_flit[i], input_offer_ps[i], input_req_ps[i], input_ack_ps[i], input_accepted[i]);
+      for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1)
+        $fwrite(fd_events, "RX,%0d,%0d,%h,-1,-1,-1,%0d,%0d,%0d\n", p, rx_expected_index[p][s] >= 0 ? expected_pkt_seq[rx_expected_index[p][s]] : -1, rx_flit[p][s], rx_egress_ps[p][s], rx_time_ps[p][s], rx_match[p][s]);
+      $fclose(fd_events);
+
+      fd_latency = $fopen(latency_csv_file, "w");
+      $fwrite(fd_latency, "port,pkt_seq,tail_flit,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,network_latency_ns\n");
+      for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s] && expected_is_tail[rx_expected_index[p][s]]) begin
+        i = rx_expected_index[p][s]; packet = expected_pkt_seq[i];
+        $fwrite(fd_latency, "%0d,%0d,%h,%0d,%0d,%0d,%f\n", p, packet, rx_flit[p][s], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0);
+      end
+      $fclose(fd_latency);
+      $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d inject_max_rate=%0d elapsed_ns=%0.3f flits_per_ns=%0.6f", pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, inject_max_rate, elapsed_ns, elapsed_ns > 0.0 ? (delivered_flits / elapsed_ns) : 0.0);
+      finish_requested = 1'b1;
+      #1 $finish;
+    end
+  endtask
+
+  genvar gp;
+  generate
+    for (gp = 0; gp < NUM_PORTS; gp = gp + 1) begin : g_boundary
+      always @(posedge clock) begin
+        if (running && tb_out_valid[gp] === 1'b1 && tb_out_ready[gp] === 1'b1)
+          last_egress_ps[gp] = now_ps();
+      end
+      always @(posedge clock) begin
+        if (!reset && running && tb_out_valid[gp] === 1'b1 && tb_out_ready[gp] === 1'b1) begin
+          if (^tb_out_data[gp*FLIT_W +: FLIT_W] === 1'bx)
+            $display("TB_PROTOCOL_X port=%0d t=%0t valid=%b ready=%b data=%h",
+                     gp, $time, tb_out_valid[gp], tb_out_ready[gp],
+                     tb_out_data[gp*FLIT_W +: FLIT_W]);
+          capture_rx(gp);
+        end
+      end
+      initial drive_port(gp);
+    end
+  endgenerate
+
+  initial begin
+    clock_period_ns = 1.0;
+    if ($value$plusargs("CLOCK_PERIOD_NS=%f", clock_period_ns)) ;
+    if (clock_period_ns <= 0.0) begin
+      $display("TB_FATAL CLOCK_PERIOD_NS must be positive");
+      $finish;
+    end
+    clock = 1'b0;
+    forever #(clock_period_ns / 2.0) clock = ~clock;
+  end
+
+  initial begin
+    case_file = ""; csv_file = "sync_noc64_summary.csv"; event_csv_file = "sync_noc64_events.csv"; latency_csv_file = "sync_noc64_latency.csv";
+    case_tick_ns = 20.0; rx_capture_ns = 0.0;
+    timeout_scale = 1.0; inject_max_rate = 0;
+    if ($value$plusargs("CASE_FILE=%s", case_file)) ;
+    if ($value$plusargs("RESULT_CSV=%s", csv_file)) ;
+    if ($value$plusargs("EVENT_CSV=%s", event_csv_file)) ;
+    if ($value$plusargs("LATENCY_CSV=%s", latency_csv_file)) ;
+    if ($value$plusargs("CLOCK_PERIOD_NS=%f", clock_period_ns)) ;
+    if ($value$plusargs("CASE_TICK_NS=%f", case_tick_ns)) ;
+    if ($value$plusargs("RX_CAPTURE_NS=%f", rx_capture_ns)) ;
+    if ($value$plusargs("TIMEOUT_SCALE=%f", timeout_scale)) ;
+    if ($test$plusargs("INJECT_MAX_RATE")) inject_max_rate = 1;
+    if ($value$plusargs("DUMP_VCD=%s", dump_vcd)) begin $dumpfile(dump_vcd); $dumpvars(0, noc64_sync_boundary_core); end
+    if (case_file == "") begin $display("TB_FATAL +CASE_FILE=<case> is required"); $finish; end
+    if (clock_period_ns <= 0.0) begin $display("TB_FATAL CLOCK_PERIOD_NS must be positive"); $finish; end
+    $display("TB_INFO NUM_CORES=%0d TOP_LANES=%0d NUM_PORTS=%0d CLOCK_PERIOD_NS=%0.3f CASE_TICK_NS=%0.3f RX_CAPTURE_NS=%0.3f INJECT_MAX_RATE=%0d", NUM_CORES, TOP_LANES, NUM_PORTS, clock_period_ns, case_tick_ns, rx_capture_ns, inject_max_rate);
+    parse_case();
+    reset = 1'b1; tb_in_valid = '0; tb_in_data = '0; tb_out_ready = '0; input_done = '0;
+    running = 1'b0; timed_out = 1'b0; finish_requested = 1'b0; unexpected_flits = 0;
+    repeat (reset_cycles) @(posedge clock);
+    reset = 1'b0;
+    tb_out_ready = {NUM_PORTS{1'b1}};
+    repeat (16) @(posedge clock);
+    case_epoch_ns = $realtime;
+    timeout_ns = timeout_cycles * case_tick_ns * timeout_scale;
+    drain_ns = 1024.0 * case_tick_ns;
+    running = 1'b1;
+  end
+
+  initial begin : completion_watchdog
+    wait(running);
+    fork
+      begin
+        wait(&input_done);
+        while (total_rx() < total_expected()) @rx_activity;
+        #(drain_ns);
+        if (!finish_requested) write_results();
+      end
+      begin
+        #(timeout_ns);
+        if (!finish_requested) begin timed_out = 1'b1; write_results(); end
+      end
+    join_any
+    disable fork;
+  end
+endmodule
+
+module tb_noc64_sync_boundary;
+`ifdef CMR_SYNC64_TOP2
+  noc64_sync_boundary_core #(.NUM_CORES(64), .TOP_LANES(2)) core();
+`else
+  noc64_sync_boundary_core #(.NUM_CORES(64), .TOP_LANES(1)) core();
+`endif
+endmodule

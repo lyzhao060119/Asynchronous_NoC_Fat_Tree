@@ -1,0 +1,6 @@
+# Thin CMR gate-level reset/X localization.  No packets are injected: any
+# fail-fast X therefore originates during reset release, not traffic handling.
+case noc16_reset_only
+group CMR_LOCALIZE
+timeout_cycles 20000
+reset_cycles 10

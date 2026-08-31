@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/event_record.schema.json",
+  "title": "DATE V3 unified event record",
+  "type": "object",
+  "required": [
+    "original_event_id",
+    "packet_id",
+    "source",
+    "destination_set",
+    "t_offer",
+    "t_head_inject",
+    "t_last_tail",
+    "delivered_destinations"
+  ],
+  "properties": {
+    "original_event_id": { "type": "string" },
+    "packet_id": { "type": "string" },
+    "source": { "type": "integer" },
+    "destination_set": { "type": "array", "items": { "type": "integer" } },
+    "t_offer": { "type": ["number", "null"] },
+    "t_head_inject": { "type": ["number", "null"] },
+    "t_last_tail": { "type": ["number", "null"] },
+    "delivered_destinations": { "type": "array", "items": { "type": "integer" } },
+    "router_traversal": { "type": "array" },
+    "link_traversal": { "type": "array" },
+    "top_mesh_injection": { "type": ["integer", "null"] },
+    "top_mesh_link_traversal": { "type": ["integer", "null"] },
+    "queue_occupancy": { "type": "object" },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "tmax_ns": {
+      "type": ["number", "null"],
+      "description": "t_last_tail - t_head_inject; never substitute per-packet max latency"
+    }
+  }
+}

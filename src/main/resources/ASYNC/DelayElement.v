@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module DelayElement
-#(parameter DelayValue = 1)
+#(parameter DelayValue = 10)
 (
 	input	wire	I,
 	output	wire	Z

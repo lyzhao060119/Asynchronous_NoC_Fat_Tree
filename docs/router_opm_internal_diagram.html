@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Router OPM 内部模块互联框图</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --panel: #ffffff;
+      --group: #edf4ff;
+      --group-border: #7aa7d9;
+      --module: #ffffff;
+      --module-border: #2f5f91;
+      --data: #1d1d1f;
+      --req: #d9822b;
+      --ack: #7b61ff;
+      --ctrl: #3976d3;
+      --state: #5a8c2b;
+      --text: #172033;
+      --muted: #5f6b7a;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    header {
+      padding: 24px 32px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .canvas {
+      margin: 16px 32px 32px;
+      padding: 18px;
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid #d7e0ea;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(30, 60, 90, 0.08);
+    }
+
+    svg {
+      display: block;
+      min-width: 2500px;
+      background: #fbfdff;
+      border-radius: 10px;
+    }
+
+    .group {
+      fill: var(--group);
+      stroke: var(--group-border);
+      stroke-width: 2;
+      rx: 18;
+      ry: 18;
+    }
+
+    .group-title {
+      fill: #1f4d7a;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .module {
+      fill: var(--module);
+      stroke: var(--module-border);
+      stroke-width: 2.5;
+      rx: 12;
+      ry: 12;
+      filter: drop-shadow(0 3px 5px rgba(20, 50, 80, 0.12));
+    }
+
+    .state-module {
+      fill: #fbfff6;
+      stroke: var(--state);
+      stroke-width: 2.5;
+      rx: 12;
+      ry: 12;
+      filter: drop-shadow(0 3px 5px rgba(20, 80, 50, 0.12));
+    }
+
+    .module-title {
+      fill: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .module-subtitle {
+      fill: var(--muted);
+      font-size: 15px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .data-line {
+      fill: none;
+      stroke: var(--data);
+      stroke-width: 3.2;
+      marker-end: url(#arrow-data);
+    }
+
+    .req-line {
+      fill: none;
+      stroke: var(--req);
+      stroke-width: 2.4;
+      stroke-dasharray: 9 8;
+      marker-end: url(#arrow-req);
+    }
+
+    .ack-line {
+      fill: none;
+      stroke: var(--ack);
+      stroke-width: 2.4;
+      stroke-dasharray: 9 8;
+      marker-end: url(#arrow-ack);
+    }
+
+    .ctrl-line {
+      fill: none;
+      stroke: var(--ctrl);
+      stroke-width: 2.2;
+      stroke-dasharray: 6 7;
+      marker-end: url(#arrow-ctrl);
+    }
+
+    .ctrl-solid {
+      fill: none;
+      stroke: var(--ctrl);
+      stroke-width: 2.2;
+      marker-end: url(#arrow-ctrl);
+    }
+
+    .state-line {
+      fill: none;
+      stroke: var(--state);
+      stroke-width: 2.4;
+      marker-end: url(#arrow-state);
+    }
+
+    .label-bg {
+      fill: #fbfdff;
+      stroke: #d9e3ef;
+      stroke-width: 1;
+      rx: 8;
+      ry: 8;
+    }
+
+    .label {
+      font-size: 15px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .label.data { fill: var(--data); }
+    .label.req { fill: var(--req); }
+    .label.ack { fill: var(--ack); }
+    .label.ctrl { fill: var(--ctrl); }
+    .label.state { fill: var(--state); }
+
+    .note {
+      fill: var(--muted);
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Router OPM 内部模块互联框图</h1>
+    <p>实线表示 <strong>data</strong> 通道；虚线表示 <strong>req</strong> 和 <strong>ack</strong> 控制链路。OPM 对每个物理输出 lane 独立实例化一个输出端口模块，本图展开其中一个 output port。</p>
+  </header>
+
+  <main class="canvas">
+    <svg viewBox="0 0 2500 1450" width="2500" height="1450" role="img" aria-label="Router OPM internal module interconnect diagram">
+      <defs>
+        <marker id="arrow-data" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#1d1d1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-req" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#d9822b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-ack" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#7b61ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-ctrl" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#3976d3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-state" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#5a8c2b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+      </defs>
+
+      <!-- Legend -->
+      <rect class="module" x="80" y="70" width="650" height="155"></rect>
+      <text class="module-title" x="160" y="105">图例</text>
+      <path class="data-line" d="M 120 145 L 260 145"></path>
+      <text class="label data" x="330" y="145">data 实线</text>
+      <path class="req-line" d="M 120 183 L 260 183"></path>
+      <text class="label req" x="330" y="183">req 虚线</text>
+      <path class="ack-line" d="M 430 183 L 570 183"></path>
+      <text class="label ack" x="500" y="145">ack 虚线</text>
+      <path class="state-line" d="M 430 145 L 570 145"></path>
+      <text class="label state" x="625" y="145">状态反馈</text>
+
+      <!-- Groups -->
+      <rect class="group" x="330" y="270" width="1740" height="940"></rect>
+      <text class="group-title" x="360" y="310">RouterOPM</text>
+
+      <rect class="group" x="470" y="360" width="1340" height="700"></rect>
+      <text class="group-title" x="500" y="400">RouterOutputPortModule(o)</text>
+
+      <rect class="group" x="620" y="460" width="900" height="360"></rect>
+      <text class="group-title" x="650" y="500">RouterOutputRequestSelectorModule</text>
+
+      <rect class="group" x="705" y="545" width="710" height="205"></rect>
+      <text class="group-title" x="735" y="585">AsyncArbiter</text>
+
+      <!-- External/internal modules -->
+      <rect class="module" x="80" y="455" width="230" height="95"></rect>
+      <text class="module-title" x="195" y="492">fromIpm(edge 0)</text>
+      <text class="module-subtitle" x="195" y="522">internal HS_Packet</text>
+
+      <rect class="module" x="80" y="650" width="230" height="95"></rect>
+      <text class="module-title" x="195" y="687">fromIpm(edge N)</text>
+      <text class="module-subtitle" x="195" y="717">internal HS_Packet</text>
+
+      <rect class="module" x="770" y="610" width="260" height="95"></rect>
+      <text class="module-title" x="900" y="647">AsyncArbiter</text>
+      <text class="module-subtitle" x="900" y="677">RequestSelector</text>
+
+      <rect class="module" x="1120" y="610" width="230" height="95"></rect>
+      <text class="module-title" x="1235" y="647">AsyncOutputBuffer</text>
+      <text class="module-subtitle" x="1235" y="677">register chosen data</text>
+
+      <rect class="state-module" x="900" y="895" width="300" height="100"></rect>
+      <text class="module-title" x="1050" y="934">RouterOutputPath</text>
+      <text class="module-subtitle" x="1050" y="964">StateModule / holder</text>
+
+      <rect class="module" x="1630" y="555" width="240" height="110"></rect>
+      <text class="module-title" x="1750" y="595">外部输出端口</text>
+      <text class="module-subtitle" x="1750" y="625">outPort(o)</text>
+
+      <rect class="state-module" x="2170" y="880" width="250" height="95"></rect>
+      <text class="module-title" x="2295" y="917">IPM feedback</text>
+      <text class="module-subtitle" x="2295" y="947">holder(o), anyPending</text>
+
+      <!-- fromIpm edge0 -> request selector -->
+      <path class="data-line" d="M 310 502 C 460 502, 590 622, 770 632"></path>
+      <path class="req-line" d="M 310 472 C 470 472, 600 592, 770 602"></path>
+      <path class="ack-line" d="M 770 662 C 600 662, 470 532, 310 532"></path>
+      <text class="label data" x="535" y="560">data</text>
+      <text class="label req" x="535" y="512">req</text>
+      <text class="label ack" x="535" y="645">ack</text>
+
+      <!-- fromIpm edgeN -> request selector -->
+      <path class="data-line" d="M 310 697 C 460 697, 590 675, 770 675"></path>
+      <path class="req-line" d="M 310 667 C 470 667, 600 642, 770 642"></path>
+      <path class="ack-line" d="M 770 705 C 600 720, 470 727, 310 727"></path>
+      <text class="label data" x="535" y="710">data</text>
+      <text class="label req" x="535" y="675">req</text>
+      <text class="label ack" x="535" y="755">ack</text>
+
+      <!-- Request selector -> output buffer data/control -->
+      <path class="data-line" d="M 1030 657 L 1120 657"></path>
+      <text class="label data" x="1075" y="637">chosenData</text>
+
+      <path class="ctrl-solid" d="M 900 705 C 900 780, 985 835, 1038 895"></path>
+      <text class="label ctrl" x="922" y="815">chosen</text>
+
+      <path class="ctrl-solid" d="M 945 705 C 970 780, 1025 835, 1065 895"></path>
+      <text class="label ctrl" x="1045" y="815">fireClock</text>
+
+      <path class="data-line" d="M 1235 705 C 1235 790, 1140 835, 1100 895"></path>
+      <text class="label data" x="1190" y="820">chosenData</text>
+
+      <!-- Request selector / ACG -> external output -->
+      <path class="data-line" d="M 1350 657 C 1440 657, 1510 610, 1630 610"></path>
+      <path class="req-line" d="M 1030 612 C 1230 560, 1420 575, 1630 575"></path>
+      <path class="ack-line" d="M 1630 645 C 1450 715, 1220 735, 1030 690"></path>
+      <text class="label data" x="1490" y="635">data</text>
+      <text class="label req" x="1325" y="548">req</text>
+      <text class="label ack" x="1325" y="745">ack</text>
+
+      <!-- Output port module export -->
+      <path class="data-line" d="M 1870 610 L 2070 610"></path>
+      <path class="req-line" d="M 1870 575 L 2070 575"></path>
+      <path class="ack-line" d="M 2070 645 L 1870 645"></path>
+      <rect class="module" x="2070" y="555" width="250" height="110"></rect>
+      <text class="module-title" x="2195" y="595">下游 Router / PE</text>
+      <text class="module-subtitle" x="2195" y="625">receiver of outPort(o)</text>
+      <text class="label data" x="1970" y="600">data</text>
+      <text class="label req" x="1970" y="555">req</text>
+      <text class="label ack" x="1970" y="675">ack</text>
+
+      <!-- State feedback -->
+      <path class="state-line" d="M 1200 945 C 1460 945, 1800 925, 2170 925"></path>
+      <text class="label state" x="1665" y="905">holder(o)</text>
+
+      <path class="ctrl-line" d="M 900 610 C 830 510, 950 430, 1180 430 C 1500 430, 1760 650, 2170 895"></path>
+      <text class="label ctrl" x="1370" y="410">anyPending</text>
+
+      <path class="ctrl-line" d="M 2170 925 C 1980 1110, 1040 1220, 700 1070"></path>
+      <text class="label ctrl" x="1490" y="1185">holder feedback to IPM input eligibility</text>
+
+      <!-- Local mapping notes -->
+      <rect class="module" x="1530" y="810" width="310" height="120"></rect>
+      <text class="module-title" x="1685" y="848">local-to-global map</text>
+      <text class="module-subtitle" x="1685" y="878">legalInputs(localIdx)</text>
+      <text class="module-subtitle" x="1685" y="906">chosen local -> input id</text>
+
+      <path class="ctrl-solid" d="M 900 705 C 1120 780, 1340 805, 1530 850"></path>
+      <text class="label ctrl" x="1295" y="780">chosen local index</text>
+
+      <path class="ctrl-solid" d="M 1840 870 C 1970 885, 2075 905, 2170 915"></path>
+      <text class="label ctrl" x="2020" y="870">chosen input id</text>
+
+      <!-- Notes -->
+      <text class="note" x="80" y="1320">说明：fromIpm(edge 0) 与 fromIpm(edge N) 之间省略若干输入边；RouterOPM 对每个 physical output o 重复实例化本图中的 RouterOutputPortModule。</text>
+      <text class="note" x="80" y="1355">每条 HS_Packet 链路拆分为 data、req、ack：data 和 req 从 source 到 sink，ack 从 sink 返回 source。</text>
+      <text class="note" x="80" y="1390">RouterOutputPathStateModule 不直接驱动 req/ack，它使用 output fireClock、chosen 和 chosenData 生成 holder，占用反馈再返回 IPM。</text>
+    </svg>
+  </main>
+</body>
+</html>

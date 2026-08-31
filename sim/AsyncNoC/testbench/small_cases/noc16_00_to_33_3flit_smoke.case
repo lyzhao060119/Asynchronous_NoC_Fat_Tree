@@ -1,0 +1,16 @@
+# NoC_16nodes AXI/BRAM smoke case.
+# Sends one 3-flit unicast packet from physical coordinate (0,0) to (3,3).
+case noc16_00_to_33_3flit_smoke
+group SMOKE_16
+timeout_cycles 2000
+reset_cycles 20
+out_ack_delay_cycles 0
+event_map      0      0
+# input  <cycle> <port> <pkt_seq> <flit_hex>
+# expect <mask_hex> <pkt_seq> <is_tail> <flit_hex>
+input      0  0      0 830c30c # flit0 head src=(0,0) dst=(3,3)
+input      1  0      0 030c30c # flit1 body src=(0,0) dst=(3,3)
+input      2  0      0 430c30c # flit2 tail src=(0,0) dst=(3,3)
+expect 08000      0 0 830c30c # dst port 15
+expect 08000      0 0 030c30c # dst port 15
+expect 08000      0 1 430c30c # dst port 15

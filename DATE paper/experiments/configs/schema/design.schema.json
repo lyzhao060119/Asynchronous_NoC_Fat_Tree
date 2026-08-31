@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/design.schema.json",
+  "title": "DATE V3 design configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "design_id",
+    "kind",
+    "family",
+    "nodes",
+    "async",
+    "routing",
+    "lane_profile",
+    "router_primitives",
+    "flit_width_bits",
+    "buffer_slots",
+    "no_uturn",
+    "interlevel_fifo",
+    "delay_recipe",
+    "clock_ns",
+    "hrep_policy",
+    "paper_role",
+    "paper_eligible_default"
+  ],
+  "properties": {
+    "schema": { "const": "date-v3-design-v1" },
+    "design_id": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+    "kind": {
+      "type": "string",
+      "enum": ["network", "router_primitive", "fpga"]
+    },
+    "family": {
+      "type": "string",
+      "enum": ["THIN", "PROP", "PFAT", "FM", "HREP", "SYNC", "MESH_SANITY", "FPGA"]
+    },
+    "nodes": { "type": ["integer", "null"], "minimum": 1 },
+    "async": { "type": "boolean" },
+    "routing": {
+      "type": "string",
+      "enum": ["quadtree", "mesh", "quadtree_topmesh", "fpga_wrap"]
+    },
+    "lane_profile": {
+      "type": "string",
+      "description": "e.g. 1-1-1-1, 1-2-2-2, 1-2-4-8, mesh-1, primitive geometry"
+    },
+    "top_mesh_lanes": { "type": ["integer", "null"], "minimum": 0 },
+    "cluster_grid": { "type": ["integer", "null"], "minimum": 1 },
+    "router_primitives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["primitive_id", "level", "child_lanes", "parent_lanes", "use_mesh_routing", "count"],
+        "properties": {
+          "primitive_id": { "type": "string" },
+          "level": { "type": "integer", "minimum": 1 },
+          "child_lanes": { "type": "integer", "minimum": 1 },
+          "parent_lanes": { "type": "integer", "minimum": 1 },
+          "use_mesh_routing": { "type": "boolean" },
+          "count": { "type": "integer", "minimum": 0 },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "expected_structure": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "routers": { "type": "integer" },
+        "ports": { "type": "integer" },
+        "adapters": { "type": "integer" },
+        "interlevel_fifos": { "type": "integer" },
+        "top_ports": { "type": "integer" },
+        "max_opm_fanin": { "type": "integer" },
+        "mutex_widths": {
+          "type": "array",
+          "items": { "type": "integer" }
+        }
+      }
+    },
+    "flit_width_bits": { "type": "integer", "const": 28 },
+    "buffer_slots": { "type": "integer", "const": 5 },
+    "no_uturn": { "type": "boolean", "const": true },
+    "interlevel_fifo": {
+      "type": "string",
+      "enum": ["bypass", "none", "n/a"]
+    },
+    "delay_recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rcu_steps", "rcu_unit_ps", "buf_stages", "ackin_steps", "ackin_unit_ps", "ackin_use_buf"],
+      "properties": {
+        "rcu_steps": { "type": "integer" },
+        "rcu_unit_ps": { "type": "integer" },
+        "buf_stages": { "type": "integer" },
+        "ackin_steps": { "type": "integer" },
+        "ackin_unit_ps": { "type": "integer" },
+        "ackin_use_buf": { "type": "boolean" }
+      }
+    },
+    "clock_ns": { "type": ["number", "null"] },
+    "hrep_policy": { "type": "boolean" },
+    "shares_netlist_with": { "type": ["string", "null"] },
+    "fpga": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "board": { "type": ["string", "null"] },
+        "part": { "type": ["string", "null"] },
+        "vivado": { "type": ["string", "null"] },
+        "host_interface": { "type": ["string", "null"] },
+        "hardware_validation": { "type": "boolean" }
+      }
+    },
+    "adapter": { "type": ["string", "null"] },
+    "paper_role": { "type": "string" },
+    "paper_eligible_default": { "type": "boolean" },
+    "notes": { "type": "string" }
+  }
+}

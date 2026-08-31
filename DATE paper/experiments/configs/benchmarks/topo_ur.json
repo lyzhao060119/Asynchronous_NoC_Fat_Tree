@@ -1,0 +1,45 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "TOPO-UR",
+  "title": "Uniform random unicast, src != dst, same rule at 64/256/1024",
+  "traffic": "topo_ur",
+  "packet_flits": 5,
+  "multicast": false,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": null,
+  "spread_S": null,
+  "multicast_fraction": 0.0,
+  "destination_set_samples": null,
+  "warmup_original_events": 1000,
+  "measurement_original_events": 10000,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": true,
+    "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load"
+  },
+  "metrics": [
+    "router_count",
+    "total_router_area",
+    "lane_links",
+    "channel_bits",
+    "traversals",
+    "zero_load_latency",
+    "saturation_throughput"
+  ],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": [
+    "PROP64",
+    "PROP256",
+    "PROP1024",
+    "FM64",
+    "FM256",
+    "FM1024"
+  ],
+  "paper_figures": [
+    "Fig. B"
+  ],
+  "notes": "Unicast only. Traversal from routing events, not theoretical hop count."
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "cmr_mesh64_current",
+  "status": "imported_readonly",
+  "design_id": "FM64",
+  "benchmark_id": null,
+  "seed": null,
+  "adapter": "import_readonly",
+  "git": {
+    "sha": "04f0e55135c59894532624a9b87e9434bf94091e",
+    "dirty": true,
+    "describe": "04f0e55-dirty"
+  },
+  "config_hash": "1f0471cafaf9e37b45ab057bb1995c014338185b723e7e88b93c4afefb9b878b",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": null,
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": null
+  },
+  "command": [
+    "import_readonly"
+  ],
+  "env": {},
+  "lsf_jobs": [],
+  "frozen_structure_ok": null,
+  "paper_eligible": false,
+  "physical_class": "unknown",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {},
+  "cases": [],
+  "created_utc": "2026-08-31T05:50:02+00:00",
+  "updated_utc": "2026-08-31T05:50:02+00:00",
+  "notes": "In-flight mesh64 runs observed on the remote: 20260831_115856_cmr_mesh64_p50 (newer) and 20260831_094757_cmr_mesh64_p50. Not curated until DC/GLS PASS and frozen-structure check."
+}

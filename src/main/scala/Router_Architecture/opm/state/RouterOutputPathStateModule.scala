@@ -9,8 +9,7 @@ import tool.AsyncClock
 /**
  * Project-specific multi-flit path state at one physical output.
  *
- * This is the multi-flit counterpart to the paper's path-hold behavior: once a
- * head flit claims an output, the owner stays active until the tail leaves.
+ * Once a head claims an output, the owner stays active until the tail leaves.
  */
 class RouterOutputPathStateModule(config: RouterModuleConfig) extends Module {
   private val inputIdxW = math.max(1, log2Ceil(config.totalPorts))

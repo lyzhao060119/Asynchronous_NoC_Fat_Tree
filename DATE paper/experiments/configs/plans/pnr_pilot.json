@@ -1,0 +1,81 @@
+{
+  "schema": "date-v3-plan-v1",
+  "plan_id": "pnr_pilot",
+  "title": "Phase 1 P&R pilot closed: post-synthesis freeze (no tech LEF/NDM)",
+  "runs": [
+    {
+      "run_id": "20260831_cmr_pnr_pilot_blocker",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": null,
+      "adapter": "pnr_pilot",
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Closed. ICC2/Innovus licensed; no tech LEF/NDM; Galaxy-ICC unlicensed. Paper path is MAXIMUM-SDF only."
+    },
+    {
+      "run_id": "pnr_probe_env",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": null,
+      "adapter": "pnr_probe",
+      "physical_class": "unknown",
+      "paper_eligible": false,
+      "notes": "LSF license checkout + PDK listing. Not a paper result."
+    },
+    {
+      "run_id": "pnr_pilot_thin_icc2",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "adapter": "pnr_pilot",
+      "env": {
+        "CMR_PNR_TOOL": "icc2",
+        "CMR_PNR_DESIGN": "thin_1x1",
+        "CMR_PNR_NETLIST_RUN_ID": "20260830_cmr_thin_l1_hop_del050_ackin050"
+      },
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Blocked: no tech LEF/NDM. Do not treat as post-layout."
+    },
+    {
+      "run_id": "pnr_pilot_thin_innovus",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "adapter": "pnr_pilot",
+      "env": {
+        "CMR_PNR_TOOL": "innovus",
+        "CMR_PNR_DESIGN": "thin_1x1",
+        "CMR_PNR_NETLIST_RUN_ID": "20260830_cmr_thin_l1_hop_del050_ackin050"
+      },
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Blocked: no tech LEF/NDM. Do not treat as post-layout."
+    },
+    {
+      "run_id": "pnr_pilot_prop_icc2",
+      "design_id": "ASYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "adapter": "pnr_pilot",
+      "env": {
+        "CMR_PNR_TOOL": "icc2",
+        "CMR_PNR_DESIGN": "prop_2x2",
+        "CMR_PNR_NETLIST_RUN_ID": "20260830_cmr_fat_l2_hop_del050_ackin050"
+      },
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Blocked: no tech LEF/NDM. Do not treat as post-layout."
+    },
+    {
+      "run_id": "pnr_pilot_prop_innovus",
+      "design_id": "ASYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "adapter": "pnr_pilot",
+      "env": {
+        "CMR_PNR_TOOL": "innovus",
+        "CMR_PNR_DESIGN": "prop_2x2",
+        "CMR_PNR_NETLIST_RUN_ID": "20260830_cmr_fat_l2_hop_del050_ackin050"
+      },
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Blocked: no tech LEF/NDM. Do not treat as post-layout."
+    }
+  ]
+}

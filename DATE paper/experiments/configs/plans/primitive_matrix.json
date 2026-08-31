@@ -1,0 +1,16 @@
+{
+  "schema": "date-v3-plan-v1",
+  "plan_id": "primitive_matrix",
+  "title": "Phase 2 Router primitives: DC + MAXIMUM-SDF R-U5 + PT-PX (no P&R)",
+  "runs": [
+    {
+      "run_id": "20260831_cmr_primitive_matrix",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "adapter": "primitive_matrix",
+      "physical_class": "post-synthesis",
+      "paper_eligible": true,
+      "notes": "Emit all V3 primitives, geometry-check, DC new PFAT/TopMesh/FlatMesh/Sync isolated routers, then 5-flit R-U5 hop GLS + PT-PX. Reuses frozen 20260830 Thin/Fat/PROP hop netlists. No P&R."
+    }
+  ]
+}

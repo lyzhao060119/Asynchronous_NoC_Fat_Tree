@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/seeds.schema.json",
+  "title": "DATE V3 frozen seed set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "seed_set_id", "frozen", "seeds"],
+  "properties": {
+    "schema": { "const": "date-v3-seeds-v1" },
+    "seed_set_id": { "type": "string" },
+    "frozen": { "type": "boolean" },
+    "seeds": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "integer" }
+    },
+    "arb_seed_offset": {
+      "type": "integer",
+      "description": "Independent arbitration RNG stream; traffic seeds never change with design."
+    },
+    "notes": { "type": "string" }
+  }
+}

@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Router IPM 内部模块互联框图</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --panel: #ffffff;
+      --group: #edf4ff;
+      --group-border: #7aa7d9;
+      --module: #ffffff;
+      --module-border: #2f5f91;
+      --data: #1d1d1f;
+      --req: #d9822b;
+      --ack: #7b61ff;
+      --ctrl: #3976d3;
+      --text: #172033;
+      --muted: #5f6b7a;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    header {
+      padding: 24px 32px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .canvas {
+      margin: 16px 32px 32px;
+      padding: 18px;
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid #d7e0ea;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(30, 60, 90, 0.08);
+    }
+
+    svg {
+      display: block;
+      min-width: 2600px;
+      background: #fbfdff;
+      border-radius: 10px;
+    }
+
+    .group {
+      fill: var(--group);
+      stroke: var(--group-border);
+      stroke-width: 2;
+      rx: 18;
+      ry: 18;
+    }
+
+    .group-title {
+      fill: #1f4d7a;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .module {
+      fill: var(--module);
+      stroke: var(--module-border);
+      stroke-width: 2.5;
+      rx: 12;
+      ry: 12;
+      filter: drop-shadow(0 3px 5px rgba(20, 50, 80, 0.12));
+    }
+
+    .module-title {
+      fill: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .module-subtitle {
+      fill: var(--muted);
+      font-size: 15px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .data-line {
+      fill: none;
+      stroke: var(--data);
+      stroke-width: 3.2;
+      marker-end: url(#arrow-data);
+    }
+
+    .req-line {
+      fill: none;
+      stroke: var(--req);
+      stroke-width: 2.4;
+      stroke-dasharray: 9 8;
+      marker-end: url(#arrow-req);
+    }
+
+    .ack-line {
+      fill: none;
+      stroke: var(--ack);
+      stroke-width: 2.4;
+      stroke-dasharray: 9 8;
+      marker-end: url(#arrow-ack);
+    }
+
+    .ctrl-line {
+      fill: none;
+      stroke: var(--ctrl);
+      stroke-width: 2.2;
+      stroke-dasharray: 6 7;
+      marker-end: url(#arrow-ctrl);
+    }
+
+    .ctrl-solid {
+      fill: none;
+      stroke: var(--ctrl);
+      stroke-width: 2.2;
+      marker-end: url(#arrow-ctrl);
+    }
+
+    .label-bg {
+      fill: #fbfdff;
+      stroke: #d9e3ef;
+      stroke-width: 1;
+      rx: 8;
+      ry: 8;
+    }
+
+    .label {
+      font-size: 15px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .label.data { fill: var(--data); }
+    .label.req { fill: var(--req); }
+    .label.ack { fill: var(--ack); }
+    .label.ctrl { fill: var(--ctrl); }
+
+    .note {
+      fill: var(--muted);
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Router IPM 内部模块互联框图</h1>
+    <p>实线表示 <strong>data</strong> 通道；虚线表示 <strong>req</strong> 和 <strong>ack</strong> 控制链路。画布故意拉宽并错开平行线，减少文字和箭头重叠。</p>
+  </header>
+
+  <main class="canvas">
+    <svg viewBox="0 0 2600 1500" width="2600" height="1500" role="img" aria-label="Router IPM internal module interconnect diagram">
+      <defs>
+        <marker id="arrow-data" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#1d1d1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-req" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#d9822b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-ack" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#7b61ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+        <marker id="arrow-ctrl" viewBox="0 0 8 8" markerWidth="7" markerHeight="7" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="#3976d3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+      </defs>
+
+      <!-- Legend -->
+      <rect class="module" x="80" y="70" width="540" height="150"></rect>
+      <text class="module-title" x="160" y="105">图例</text>
+      <path class="data-line" d="M 120 145 L 260 145"></path>
+      <text class="label data" x="330" y="145">data 实线</text>
+      <path class="req-line" d="M 120 180 L 260 180"></path>
+      <text class="label req" x="330" y="180">req 虚线</text>
+      <path class="ack-line" d="M 420 180 L 560 180"></path>
+      <text class="label ack" x="490" y="145">ack 虚线</text>
+
+      <!-- Groups -->
+      <rect class="group" x="360" y="250" width="1840" height="1040"></rect>
+      <text class="group-title" x="390" y="290">RouterIPM</text>
+
+      <rect class="group" x="430" y="330" width="1500" height="640"></rect>
+      <text class="group-title" x="460" y="370">InputPortModule(i)</text>
+
+      <rect class="group" x="470" y="420" width="1400" height="350"></rect>
+      <text class="group-title" x="500" y="460">InputDatapathModule</text>
+
+      <rect class="group" x="540" y="1040" width="1380" height="190"></rect>
+      <text class="group-title" x="570" y="1080">InputControlModule</text>
+
+      <!-- Modules -->
+      <rect class="module" x="80" y="545" width="220" height="100"></rect>
+      <text class="module-title" x="190" y="585">上游输入端口</text>
+      <text class="module-subtitle" x="190" y="615">inPort(i)</text>
+
+      <rect class="module" x="520" y="545" width="190" height="110"></rect>
+      <text class="module-title" x="615" y="585">AsyncFork</text>
+      <text class="module-subtitle" x="615" y="615">VC demux</text>
+
+      <rect class="module" x="800" y="455" width="210" height="95"></rect>
+      <text class="module-title" x="905" y="492">InputBuffer</text>
+      <text class="module-subtitle" x="905" y="522">VC 0</text>
+
+      <rect class="module" x="800" y="650" width="210" height="95"></rect>
+      <text class="module-title" x="905" y="687">InputBuffer</text>
+      <text class="module-subtitle" x="905" y="717">VC N</text>
+
+      <rect class="module" x="1110" y="545" width="230" height="110"></rect>
+      <text class="module-title" x="1225" y="585">AsyncMaskedArbiter</text>
+      <text class="module-subtitle" x="1225" y="615">VC selector</text>
+
+      <rect class="module" x="1440" y="545" width="235" height="110"></rect>
+      <text class="module-title" x="1557" y="585">InputRequest</text>
+      <text class="module-subtitle" x="1557" y="615">GeneratorModule</text>
+
+      <rect class="module" x="1770" y="545" width="190" height="110"></rect>
+      <text class="module-title" x="1865" y="585">AsyncFork</text>
+      <text class="module-subtitle" x="1865" y="615">multicast</text>
+
+      <rect class="module" x="2250" y="455" width="230" height="95"></rect>
+      <text class="module-title" x="2365" y="492">toOpm(edge 0)</text>
+      <text class="module-subtitle" x="2365" y="522">internal HS_Packet</text>
+
+      <rect class="module" x="2250" y="650" width="230" height="95"></rect>
+      <text class="module-title" x="2365" y="687">toOpm(edge N)</text>
+      <text class="module-subtitle" x="2365" y="717">internal HS_Packet</text>
+
+      <rect class="module" x="1130" y="835" width="290" height="95"></rect>
+      <text class="module-title" x="1275" y="872">PacketContextModule</text>
+      <text class="module-subtitle" x="1275" y="902">stored route/lane/mask</text>
+
+      <rect class="module" x="620" y="1110" width="220" height="80"></rect>
+      <text class="module-title" x="730" y="1150">PacketRouteSelector</text>
+
+      <rect class="module" x="930" y="1110" width="220" height="80"></rect>
+      <text class="module-title" x="1040" y="1150">LaneReservation</text>
+
+      <rect class="module" x="1240" y="1110" width="260" height="80"></rect>
+      <text class="module-title" x="1370" y="1142">MulticastRequest</text>
+      <text class="module-subtitle" x="1370" y="1168">MaskModule</text>
+
+      <rect class="module" x="1610" y="1110" width="240" height="80"></rect>
+      <text class="module-title" x="1730" y="1150">InputEligibility</text>
+
+      <!-- HS channel: upstream -> VC demux -->
+      <path class="data-line" d="M 300 595 L 520 595"></path>
+      <path class="req-line" d="M 300 565 L 520 565"></path>
+      <path class="ack-line" d="M 520 625 L 300 625"></path>
+      <rect class="label-bg" x="385" y="574" width="50" height="26"></rect>
+      <text class="label data" x="410" y="588">data</text>
+      <rect class="label-bg" x="385" y="544" width="44" height="26"></rect>
+      <text class="label req" x="407" y="557">req</text>
+      <rect class="label-bg" x="385" y="634" width="44" height="26"></rect>
+      <text class="label ack" x="407" y="647">ack</text>
+
+      <!-- VC demux -> VC buffers -->
+      <path class="data-line" d="M 710 575 C 750 575, 750 502, 800 502"></path>
+      <path class="req-line" d="M 710 545 C 760 545, 760 472, 800 472"></path>
+      <path class="ack-line" d="M 800 532 C 760 532, 760 625, 710 625"></path>
+      <text class="label data" x="760" y="520">data</text>
+      <text class="label req" x="760" y="455">req</text>
+      <text class="label ack" x="760" y="650">ack</text>
+
+      <path class="data-line" d="M 710 615 C 750 615, 750 697, 800 697"></path>
+      <path class="req-line" d="M 710 585 C 760 585, 760 667, 800 667"></path>
+      <path class="ack-line" d="M 800 727 C 760 727, 760 655, 710 655"></path>
+      <text class="label data" x="760" y="705">data</text>
+      <text class="label req" x="762" y="640">req</text>
+      <text class="label ack" x="760" y="755">ack</text>
+
+      <!-- VC buffers -> VC arbiter -->
+      <path class="data-line" d="M 1010 502 C 1060 502, 1060 575, 1110 575"></path>
+      <path class="req-line" d="M 1010 472 C 1070 472, 1070 545, 1110 545"></path>
+      <path class="ack-line" d="M 1110 605 C 1070 605, 1070 532, 1010 532"></path>
+      <text class="label data" x="1060" y="520">data</text>
+      <text class="label req" x="1062" y="455">req</text>
+      <text class="label ack" x="1060" y="630">ack</text>
+
+      <path class="data-line" d="M 1010 697 C 1060 697, 1060 615, 1110 615"></path>
+      <path class="req-line" d="M 1010 667 C 1070 667, 1070 585, 1110 585"></path>
+      <path class="ack-line" d="M 1110 645 C 1070 645, 1070 727, 1010 727"></path>
+      <text class="label data" x="1060" y="705">data</text>
+      <text class="label req" x="1062" y="675">req</text>
+      <text class="label ack" x="1060" y="755">ack</text>
+
+      <!-- VC arbiter -> request generator -->
+      <path class="data-line" d="M 1340 600 L 1440 600"></path>
+      <path class="req-line" d="M 1340 565 L 1440 565"></path>
+      <path class="ack-line" d="M 1440 635 L 1340 635"></path>
+      <text class="label data" x="1390" y="590">data</text>
+      <text class="label req" x="1390" y="548">req</text>
+      <text class="label ack" x="1390" y="658">ack</text>
+
+      <!-- request generator -> multicast fork -->
+      <path class="data-line" d="M 1675 600 L 1770 600"></path>
+      <path class="req-line" d="M 1675 565 L 1770 565"></path>
+      <path class="ack-line" d="M 1770 635 L 1675 635"></path>
+      <text class="label data" x="1722" y="590">data</text>
+      <text class="label req" x="1722" y="548">req</text>
+      <text class="label ack" x="1722" y="658">ack</text>
+
+      <!-- multicast fork -> OPM edges -->
+      <path class="data-line" d="M 1960 575 C 2070 575, 2120 502, 2250 502"></path>
+      <path class="req-line" d="M 1960 545 C 2080 545, 2120 472, 2250 472"></path>
+      <path class="ack-line" d="M 2250 532 C 2120 532, 2080 625, 1960 625"></path>
+      <text class="label data" x="2110" y="520">data</text>
+      <text class="label req" x="2112" y="455">req</text>
+      <text class="label ack" x="2110" y="650">ack</text>
+
+      <path class="data-line" d="M 1960 615 C 2070 615, 2120 697, 2250 697"></path>
+      <path class="req-line" d="M 1960 585 C 2080 585, 2120 667, 2250 667"></path>
+      <path class="ack-line" d="M 2250 727 C 2120 727, 2080 655, 1960 655"></path>
+      <text class="label data" x="2110" y="705">data</text>
+      <text class="label req" x="2112" y="640">req</text>
+      <text class="label ack" x="2110" y="755">ack</text>
+
+      <!-- Control-plane links -->
+      <path class="ctrl-solid" d="M 1225 655 C 1225 740, 820 840, 730 1110"></path>
+      <text class="label ctrl" x="1010" y="840">inBits / isHead / inValid</text>
+
+      <path class="ctrl-solid" d="M 840 1150 L 930 1150"></path>
+      <text class="label ctrl" x="885" y="1130">currentDestVec</text>
+
+      <path class="ctrl-solid" d="M 1150 1150 L 1240 1150"></path>
+      <text class="label ctrl" x="1195" y="1130">headSelLane</text>
+
+      <path class="ctrl-solid" d="M 1500 1150 L 1610 1150"></path>
+      <text class="label ctrl" x="1555" y="1130">requestMask</text>
+
+      <path class="ctrl-solid" d="M 1730 1110 C 1730 990, 1840 820, 1865 655"></path>
+      <text class="label ctrl" x="1810" y="900">destMask</text>
+
+      <path class="ctrl-line" d="M 1730 1110 C 1600 960, 1400 760, 1225 655"></path>
+      <text class="label ctrl" x="1510" y="845">vcAllow</text>
+
+      <path class="ctrl-solid" d="M 1865 655 C 1770 790, 1530 870, 1420 880"></path>
+      <text class="label ctrl" x="1635" y="780">launch / complete</text>
+
+      <path class="ctrl-solid" d="M 1130 875 C 910 875, 750 1010, 730 1110"></path>
+      <text class="label ctrl" x="900" y="900">storedDir</text>
+
+      <path class="ctrl-solid" d="M 1275 930 C 1325 1000, 1360 1060, 1370 1110"></path>
+      <text class="label ctrl" x="1425" y="1015">storedMask</text>
+
+      <path class="ctrl-solid" d="M 1730 1190 C 1620 1265, 1370 1265, 1275 930"></path>
+      <text class="label ctrl" x="1470" y="1280">nextDir / nextLane / nextMask</text>
+
+      <path class="ctrl-line" d="M 2250 502 C 2100 970, 1900 1050, 1850 1148"></path>
+      <text class="label ctrl" x="2090" y="1010">holder / outEmpty feedback</text>
+
+      <!-- Notes -->
+      <text class="note" x="80" y="1370">说明：VC 0 和 VC N 之间省略若干 VC；toOpm(edge 0) 和 toOpm(edge N) 之间省略若干稀疏内部边。</text>
+      <text class="note" x="80" y="1405">每条 HS_Packet 链路均拆分为 data、req、ack 三条边：data 和 req 从 source 到 sink，ack 从 sink 返回 source。</text>
+    </svg>
+  </main>
+</body>
+</html>

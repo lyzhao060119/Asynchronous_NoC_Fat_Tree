@@ -3,6 +3,7 @@ package Router_Architecture.ipm
 import DataStruct._
 import Router_Architecture.common.{AsyncFifo, RouterModuleConfig}
 import chisel3._
+import tool.AsyncDelay
 
 /** Paper-aligned input buffer stage.
   *
@@ -21,7 +22,7 @@ class InputBuffer(config: RouterModuleConfig) extends Module {
     val isTail = Output(Bool())
   })
 
-  private val fifo = Module(new AsyncFifo(config.fifoDepth))
+  private val fifo = Module(new AsyncFifo(config.fifoDepth, AsyncDelay.FifoDfire))
 
   fifo.io.enq <> io.in
   io.out <> fifo.io.deq

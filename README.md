@@ -13,6 +13,14 @@ The design uses request/acknowledge handshakes and supports multi-flit unicast a
 - Quadtree routing suppresses same-tree back-edge re-forwarding to avoid duplicate sends and loops.
 - Quadtree root routing supports cross-tree rectangle multicast by keeping local fanout while also duplicating upward when needed.
 - Top-layer routing supports rectangle spread across multiple quadtree tiles with ingress-aware duplicate suppression.
+- Current ASIC/post-synthesis work is tracked in [docs/current_progress_summary.md](docs/current_progress_summary.md).
+  The current stable RouterL1 profile is `P100_FIFO_ONLY`; RouterL1 SDF smoke
+  passes with direct DUT-boundary `E2E_EDGE=2.147ns`, and reqGen timing now
+  points to the `InputControlModule` dest-mask/control cone as the main hotspot.
+- Router handshake-domain hardware details are documented in
+  [docs/router_handshake_domains.md](docs/router_handshake_domains.md).
+- The Router timing optimization roadmap is documented in
+  [docs/router_timing_optimization_plan.md](docs/router_timing_optimization_plan.md).
 
 ## Architecture
 
@@ -138,12 +146,27 @@ powershell -ExecutionPolicy Bypass -File sim/xsim/cleanup_outputs.ps1
 
 This removes generated webtalk artifacts and cleans legacy root-level Vivado outputs (`.Xil`, `xsim.dir`, logs, backup journals). Legacy root outputs are archived under `sim/work/xsim/archive`.
 
+## Async Primitive Timing
+
+RTL functional simulation uses `ASYNC_PRIMITIVES=sim` by default. This compiles
+`DelayElement_sim.v` and `Mutex2_sim.v`, which contain `#` delays for event
+ordering only. For FPGA-oriented synthesis checks, use `ASYNC_PRIMITIVES=fpga`
+or `sbt -Dasync.primitives=fpga ...` and include
+`constraints/async_primitives_fpga.xdc`. For the AsyncNoC16 AXI/BRAM top,
+include `constraints/async_noc16_axi_fpga.xdc` to add the 50MHz clock constraint
+and allow intentional async feedback loops.
+
+Real async delay numbers must come from post-route timing or board calibration,
+not from RTL `#` delays. See `docs/async_timing.md`.
+
 ## Repository Layout
 
 - `src/main/scala/DataStruct`: packet and handshake definitions
 - `src/main/scala/Router_Architecture`: router building blocks and routing logic
 - `src/main/scala/NoC`: top-level network generators
-- `src/main/resources/ASYNC`: async Verilog cells (`DelayElement`, `Mutex2`, `MrGo`)
+- `src/main/resources/ASYNC`: async Verilog cells and sim/fpga primitive profiles
+- `constraints`: FPGA constraint templates for async primitive synthesis
+- `scripts/async`: post-route timing report helpers for async primitive calibration
 - `sim/testbenches`: SystemVerilog testbenches
 - `sim/modelsim`: ModelSim/Questa scripts
 - `sim/xsim`: Vivado xsim launch and Tcl scripts

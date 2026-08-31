@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/plan.schema.json",
+  "title": "DATE V3 orchestrator plan",
+  "type": "object",
+  "required": ["schema", "plan_id", "runs"],
+  "properties": {
+    "schema": { "const": "date-v3-plan-v1" },
+    "plan_id": { "type": "string" },
+    "title": { "type": "string" },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["run_id", "design_id", "adapter"],
+        "properties": {
+          "run_id": { "type": "string" },
+          "design_id": { "type": ["string", "null"] },
+          "benchmark_id": { "type": ["string", "null"] },
+          "seed": { "type": ["integer", "null"] },
+          "adapter": { "type": "string" },
+          "env": { "type": "object" },
+          "argv": { "type": "array", "items": { "type": "string" } },
+          "physical_class": { "type": "string" },
+          "paper_eligible": { "type": "boolean" },
+          "archive_only_reason": { "type": ["string", "null"] },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

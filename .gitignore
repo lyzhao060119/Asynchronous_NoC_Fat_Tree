@@ -80,3 +80,56 @@ modelsim.ini
 vish_stacktrace.vstf
 
 fat_tree_NoC_1024_standard/
+sim/SyncRouterL1/summary_RTL
+sim/SyncRouterL1/testbench/generated_cases
+sim/SyncNoC_64/testbench/generated_cases
+sim/SyncNoC_64
+sim/AsyncRouterL1/summary
+sim/AsyncRouterL1/testbench/cases
+DUT/
+sim/AsyncNoC/testbench/generated_cases
+sim/AsyncNoC/testbench/generated_cases_noc64
+
+scripts/asic_dc/timing
+scripts/asic_dc/sim_gls/results
+tmp
+scripts/asic_dc/ultra/results
+scripts/asic_dc/cmr/results
+scripts/asic_pnr/cmr/results
+test_run_dir/
+
+### Local reference documents ###
+/docs/*.pdf
+
+### DATE V3 experiment bulky artifacts ###
+DATE paper/experiments/raw/
+DATE paper/experiments/intermediate/
+DATE paper/experiments/model/work/
+DATE paper/experiments/**/__pycache__/
+/DATE paper/references/
+!DATE paper/experiments/registry/
+!DATE paper/experiments/registry/**
+!DATE paper/experiments/curated/
+!DATE paper/experiments/curated/**
+!DATE paper/experiments/figures/
+!DATE paper/experiments/figures/**
+!DATE paper/experiments/configs/
+!DATE paper/experiments/configs/**
+!DATE paper/experiments/scripts/
+!DATE paper/experiments/scripts/**
+
+### Python bytecode/cache ###
+__pycache__/
+*.py[cod]
+
+### ASIC/simulation generated artifacts ###
+*.vcd
+*.vpd
+*.fsdb
+*.sdf
+*.spef
+*.ddc
+*.gds
+*.gds.gz
+*.oas
+*.ndm/

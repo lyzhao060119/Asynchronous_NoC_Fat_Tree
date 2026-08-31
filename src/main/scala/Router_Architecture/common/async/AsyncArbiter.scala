@@ -2,6 +2,7 @@ package Router_Architecture.common
 
 import DataStruct._
 import chisel3._
+import tool.AsyncDelay
 
 /**
  * Asynchronous arbiter for multiple packet channels.
@@ -9,10 +10,14 @@ import chisel3._
  * This shell preserves the existing interface while internally splitting the
  * selector and output buffer into separate modules.
  */
-class AsyncArbiter(val nIn: Int) extends Module {
+class AsyncArbiter(
+    val nIn: Int,
+    dfireDelayRole: String = AsyncDelay.DefaultRole
+) extends Module {
   require(nIn >= 1)
   val idxW = math.max(1, chisel3.util.log2Ceil(nIn))
-  private val selector = Module(new AsyncArbiterRequestSelector(nIn))
+  private val selector =
+    Module(new AsyncArbiterRequestSelector(nIn, dfireDelayRole))
   private val outBuffer = Module(new AsyncOutputBuffer)
 
   val io = IO(new Bundle {
