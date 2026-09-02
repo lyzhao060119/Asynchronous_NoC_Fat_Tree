@@ -32,12 +32,12 @@
   "lsf_jobs": [],
   "frozen_structure_ok": null,
   "paper_eligible": false,
-  "physical_class": "post-synthesis",
-  "archive_only_reason": null,
+  "physical_class": "archive-only",
+  "archive_only_reason": "3-cycle Head path. Do not overwrite.",
   "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
   "artifacts": {},
   "cases": [],
   "created_utc": "2026-08-31T05:50:02+00:00",
   "updated_utc": "2026-08-31T05:50:02+00:00",
-  "notes": "Clocked Fat 1-2-2-2 SyncNoC64 1.0 ns."
+  "notes": "Phase 2 clocked Fat 1-2-2-2 SyncNoC64 1.0 ns with 3-cycle Head path. Archive-only after Phase 2.5."
 }

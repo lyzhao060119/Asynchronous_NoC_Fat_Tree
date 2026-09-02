@@ -18,5 +18,13 @@ class CMRTopMeshGeometrySpec extends AnyFlatSpec {
         CMRParameters.expectedLaneAdapters(2, 2)
     )
     assert(CMRParameters.SupportedLaneGeometries.contains((2, 2)))
+    assert(CMRParameters.SupportedLaneGeometries.contains((1, 2)))
+    assert(!CMRParameters.SupportedLaneGeometries.contains((4, 2)))
+  }
+
+  "TopMesh dual-lane Local" should "be parentLanes=2 on a direction-level mask" in {
+    assert(CMRParameters.portCount(2, 2) == 10)
+    assert(CMRParameters.maxOpmFanIn(2, 2) == 8)
+    assert(CMRParameters.expectedLaneAdapters(1, 2) == 4)
   }
 }

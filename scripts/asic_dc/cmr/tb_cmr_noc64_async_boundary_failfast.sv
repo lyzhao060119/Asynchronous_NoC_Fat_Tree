@@ -1,16 +1,24 @@
 `timescale 1ns/1ps
 
 // CMR fail-fast shell around tb_noc64_async_boundary.
-// TOP_LANES: 8 Fat 1-2-4-8, 2 Fat 1-2-2-2 (`CMR_NOC64_TOP2), 0 mesh (`CMR_NOC64_MESH).
+// TOP_LANES: 8 Fat 1-2-4-8, 2 Fat 1-2-2-2 (`CMR_NOC64_TOP2), 1 Thin (`CMR_NOC64_THIN), 0 mesh (`CMR_NOC64_MESH).
 module tb_cmr_noc64_async_boundary_failfast;
-`ifdef CMR_NOC64_MESH
+`ifdef CMR_MESH16
   localparam integer TOP_LANES = 0;
+  localparam integer NUM_CORES = 16;
+`elsif CMR_NOC64_MESH
+  localparam integer TOP_LANES = 0;
+  localparam integer NUM_CORES = 64;
+`elsif CMR_NOC64_THIN
+  localparam integer TOP_LANES = 1;
+  localparam integer NUM_CORES = 64;
 `elsif CMR_NOC64_TOP2
   localparam integer TOP_LANES = 2;
+  localparam integer NUM_CORES = 64;
 `else
   localparam integer TOP_LANES = 8;
-`endif
   localparam integer NUM_CORES = 64;
+`endif
   localparam integer NUM_PORTS = NUM_CORES + TOP_LANES;
 
   noc64_async_boundary_core #(
@@ -27,6 +35,7 @@ module tb_cmr_noc64_async_boundary_failfast;
   realtime last_progress_ns;
   reg watchdog_armed;
   reg failure_fired;
+  reg dump_on_fail;
   reg trace_enabled;
   reg diagnostic_trigger;
   integer diagnostic_port;
@@ -72,6 +81,11 @@ module tb_cmr_noc64_async_boundary_failfast;
       if (!failure_fired) begin
         failure_fired = 1'b1;
         $display("%0s", marker);
+        if (dump_on_fail) begin
+          $display("TB_DUMP_ON_FAIL writing CSV before fatal");
+          core.dump_csv_results();
+        end
+        dump_mesh_hop_counts();
         $fatal(1, "%0s", marker);
       end
     end
@@ -214,13 +228,208 @@ module tb_cmr_noc64_async_boundary_failfast;
                core.noc_out_req);
   end
 
+`ifdef CMR_MESH16
+  always @(core.noc_out_req[13] or core.noc_out_ack[13]) begin
+    if (core.running && $test$plusargs("MESH_LOCAL_PROBE"))
+      $display("TB_MESH_LOCAL13 t=%0t req=%b ack=%b data=%h rx=%0d unexpected=%0d",
+               $time, core.noc_out_req[13], core.noc_out_ack[13],
+               core.noc_out_data[13*28 +: 28], core.rx_count[13],
+               core.unexpected_flits);
+  end
+
+  // XY 3→13: (3,0) west to (1,0), then north to (1,3) local.
+  integer hop_n_3_0_local_in, hop_n_3_0_west, hop_n_2_0_west;
+  integer hop_n_1_0_north, hop_n_1_1_north, hop_n_1_2_north;
+  integer hop_n_1_3_south, hop_n_1_3_local, hop_n_1_3_path, hop_n_1_3_tail;
+
+  `define TB_MESH_HOP(req, ack, flit, nm, cnt) \
+    always @(req) begin \
+      if (core.running && $test$plusargs("MESH_HOP_PROBE")) begin \
+        cnt = cnt + 1; \
+        $display("TB_HOP t=%0t link=%s n=%0d req=%b ack=%b ht=%0d%0d flit=%h", \
+                 $time, nm, cnt, req, ack, flit[27], flit[26], flit); \
+      end \
+    end
+
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_3_0.io_inputs_parent_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_3_0.io_inputs_parent_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_3_0.io_inputs_parent_0_Data_flit,
+               "meshR_3_0.local_in", hop_n_3_0_local_in)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_3_0.io_outputs_child_0_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_3_0.io_outputs_child_0_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_3_0.io_outputs_child_0_0_Data_flit,
+               "meshR_3_0.west_out", hop_n_3_0_west)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_2_0.io_outputs_child_0_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_2_0.io_outputs_child_0_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_2_0.io_outputs_child_0_0_Data_flit,
+               "meshR_2_0.west_out", hop_n_2_0_west)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_0.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_0.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_0.io_outputs_child_3_0_Data_flit,
+               "meshR_1_0.north_out", hop_n_1_0_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_1.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_1.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_1.io_outputs_child_3_0_Data_flit,
+               "meshR_1_1.north_out", hop_n_1_1_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_2.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_2.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_2.io_outputs_child_3_0_Data_flit,
+               "meshR_1_2.north_out", hop_n_1_2_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.io_inputs_child_1_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.io_inputs_child_1_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.io_inputs_child_1_0_Data_flit,
+               "meshR_1_3.south_in", hop_n_1_3_south)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.io_outputs_parent_0_HS_Req,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.io_outputs_parent_0_HS_Ack,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.io_outputs_parent_0_Data_flit,
+               "meshR_1_3.local_out", hop_n_1_3_local)
+
+  always @(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.InputPortModules_1_io_PathEnabled_3) begin
+    if (core.running && $test$plusargs("MESH_HOP_PROBE")) begin
+      hop_n_1_3_path = hop_n_1_3_path + 1;
+      $display("TB_HOP t=%0t link=meshR_1_3.south_to_local.PathEnabled n=%0d val=%b",
+               $time, hop_n_1_3_path,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.InputPortModules_1_io_PathEnabled_3);
+    end
+  end
+  always @(core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.OutputPortModules_4_io_TailPassed_1) begin
+    if (core.running && $test$plusargs("MESH_HOP_PROBE")) begin
+      hop_n_1_3_tail = hop_n_1_3_tail + 1;
+      $display("TB_HOP t=%0t link=meshR_1_3.local.TailPassed_south n=%0d val=%b",
+               $time, hop_n_1_3_tail,
+               core.g_behavioral_noc_mesh16.noc.dut.meshR_1_3.OutputPortModules_4_io_TailPassed_1);
+    end
+  end
+
+  task automatic dump_mesh_hop_counts;
+    begin
+      if ($test$plusargs("MESH_HOP_PROBE"))
+        $display("TB_HOP_COUNTS local_in=%0d w30=%0d w20=%0d n10=%0d n11=%0d n12=%0d south13=%0d local13=%0d path=%0d tail=%0d",
+                 hop_n_3_0_local_in, hop_n_3_0_west, hop_n_2_0_west,
+                 hop_n_1_0_north, hop_n_1_1_north, hop_n_1_2_north,
+                 hop_n_1_3_south, hop_n_1_3_local, hop_n_1_3_path,
+                 hop_n_1_3_tail);
+    end
+  endtask
+`elsif CMR_NOC64_MESH
+  always @(core.noc_out_req[44] or core.noc_out_ack[44]) begin
+    if (core.running && $test$plusargs("MESH_LOCAL_PROBE"))
+      $display("TB_MESH_LOCAL44 t=%0t req=%b ack=%b data=%h rx=%0d unexpected=%0d",
+               $time, core.noc_out_req[44], core.noc_out_ack[44],
+               core.noc_out_data[44*28 +: 28], core.rx_count[44],
+               core.unexpected_flits);
+  end
+
+  // XY 6→44: (6,0) west to (4,0), then north to (4,5) local.
+  // Count request transitions only.  Do not dump waveforms.
+  integer hop_n_6_0_local_in, hop_n_6_0_west, hop_n_5_0_west;
+  integer hop_n_4_0_north, hop_n_4_1_north, hop_n_4_2_north;
+  integer hop_n_4_3_north, hop_n_4_4_north, hop_n_4_5_south, hop_n_4_5_local;
+  integer hop_n_4_5_path, hop_n_4_5_tail;
+
+  `define TB_MESH_HOP(req, ack, flit, nm, cnt) \
+    always @(req) begin \
+      if (core.running && $test$plusargs("MESH_HOP_PROBE")) begin \
+        cnt = cnt + 1; \
+        $display("TB_HOP t=%0t link=%s n=%0d req=%b ack=%b ht=%0d%0d flit=%h", \
+                 $time, nm, cnt, req, ack, flit[27], flit[26], flit); \
+      end \
+    end
+
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_6_0.io_inputs_parent_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_6_0.io_inputs_parent_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_6_0.io_inputs_parent_0_Data_flit,
+               "meshR_6_0.local_in", hop_n_6_0_local_in)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_6_0.io_outputs_child_0_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_6_0.io_outputs_child_0_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_6_0.io_outputs_child_0_0_Data_flit,
+               "meshR_6_0.west_out", hop_n_6_0_west)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_5_0.io_outputs_child_0_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_5_0.io_outputs_child_0_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_5_0.io_outputs_child_0_0_Data_flit,
+               "meshR_5_0.west_out", hop_n_5_0_west)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_0.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_0.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_0.io_outputs_child_3_0_Data_flit,
+               "meshR_4_0.north_out", hop_n_4_0_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_1.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_1.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_1.io_outputs_child_3_0_Data_flit,
+               "meshR_4_1.north_out", hop_n_4_1_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_2.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_2.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_2.io_outputs_child_3_0_Data_flit,
+               "meshR_4_2.north_out", hop_n_4_2_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_3.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_3.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_3.io_outputs_child_3_0_Data_flit,
+               "meshR_4_3.north_out", hop_n_4_3_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_4.io_outputs_child_3_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_4.io_outputs_child_3_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_4.io_outputs_child_3_0_Data_flit,
+               "meshR_4_4.north_out", hop_n_4_4_north)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.io_inputs_child_1_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.io_inputs_child_1_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.io_inputs_child_1_0_Data_flit,
+               "meshR_4_5.south_in", hop_n_4_5_south)
+  `TB_MESH_HOP(core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.io_outputs_parent_0_HS_Req,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.io_outputs_parent_0_HS_Ack,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.io_outputs_parent_0_Data_flit,
+               "meshR_4_5.local_out", hop_n_4_5_local)
+
+  always @(core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.InputPortModules_1_io_PathEnabled_3) begin
+    if (core.running && $test$plusargs("MESH_HOP_PROBE")) begin
+      hop_n_4_5_path = hop_n_4_5_path + 1;
+      $display("TB_HOP t=%0t link=meshR_4_5.south_to_local.PathEnabled n=%0d val=%b",
+               $time, hop_n_4_5_path,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.InputPortModules_1_io_PathEnabled_3);
+    end
+  end
+  always @(core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.OutputPortModules_4_io_TailPassed_1) begin
+    if (core.running && $test$plusargs("MESH_HOP_PROBE")) begin
+      hop_n_4_5_tail = hop_n_4_5_tail + 1;
+      $display("TB_HOP t=%0t link=meshR_4_5.local.TailPassed_south n=%0d val=%b",
+               $time, hop_n_4_5_tail,
+               core.g_behavioral_noc_mesh.noc.dut.meshR_4_5.OutputPortModules_4_io_TailPassed_1);
+    end
+  end
+
+  task automatic dump_mesh_hop_counts;
+    begin
+      if ($test$plusargs("MESH_HOP_PROBE"))
+        $display("TB_HOP_COUNTS local_in=%0d w60=%0d w50=%0d n40=%0d n41=%0d n42=%0d n43=%0d n44=%0d south45=%0d local45=%0d path=%0d tail=%0d",
+                 hop_n_6_0_local_in, hop_n_6_0_west, hop_n_5_0_west,
+                 hop_n_4_0_north, hop_n_4_1_north, hop_n_4_2_north,
+                 hop_n_4_3_north, hop_n_4_4_north, hop_n_4_5_south,
+                 hop_n_4_5_local, hop_n_4_5_path, hop_n_4_5_tail);
+    end
+  endtask
+`else
+  task automatic dump_mesh_hop_counts;
+    begin
+    end
+  endtask
+`endif
+
   initial begin : fail_fast_watchdogs
     stall_timeout_ns = 50000.0;
     hard_timeout_ns = 400000.0;
     watchdog_poll_ns = 1000.0;
     watchdog_armed = 1'b0;
     failure_fired = 1'b0;
+    dump_on_fail = 1'b0;
     trace_enabled = 1'b0;
+`ifdef CMR_MESH16
+    hop_n_3_0_local_in = 0; hop_n_3_0_west = 0; hop_n_2_0_west = 0;
+    hop_n_1_0_north = 0; hop_n_1_1_north = 0; hop_n_1_2_north = 0;
+    hop_n_1_3_south = 0; hop_n_1_3_local = 0; hop_n_1_3_path = 0;
+    hop_n_1_3_tail = 0;
+`elsif CMR_NOC64_MESH
+    hop_n_6_0_local_in = 0; hop_n_6_0_west = 0; hop_n_5_0_west = 0;
+    hop_n_4_0_north = 0; hop_n_4_1_north = 0; hop_n_4_2_north = 0;
+    hop_n_4_3_north = 0; hop_n_4_4_north = 0; hop_n_4_5_south = 0;
+    hop_n_4_5_local = 0; hop_n_4_5_path = 0; hop_n_4_5_tail = 0;
+`endif
     diagnostic_trigger = 1'b0;
     diagnostic_port = -1;
     unex_port = -1;
@@ -228,6 +437,7 @@ module tb_cmr_noc64_async_boundary_failfast;
     if ($value$plusargs("HARD_TIMEOUT_NS=%f", hard_timeout_ns)) ;
     if ($value$plusargs("WATCHDOG_POLL_NS=%f", watchdog_poll_ns)) ;
     if ($test$plusargs("CMR_FAILFAST_TRACE")) trace_enabled = 1'b1;
+    if ($test$plusargs("DUMP_ON_FAIL")) dump_on_fail = 1'b1;
     wait (core.running === 1'b1);
     traffic_start_ns = $realtime;
     last_progress_ns = $realtime;

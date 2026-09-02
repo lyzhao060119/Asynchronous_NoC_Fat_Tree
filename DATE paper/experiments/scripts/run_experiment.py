@@ -12,11 +12,12 @@ if str(SCRIPTS) not in sys.path:
 
 from date_v3 import gitmeta  # noqa: E402
 from date_v3.adapters import run_adapter  # noqa: E402
-from date_v3.hashutil import load_json, sha256_json  # noqa: E402
+from date_v3.hashutil import load_json  # noqa: E402
 from date_v3.manifest import config_hash_of, hashes_match, new_manifest, save_manifest  # noqa: E402
 from date_v3.paths import BENCHMARKS, DESIGNS, PLANS, REGISTRY  # noqa: E402
 from date_v3.registry import curated_gate, get_run, iter_manifests, upsert_run  # noqa: E402
 from date_v3.schema import assert_locked_delay, validate_file  # noqa: E402
+from date_v3.display_names import display_name  # noqa: E402
 
 
 def load_design(design_id: str) -> dict:
@@ -145,11 +146,12 @@ def cmd_status(_args: argparse.Namespace) -> int:
             has_traffic=bool(manifest.get("benchmark_id")),
         )
         print(
-            "%s  %-18s  %-16s  paper=%s  class=%s  gate=%s"
+            "%s  %-12s  %s  %s  paper=%s  class=%s  gate=%s"
             % (
                 manifest["run_id"],
                 manifest.get("status"),
-                manifest.get("design_id") or "-",
+                display_name(manifest.get("design_id")),
+                display_name(manifest.get("benchmark_id")) if manifest.get("benchmark_id") else "-",
                 manifest.get("paper_eligible"),
                 manifest.get("physical_class"),
                 "OK" if not gate else ",".join(gate),

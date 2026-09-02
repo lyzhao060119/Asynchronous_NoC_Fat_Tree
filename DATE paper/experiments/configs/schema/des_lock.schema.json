@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/des_lock.schema.json",
+  "title": "DATE V3 DES calibration lock",
+  "type": "object",
+  "required": [
+    "schema",
+    "model_version",
+    "physical_class",
+    "calibration_file",
+    "calibration_hash"
+  ],
+  "properties": {
+    "schema": { "const": "date-v3-des-lock-v1" },
+    "model_version": { "type": "string" },
+    "physical_class": { "const": "post-synthesis" },
+    "calibration_file": { "type": "string" },
+    "calibration_run_id": { "type": ["string", "null"] },
+    "calibration_hash": { "type": "string" },
+    "locked_utc": { "type": "string" },
+    "stale_if": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "string" },
+    "calibration_seed": { "type": "integer" },
+    "hop_self_check": { "type": "string" },
+    "network_rtl_64": { "type": "string" },
+    "network_rtl_256": { "type": "string" },
+    "paper_matrix_allowed": { "type": "boolean" }
+  }
+}

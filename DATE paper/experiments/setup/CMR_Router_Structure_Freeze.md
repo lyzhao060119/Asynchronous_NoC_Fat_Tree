@@ -198,10 +198,18 @@ CMR_BYPASS_INTERLEVEL_FIFO=1          # 64 核论文 DUT
 | Fat L1 `(1,2)` | `20260830_cmr_fat_l1_hop_del050_ackin050` |
 | PROP L2 `(2,2)` | `20260830_cmr_fat_l2_hop_del050_ackin050` |
 | PROP L3 `(2,2)` | `20260830_cmr_fat_l3_hop_del050_ackin050` |
+| FlatMesh `(1,1)` mesh Mat | `20260831_cmr_flatmesh_c1p1_del050_ackin050` |
+| TopMesh2 `(2,2)` mesh Mat | `20260831_cmr_topmesh_c2p2_del050_ackin050` |
+| PFAT L2 `(2,4)` | `20260831_cmr_pfat_l2_c2p4_del050_ackin050` |
+| PFAT L3 `(4,8)` | `20260831_cmr_pfat_l3_c4p8_del050_ackin050` |
+| Sync Thin isolated（2 拍 Head，archive） | `20260831_cmr_sync_thin_1x1_1p0ns` |
+| Sync PROP isolated（3 拍 Head，archive） | `20260831_cmr_sync_prop_2x2_1p0ns` |
+| Sync Thin isolated（Phase 2.5，1 拍 Head） | `20260901_cmr_sync_thin_1x1_1p0ns` |
+| Sync PROP isolated（Phase 2.5，1 拍 Head） | `20260901_cmr_sync_prop_2x2_1p0ns` |
 
-PPA 汇总目录：`20260830_cmr_router_level_baseline_del050`。
+DATE V3 Table I / Fig. A 的 **Async** Router PPA 仍引用 `20260831_cmr_primitive_hop_ppa_ru5` 的 Async 行。Sync 行改为 Phase 2.5 汇总 `20260901_cmr_primitive_hop_ppa_ru5`（1 拍 Head）。历史 hop 对照目录 `20260830_cmr_router_level_baseline_del050` 与 Phase 2 Sync hop ID 保留、禁止覆盖。
 
-该配方上已测得的 hop Head（**引用用，不是新的调时目标**）：Thin ≈ **0.681 ns**；Fat L2/L3 ≈ **0.956 ns**。Body/Tail、面积、energy 以该 PPA 文件夹为准，不在实验中途改 DEL 去“刷”这两个数。
+该配方上已测得的 hop Head（**引用用，不是新的调时目标**）：Thin / FlatMesh ≈ **0.681 ns**；PROP L2/L3 / TopMesh2 ≈ **0.956–0.958 ns**；PFAT L2 ≈ **1.022 ns**；PFAT L3 ≈ **1.328 ns**。面积与 energy 以 `20260831_cmr_primitive_hop_ppa_ru5` 为准。
 
 ### 4.3 明确不是论文 hop 对照的网表
 
@@ -214,33 +222,45 @@ PPA 汇总目录：`20260830_cmr_router_level_baseline_del050`。
 | Fat NoC64 `20260830_095259_cmr_noc64_p50_1222` | 网络 SDF PASS，Ackin **DEL250**（网络稳健性前驱，不是 hop 配方） |
 | 历史 Fig. 6 默认 4×`DEL150` | 实现笔记残留，代码默认已是 1×`DEL050` |
 
-PFAT L2 `(2,4)` / L3 `(4,8)` 的 **RTL 几何已冻结**，隔离 hop 网表 **尚未** 进入 `FROZEN_HOP_NETLIST_RUN_IDS`。Fig. A 的 PFAT 硬件点必须用 **同一 DEL 配方** 新跑，不得拿 Ackin-250 或 1248 实验室网表充数。
+PFAT L2 `(2,4)` / L3 `(4,8)` 隔离 hop 已进入冻结集（同一 `1×DEL050` 配方），见上表。不得拿 Ackin-250 或旧 1248 实验室网表替换。
 
 ---
 
 ## 5. 同步时钟冻结（Thin = Fat 1-2-2-2）
 
+Phase 2.5 把 isolated Head 从 2/3 拍改为 **1 拍**（组合 `liveGrant` / `LaneSelect`）。**2026-09-01 Gate PASS**：1.0 ns 合上，未改周期。**禁止** 为追异步 Head 改到 0.90 ns。ZeroWireload 裕量极薄，不要加快时钟。
+
 | 项 | 冻结值 |
 | --- | --- |
-| 周期 | **1.0 ns** |
+| 周期 | **1.0 ns**（`FROZEN_SYNC64_CLOCK_NS`；Thin/PROP/NoC64 共用） |
 | 工艺 / 角 | TSMC 28 nm SS `ssg0p81v125c` |
 | 线载 | ZeroWireload |
 | SDC | `scripts/asic_dc/cmr/sync_cmr_noc64.sdc`：setup uncertainty = 5%×周期，hold = 0.02 ns，I/O = 10%，ideal clock |
-| 关键路径 | L2 `destReg` → bypass 导线 → L1 buffer 写（Mat/flit，**一个时钟**） |
-| Fat 限制器 | arrival **0.85 ns**，required 0.93 ns，WNS **0.083 ns** |
-| Thin | arrival 0.80 ns，WNS 0.134 ns |
-| 同网表零裕量下限 | Fat ≈ **0.92 ns**；**禁止** 对这些 run ID 设 `CMR_SYNC64_CLOCK_PERIOD_NS=0.9` |
+| Head 拍数 | Thin 与 PROP isolated **1 拍**（hop TB `head_ns == clock_ns`） |
+| Isolated hop WNS | Thin **0.261 ns**；PROP **0.0026 ns** |
+| Sync64 WNS | Thin **0.000667 ns**；Fat 1-2-2-2 **0.000033 ns**（均 MET） |
+| 结构 | Thin 21 router / 105 port / 0 selector；Fat 21 / 146 / 264；Mutex=DEL=LanePhaseAdapter=0 |
+| 关键路径 | L2 `destReg` → Mat →（PROP）LaneSelect → OPM PE → bypass → L1 buffer 写 |
+| 禁止 | `CMR_SYNC64_CLOCK_PERIOD_NS=0.9` |
 
-1.0 ns 是 Fat 在 ZeroWireload 下还剩约 80 ps 给真实线网的签核周期，不是松的 1.5–2 ns pad，也 **不是** 芯片 Fmax，更 **不是** 异步 hop Head。
+Phase 2 旧网表（2/3 拍 Head，**archive-only**，禁止覆盖）：
 
-已冻结 Sync 64 核网表：
+| 几何 | run ID |
+| --- | --- |
+| Thin hop / PROP hop | `20260831_cmr_sync_thin_1x1_1p0ns` / `20260831_cmr_sync_prop_2x2_1p0ns` |
+| Thin NoC64 / Fat NoC64 | `20260831_014622_cmr_sync_noc64_thin_p50` / `20260831_084457_cmr_sync_noc64_fat1222_p50` |
 
-| 几何 | run ID | 面积（约） | SDF |
-| --- | --- | --- | --- |
-| Thin | `20260831_014622_cmr_sync_noc64_thin_p50` | 0.143 mm² | TAB 3000/3000；VCTM-MC5-NM 3000 in / 4500 out |
-| Fat 1-2-2-2 | `20260831_084457_cmr_sync_noc64_fat1222_p50` | 0.211 mm² | 同上 |
+Phase 2.5 论文入口网表（**2026-09-01 Gate PASS**，禁止覆盖）：
 
-复用：`CMR_SYNC64_NETLIST_RUN_ID`。不要对同一 id 再跑 DC。
+| 几何 | run ID |
+| --- | --- |
+| Thin hop | `20260901_cmr_sync_thin_1x1_1p0ns` |
+| PROP hop | `20260901_cmr_sync_prop_2x2_1p0ns` |
+| hop PPA 汇总 | `20260901_cmr_primitive_hop_ppa_ru5` |
+| Thin NoC64 | `20260901_cmr_sync_noc64_thin_p50` |
+| Fat 1-2-2-2 NoC64 | `20260901_cmr_sync_noc64_fat1222_p50` |
+
+复用新 ID：`CMR_SYNC64_NETLIST_RUN_ID` / `CMR_SYNC_THIN_NETLIST_RUN_ID`。不要对同一 id 再跑 DC。
 
 ---
 
@@ -261,7 +281,7 @@ PFAT L2 `(2,4)` / L3 `(4,8)` 的 **RTL 几何已冻结**，隔离 hop 网表 **�
 | PROP | Async `CMRRouter` | Q64 1-2-2-2 | 1×`DEL050` + 1×`DEL050` | 主设计 |
 | SYNC | `SyncCmrRouter` | 与 PROP 同几何 | 1.0 ns，无 DEL | 实现对照，不是 topology baseline |
 | THIN | Async `CMRRouter` | 全 `(1,1)` | **同一 DEL** | ablation；不要减 DEL 去“帮”Thin |
-| PFAT | Async `CMRRouter` | 1-2-4-8 | **同一 DEL** | DSE 上界；L3 hop 网表待按本配方新跑 |
+| PFAT | Async `CMRRouter` | 1-2-4-8 | **同一 DEL** | DSE 上界；L2/L3 hop 已冻结 |
 | FM | Async `CMRRouter` `useMeshRouting` | 8×8 `(1,1)` | 同一 DEL | 只比 topology；Sync Mesh 尚未实现 |
 | H-REP | 与 PROP **同一硬件** | 1-2-2-2 | 同一 DEL | 只改跨 cluster 拆包策略 |
 
@@ -270,7 +290,7 @@ PFAT L2 `(2,4)` / L3 `(4,8)` 的 **RTL 几何已冻结**，隔离 hop 网表 **�
 ## 8. 禁止清单（实验过程中）
 
 1. 为了让 Thin hop 更好看而加厚 / 减薄 DEL，或只给 Fat 用 `DEL250`。
-2. 把 1.0 ns Sync 时钟改成 0.90 ns 去追异步 Head。
+2. 把 Sync 时钟改成 0.90 ns 去追异步 Head。Phase 2.5 已在 **1.0 ns** 合上（Fat WNS ≈ 0.03 ps）；不要加快。若日后重签失败，只能按 ~80 ps ZeroWireload 裕量放慢，不能加快。
 3. 在 Fig. 7/8、AddressRegister、LanePhaseAdapter 里插入新的 `DelayElement`。
 4. 用 `DontTouchBuf` 替换锁定的 Ackin `DEL050`。
 5. 论文 64 核 DUT 打开层间 FIFO（`CMR_BYPASS_INTERLEVEL_FIFO=0`）却仍引用 bypass 面积/延迟。
@@ -285,7 +305,7 @@ PFAT L2 `(2,4)` / L3 `(4,8)` 的 **RTL 几何已冻结**，隔离 hop 网表 **�
 这些项 **不打开** 微架构或 DEL/时钟，只补 DUT 入口：
 
 1. Async Thin 64 核 tile 生成器（21×`(1,1)`，bypass），与 Sync Thin 对齐。
-2. PFAT L2 `(2,4)` / L3 `(4,8)` 在本 DEL 配方下的 hop DC/SDF。
+2. PFAT L2 `(2,4)` / L3 `(4,8)` hop DC/SDF：**已完成**（`20260831_cmr_pfat_l2_c2p4_del050_ackin050` / `20260831_cmr_pfat_l3_c4p8_del050_ackin050`）。
 3. Q64 之上的 Top Mesh2 改为 `CMRRouter`（PROP 256/1024）。
 4. Sync `CMRMeshNoC` 对照（若 FM 需要 Sync 点）。
 

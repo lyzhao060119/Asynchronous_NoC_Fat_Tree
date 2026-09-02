@@ -18,6 +18,10 @@ if [[ "$PROFILE" == "1222" || "$PROFILE" == "FatLane1222" || "$PROFILE" == "1-2-
   PROFILE=1222
   TB_DEFINE="+define+CMR_NOC64_TOP2"
   SDF_SCOPE="tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_1222.noc.dut"
+elif [[ "$PROFILE" == "thin" || "$PROFILE" == "111" || "$PROFILE" == "1-1-1-1" ]]; then
+  PROFILE=thin
+  TB_DEFINE="+define+CMR_NOC64_THIN"
+  SDF_SCOPE="tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_thin.noc.dut"
 else
   PROFILE=1248
   TB_DEFINE=""
@@ -129,6 +133,7 @@ fi
 ./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   $SIMV_TIMING \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
+  +V3_METRICS_CSV="$LOG/v3_metrics.csv" \
   +CASE_TICK_NS=20 +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
   +STALL_TIMEOUT_NS="$STALL_TIMEOUT_NS" +HARD_TIMEOUT_NS="$HARD_TIMEOUT_NS" \
   $INJECT_ARG $EXTRA_SIM_ARGS \

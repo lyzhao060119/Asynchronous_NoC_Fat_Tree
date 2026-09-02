@@ -6,14 +6,15 @@ import Router_Architecture.algorithm.RoutingLogic
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
 
-/**
-  * Clocked Fig. 6 RCU.  Head latches the destination rectangle; Body/Tail
-  * keep that lock.  Quadtree `RoutingLogic` produces Mat combinationally
-  * from destReg.  One hop is one clock: that cycle is the Mat budget, so
-  * Mat drives PathEnabled / PPE directly.  There is no DelayElement and
-  * no extra match-delay register.  Per-branch TailPassed still drops that
-  * bit so a finished output does not keep requesting.
-  */
+  /**
+    * Clocked Fig. 6 RCU.  Head latches the destination rectangle; Body/Tail
+    * keep that lock.  Quadtree `RoutingLogic` produces Mat combinationally
+    * from destReg (visible the cycle after Head fire, same cycle as CellFull).
+    * Isolated hop is one clock: PathEnabled from destReg, then combinational
+    * liveGrant / LaneSelect in SyncOPM.  There is no DelayElement and no extra
+    * match-delay register.  Per-branch TailPassed still drops that bit so a
+    * finished output does not keep requesting.
+    */
 class SyncCmrRCU(
     config: RouterModuleConfig,
     xCoordinate: Int,

@@ -54,8 +54,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Optional Mesh4 sanity; backup only",
-  "paper_eligible_default": true,
-  "notes": ""
+  "paper_role": "Four-lane top-mesh variation; unsupported geometry, not elaborated",
+  "paper_eligible_default": false,
+  "notes": "Unsupported. Do not fabricate logic-synthesis or delay-format results.",
+  "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, four-lane top-mesh variation (unsupported)",
+  "display_description": "Four-lane top mesh needs unsupported router geometry (4,2). Do not fabricate synthesis or delay-format results."
 }

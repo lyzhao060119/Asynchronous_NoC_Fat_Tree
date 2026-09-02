@@ -18,6 +18,11 @@
   "properties": {
     "schema": { "const": "date-v3-benchmark-v1" },
     "benchmark_id": { "type": "string" },
+    "display_name": {
+      "type": "string",
+      "description": "Complete English name shown to users. Not part of config_hash."
+    },
+    "display_description": { "type": "string" },
     "title": { "type": "string" },
     "traffic": {
       "type": "string",
@@ -28,9 +33,7 @@
         "xmc_f16",
         "xmc10_g",
         "mesh_intercluster_ur",
-        "fpga_directed",
-        "fpga_ur",
-        "fpga_multicast"
+        "snn_trace1024"
       ]
     },
     "packet_flits": { "type": "integer", "enum": [1, 5] },

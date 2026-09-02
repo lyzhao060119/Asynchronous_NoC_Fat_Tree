@@ -19,7 +19,8 @@ class IPM(
     routerLevel: Int,
     ingressPort: Int,
     useMeshRouting: Boolean = false,
-    meshGridSize: Int = 8
+    meshGridSize: Int = 8,
+    meshCoordShift: Int = 0
 ) extends Module {
   override def desiredName: String = "IPM"
 
@@ -47,7 +48,7 @@ class IPM(
 
   private val RouteComputationUnit = Module(new RCU(
     config, xCoordinate, yCoordinate, routerLevel, ingressPort,
-    useMeshRouting, meshGridSize
+    useMeshRouting, meshGridSize, meshCoordShift
   ))
   private val Buffer = Module(new CMRBuffer)
 

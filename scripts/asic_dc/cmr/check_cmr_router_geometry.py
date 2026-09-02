@@ -32,6 +32,15 @@ EXPECTED_NOC64 = {
         "top_ports": 2,
         "dut": "NoC_64nodes.v",
     },
+    "mesh_noc16_11": {
+        "adapters": 0,
+        "adapter_lanes": {},
+        "mutex_widths": {4},
+        "async_fifo": 0,
+        "top_ports": 0,
+        "dut": "CMRMeshNoC.v",
+        "routers": 16,
+    },
     "mesh_noc64_11": {
         "adapters": 0,
         "adapter_lanes": {},
@@ -40,6 +49,15 @@ EXPECTED_NOC64 = {
         "top_ports": 0,
         "dut": "CMRMeshNoC.v",
         "routers": 64,
+    },
+    "fat_tree_noc64_thin": {
+        "adapters": 0,
+        "adapter_lanes": {},
+        "mutex_widths": {4},
+        "async_fifo": 0,
+        "top_ports": 1,
+        "dut": "NoC_64nodes.v",
+        "routers": 21,
     },
 }
 
@@ -203,7 +221,10 @@ def check_noc64(generated: Path, name: str) -> None:
     if top_ports != expected["top_ports"]:
         raise SystemExit(f"{name}: top ports {top_ports} != {expected['top_ports']}")
     if "routers" in expected:
-        router_count = len(re.findall(r"^\s+CMRRouter(?:_\d+)?\s+meshR_", text, re.M))
+        if "mesh" in name:
+            router_count = len(re.findall(r"^\s+CMRRouter(?:_\d+)?\s+meshR_", text, re.M))
+        else:
+            router_count = len(re.findall(r"^\s+CMRRouter(?:_\d+)?\s+routers?L", text, re.M))
         if router_count != expected["routers"]:
             raise SystemExit(f"{name}: routers {router_count} != {expected['routers']}")
 
@@ -252,7 +273,9 @@ def main() -> None:
     if args.noc64:
         for name in EXPECTED_NOC64:
             dut = EXPECTED_NOC64[name].get("dut", "NoC_64nodes.v")
-            if not (args.root / name / dut).is_file() and name.startswith("mesh_"):
+            if not (args.root / name / dut).is_file() and (
+                name.startswith("mesh_") or name.endswith("_thin")
+            ):
                 continue
             check_noc64(args.root / name, name)
     if args.sync:

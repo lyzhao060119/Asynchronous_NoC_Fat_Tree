@@ -67,8 +67,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Fig. A progressive-fat upper bound",
+  "paper_role": "Asynchronous progressively widened hierarchical network, 64 nodes",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous progressively widened hierarchical network, 64 nodes",
+  "display_description": "64-node asynchronous hierarchical network that widens upper-level lanes to 1-2-4-8."
 }

@@ -28,6 +28,14 @@ set expected_adapters 0
 if {[info exists ::env(CMR_EXPECTED_ADAPTERS)] && $::env(CMR_EXPECTED_ADAPTERS) ne ""} {
   set expected_adapters $::env(CMR_EXPECTED_ADAPTERS)
 }
+set expected_grant_hold -1
+if {[info exists ::env(CMR_EXPECTED_GRANT_HOLD_BUF)] && $::env(CMR_EXPECTED_GRANT_HOLD_BUF) ne ""} {
+  set expected_grant_hold $::env(CMR_EXPECTED_GRANT_HOLD_BUF)
+}
+set expected_latch_reopen -1
+if {[info exists ::env(CMR_EXPECTED_LATCH_REOPEN_DEL)] && $::env(CMR_EXPECTED_LATCH_REOPEN_DEL) ne ""} {
+  set expected_latch_reopen $::env(CMR_EXPECTED_LATCH_REOPEN_DEL)
+}
 set rcu_unit_ps 50
 if {[info exists ::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)] && $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS) ne ""} {
   set rcu_unit_ps $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)
@@ -45,6 +53,7 @@ source "$RTL_DIR/tech_t28ss.tcl"
 define_design_lib WORK -path $WORK_LIB
 analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/DelayElement_ASIC.v" \
+  "$RTL_DIR/DontTouchBuf_ASIC.v" \
   "$RTL_DIR/Mutex2_ASIC.v" \
   "$RTL_DIR/Mutex4.v" \
   "$RTL_DIR/MullerC2.v" \
@@ -100,6 +109,11 @@ proc cmr_mesh_matched_leaves {unit} {
 proc cmr_mesh_ackin_leaves {unit} {
   set glob [cmr_mesh_delay_glob $unit]
   return [get_cells -hierarchical -quiet -filter "ref_name =~ $glob && full_name =~ *AckinDelay*"]
+}
+
+proc cmr_mesh_reopen_leaves {unit} {
+  set glob [cmr_mesh_delay_glob $unit]
+  return [get_cells -hierarchical -quiet -filter "ref_name =~ $glob && full_name =~ *LatchReopenDelay*"]
 }
 
 elaborate CMRMeshNoC -work WORK
@@ -158,6 +172,8 @@ set del100_rcu [sizeof_collection [cmr_mesh_matched_leaves 100]]
 set del150_rcu [sizeof_collection [cmr_mesh_matched_leaves 150]]
 set ackin_count [sizeof_collection [cmr_mesh_ackin_leaves $opm_ackin_unit_ps]]
 set ackin_del250 [sizeof_collection [cmr_mesh_ackin_leaves 250]]
+set latch_reopen_count [sizeof_collection [cmr_mesh_reopen_leaves $opm_ackin_unit_ps]]
+set grant_hold_buf [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *GrantHoldBuf* && ref_name =~ BUFFD0*}]]
 set top_ports [sizeof_collection [get_ports -quiet io_top_input*]]
 
 set fd [open "$REPORT_DIR/cmr_mesh64_structure.rpt" w]
@@ -186,8 +202,10 @@ puts $fd "RCU_MATCHED_DELAY_STEPS=$rcu_steps"
 puts $fd "OPM_ACKIN_DELAY_COUNT=$ackin_count"
 puts $fd "OPM_ACKIN_DELAY_UNIT_PS=$opm_ackin_unit_ps"
 puts $fd "OPM_ACKIN_DEL250_COUNT=$ackin_del250"
+puts $fd "LATCH_REOPEN_DEL_COUNT=$latch_reopen_count"
+puts $fd "GRANT_HOLD_BUF_COUNT=$grant_hold_buf"
 close $fd
-puts "CMR_MESH64_STRUCTURE ROUTER=$router_count FIFO=$async_fifo_count IPM=$ipm_count OPM=$opm_count ADAPTER=$adapter_count TOP=$top_ports MUTEX4=$mutex4_count MUTEX2=$mutex2_count CLEAR=$clear_count SET=$set_count PATH=$path_count CLOSE=$close_count ROUTESEL_AND2=$routesel_and_count DEL050=$del050_rcu ACKIN=$ackin_count ACKIN_UNIT=$opm_ackin_unit_ps ACKIN250=$ackin_del250"
+puts "CMR_MESH64_STRUCTURE ROUTER=$router_count FIFO=$async_fifo_count IPM=$ipm_count OPM=$opm_count ADAPTER=$adapter_count TOP=$top_ports MUTEX4=$mutex4_count MUTEX2=$mutex2_count CLEAR=$clear_count SET=$set_count PATH=$path_count CLOSE=$close_count ROUTESEL_AND2=$routesel_and_count DEL050=$del050_rcu ACKIN=$ackin_count ACKIN_UNIT=$opm_ackin_unit_ps ACKIN250=$ackin_del250 LATCH_REOPEN=$latch_reopen_count GRANT_HOLD=$grant_hold_buf"
 
 if {$n_gtech > 0 || $n_unmapped > 0} {
   puts "CMR_MESH64_DC_FAIL unmapped gtech=$n_gtech generic=$n_unmapped"
@@ -233,6 +251,14 @@ if {$ackin_count != $expected_ports} {
 }
 if {$opm_ackin_unit_ps != 250 && $ackin_del250 != 0} {
   puts "CMR_MESH64_DC_FAIL leftover_ackin_del250 actual=$ackin_del250"
+  exit 2
+}
+if {$expected_grant_hold >= 0 && $grant_hold_buf != $expected_grant_hold} {
+  puts "CMR_MESH64_DC_FAIL grant_hold_buf actual=$grant_hold_buf expected=$expected_grant_hold"
+  exit 2
+}
+if {$expected_latch_reopen >= 0 && $latch_reopen_count != $expected_latch_reopen} {
+  puts "CMR_MESH64_DC_FAIL latch_reopen_del actual=$latch_reopen_count expected=$expected_latch_reopen"
   exit 2
 }
 

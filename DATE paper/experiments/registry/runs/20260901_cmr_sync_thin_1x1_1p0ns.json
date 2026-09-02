@@ -1,0 +1,50 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260901_cmr_sync_thin_1x1_1p0ns",
+  "status": "pass",
+  "design_id": "SYNC_THIN_1X1",
+  "benchmark_id": "R-U5",
+  "seed": null,
+  "adapter": "dc_sync_router",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "a45f3ecc4e2c59a76ade6e98f58a4cdd93ef41ac5844d8d745f8022cf20c8965",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "c49d4305abd7d14ed6e5419e065ab8cc62c1f57b1a3182d5b265cbde15258970",
+  "sdf_hash": "e46a08b0f9a37f39974010636afd4b2bdc857e65a0592bfcf4f0ea959b660d4d",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": "4385f8b70c2e69f69589025557458cf1c205f926c8382910e2714bc86bbe62df",
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [],
+  "env": {},
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": true,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "local_dc": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_thin_1x1_1p0ns",
+    "hop_ppa": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_primitive_hop_ppa_ru5",
+    "metrics_csv": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_primitive_hop_ppa_ru5/metrics.csv",
+    "kind": "sync_thin_1x1",
+    "area_um2": 6752.087938,
+    "head_ns": "1.000",
+    "wns_ns": 0.260641,
+    "max_opm_fanin": 4
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T16:54:59+00:00",
+  "updated_utc": "2026-08-31T16:54:59+00:00",
+  "notes": "DATE V3 Phase 2.5 Sync 1-cycle Head post-synthesis DC + R-U5 hop PPA. No P&R."
+}

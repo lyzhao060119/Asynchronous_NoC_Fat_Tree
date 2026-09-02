@@ -45,8 +45,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Fig. B 8x8 flat mesh",
+  "paper_role": "Asynchronous flat mesh network, 64 nodes",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous flat mesh network, 64 nodes",
+  "display_description": "8-by-8 asynchronous flat mesh of narrow routers."
 }

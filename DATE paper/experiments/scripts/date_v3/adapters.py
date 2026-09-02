@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .paths import CMR_SCRIPTS, PNR_SCRIPTS, REPO
+from .paths import CMR_SCRIPTS, PNR_SCRIPTS, REPO, SCRIPTS
 
 ADAPTERS = {
     "import_readonly": None,
@@ -25,6 +25,15 @@ ADAPTERS = {
     "noc64_async": CMR_SCRIPTS / "run_remote_cmr_noc64_sdf.py",
     "noc64_sync": CMR_SCRIPTS / "run_remote_cmr_sync_noc64_sdf.py",
     "mesh64": CMR_SCRIPTS / "run_remote_cmr_mesh64_sdf.py",
+    "noc256_rtl": CMR_SCRIPTS / "run_remote_cmr_noc256_rtl.py",
+    "hier_dc": CMR_SCRIPTS / "run_remote_cmr_hier_dc.py",
+    "network_sdf": CMR_SCRIPTS / "run_remote_cmr_network_sdf.py",
+    "v31_gates": SCRIPTS / "run_v31_network_gates.py",
+    "v3_traffic": SCRIPTS / "gen_cases_v3.py",
+    "des": SCRIPTS / "run_des.py",
+    "des_calibrate": SCRIPTS / "calibrate_des.py",
+    "des_prepare": SCRIPTS / "prepare_descal.py",
+    "des_gls": SCRIPTS / "run_descal_gls.py",
     "pnr_pilot": PNR_SCRIPTS / "run_remote_cmr_pnr_pilot.py",
     "pnr_probe": PNR_SCRIPTS / "probe_remote_pnr.py",
 }

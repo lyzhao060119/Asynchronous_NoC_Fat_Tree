@@ -1,0 +1,49 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260831_cmr_sync_thin_1x1_1p0ns",
+  "status": "pass",
+  "design_id": "SYNC_THIN_1X1",
+  "benchmark_id": "R-U5",
+  "seed": null,
+  "adapter": "dc_sync_router",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "a45f3ecc4e2c59a76ade6e98f58a4cdd93ef41ac5844d8d745f8022cf20c8965",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "2bfad990227e344fad7740e134d57e0f679bb4e15ff32d627b78f56179b60dd3",
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [],
+  "env": {},
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "archive-only",
+  "archive_only_reason": "Phase 2 Sync hop with 2-cycle Head. Replaced by Phase 2.5 1-cycle Head.",
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "local_dc": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_sync_thin_1x1_1p0ns",
+    "hop_ppa": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5",
+    "metrics_csv": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5/metrics.csv",
+    "kind": "sync_thin_1x1",
+    "area_um2": 6868.847925,
+    "head_ns": "2.000",
+    "max_opm_fanin": 4
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T15:52:39+00:00",
+  "updated_utc": "2026-08-31T15:52:39+00:00",
+  "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+}

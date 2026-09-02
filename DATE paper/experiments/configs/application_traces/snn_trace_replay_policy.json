@@ -1,0 +1,31 @@
+{
+  "schema": "date-v3-snn-trace-policy-v1",
+  "status": "unselected",
+  "benchmark_id": "SNN-TRACE1024",
+  "optional": true,
+  "run_only_after_gate": "F",
+  "network_nodes": 1024,
+  "applies_to_designs": [
+    "PROP1024",
+    "HREP1024"
+  ],
+  "flat_mesh_included": false,
+  "requires": [
+    "frozen source trace",
+    "source hash",
+    "provenance and license",
+    "logical-to-1024-node endpoint mapping",
+    "one spike event remains one multicast injection",
+    "whole-network maximum-delay gate-level evidence"
+  ],
+  "metrics": [
+    "useful_destinations",
+    "region_covered_destinations",
+    "region_efficiency",
+    "top_mesh_link_traversals",
+    "tmax",
+    "energy_per_original_event"
+  ],
+  "admission_rule": "Archive unless one gate-level pilot passes and materially confirms reduced replicated global traffic or final-destination completion time.",
+  "notes": "No trace has been selected. This policy neither authorizes SNN model implementation nor blocks the required synthetic gate-level matrix."
+}

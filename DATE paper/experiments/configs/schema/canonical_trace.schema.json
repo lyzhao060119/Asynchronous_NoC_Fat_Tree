@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/canonical_trace.schema.json",
+  "title": "DATE V3 canonical original-event trace header",
+  "type": "object",
+  "required": [
+    "schema",
+    "benchmark_id",
+    "nodes",
+    "seed",
+    "packet_flits",
+    "warmup_original_events",
+    "measurement_original_events",
+    "offered_load",
+    "paired_trace"
+  ],
+  "properties": {
+    "schema": { "const": "date-v3-canonical-trace-v1" },
+    "kind": { "const": "header" },
+    "benchmark_id": { "type": "string" },
+    "traffic": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "trace_hash": { "type": "string" },
+    "nodes": { "type": "integer" },
+    "seed": { "type": "integer" },
+    "seed_set_id": { "type": "string" },
+    "packet_flits": { "const": 5 },
+    "warmup_original_events": { "type": "integer", "minimum": 0 },
+    "measurement_original_events": { "type": "integer", "minimum": 0 },
+    "offered_load": { "type": "number" },
+    "load_tag": { "type": "string" },
+    "spread_S": { "type": ["integer", "null"] },
+    "paired_trace": { "const": true },
+    "tmax_definition": { "type": ["string", "null"] }
+  }
+}

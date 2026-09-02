@@ -75,5 +75,9 @@ def hashes_match(existing: dict[str, Any], incoming: dict[str, Any]) -> bool:
     return True
 
 
+DISPLAY_HASH_EXCLUDES = ("display_name", "display_description")
+
+
 def config_hash_of(design: dict[str, Any]) -> str:
-    return sha256_json(design)
+    payload = {key: value for key, value in design.items() if key not in DISPLAY_HASH_EXCLUDES}
+    return sha256_json(payload)

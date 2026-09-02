@@ -15,7 +15,12 @@
   ],
   "properties": {
     "original_event_id": { "type": "string" },
-    "packet_id": { "type": "string" },
+    "packet_id": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      ]
+    },
     "source": { "type": "integer" },
     "destination_set": { "type": "array", "items": { "type": "integer" } },
     "t_offer": { "type": ["number", "null"] },

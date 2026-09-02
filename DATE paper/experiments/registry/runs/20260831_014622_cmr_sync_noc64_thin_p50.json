@@ -32,12 +32,12 @@
   "lsf_jobs": [],
   "frozen_structure_ok": null,
   "paper_eligible": false,
-  "physical_class": "post-synthesis",
-  "archive_only_reason": null,
+  "physical_class": "archive-only",
+  "archive_only_reason": "2-cycle Head microarchitecture. Do not overwrite.",
   "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
   "artifacts": {},
   "cases": [],
   "created_utc": "2026-08-31T05:50:01+00:00",
   "updated_utc": "2026-08-31T05:50:01+00:00",
-  "notes": "Clocked Thin SyncNoC64 1.0 ns SS ZeroWireload."
+  "notes": "Phase 2 clocked Thin SyncNoC64 1.0 ns with 2-cycle Head. Archive-only after Phase 2.5."
 }

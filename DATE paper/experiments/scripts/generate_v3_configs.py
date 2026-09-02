@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Write frozen DATE V3.0.2 design / benchmark / seed / plan JSON files."""
+"""Write frozen DATE V3.2.0 design / benchmark / seed / plan JSON files.
+
+Machine identifiers are unchanged from V3.0.2. Display names are complete English.
+"""
 from __future__ import annotations
 
 import json
@@ -7,6 +10,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from date_v3.display_names import attach_display  # noqa: E402
+
 DESIGNS = ROOT / "configs" / "designs"
 BENCHMARKS = ROOT / "configs" / "benchmarks"
 SEEDS = ROOT / "configs" / "seeds"
@@ -23,6 +30,7 @@ LOCKED = {
 
 
 def dump(path: Path, obj: dict) -> None:
+    attach_display(obj)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
@@ -105,6 +113,10 @@ def network(
     paper_role="",
     async_design=True,
     clock_ns=None,
+    adapter=None,
+    paired_trace_with=None,
+    notes="",
+    paper_eligible_default=True,
 ) -> dict:
     return {
         "schema": "date-v3-design-v1",
@@ -127,14 +139,25 @@ def network(
         "clock_ns": clock_ns,
         "hrep_policy": hrep,
         "shares_netlist_with": shares,
-        "adapter": None,
+        "paired_trace_with": paired_trace_with,
+        "adapter": adapter,
         "paper_role": paper_role,
-        "paper_eligible_default": True,
-        "notes": "",
+        "paper_eligible_default": paper_eligible_default,
+        "notes": notes,
     }
 
 
 def main() -> int:
+    # V3.2 removes FPGA validation completely.  Delete stale generated inputs
+    # so a repeated generator invocation cannot revive that experiment path.
+    for stale in (
+        DESIGNS / "fpga_async_prop64.json",
+        DESIGNS / "fpga_sync_prop64.json",
+        BENCHMARKS / "fpga_directed.json",
+        BENCHMARKS / "fpga_ur.json",
+        BENCHMARKS / "fpga_multicast.json",
+    ):
+        stale.unlink(missing_ok=True)
     designs = [
         primitive(
             "ASYNC_THIN_1X1", "THIN", 1, 1, 1, mesh=False, async_design=True,
@@ -186,16 +209,15 @@ def main() -> int:
             paper_role="Table I / FM leaf",
         ),
         network(
-            "THIN64", "THIN", 64, "1-1-1-1", "quadtree_topmesh",
+            "THIN64", "THIN", 64, "1-1-1-1", "quadtree",
             [
                 {"primitive_id": "async_thin_1x1", "level": 1, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": False, "count": 16},
                 {"primitive_id": "async_thin_1x1", "level": 2, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": False, "count": 4},
                 {"primitive_id": "async_thin_1x1", "level": 3, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": False, "count": 1},
-                {"primitive_id": "async_topmesh_2x2", "level": 1, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": True, "count": 1, "notes": "top parent lanes=1; TopMesh geometry may collapse to 1-lane if Mesh1"},
             ],
-            {"routers": 21, "interlevel_fifos": 0, "top_ports": 1, "max_opm_fanin": 4, "adapters": 0},
-            top_mesh_lanes=2, cluster_grid=1,
-            paper_role="Fig. A bounded-fat thin ablation",
+            {"routers": 21, "ports": 105, "adapters": 0, "interlevel_fifos": 0, "top_ports": 1, "max_opm_fanin": 4, "mutex_widths": [4]},
+            top_mesh_lanes=1, cluster_grid=1,
+            paper_role="Asynchronous narrow hierarchical network, 64 nodes; hierarchical-width ablation",
         ),
         network(
             "PROP64", "PROP", 64, "1-2-2-2", "quadtree_topmesh",
@@ -206,7 +228,35 @@ def main() -> int:
             ],
             {"routers": 21, "ports": 146, "adapters": 264, "interlevel_fifos": 0, "top_ports": 2, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
             top_mesh_lanes=2, cluster_grid=1,
-            paper_role="Proposed 64-node Q64",
+            paper_role="Asynchronous balanced hierarchical network, 64 nodes",
+        ),
+        network(
+            "SYNC_THIN64", "SYNC", 64, "1-1-1-1", "quadtree",
+            [
+                {"primitive_id": "sync_thin_1x1", "level": 1, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": False, "count": 16},
+                {"primitive_id": "sync_thin_1x1", "level": 2, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": False, "count": 4},
+                {"primitive_id": "sync_thin_1x1", "level": 3, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": False, "count": 1},
+            ],
+            {"routers": 21, "ports": 105, "adapters": 0, "interlevel_fifos": 0, "top_ports": 1, "max_opm_fanin": 4, "mutex_widths": [4]},
+            top_mesh_lanes=1, cluster_grid=1,
+            async_design=False, clock_ns=1.0, adapter="noc64_sync",
+            paired_trace_with="THIN64",
+            paper_role="Synchronous narrow hierarchical network, 64 nodes; same traces as the asynchronous narrow 64-node network",
+            notes="Phase 2.5 one-cycle head; frozen clock 1.0 ns. Shares case format with the asynchronous narrow 64-node network.",
+        ),
+        network(
+            "SYNC_PROP64", "SYNC", 64, "1-2-2-2", "quadtree_topmesh",
+            [
+                {"primitive_id": "sync_fat_1x2", "level": 1, "child_lanes": 1, "parent_lanes": 2, "use_mesh_routing": False, "count": 16},
+                {"primitive_id": "sync_prop_2x2", "level": 2, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 4},
+                {"primitive_id": "sync_prop_2x2", "level": 3, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 1},
+            ],
+            {"routers": 21, "ports": 146, "adapters": 264, "interlevel_fifos": 0, "top_ports": 2, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
+            top_mesh_lanes=2, cluster_grid=1,
+            async_design=False, clock_ns=1.0, adapter="noc64_sync",
+            paired_trace_with="PROP64",
+            paper_role="Synchronous balanced hierarchical network, 64 nodes; same traces as the asynchronous balanced 64-node network",
+            notes="Phase 2.5 one-cycle head; frozen clock 1.0 ns. Shares case format with the asynchronous balanced 64-node network.",
         ),
         network(
             "PFAT64", "PFAT", 64, "1-2-4-8", "quadtree_topmesh",
@@ -217,28 +267,28 @@ def main() -> int:
             ],
             {"routers": 21, "ports": 168, "adapters": 352, "interlevel_fifos": 0, "top_ports": 8, "max_opm_fanin": 20, "mutex_widths": [2, 4, 5, 8, 10, 16, 20]},
             top_mesh_lanes=8, cluster_grid=1,
-            paper_role="Fig. A progressive-fat upper bound",
+            paper_role="Asynchronous progressively widened hierarchical network, 64 nodes",
         ),
         network(
             "FM64", "FM", 64, "mesh-1", "mesh",
             [{"primitive_id": "async_flatmesh_1x1", "level": 1, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": True, "count": 64}],
             {"routers": 64, "ports": 320, "adapters": 0, "interlevel_fifos": 0, "top_ports": 0, "max_opm_fanin": 4, "mutex_widths": [4]},
             top_mesh_lanes=0, cluster_grid=None,
-            paper_role="Fig. B 8x8 flat mesh",
+            paper_role="Asynchronous flat mesh network, 64 nodes",
         ),
         network(
             "FM256", "FM", 256, "mesh-1", "mesh",
             [{"primitive_id": "async_flatmesh_1x1", "level": 1, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": True, "count": 256}],
-            {"routers": 256, "adapters": 0, "interlevel_fifos": 0, "max_opm_fanin": 4},
+            {"routers": 256, "ports": 1280, "adapters": 0, "interlevel_fifos": 0, "top_ports": 0, "max_opm_fanin": 4, "mutex_widths": [4]},
             top_mesh_lanes=0,
-            paper_role="Fig. B 16x16 flat mesh",
+            paper_role="Asynchronous flat mesh network, 256 nodes",
         ),
         network(
             "FM1024", "FM", 1024, "mesh-1", "mesh",
             [{"primitive_id": "async_flatmesh_1x1", "level": 1, "child_lanes": 1, "parent_lanes": 1, "use_mesh_routing": True, "count": 1024}],
-            {"routers": 1024, "adapters": 0, "interlevel_fifos": 0, "max_opm_fanin": 4},
+            {"routers": 1024, "ports": 5120, "adapters": 0, "interlevel_fifos": 0, "top_ports": 0, "max_opm_fanin": 4, "mutex_widths": [4]},
             top_mesh_lanes=0,
-            paper_role="Fig. B 32x32 flat mesh",
+            paper_role="Asynchronous flat mesh network, 1024 nodes",
         ),
         network(
             "PROP256", "PROP", 256, "1-2-2-2", "quadtree_topmesh",
@@ -248,9 +298,9 @@ def main() -> int:
                 {"primitive_id": "async_prop_2x2", "level": 3, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 4},
                 {"primitive_id": "async_topmesh_2x2", "level": 1, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": True, "count": 4},
             ],
-            {"routers": 88, "interlevel_fifos": 0, "max_opm_fanin": 8},
+            {"routers": 88, "ports": 624, "adapters": 1216, "interlevel_fifos": 0, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
             top_mesh_lanes=2, cluster_grid=2,
-            paper_role="Fig. B 2x2 Q64 clusters",
+            paper_role="Asynchronous balanced hierarchical network, 256 nodes",
         ),
         network(
             "PROP1024", "PROP", 1024, "1-2-2-2", "quadtree_topmesh",
@@ -260,9 +310,9 @@ def main() -> int:
                 {"primitive_id": "async_prop_2x2", "level": 3, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 16},
                 {"primitive_id": "async_topmesh_2x2", "level": 1, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": True, "count": 16},
             ],
-            {"routers": 352, "interlevel_fifos": 0, "max_opm_fanin": 8},
+            {"routers": 352, "ports": 2496, "adapters": 4864, "interlevel_fifos": 0, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
             top_mesh_lanes=2, cluster_grid=4,
-            paper_role="Proposed 4x4 Q64 + Mesh2",
+            paper_role="Asynchronous balanced hierarchical network, 1024 nodes",
         ),
         network(
             "HREP1024", "HREP", 1024, "1-2-2-2", "quadtree_topmesh",
@@ -272,9 +322,9 @@ def main() -> int:
                 {"primitive_id": "async_prop_2x2", "level": 3, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 16},
                 {"primitive_id": "async_topmesh_2x2", "level": 1, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": True, "count": 16},
             ],
-            {"routers": 352, "interlevel_fifos": 0, "max_opm_fanin": 8},
+            {"routers": 352, "ports": 2496, "adapters": 4864, "interlevel_fifos": 0, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
             top_mesh_lanes=2, cluster_grid=4, hrep=True, shares="PROP1024",
-            paper_role="Fig. C cross-tier replication ablation; same netlist as PROP1024",
+            paper_role="Boundary packet-replication comparison; shares the 1024-node hierarchical netlist",
         ),
         network(
             "PROP1024_MESH1", "MESH_SANITY", 1024, "1-2-2-2", "quadtree_topmesh",
@@ -282,10 +332,13 @@ def main() -> int:
                 {"primitive_id": "async_fat_1x2", "level": 1, "child_lanes": 1, "parent_lanes": 2, "use_mesh_routing": False, "count": 256},
                 {"primitive_id": "async_prop_2x2", "level": 2, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 64},
                 {"primitive_id": "async_prop_2x2", "level": 3, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 16},
+                {"primitive_id": "async_topmesh_1x2", "level": 1, "child_lanes": 1, "parent_lanes": 2, "use_mesh_routing": True, "count": 16},
             ],
-            {"routers": 336, "interlevel_fifos": 0},
+            {"routers": 352, "ports": 2432, "adapters": 4288, "interlevel_fifos": 0, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
             top_mesh_lanes=1, cluster_grid=4,
-            paper_role="Optional Mesh1 sanity; backup only",
+            paper_role="Single-lane top-mesh sanity; backup only, not a paper-matrix netlist",
+            paper_eligible_default=False,
+            notes="Backup only. Do not use as 1024-node paper evidence.",
         ),
         network(
             "PROP1024_MESH2", "MESH_SANITY", 1024, "1-2-2-2", "quadtree_topmesh",
@@ -295,9 +348,10 @@ def main() -> int:
                 {"primitive_id": "async_prop_2x2", "level": 3, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": False, "count": 16},
                 {"primitive_id": "async_topmesh_2x2", "level": 1, "child_lanes": 2, "parent_lanes": 2, "use_mesh_routing": True, "count": 16},
             ],
-            {"routers": 352, "interlevel_fifos": 0},
+            {"routers": 352, "ports": 2496, "adapters": 4864, "interlevel_fifos": 0, "max_opm_fanin": 8, "mutex_widths": [2, 4, 5, 8]},
             top_mesh_lanes=2, cluster_grid=4, shares="PROP1024",
-            paper_role="Mesh2 sanity alias of PROP1024",
+            paper_role="Two-lane top-mesh alias of the 1024-node hierarchical netlist; backup only",
+            paper_eligible_default=False,
         ),
         network(
             "PROP1024_MESH4", "MESH_SANITY", 1024, "1-2-2-2", "quadtree_topmesh",
@@ -308,49 +362,13 @@ def main() -> int:
             ],
             {"routers": 336, "interlevel_fifos": 0},
             top_mesh_lanes=4, cluster_grid=4,
-            paper_role="Optional Mesh4 sanity; backup only",
+            paper_role="Four-lane top-mesh variation; unsupported geometry, not elaborated",
+            paper_eligible_default=False,
+            notes="Unsupported. Do not fabricate logic-synthesis or delay-format results.",
         ),
     ]
     for design in designs:
         dump(DESIGNS / ("%s.json" % design["design_id"].lower()), design)
-
-    for design_id, async_fpga in (("FPGA_ASYNC_PROP64", True), ("FPGA_SYNC_PROP64", False)):
-        dump(
-            DESIGNS / ("%s.json" % design_id.lower()),
-            {
-                "schema": "date-v3-design-v1",
-                "design_id": design_id,
-                "kind": "fpga",
-                "family": "FPGA",
-                "nodes": 64,
-                "async": async_fpga,
-                "routing": "fpga_wrap",
-                "lane_profile": "1-2-2-2",
-                "top_mesh_lanes": 2,
-                "cluster_grid": 1,
-                "router_primitives": [],
-                "expected_structure": {"routers": 21},
-                "flit_width_bits": 28,
-                "buffer_slots": 5,
-                "no_uturn": True,
-                "interlevel_fifo": "bypass",
-                "delay_recipe": dict(LOCKED),
-                "clock_ns": None if async_fpga else 1.0,
-                "hrep_policy": False,
-                "shares_netlist_with": "PROP64",
-                "fpga": {
-                    "board": None,
-                    "part": None,
-                    "vivado": None,
-                    "host_interface": None,
-                    "hardware_validation": False,
-                },
-                "adapter": None,
-                "paper_role": "Phase 11 64-node hardware validation",
-                "paper_eligible_default": False,
-                "notes": "Board/part/Vivado must be frozen before bitstream can count as hardware validation.",
-            },
-        )
 
     saturation = {
         "enabled": True,
@@ -389,7 +407,7 @@ def main() -> int:
     dump(BENCHMARKS / "bf_stress64.json", {
         "schema": "date-v3-benchmark-v1",
         "benchmark_id": "BF-STRESS64",
-        "title": "64-node bounded-fat stress: dst not in same L2 subtree",
+        "title": "64-node hierarchical-width stress traffic: destination not in the same level-2 subtree",
         "traffic": "bf_stress64",
         "packet_flits": 5,
         "multicast": False,
@@ -406,14 +424,14 @@ def main() -> int:
         "load_sweep": saturation,
         "metrics": ["saturation_throughput", "mean_latency", "p50", "p95", "p99"],
         "tmax_definition": tmax,
-        "applies_to_designs": ["THIN64", "PROP64", "PFAT64"],
+        "applies_to_designs": ["THIN64", "PROP64", "PFAT64", "SYNC_THIN64", "SYNC_PROP64"],
         "paper_figures": ["Fig. A"],
-        "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT.",
+        "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT and Sync64 counterparts.",
     })
     dump(BENCHMARKS / "topo_ur.json", {
         "schema": "date-v3-benchmark-v1",
         "benchmark_id": "TOPO-UR",
-        "title": "Uniform random unicast, src != dst, same rule at 64/256/1024",
+        "title": "Uniform random single-destination traffic, source not equal to destination, same rule at 64/256/1024 nodes",
         "traffic": "topo_ur",
         "packet_flits": 5,
         "multicast": False,
@@ -430,14 +448,14 @@ def main() -> int:
         "load_sweep": saturation,
         "metrics": ["router_count", "total_router_area", "lane_links", "channel_bits", "traversals", "zero_load_latency", "saturation_throughput"],
         "tmax_definition": tmax,
-        "applies_to_designs": ["PROP64", "PROP256", "PROP1024", "FM64", "FM256", "FM1024"],
+        "applies_to_designs": ["PROP64", "PROP256", "PROP1024", "FM64", "FM256", "FM1024", "SYNC_PROP64", "SYNC_THIN64", "THIN64"],
         "paper_figures": ["Fig. B"],
         "notes": "Unicast only. Traversal from routing events, not theoretical hop count.",
     })
     dump(BENCHMARKS / "xmc_f16.json", {
         "schema": "date-v3-benchmark-v1",
         "benchmark_id": "XMC-F16",
-        "title": "Fixed fanout-16 cross-tier multicast, S=1/4/16",
+        "title": "1024-node fixed sixteen-destination cross-group multicast traffic, spread 1/4/16",
         "traffic": "xmc_f16",
         "packet_flits": 5,
         "multicast": True,
@@ -461,7 +479,7 @@ def main() -> int:
     dump(BENCHMARKS / "xmc10_g.json", {
         "schema": "date-v3-benchmark-v1",
         "benchmark_id": "XMC10-G",
-        "title": "90% UR + 10% multicast F=16, pre-registered S=4",
+        "title": "1024-node mixed load: 90 percent single-destination plus 10 percent sixteen-destination multicast",
         "traffic": "xmc10_g",
         "packet_flits": 5,
         "multicast": True,
@@ -485,7 +503,7 @@ def main() -> int:
     dump(BENCHMARKS / "mesh_intercluster_ur.json", {
         "schema": "date-v3-benchmark-v1",
         "benchmark_id": "MESH-INTERCLUSTER-UR",
-        "title": "100% inter-cluster UR Mesh1/2/4 sanity",
+        "title": "1024-node inter-cluster single-destination sanity traffic (backup only)",
         "traffic": "mesh_intercluster_ur",
         "packet_flits": 5,
         "multicast": False,
@@ -506,13 +524,13 @@ def main() -> int:
         "paper_figures": ["backup"],
         "notes": "Default backup only.",
     })
-    dump(BENCHMARKS / "fpga_directed.json", {
+    dump(BENCHMARKS / "snn_trace1024.json", {
         "schema": "date-v3-benchmark-v1",
-        "benchmark_id": "FPGA-DIRECTED",
-        "title": "FPGA 4032 directed src-dst pairs, 5 flit",
-        "traffic": "fpga_directed",
+        "benchmark_id": "SNN-TRACE1024",
+        "title": "Frozen spiking-neural-network multicast trace replay, 1024 nodes (optional)",
+        "traffic": "snn_trace1024",
         "packet_flits": 5,
-        "multicast": False,
+        "multicast": True,
         "src_neq_dst": True,
         "dst_not_same_l2_subtree": False,
         "fanout_F": None,
@@ -520,63 +538,22 @@ def main() -> int:
         "multicast_fraction": None,
         "destination_set_samples": None,
         "warmup_original_events": 0,
-        "measurement_original_events": 4032,
+        "measurement_original_events": 0,
         "seed_set_id": "v3_main_seeds",
         "paired_trace": True,
-        "load_sweep": {"enabled": False, "coarse_then_fine": False, "saturation_rule": "n/a"},
-        "metrics": ["errors", "timeouts", "drops"],
+        "load_sweep": {"enabled": False, "coarse_then_fine": False, "saturation_rule": "trace replay"},
+        "metrics": [
+            "useful_destinations",
+            "region_covered_destinations",
+            "region_efficiency",
+            "top_mesh_link_traversals",
+            "tmax",
+            "energy_per_original_event",
+        ],
         "tmax_definition": tmax,
-        "applies_to_designs": ["FPGA_ASYNC_PROP64", "FPGA_SYNC_PROP64"],
-        "paper_figures": ["Table I", "fpga_validation"],
-        "notes": "Zero errors/loss/timeout required.",
-    })
-    dump(BENCHMARKS / "fpga_ur.json", {
-        "schema": "date-v3-benchmark-v1",
-        "benchmark_id": "FPGA-UR",
-        "title": "FPGA UR low/medium/near-max-stable, >=1e6 original events",
-        "traffic": "fpga_ur",
-        "packet_flits": 5,
-        "multicast": False,
-        "src_neq_dst": True,
-        "dst_not_same_l2_subtree": False,
-        "fanout_F": None,
-        "spread_S": None,
-        "multicast_fraction": 0.0,
-        "destination_set_samples": None,
-        "warmup_original_events": 1000,
-        "measurement_original_events": 1000000,
-        "seed_set_id": "v3_main_seeds",
-        "paired_trace": True,
-        "load_sweep": {"enabled": True, "coarse_then_fine": False, "saturation_rule": "hardware sustained"},
-        "metrics": ["errors", "sustained_throughput"],
-        "tmax_definition": tmax,
-        "applies_to_designs": ["FPGA_ASYNC_PROP64", "FPGA_SYNC_PROP64"],
-        "paper_figures": ["fpga_validation"],
-        "notes": "FPGA latency is a hardware behavior metric, not an ASIC model calibration source.",
-    })
-    dump(BENCHMARKS / "fpga_multicast.json", {
-        "schema": "date-v3-benchmark-v1",
-        "benchmark_id": "FPGA-MULTICAST",
-        "title": "FPGA F=4, F=16, Q64 broadcast, all-destination completion",
-        "traffic": "fpga_multicast",
-        "packet_flits": 5,
-        "multicast": True,
-        "src_neq_dst": True,
-        "dst_not_same_l2_subtree": False,
-        "fanout_F": 16,
-        "spread_S": None,
-        "multicast_fraction": 1.0,
-        "destination_set_samples": None,
-        "warmup_original_events": 0,
-        "measurement_original_events": 64,
-        "seed_set_id": "v3_main_seeds",
-        "paired_trace": True,
-        "load_sweep": {"enabled": False, "coarse_then_fine": False, "saturation_rule": "n/a"},
-        "metrics": ["all_destination_completion", "tmax"],
-        "tmax_definition": tmax,
-        "applies_to_designs": ["FPGA_ASYNC_PROP64", "FPGA_SYNC_PROP64"],
-        "paper_figures": ["fpga_validation"],
-        "notes": "",
+        "applies_to_designs": ["PROP1024", "HREP1024"],
+        "paper_figures": ["optional_inset"],
+        "notes": "Optional only after Gate F. Requires a frozen source trace, provenance, endpoint mapping, and preserved one-spike-to-one-multicast semantics.",
     })
 
     dump(SEEDS / "v3_main_seeds.json", {
@@ -623,18 +600,36 @@ def main() -> int:
             "design_id": "SYNC_THIN_1X1",
             "benchmark_id": None,
             "adapter": "import_readonly",
-            "physical_class": "post-synthesis",
+            "physical_class": "archive-only",
             "paper_eligible": False,
-            "notes": "Clocked Thin SyncNoC64 1.0 ns SS ZeroWireload.",
+            "notes": "Phase 2 Thin SyncNoC64 1.0 ns, 2-cycle Head. Archive-only. Do not overwrite.",
         },
         {
             "run_id": "20260831_084457_cmr_sync_noc64_fat1222_p50",
             "design_id": "SYNC_PROP_2X2",
             "benchmark_id": None,
             "adapter": "import_readonly",
-            "physical_class": "post-synthesis",
+            "physical_class": "archive-only",
             "paper_eligible": False,
-            "notes": "Clocked Fat 1-2-2-2 SyncNoC64 1.0 ns.",
+            "notes": "Phase 2 Fat 1-2-2-2 SyncNoC64 1.0 ns, 3-cycle Head path. Archive-only. Do not overwrite.",
+        },
+        {
+            "run_id": "20260901_cmr_sync_noc64_thin_p50",
+            "design_id": "SYNC_THIN_1X1",
+            "benchmark_id": None,
+            "adapter": "dc_sync_noc64",
+            "physical_class": "post-synthesis",
+            "paper_eligible": True,
+            "notes": "Phase 2.5 1-cycle Head Thin SyncNoC64 1.0 ns MAXIMUM-SDF. Do not overwrite.",
+        },
+        {
+            "run_id": "20260901_cmr_sync_noc64_fat1222_p50",
+            "design_id": "SYNC_PROP_2X2",
+            "benchmark_id": None,
+            "adapter": "dc_sync_noc64",
+            "physical_class": "post-synthesis",
+            "paper_eligible": True,
+            "notes": "Phase 2.5 1-cycle Head Fat 1-2-2-2 SyncNoC64 1.0 ns MAXIMUM-SDF. Do not overwrite.",
         },
         {
             "run_id": "cmr_mesh64_current",
@@ -771,6 +766,102 @@ def main() -> int:
                     "Reuses frozen 20260830 Thin/Fat/PROP hop netlists. No P&R."
                 ),
             }
+        ],
+    })
+    dump(PLANS / "phase4_traffic.json", {
+        "schema": "date-v3-plan-v1",
+        "plan_id": "phase4_traffic",
+        "title": "Phase 4 V3 traffic infrastructure (local generator; not paper numbers)",
+        "runs": [
+            {
+                "run_id": "20260901_v3_traffic_smoke",
+                "design_id": "PROP64",
+                "benchmark_id": "BF-STRESS64",
+                "adapter": "v3_traffic",
+                "argv": [
+                    "--smoke", "--benchmark", "BF-STRESS64", "--materialize",
+                    "--design", "THIN64", "--design", "PROP64",
+                    "--design", "SYNC_THIN64", "--design", "SYNC_PROP64",
+                ],
+                "physical_class": "rtl",
+                "paper_eligible": False,
+                "notes": "Local canonical JSONL + paired .case smoke. Formal 11k-event maximum-delay gate-level scoreboard is Phase 6 Gates C-F.",
+            }
+        ],
+    })
+    dump(PLANS / "phase6_network_gates.json", {
+        "schema": "date-v3-plan-v1",
+        "plan_id": "phase6_network_gates",
+        "title": "V3.1.0 whole-network logic synthesis and maximum-delay gate-level simulation",
+        "runs": [
+            {
+                "run_id": "20260901_cmr_v31_gate_a_local",
+                "design_id": "PROP64",
+                "benchmark_id": None,
+                "adapter": "v31_gates",
+                "physical_class": "rtl",
+                "paper_eligible": False,
+                "notes": "Gate A local readiness. Not paper numbers.",
+                "env": {"CMR_V31_GATE": "A"},
+            },
+            {
+                "run_id": "20260901_cmr_v31_prop256_dc",
+                "design_id": "PROP256",
+                "benchmark_id": None,
+                "adapter": "network_sdf",
+                "physical_class": "post-synthesis",
+                "paper_eligible": False,
+                "notes": "Gate C synthesis of the asynchronous balanced hierarchical network, 256 nodes. Paper-eligible only after representative and formal delay simulations pass.",
+                "env": {
+                    "CMR_NETWORK_DESIGN_ID": "PROP256",
+                    "CMR_HIER_SKIP_GLS": "1",
+                    "CMR_DESCAL_SUBMIT_ONLY": "1",
+                },
+            },
+            {
+                "run_id": "20260901_cmr_v31_fm256_dc",
+                "design_id": "FM256",
+                "benchmark_id": None,
+                "adapter": "network_sdf",
+                "physical_class": "post-synthesis",
+                "paper_eligible": False,
+                "notes": "Gate C synthesis of the asynchronous flat mesh network, 256 nodes.",
+                "env": {
+                    "CMR_NETWORK_DESIGN_ID": "FM256",
+                    "CMR_HIER_SKIP_GLS": "1",
+                    "CMR_DESCAL_SUBMIT_ONLY": "1",
+                },
+            },
+            {
+                "run_id": "20260901_cmr_v31_prop1024_dc",
+                "design_id": "PROP1024",
+                "benchmark_id": None,
+                "adapter": "network_sdf",
+                "physical_class": "post-synthesis",
+                "paper_eligible": False,
+                "notes": "Gate E synthesis of the asynchronous balanced hierarchical network, 1024 nodes. Submit only after Gate D.",
+                "env": {
+                    "CMR_NETWORK_DESIGN_ID": "PROP1024",
+                    "CMR_HIER_SKIP_GLS": "1",
+                    "CMR_DESCAL_SUBMIT_ONLY": "1",
+                    "CMR_V31_REQUIRE_GATE": "D",
+                },
+            },
+            {
+                "run_id": "20260901_cmr_v31_fm1024_dc",
+                "design_id": "FM1024",
+                "benchmark_id": None,
+                "adapter": "network_sdf",
+                "physical_class": "post-synthesis",
+                "paper_eligible": False,
+                "notes": "Gate E synthesis of the asynchronous flat mesh network, 1024 nodes. Submit only after Gate D.",
+                "env": {
+                    "CMR_NETWORK_DESIGN_ID": "FM1024",
+                    "CMR_HIER_SKIP_GLS": "1",
+                    "CMR_DESCAL_SUBMIT_ONLY": "1",
+                    "CMR_V31_REQUIRE_GATE": "D",
+                },
+            },
         ],
     })
     print("wrote designs", len(list(DESIGNS.glob('*.json'))), "benchmarks", len(list(BENCHMARKS.glob('*.json'))))

@@ -34,7 +34,9 @@ module SRLatch (
 endmodule
 
 // Fig. 6 OPM Selector: RouteSel sets a packet-lifetime path; the matching
-// TailPassed independently releases that path.
+// TailPassed independently releases that path.  After TailPassed, ignore
+// RouteSel until it has fallen so a still-high or glitching RouteSel cannot
+// re-open the wormhole and replay a body that is still sitting in the buffer.
 module OPMSelector #(
     parameter PORTS = 4
 ) (
@@ -46,9 +48,18 @@ module OPMSelector #(
     genvar port;
     generate
         for (port = 0; port < PORTS; port = port + 1) begin : selector
+            wire BlockSet;
+            wire SetQual = RouteSel[port] & ~BlockSet;
+
+            SRLatch BlockLatch (
+                .reset(reset),
+                .S(TailPassed[port]),
+                .R(~RouteSel[port]),
+                .Q(BlockSet)
+            );
             SRLatch PathLatch (
                 .reset(reset),
-                .S(RouteSel[port]),
+                .S(SetQual),
                 .R(TailPassed[port]),
                 .Q(PathEnabled[port])
             );

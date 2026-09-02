@@ -45,8 +45,16 @@
   ],
   "expected_structure": {
     "routers": 352,
+    "ports": 2496,
+    "adapters": 4864,
     "interlevel_fifos": 0,
-    "max_opm_fanin": 8
+    "max_opm_fanin": 8,
+    "mutex_widths": [
+      2,
+      4,
+      5,
+      8
+    ]
   },
   "flit_width_bits": 28,
   "buffer_slots": 5,
@@ -63,8 +71,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Proposed 4x4 Q64 + Mesh2",
+  "paper_role": "Asynchronous balanced hierarchical network, 1024 nodes",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous balanced hierarchical network, 1024 nodes",
+  "display_description": "4-by-4 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 1024-node network is added."
 }

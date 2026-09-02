@@ -1,0 +1,49 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260831_cmr_pfat_l3_c4p8_del050_ackin050",
+  "status": "pass",
+  "design_id": "ASYNC_PFAT_4X8",
+  "benchmark_id": "R-U5",
+  "seed": null,
+  "adapter": "dc_cmr_router",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "a245c97935bc23b5bf929128191776fad69eac22fb8c67dccdce5ac051f178ea",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "c5bfd2fa4d36ba8ac8a248d8e4ac12862d0194f11ffbdc9fa8b448aa24b32dbb",
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [],
+  "env": {},
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": true,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "local_dc": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_pfat_l3_c4p8_del050_ackin050",
+    "hop_ppa": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5",
+    "metrics_csv": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5/metrics.csv",
+    "kind": "async_pfat_4x8",
+    "area_um2": 56288.735449,
+    "head_ns": "1.328",
+    "max_opm_fanin": 20
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T15:52:39+00:00",
+  "updated_utc": "2026-08-31T15:52:39+00:00",
+  "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+}

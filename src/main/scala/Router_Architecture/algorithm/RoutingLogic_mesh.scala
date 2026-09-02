@@ -7,9 +7,9 @@ import chisel3.util._
 /**
   * Core-grid XY + rectangle expansion for an 8x8 CMR mesh.
   *
-  * Same W/S/E/N/Local numbering as `RoutingLogic_top_layer`, but the
-  * router coordinate is the core (x, y) itself.  Destination fields are
-  * compared in that space; there is no tile `x >> 3` walk.
+  * Same W/S/E/N/Local numbering as `RoutingLogic_top_layer`.  Flat mesh
+  * uses PE coordinates (`coordShift=0`).  Q64 TopMesh uses cluster
+  * coordinates (`coordShift=3` so dest PE `x >> 3`).
   */
 object RoutingLogicMeshModel {
   val DirWest = 0
@@ -29,18 +29,20 @@ object RoutingLogicMeshModel {
       y0: Int,
       x1: Int,
       y1: Int,
-      packetValid: Boolean
+      packetValid: Boolean,
+      coordShift: Int = 0
   ): Int = {
     require(gridSize >= 2 && gridSize <= 64)
+    require(coordShift >= 0 && coordShift <= 5)
     require(coordinateX >= 0 && coordinateX < gridSize)
     require(coordinateY >= 0 && coordinateY < gridSize)
     require(ingressDir >= 0 && ingressDir <= 4)
     if (!packetValid) return 0
 
-    val xLo = math.min(x0, x1)
-    val xHi = math.max(x0, x1)
-    val yLo = math.min(y0, y1)
-    val yHi = math.max(y0, y1)
+    val xLo = math.min(x0, x1) >> coordShift
+    val xHi = math.max(x0, x1) >> coordShift
+    val yLo = math.min(y0, y1) >> coordShift
+    val yHi = math.max(y0, y1) >> coordShift
     val cx = coordinateX
     val cy = coordinateY
     val inRectColumn = cx >= xLo && cx <= xHi
@@ -132,9 +134,11 @@ object RoutingLogicMeshModel {
 class RoutingLogic_mesh(
     coordinate_x: Int,
     coordinate_y: Int,
-    gridSize: Int = 8
+    gridSize: Int = 8,
+    coordShift: Int = 0
 ) {
   require(gridSize >= 2 && gridSize <= 64)
+  require(coordShift >= 0 && coordShift <= 5)
   require(coordinate_x >= 0 && coordinate_x < gridSize)
   require(coordinate_y >= 0 && coordinate_y < gridSize)
 
@@ -158,10 +162,21 @@ class RoutingLogic_mesh(
     val xHi = Wire(UInt(6.W))
     val yLo = Wire(UInt(6.W))
     val yHi = Wire(UInt(6.W))
-    xLo := Mux(x0 <= x1, x0, x1)
-    xHi := Mux(x0 <= x1, x1, x0)
-    yLo := Mux(y0 <= y1, y0, y1)
-    yHi := Mux(y0 <= y1, y1, y0)
+    val xLoRaw = Mux(x0 <= x1, x0, x1)
+    val xHiRaw = Mux(x0 <= x1, x1, x0)
+    val yLoRaw = Mux(y0 <= y1, y0, y1)
+    val yHiRaw = Mux(y0 <= y1, y1, y0)
+    if (coordShift == 0) {
+      xLo := xLoRaw
+      xHi := xHiRaw
+      yLo := yLoRaw
+      yHi := yHiRaw
+    } else {
+      xLo := xLoRaw >> coordShift
+      xHi := xHiRaw >> coordShift
+      yLo := yLoRaw >> coordShift
+      yHi := yHiRaw >> coordShift
+    }
 
     val cx = coordinate_x.U(6.W)
     val cy = coordinate_y.U(6.W)

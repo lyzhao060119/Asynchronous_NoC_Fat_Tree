@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/snn_trace.schema.json",
+  "title": "DATE V3.2 frozen spiking-neural-network multicast trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "trace_id",
+    "source_sha256",
+    "provenance",
+    "license",
+    "network_nodes",
+    "endpoint_mapping",
+    "preserves_original_multicast",
+    "events"
+  ],
+  "properties": {
+    "schema": { "const": "date-v3-snn-trace-v1" },
+    "trace_id": { "type": "string", "minLength": 1 },
+    "source_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "provenance": { "type": "string", "minLength": 1 },
+    "license": { "type": "string", "minLength": 1 },
+    "network_nodes": { "const": 1024 },
+    "endpoint_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapping_id", "mapping_sha256", "logical_to_network_node"],
+      "properties": {
+        "mapping_id": { "type": "string", "minLength": 1 },
+        "mapping_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "logical_to_network_node": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 1023 }
+        }
+      }
+    },
+    "preserves_original_multicast": { "const": true },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_id", "order", "source", "destinations", "packet_flits"],
+        "properties": {
+          "event_id": { "type": "integer", "minimum": 0 },
+          "order": { "type": "integer", "minimum": 0 },
+          "time_ps": { "type": "integer", "minimum": 0 },
+          "source": { "type": "string", "minLength": 1 },
+          "destinations": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "packet_flits": { "const": 5 }
+        }
+      }
+    }
+  }
+}

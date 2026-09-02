@@ -43,6 +43,11 @@ def delay_env(base: dict[str, str] | None = None) -> dict[str, str]:
     return env
 
 
+def sbt_cmd(*parts: str) -> list[str]:
+    # Windows sbt.bat treats extra argv as separate sbt commands unless quoted.
+    return [SBT, " ".join(parts)]
+
+
 def run(cmd: list[str], *, env: dict[str, str] | None = None, cwd: Path | None = None) -> None:
     print("RUN", " ".join(cmd), flush=True)
     subprocess.check_call(cmd, cwd=cwd or REPO, env=env or os.environ.copy())
@@ -52,9 +57,9 @@ def local_emit_and_check() -> None:
     emit_env = delay_env()
     emit_env.pop("CMR_SKIP_EMIT", None)
     run([sys.executable, str(HERE / "gen_cmr_hop_dut_bind.py")])
-    run([SBT, "runMain", "Router_Architecture.CMR.CMRPrimitiveMatrixEmitMain"], env=emit_env)
+    run(sbt_cmd("runMain", "Router_Architecture.CMR.CMRPrimitiveMatrixEmitMain"), env=emit_env)
     run(
-        [SBT, "runMain", "Router_Architecture.sync_cmr.SyncCmrPrimitiveMatrixEmitMain"],
+        sbt_cmd("runMain", "Router_Architecture.sync_cmr.SyncCmrPrimitiveMatrixEmitMain"),
         env=emit_env,
     )
     run(
@@ -76,12 +81,12 @@ def local_emit_and_check() -> None:
     )
     if os.environ.get("CMR_SKIP_MESH_TEST", "0") != "1":
         run(
-            [
-                SBT,
+            sbt_cmd(
                 "testOnly",
                 "Router_Architecture.algorithm.RoutingLogicMeshSpec",
                 "Router_Architecture.CMR.CMRTopMeshGeometrySpec",
-            ]
+                "Router_Architecture.sync_cmr.SyncCmrRouterHopLatencySpec",
+            )
         )
 
 

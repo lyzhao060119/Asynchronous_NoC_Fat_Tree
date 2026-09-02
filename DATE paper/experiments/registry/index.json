@@ -1,6 +1,6 @@
 {
   "schema": "date-v3-registry-v1",
-  "updated_utc": "2026-08-31T06:50:58+00:00",
+  "updated_utc": "2026-09-01T12:44:52+00:00",
   "notes": "Empty index; populated by run_experiment.py plan.",
   "runs": [
     {
@@ -108,10 +108,10 @@
       "benchmark_id": null,
       "status": "imported_readonly",
       "paper_eligible": false,
-      "physical_class": "post-synthesis",
+      "physical_class": "archive-only",
       "config_hash": "dc9518b1460d83c12331802d0a02198484ca92ba1bf51b631ea90b97bf745c06",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_014622_cmr_sync_noc64_thin_p50.json",
-      "notes": "Clocked Thin SyncNoC64 1.0 ns SS ZeroWireload."
+      "notes": "Phase 2 clocked Thin SyncNoC64 1.0 ns with 2-cycle Head. Archive-only after Phase 2.5."
     },
     {
       "run_id": "20260831_084457_cmr_sync_noc64_fat1222_p50",
@@ -119,10 +119,43 @@
       "benchmark_id": null,
       "status": "imported_readonly",
       "paper_eligible": false,
-      "physical_class": "post-synthesis",
+      "physical_class": "archive-only",
       "config_hash": "d143f8b05387580c3088f71180c041141263dfa28b3a15e8952ae60b7f6b01da",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_084457_cmr_sync_noc64_fat1222_p50.json",
-      "notes": "Clocked Fat 1-2-2-2 SyncNoC64 1.0 ns."
+      "notes": "Phase 2 clocked Fat 1-2-2-2 SyncNoC64 1.0 ns with 3-cycle Head path. Archive-only after Phase 2.5."
+    },
+    {
+      "run_id": "20260831_cmr_flatmesh_c1p1_del050_ackin050",
+      "design_id": "ASYNC_FLATMESH_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "0a1434c188bcdc405dc504f5b76fa58d7acff8ad98b41abffe7c820a1cebb9ca",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_flatmesh_c1p1_del050_ackin050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260831_cmr_pfat_l2_c2p4_del050_ackin050",
+      "design_id": "ASYNC_PFAT_2X4",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "7a124ecee8d3ba0c40e65921a3336dd775ec9a43d915aaa161085e620fda68e1",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_pfat_l2_c2p4_del050_ackin050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260831_cmr_pfat_l3_c4p8_del050_ackin050",
+      "design_id": "ASYNC_PFAT_4X8",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "a245c97935bc23b5bf929128191776fad69eac22fb8c67dccdce5ac051f178ea",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_pfat_l3_c4p8_del050_ackin050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
     },
     {
       "run_id": "20260831_cmr_pnr_pilot_blocker",
@@ -134,6 +167,160 @@
       "config_hash": "7fa61e002c9afb0a7ca902980b3654c4d47aad625bb337b7f7bbbc685dfda4c6",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_pnr_pilot_blocker.json",
       "notes": "Phase 1 P&R Gate FAIL. No tech LEF/NDM. Paper path frozen to post-synthesis MAXIMUM-SDF."
+    },
+    {
+      "run_id": "20260831_cmr_primitive_hop_ppa_ru5",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "181081fee0ec867f26cf4ca81c357ad961bf7aa095c870f6465104376edf1552",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_primitive_hop_ppa_ru5.json",
+      "notes": "Phase 2 R-U5. Async rows remain paper inputs; Sync rows archive-only (2/3-cycle Head)."
+    },
+    {
+      "run_id": "20260831_cmr_sync_prop_2x2_1p0ns",
+      "design_id": "SYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "b7fa96549b322aa3ca26d7c00074b27db3e204f619054feefbf4c13d2ee6c545",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_sync_prop_2x2_1p0ns.json",
+      "notes": "Phase 2 Sync PROP hop, 3-cycle Head. Archive-only."
+    },
+    {
+      "run_id": "20260831_cmr_sync_thin_1x1_1p0ns",
+      "design_id": "SYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "a45f3ecc4e2c59a76ade6e98f58a4cdd93ef41ac5844d8d745f8022cf20c8965",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_sync_thin_1x1_1p0ns.json",
+      "notes": "Phase 2 Sync Thin hop, 2-cycle Head. Archive-only."
+    },
+    {
+      "run_id": "20260831_cmr_topmesh_c2p2_del050_ackin050",
+      "design_id": "ASYNC_TOPMESH_2X2",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "411a6769683d16bb57d4e314c2a520ef8e072518055f5ffcce4d3f8267df1b07",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_topmesh_c2p2_del050_ackin050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260901_195030_cmr_descal_fm64",
+      "design_id": "FM64",
+      "benchmark_id": null,
+      "status": "fail",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "c6059e944c3ff0c5b14df6c8438f12d56789e1f219a9eaec88a06a3afe9f826b",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_195030_cmr_descal_fm64.json",
+      "notes": "V3.1.0 Gate B whole-network MAXIMUM-SDF smoke (seed 900001, 5-flit). Not paper 11k. paper_eligible=false. Do not use DES Tmax as a substitute."
+    },
+    {
+      "run_id": "20260901_195030_cmr_descal_pfat64_1248",
+      "design_id": "PFAT64",
+      "benchmark_id": null,
+      "status": "fail",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "5aaf9b4325b1cb3295822936f285c817a75355c12adf92b333644eac1c9ffe89",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_195030_cmr_descal_pfat64_1248.json",
+      "notes": "V3.1.0 Gate B whole-network MAXIMUM-SDF smoke (seed 900001, 5-flit). Not paper 11k. paper_eligible=false. Do not use DES Tmax as a substitute."
+    },
+    {
+      "run_id": "20260901_195030_cmr_descal_prop64_1222",
+      "design_id": "PROP64",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "6839c78138e3de7b64e3bc745d1ed5a3d50988b0b607dbcb87445a60fcec1459",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_195030_cmr_descal_prop64_1222.json",
+      "notes": "V3.1.0 Gate B whole-network MAXIMUM-SDF smoke (seed 900001, 5-flit). Not paper 11k. paper_eligible=false. Do not use DES Tmax as a substitute."
+    },
+    {
+      "run_id": "20260901_195030_cmr_descal_thin64_thin",
+      "design_id": "THIN64",
+      "benchmark_id": null,
+      "status": "fail",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "0c400d758feef6c0fdea696e091b7b9d3d4daf65d973e94c657de9286b13c9ec",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_195030_cmr_descal_thin64_thin.json",
+      "notes": "V3.1.0 Gate B whole-network MAXIMUM-SDF smoke (seed 900001, 5-flit). Not paper 11k. paper_eligible=false. Do not use DES Tmax as a substitute."
+    },
+    {
+      "run_id": "20260901_201853_cmr_descal_thin64_thin",
+      "design_id": "THIN64",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "0c400d758feef6c0fdea696e091b7b9d3d4daf65d973e94c657de9286b13c9ec",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_201853_cmr_descal_thin64_thin.json",
+      "notes": "V3.1.0 Gate B whole-network MAXIMUM-SDF smoke (seed 900001, 5-flit). Not paper 11k. paper_eligible=false. Do not use DES Tmax as a substitute."
+    },
+    {
+      "run_id": "20260901_cmr_primitive_hop_ppa_ru5",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "d0883c99ef6120bc93f7edf2016dac3e94c96dab4d38e77b3b1b8408b2b0a7e2",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_cmr_primitive_hop_ppa_ru5.json",
+      "notes": "Phase 2.5 hop PPA: Async rows reused from 20260831; Sync Thin/PROP are 1-cycle Head. No P&R."
+    },
+    {
+      "run_id": "20260901_cmr_sync_noc64_fat1222_p50",
+      "design_id": "SYNC_PROP_2X2",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "b7fa96549b322aa3ca26d7c00074b27db3e204f619054feefbf4c13d2ee6c545",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_cmr_sync_noc64_fat1222_p50.json",
+      "notes": "Phase 2.5 1-cycle Head Fat 1-2-2-2 SyncNoC64 1.0 ns DC + MAXIMUM-SDF TAB+VCTM. Structure 21/146/264. No P&R."
+    },
+    {
+      "run_id": "20260901_cmr_sync_noc64_thin_p50",
+      "design_id": "SYNC_THIN_1X1",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "a45f3ecc4e2c59a76ade6e98f58a4cdd93ef41ac5844d8d745f8022cf20c8965",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_cmr_sync_noc64_thin_p50.json",
+      "notes": "Phase 2.5 1-cycle Head Thin SyncNoC64 1.0 ns DC + MAXIMUM-SDF TAB. Structure 21/105/0. No P&R."
+    },
+    {
+      "run_id": "20260901_cmr_sync_prop_2x2_1p0ns",
+      "design_id": "SYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "b7fa96549b322aa3ca26d7c00074b27db3e204f619054feefbf4c13d2ee6c545",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_cmr_sync_prop_2x2_1p0ns.json",
+      "notes": "DATE V3 Phase 2.5 Sync 1-cycle Head post-synthesis DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260901_cmr_sync_thin_1x1_1p0ns",
+      "design_id": "SYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "a45f3ecc4e2c59a76ade6e98f58a4cdd93ef41ac5844d8d745f8022cf20c8965",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_cmr_sync_thin_1x1_1p0ns.json",
+      "notes": "DATE V3 Phase 2.5 Sync 1-cycle Head post-synthesis DC + R-U5 hop PPA. No P&R."
     },
     {
       "run_id": "cmr_mesh64_current",

@@ -46,5 +46,6 @@
   "adapter": "dc_sync_router",
   "paper_role": "Table I Sync Thin counterpart",
   "paper_eligible_default": true,
-  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only."
+  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
+  "display_name": "Synchronous narrow router primitive"
 }

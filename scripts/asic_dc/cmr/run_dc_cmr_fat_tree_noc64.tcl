@@ -1,5 +1,5 @@
 # CMR fat-tree NoC64 DC entry: 16 L1 + 4 L2 + 1 L3.
-# Geometry is selected by CMR_FAT_LANE_PROFILE (1248 or 1222).
+# Geometry is selected by CMR_FAT_LANE_PROFILE (1248, 1222, or thin).
 # Default DUT omits inter-level FIFOs (bypass).
 set PROJECT_DIR $::env(CMR_REMOTE_ROOT)
 set RUN_ID $::env(CMR_NOC64_RUN_ID)
@@ -386,41 +386,46 @@ set ackin_del250 [sizeof_collection [cmr_ft_ackin_leaves 250]]
 set fifo_del150 [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ DEL150D1* && full_name =~ *outReqDelay*}]]
 
 set fd [open "$REPORT_DIR/cmr_fat_tree_noc64_structure.rpt" w]
-puts $fd "ROUTER_COUNT=$router_count"
-puts $fd "INTERLEVEL_FIFO_COUNT=$fifo_count"
-puts $fd "ASYNC_FIFO_COUNT=$async_fifo_count"
-puts $fd "CIRCULAR_FIFO_COUNT=$circular_fifo_count"
-puts $fd "IPM_COUNT=$ipm_count"
-puts $fd "OPM_COUNT=$opm_count"
-puts $fd "MUTEX4_COUNT=$mutex4_count"
-puts $fd "MUTEX2_COUNT=$mutex2_count"
-puts $fd "RESET_LATCH_COUNT=$clear_count"
-puts $fd "SET_RESET_LATCH_COUNT=$set_count"
-puts $fd "SR_LATCH_COUNT=$sr_count"
-puts $fd "PATH_LATCH_CLEAR_COUNT=$path_count"
-puts $fd "PATH_LATCH_DUAL_COUNT=$selector_dual_count"
-puts $fd "V2_CLOSE_EVENT_COUNT=$close_count"
-puts $fd "HANDSHAKE_COMPLETE_COUNT=$handshake_complete_count"
-puts $fd "ROUTESEL_AND2_COUNT=$routesel_and_count"
-puts $fd "ROUTESEL_AN2D0_COUNT=$routesel_an2_count"
-puts $fd "ADAPTER_COUNT=$adapter_count"
-puts $fd "ACKLATCH_E_COUNT=$acklatch_e_count"
-puts $fd "LANE01_ACKLATCH_BUF_COUNT=$lane01_buf"
-puts $fd "LANE01_BUF_STAGES=$lane01_stages"
-puts $fd "CFIFO_HS02_BUF_COUNT=$cfifo_hs02_buf"
-puts $fd "CFIFO_RD01_BUF_COUNT=$cfifo_rd01_buf"
-puts $fd "RCU_DEL050_COUNT=$del050_rcu"
-puts $fd "RCU_DEL075_COUNT=$del075_rcu"
-puts $fd "RCU_DEL100_COUNT=$del100_rcu"
-puts $fd "RCU_DEL150_COUNT=$del150_rcu"
-puts $fd "RCU_MATCHED_DELAY_UNIT_PS=$rcu_unit_ps"
-puts $fd "RCU_MATCHED_DELAY_STEPS=$rcu_steps"
-puts $fd "OPM_ACKIN_DELAY_COUNT=$ackin_count"
-puts $fd "OPM_ACKIN_DELAY_UNIT_PS=$opm_ackin_unit_ps"
-puts $fd "OPM_ACKIN_DEL250_COUNT=$ackin_del250"
-puts $fd "FIFO_OUTREQ_DEL150_COUNT=$fifo_del150"
+foreach {key val} [list \
+  ROUTER_COUNT $router_count \
+  INTERLEVEL_FIFO_COUNT $fifo_count \
+  ASYNC_FIFO_COUNT $async_fifo_count \
+  CIRCULAR_FIFO_COUNT $circular_fifo_count \
+  IPM_COUNT $ipm_count \
+  OPM_COUNT $opm_count \
+  MUTEX4_COUNT $mutex4_count \
+  MUTEX2_COUNT $mutex2_count \
+  RESET_LATCH_COUNT $clear_count \
+  SET_RESET_LATCH_COUNT $set_count \
+  SR_LATCH_COUNT $sr_count \
+  PATH_LATCH_CLEAR_COUNT $path_count \
+  PATH_LATCH_DUAL_COUNT $selector_dual_count \
+  V2_CLOSE_EVENT_COUNT $close_count \
+  HANDSHAKE_COMPLETE_COUNT $handshake_complete_count \
+  ROUTESEL_AND2_COUNT $routesel_and_count \
+  ROUTESEL_AN2D0_COUNT $routesel_an2_count \
+  ADAPTER_COUNT $adapter_count \
+  ACKLATCH_E_COUNT $acklatch_e_count \
+  LANE01_ACKLATCH_BUF_COUNT $lane01_buf \
+  LANE01_BUF_STAGES $lane01_stages \
+  CFIFO_HS02_BUF_COUNT $cfifo_hs02_buf \
+  CFIFO_RD01_BUF_COUNT $cfifo_rd01_buf \
+  RCU_DEL050_COUNT $del050_rcu \
+  RCU_DEL075_COUNT $del075_rcu \
+  RCU_DEL100_COUNT $del100_rcu \
+  RCU_DEL150_COUNT $del150_rcu \
+  RCU_MATCHED_DELAY_UNIT_PS $rcu_unit_ps \
+  RCU_MATCHED_DELAY_STEPS $rcu_steps \
+  OPM_ACKIN_DELAY_COUNT $ackin_count \
+  OPM_ACKIN_DELAY_UNIT_PS $opm_ackin_unit_ps \
+  OPM_ACKIN_DEL250_COUNT $ackin_del250 \
+  FIFO_OUTREQ_DEL150_COUNT $fifo_del150 \
+] {
+  puts $fd [format "%s=%s" $key $val]
+}
 close $fd
-puts "CMR_NOC64_STRUCTURE ROUTER=$router_count FIFO=$fifo_count ASYNC_FIFO=$async_fifo_count CIRCULAR_FIFO=$circular_fifo_count IPM=$ipm_count OPM=$opm_count ADAPTER=$adapter_count ACKLATCH_E=$acklatch_e_count LANE01_BUF=$lane01_buf stages=$lane01_stages MUTEX4=$mutex4_count MUTEX2=$mutex2_count CLEAR=$clear_count SET=$set_count SR=$sr_count CLOSE=$close_count COMPLETE=$handshake_complete_count ROUTESEL_AND2=$routesel_and_count ROUTESEL_AN2D0=$routesel_an2_count DEL050=$del050_rcu ACKIN=$ackin_count ACKIN_UNIT=$opm_ackin_unit_ps ACKIN250=$ackin_del250 HS02=$cfifo_hs02_buf RD01=$cfifo_rd01_buf FIFO_OUTREQ_DEL150=$fifo_del150"
+puts [format "CMR_NOC64_STRUCTURE ROUTER=%s FIFO=%s ASYNC_FIFO=%s CIRCULAR_FIFO=%s IPM=%s OPM=%s ADAPTER=%s ACKLATCH_E=%s LANE01_BUF=%s stages=%s MUTEX4=%s MUTEX2=%s CLEAR=%s SET=%s SR=%s CLOSE=%s COMPLETE=%s ROUTESEL_AND2=%s ROUTESEL_AN2D0=%s DEL050=%s ACKIN=%s ACKIN_UNIT=%s ACKIN250=%s HS02=%s RD01=%s FIFO_OUTREQ_DEL150=%s" \
+  $router_count $fifo_count $async_fifo_count $circular_fifo_count $ipm_count $opm_count $adapter_count $acklatch_e_count $lane01_buf $lane01_stages $mutex4_count $mutex2_count $clear_count $set_count $sr_count $close_count $handshake_complete_count $routesel_and_count $routesel_an2_count $del050_rcu $ackin_count $opm_ackin_unit_ps $ackin_del250 $cfifo_hs02_buf $cfifo_rd01_buf $fifo_del150]
 
 if {$n_gtech > 0 || $n_unmapped > 0} {
   puts "CMR_NOC64_DC_FAIL unmapped gtech=$n_gtech generic=$n_unmapped"

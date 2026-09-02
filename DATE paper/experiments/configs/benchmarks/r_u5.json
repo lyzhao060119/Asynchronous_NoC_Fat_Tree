@@ -46,5 +46,6 @@
   "paper_figures": [
     "Table I"
   ],
-  "notes": "Also run continuous 5-flit stream, idle window, and contention sanity. Not a network load sweep."
+  "notes": "Also run continuous 5-flit stream, idle window, and contention sanity. Not a network load sweep.",
+  "display_name": "Isolated five-flit hop characterization"
 }

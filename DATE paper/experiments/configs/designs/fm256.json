@@ -21,9 +21,14 @@
   ],
   "expected_structure": {
     "routers": 256,
+    "ports": 1280,
     "adapters": 0,
     "interlevel_fifos": 0,
-    "max_opm_fanin": 4
+    "top_ports": 0,
+    "max_opm_fanin": 4,
+    "mutex_widths": [
+      4
+    ]
   },
   "flit_width_bits": 28,
   "buffer_slots": 5,
@@ -40,8 +45,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Fig. B 16x16 flat mesh",
+  "paper_role": "Asynchronous flat mesh network, 256 nodes",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous flat mesh network, 256 nodes",
+  "display_description": "16-by-16 asynchronous flat mesh. Compared with the 256-node hierarchical network at the same node count."
 }

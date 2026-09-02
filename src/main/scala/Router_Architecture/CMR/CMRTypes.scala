@@ -54,6 +54,21 @@ object CMRParameters {
     parentDirAdapters + childDirAdapters
   }
 
+  def portCount(childLanes: Int, parentLanes: Int): Int = 4 * childLanes + parentLanes
+
+  def childOpmFanIn(childLanes: Int, parentLanes: Int): Int =
+    3 * childLanes + parentLanes
+
+  def parentOpmFanIn(childLanes: Int): Int = 4 * childLanes
+
+  def maxOpmFanIn(childLanes: Int, parentLanes: Int): Int =
+    math.max(childOpmFanIn(childLanes, parentLanes), parentOpmFanIn(childLanes))
+
+  def mutexWidths(childLanes: Int, parentLanes: Int): Set[Int] = {
+    val lanes = Set(childLanes, parentLanes).filter(_ > 1)
+    Set(childOpmFanIn(childLanes, parentLanes), parentOpmFanIn(childLanes)) ++ lanes
+  }
+
   def legalOutputDirections(
       config: Router_Architecture.common.RouterModuleConfig,
       ingressPort: Int

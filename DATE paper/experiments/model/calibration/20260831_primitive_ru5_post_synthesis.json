@@ -1,0 +1,168 @@
+{
+  "run_id": "20260831_cmr_primitive_hop_ppa_ru5",
+  "physical_class": "post-synthesis",
+  "primitives": [
+    {
+      "kind": "async_thin_1x1",
+      "netlist_run_id": "20260830_cmr_thin_l1_hop_del050_ackin050",
+      "total_cell_area_um2": 7134.119951,
+      "physical_class": "post-synthesis",
+      "head_ns": "0.681",
+      "body_ns": "0.475",
+      "tail_ns": "0.521",
+      "idle_power_w": 0.000458,
+      "active_power_w": 0.001602,
+      "packet_energy_j": 6.609773000000007e-12,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "async_flatmesh_1x1",
+      "netlist_run_id": "20260831_cmr_flatmesh_c1p1_del050_ackin050",
+      "total_cell_area_um2": 7249.367951,
+      "physical_class": "post-synthesis",
+      "head_ns": "0.681",
+      "body_ns": "0.475",
+      "tail_ns": "0.521",
+      "idle_power_w": 0.0004685,
+      "active_power_w": 0.001599,
+      "packet_energy_j": 6.581850000000007e-12,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "async_fat_1x2",
+      "netlist_run_id": "20260830_cmr_fat_l1_hop_del050_ackin050",
+      "total_cell_area_um2": 8908.703938,
+      "physical_class": "post-synthesis",
+      "head_ns": "0.796",
+      "body_ns": "0.604",
+      "tail_ns": "0.642",
+      "idle_power_w": 0.0005664,
+      "active_power_w": 0.001574,
+      "packet_energy_j": 7.67715000000001e-12,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "async_prop_2x2",
+      "netlist_run_id": "20260830_cmr_fat_l2_hop_del050_ackin050",
+      "total_cell_area_um2": 16950.191866,
+      "physical_class": "post-synthesis",
+      "head_ns": "0.956",
+      "body_ns": "0.679",
+      "tail_ns": "0.715",
+      "idle_power_w": 0.001053,
+      "active_power_w": 0.002024,
+      "packet_energy_j": 1.069522999999997e-11,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "async_topmesh_2x2",
+      "netlist_run_id": "20260831_cmr_topmesh_c2p2_del050_ackin050",
+      "total_cell_area_um2": 17201.183865,
+      "physical_class": "post-synthesis",
+      "head_ns": "0.958",
+      "body_ns": "0.679",
+      "tail_ns": "0.715",
+      "idle_power_w": 0.001078,
+      "active_power_w": 0.002035,
+      "packet_energy_j": 1.0710559999999972e-11,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "async_pfat_2x4",
+      "netlist_run_id": "20260831_cmr_pfat_l2_c2p4_del050_ackin050",
+      "total_cell_area_um2": 21370.607838,
+      "physical_class": "post-synthesis",
+      "head_ns": "1.022",
+      "body_ns": "0.714",
+      "tail_ns": "0.754",
+      "idle_power_w": 0.001311,
+      "active_power_w": 0.002253,
+      "packet_energy_j": 1.2321119999999983e-11,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "async_pfat_4x8",
+      "netlist_run_id": "20260831_cmr_pfat_l3_c4p8_del050_ackin050",
+      "total_cell_area_um2": 56288.735449,
+      "physical_class": "post-synthesis",
+      "head_ns": "1.328",
+      "body_ns": "0.885",
+      "tail_ns": "0.941",
+      "idle_power_w": 0.003294,
+      "active_power_w": 0.004174,
+      "packet_energy_j": 2.6611391999999933e-11,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "sync_thin_1x1",
+      "netlist_run_id": "20260831_cmr_sync_thin_1x1_1p0ns",
+      "total_cell_area_um2": 6868.847925,
+      "physical_class": "post-synthesis",
+      "head_ns": "2.000",
+      "body_ns": "1.000",
+      "tail_ns": "1.000",
+      "idle_power_w": 0.004199,
+      "active_power_w": 0.004404,
+      "packet_energy_j": 6.188442000000002e-11,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    },
+    {
+      "kind": "sync_prop_2x2",
+      "netlist_run_id": "20260831_cmr_sync_prop_2x2_1p0ns",
+      "total_cell_area_um2": 15469.943816,
+      "physical_class": "post-synthesis",
+      "head_ns": "3.000",
+      "body_ns": "1.000",
+      "tail_ns": "1.000",
+      "idle_power_w": 0.00889,
+      "active_power_w": 0.00911,
+      "packet_energy_j": 1.3775418300000003e-10,
+      "modes_pass": [
+        "contention",
+        "idle",
+        "isolated",
+        "stream"
+      ]
+    }
+  ]
+}

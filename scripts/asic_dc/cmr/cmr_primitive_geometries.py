@@ -3,7 +3,8 @@
 
 Lane geometry and routing mode only.  Microarchitecture, DEL recipe, and the
 Sync 1.0 ns clock are locked in CMR_Router_Structure_Freeze.md.  DATE V3 does
-not run P&R.
+not run P&R.  Phase 2.5 Sync hop IDs are 1-cycle Head; do not reuse the
+20260831 Sync hop directories.
 """
 from __future__ import annotations
 
@@ -191,7 +192,7 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "mesh": False,
         "mutex_widths": frozenset(),
         "reuse_dc_id": None,
-        "dc_id": "20260831_cmr_sync_thin_1x1_1p0ns",
+        "dc_id": "20260901_cmr_sync_thin_1x1_1p0ns",
         "netlist_envs": ("CMR_SYNC_THIN_NETLIST_RUN_ID",),
         "rx_default": "0.0",
         "dut": "SyncCmrRouter",
@@ -208,7 +209,7 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "mesh": False,
         "mutex_widths": frozenset(),
         "reuse_dc_id": None,
-        "dc_id": "20260831_cmr_sync_prop_2x2_1p0ns",
+        "dc_id": "20260901_cmr_sync_prop_2x2_1p0ns",
         "netlist_envs": ("CMR_SYNC_PROP_NETLIST_RUN_ID",),
         "rx_default": "0.0",
         "dut": "SyncCmrRouter",
@@ -259,7 +260,7 @@ for _row in PRIMITIVES:
     for _alias in _row.get("aliases") or ():
         KIND_INDEX[_alias] = _row
 
-HOP_PPA_RUN_ID = "20260831_cmr_primitive_hop_ppa_ru5"
+HOP_PPA_RUN_ID = "20260901_cmr_primitive_hop_ppa_ru5"
 DEFAULT_HOP_KINDS = tuple(row["kind"] for row in PRIMITIVES)
 
 

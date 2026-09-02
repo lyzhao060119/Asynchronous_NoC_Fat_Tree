@@ -92,6 +92,7 @@ set +e
 # shellcheck disable=SC2086
 ./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
+  +V3_METRICS_CSV="$LOG/v3_metrics.csv" \
   +CLOCK_PERIOD_NS="$CLOCK_PERIOD_NS" +CASE_TICK_NS=20 \
   +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
   +STALL_TIMEOUT_NS="$STALL_TIMEOUT_NS" +HARD_TIMEOUT_NS="$HARD_TIMEOUT_NS" \

@@ -26,6 +26,11 @@ proc async_apply_primitive_dont_touch {} {
     set_dont_touch $ackin_buf_cells
     puts "INFO: set_dont_touch on [sizeof_collection $ackin_buf_cells] AckinDelay BUFFD0 cells"
   }
+  set grant_hold_buf_cells [get_cells -hierarchical -quiet -filter {full_name =~ *GrantHoldBuf* && ref_name =~ BUFFD0*}]
+  if {[sizeof_collection $grant_hold_buf_cells] > 0} {
+    set_dont_touch $grant_hold_buf_cells
+    puts "INFO: set_dont_touch on [sizeof_collection $grant_hold_buf_cells] GrantHoldBuf BUFFD0 cells"
+  }
 
   set del_cells [get_cells -hierarchical -quiet -filter {ref_name =~ DEL*}]
   if {[sizeof_collection $del_cells] > 0} {

@@ -16,6 +16,7 @@ from pathlib import Path
 import paramiko
 
 from cmr_frozen_run_ids import refuse_overwrite
+from cmr_primitive_geometries import max_opm_fanin
 
 
 REPO = Path(__file__).resolve().parents[3]
@@ -76,6 +77,10 @@ def expected_adapters(child_lanes, parent_lanes):
 
 
 EXPECTED_ADAPTERS = expected_adapters(CHILD_LANES, PARENT_LANES)
+EXPECTED_PORTS = 4 * CHILD_LANES + PARENT_LANES
+EXPECTED_ACKOUT_CLOSE_DELAY = (
+    EXPECTED_PORTS if max_opm_fanin(CHILD_LANES, PARENT_LANES) >= 16 else 0
+)
 
 
 def password():
@@ -488,15 +493,17 @@ def main():
         "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
         "module load syn 2>/dev/null || true\n"
         "export CMR_REMOTE_ROOT=%s CMR_RUN_ID=%s CMR_EXPECTED_PORTS=%d "
-        "CMR_EXPECTED_EDGES=%d CMR_EXPECTED_ADAPTERS=%d CMR_RCU_MAT_MAX_NS=%s "
+        "CMR_EXPECTED_EDGES=%d CMR_EXPECTED_ADAPTERS=%d "
+        "CMR_EXPECTED_ACKOUT_CLOSE_DELAY=%d CMR_RCU_MAT_MAX_NS=%s "
         "CMR_DC_SEED_RUN_ID=%s CMR_RCU_MATCHED_BUF_STAGES=%s "
         "CMR_LANE01_BUF_STAGES=%s "
         "CMR_RCU_MATCHED_DELAY_UNIT_PS=%s CMR_RCU_MATCHED_DELAY_STEPS=%s "
         "CMR_OPM_ACKIN_DELAY_STEPS=%s CMR_OPM_ACKIN_DELAY_UNIT_PS=%s "
-        "CMR_OPM_ACKIN_USE_BUF=%s CMR_DUT_V=%s\n"
+        "CMR_OPM_ACKIN_USE_BUF=%s CMR_DUT_V=%s CMR_DONT_TOUCH_ADAPTERS=%s\n"
         "cd %s\ndc_shell-t -64 -f %s/scripts/dc/run_dc_cmr_router.tcl\n"
-        % (ROOT, shlex.quote(RUN_ID), 4 * CHILD_LANES + PARENT_LANES,
+        % (ROOT, shlex.quote(RUN_ID), EXPECTED_PORTS,
            EXPECTED_PHYSICAL_EDGES, EXPECTED_ADAPTERS,
+           EXPECTED_ACKOUT_CLOSE_DELAY,
            shlex.quote(os.environ.get("CMR_RCU_MAT_MAX_NS", "0.20")),
            shlex.quote(SEED_RUN_ID),
            shlex.quote(BUF_STAGES),
@@ -507,6 +514,7 @@ def main():
            shlex.quote(OPM_ACKIN_UNIT_PS),
            shlex.quote(OPM_ACKIN_USE_BUF),
            shlex.quote(ROOT + "/rtl/runs/" + RUN_ID + "/CMRRouter.v"),
+           shlex.quote(os.environ.get("CMR_DONT_TOUCH_ADAPTERS", "0")),
            ROOT, ROOT)
     )
     sftp = client.open_sftp()

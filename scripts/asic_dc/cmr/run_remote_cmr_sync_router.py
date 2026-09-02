@@ -44,11 +44,15 @@ def emit_local() -> Path:
         subprocess.run(
             [
                 sbt,
-                "runMain",
-                "Router_Architecture.sync_cmr.SyncCmrRouterMain",
-                str(GEOM["level"]),
-                str(GEOM["child"]),
-                str(GEOM["parent"]),
+                " ".join(
+                    [
+                        "runMain",
+                        "Router_Architecture.sync_cmr.SyncCmrRouterMain",
+                        str(GEOM["level"]),
+                        str(GEOM["child"]),
+                        str(GEOM["parent"]),
+                    ]
+                ),
             ],
             cwd=REPO,
             check=True,

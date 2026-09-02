@@ -1,0 +1,56 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260831_cmr_primitive_hop_ppa_ru5",
+  "status": "pass",
+  "design_id": "ASYNC_THIN_1X1",
+  "benchmark_id": "R-U5",
+  "seed": null,
+  "adapter": "hop_ppa",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "181081fee0ec867f26cf4ca81c357ad961bf7aa095c870f6465104376edf1552",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": null,
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [],
+  "env": {},
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": true,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "metrics_csv": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5/metrics.csv",
+    "calibration_json": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5/calibration.json",
+    "summary_json": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_primitive_hop_ppa_ru5/summary.json",
+    "kinds": [
+      "async_thin_1x1",
+      "async_flatmesh_1x1",
+      "async_fat_1x2",
+      "async_prop_2x2",
+      "async_topmesh_2x2",
+      "async_pfat_2x4",
+      "async_pfat_4x8",
+      "sync_thin_1x1",
+      "sync_prop_2x2"
+    ]
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T15:52:40+00:00",
+  "updated_utc": "2026-08-31T15:52:40+00:00",
+  "notes": "Phase 2 R-U5 MAXIMUM-SDF + PT-PX. Async rows remain Table I inputs. Sync rows are 2/3-cycle Head archive-only; use Phase 2.5 20260901 hop PPA for Sync."
+}

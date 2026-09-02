@@ -1,0 +1,20 @@
+{
+  "schema": "date-v3-des-lock-v1",
+  "model_version": "date-des-v1",
+  "physical_class": "post-synthesis",
+  "calibration_file": "20260901_primitive_ru5_post_synthesis.json",
+  "calibration_run_id": "20260901_cmr_primitive_hop_ppa_ru5",
+  "calibration_hash": "4385f8b70c2e69f69589025557458cf1c205f926c8382910e2714bc86bbe62df",
+  "calibration_seed": 900001,
+  "hop_self_check": "pass",
+  "network_rtl_64": "pending",
+  "network_rtl_256": "pending",
+  "paper_matrix_allowed": false,
+  "locked_utc": "2026-09-02T02:42:39+00:00",
+  "stale_if": [
+    "dc_netlist_change",
+    "maximum_sdf_change",
+    "locked_delay_recipe_change"
+  ],
+  "notes": "Hop H/B/T is locked to post-synthesis MAXIMUM-SDF primitives.  Formal 64/256/1024 DES paper matrix requires paper_matrix_allowed.  256 rtl_keycase does not use DelayElement_sim Tmax vs post-synth 5%.  Do not write post-layout.  Do not overwrite frozen hop netlists.  Do not tune on paper seeds 202701/202702/202703. network_rtl_64=pending network_rtl_256=pending."
+}

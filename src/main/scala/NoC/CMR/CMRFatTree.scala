@@ -9,9 +9,11 @@ import tool.AsyncDelay
 
 /** One complete 64-core CMR quadtree.
   *
-  * Lane geometry comes from `scale.channels`.  FatLane1248 is L1 1→2, L2 2→4,
-  * L3 4→8 (eight top lanes).  FatLane1222 keeps L1 1→2 and uses 2→2 at L2
-  * and L3 (two top lanes).  L1 stays one child lane so the tile is 64 cores.
+  * Lane geometry comes from `scale.channels`.  Thin is all (1,1) with one
+  * top lane.  FatLane1222 is L1 1→2 and 2→2 at L2/L3 (two top lanes).
+  * FatLane1248 is L1 1→2, L2 2→4, L3 4→8 (eight top lanes).  L1 stays one
+  * child lane so the tile is 64 cores.  The same wiring is used for all
+  * three profiles.
   *
   * Set CMR_USE_CIRCULAR_FIFO=1 to replace the inter-level AsyncFifo chain with
   * the Transition-paper circular FIFO on existing depth-three lanes. The
@@ -31,10 +33,13 @@ class CMRFatTree(
   private val l1 = scale.channels.l1
   private val l2 = scale.channels.l2
   private val l3 = scale.channels.l3
-  require((l1.childLanes, l1.parentLanes) == (1, 2),
-    s"64-core Fat L1 must be (1,2), got (${l1.childLanes},${l1.parentLanes})")
+  require(l1.childLanes == 1,
+    s"64-core Q64 L1 child lanes must be 1, got ${l1.childLanes}")
   require(l2.childLanes == l1.parentLanes)
   require(l3.childLanes == l2.parentLanes)
+  require(Router_Architecture.CMR.CMRParameters.SupportedLaneGeometries.contains(
+    (l1.childLanes, l1.parentLanes)
+  ), s"unsupported L1 geometry (${l1.childLanes},${l1.parentLanes})")
   require(Router_Architecture.CMR.CMRParameters.SupportedLaneGeometries.contains(
     (l2.childLanes, l2.parentLanes)
   ), s"unsupported L2 geometry (${l2.childLanes},${l2.parentLanes})")
@@ -172,10 +177,12 @@ class CMRFatTree(
 }
 
 object CMRFatTreeMain extends App {
-  private val scale = NoCScaleConfig.fatTree64
-  private val targetDir =
-    if (NoCScaleConfig.fatLaneProfileName == "1222") "generated_cmr/fat_tree_1_2_2_2"
-    else "generated_cmr/fat_tree_1_2_4_8"
+  private val scale = NoCScaleConfig.q64TreeFromEnv
+  private val targetDir = scale.channels match {
+    case ch if ch == NoCScaleConfig.ThinLane111 => "generated_cmr/fat_tree_1_1_1_1"
+    case ch if ch == NoCScaleConfig.FatLane1222 => "generated_cmr/fat_tree_1_2_2_2"
+    case _ => "generated_cmr/fat_tree_1_2_4_8"
+  }
   emitVerilog(
     new CMRFatTree(scale = scale),
     Array("--target-dir", targetDir)
@@ -184,14 +191,15 @@ object CMRFatTreeMain extends App {
 
 /** Simulation boundary harness for a two-packet, three-level upward path. */
 class CMRFatTreeSmokeHarness extends Module {
-  private val scale = NoCScaleConfig.Verification256
+  private val scale = NoCScaleConfig.fatTree64
+  private val topLanes = scale.channels.l3.parentLanes
   val io = IO(new Bundle {
     val Reqin = Input(Vec(2, Bool()))
     val Datain = Input(Vec(2, new DataStruct.Packet))
     val Ackout = Output(Vec(2, Bool()))
-    val TopReqout = Output(Vec(8, Bool()))
-    val TopDataout = Output(Vec(8, new DataStruct.Packet))
-    val TopAckin = Input(Vec(8, Bool()))
+    val TopReqout = Output(Vec(topLanes, Bool()))
+    val TopDataout = Output(Vec(topLanes, new DataStruct.Packet))
+    val TopAckin = Input(Vec(topLanes, Bool()))
   })
 
   private val tree = Module(new CMRFatTree(scale = scale))
@@ -206,7 +214,7 @@ class CMRFatTreeSmokeHarness extends Module {
     }
     tree.io.core_outputs(core).HS.Ack := false.B
   }
-  for (lane <- 0 until 8) {
+  for (lane <- 0 until topLanes) {
     tree.io.top_input(lane).HS.Req := false.B
     tree.io.top_input(lane).Data.flit := 0.U
     io.TopReqout(lane) := tree.io.top_output(lane).HS.Req

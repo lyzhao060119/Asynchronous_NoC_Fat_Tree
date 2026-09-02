@@ -5,9 +5,9 @@
   "family": "THIN",
   "nodes": 64,
   "async": true,
-  "routing": "quadtree_topmesh",
+  "routing": "quadtree",
   "lane_profile": "1-1-1-1",
-  "top_mesh_lanes": 2,
+  "top_mesh_lanes": 1,
   "cluster_grid": 1,
   "router_primitives": [
     {
@@ -33,23 +33,18 @@
       "parent_lanes": 1,
       "use_mesh_routing": false,
       "count": 1
-    },
-    {
-      "primitive_id": "async_topmesh_2x2",
-      "level": 1,
-      "child_lanes": 2,
-      "parent_lanes": 2,
-      "use_mesh_routing": true,
-      "count": 1,
-      "notes": "top parent lanes=1; TopMesh geometry may collapse to 1-lane if Mesh1"
     }
   ],
   "expected_structure": {
     "routers": 21,
+    "ports": 105,
+    "adapters": 0,
     "interlevel_fifos": 0,
     "top_ports": 1,
     "max_opm_fanin": 4,
-    "adapters": 0
+    "mutex_widths": [
+      4
+    ]
   },
   "flit_width_bits": 28,
   "buffer_slots": 5,
@@ -66,8 +61,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Fig. A bounded-fat thin ablation",
+  "paper_role": "Asynchronous narrow hierarchical network, 64 nodes; hierarchical-width ablation",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous narrow hierarchical network, 64 nodes",
+  "display_description": "64-node asynchronous hierarchical network with one lane on every tree level."
 }

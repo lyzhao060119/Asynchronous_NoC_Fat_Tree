@@ -5,13 +5,13 @@ import Router_Architecture.CMR.{CMRParameters, CMRRouter}
 import chisel3._
 
 /**
-  * 8x8 asynchronous CMR mesh of 64 cores.
+  * n×n asynchronous CMR flat mesh (FM16/64/256/1024 = 4/8/16/32).
   *
   * Each router is `CMRRouter(x, y, level=1)` with constructor
-  * `useMeshRouting=true`.  Child 0-3 are W/S/E/N; parent is Local to the
-  * PE at physical port `x + n*y`.  There is no top port.  Default lane
-  * geometry is (1,1); extra lanes are wired neighbor-to-neighbor and do
-  * not block the first GLS.
+  * `useMeshRouting=true` and PE-grid coordinates (`meshCoordShift=0`).
+  * Child 0-3 are W/S/E/N; parent is Local to the PE at `x + n*y`.
+  * There is no top port.  DATE V3 keeps (1,1), 28-bit flits, 5 slots,
+  * no U-turn.
   */
 class CMRMeshNoC(
     n: Int = 8,
@@ -20,7 +20,7 @@ class CMRMeshNoC(
 ) extends Module {
   override def desiredName: String = "CMRMeshNoC"
 
-  require(n == 8, s"paper DUT is 8x8 / 64 cores, got n=$n")
+  require(Set(4, 8, 16, 32).contains(n), s"FM DUT is 4/8/16/32 per side, got n=$n")
   require(CMRParameters.SupportedLaneGeometries.contains((childLanes, parentLanes)),
     s"unsupported mesh geometry ($childLanes,$parentLanes)")
 
@@ -93,10 +93,18 @@ class CMRMeshNoC(
 }
 
 object CMRMeshNoCMain extends App {
-  private val childLanes = args.headOption.map(_.toInt).getOrElse(1)
-  private val parentLanes = args.drop(1).headOption.map(_.toInt).getOrElse(1)
+  private val n = args.headOption.map(_.toInt).getOrElse(8)
+  private val childLanes = args.drop(1).headOption.map(_.toInt).getOrElse(1)
+  private val parentLanes = args.drop(2).headOption.map(_.toInt).getOrElse(1)
+  private val tag = n match {
+    case 4 => "16"
+    case 8 => "64"
+    case 16 => "256"
+    case 32 => "1024"
+    case other => other.toString
+  }
   emitVerilog(
-    new CMRMeshNoC(n = 8, childLanes = childLanes, parentLanes = parentLanes),
-    Array("--target-dir", "generated_cmr/mesh_noc64_11")
+    new CMRMeshNoC(n = n, childLanes = childLanes, parentLanes = parentLanes),
+    Array("--target-dir", s"generated_cmr/mesh_noc${tag}_${childLanes}${parentLanes}")
   )
 }

@@ -86,6 +86,8 @@ for rid in \
   20260830_cmr_router_level_baseline_del050 \
   20260831_014622_cmr_sync_noc64_thin_p50 \
   20260831_084457_cmr_sync_noc64_fat1222_p50 \
+  20260901_cmr_sync_noc64_thin_p50 \
+  20260901_cmr_sync_noc64_fat1222_p50 \
   20260830_095259_cmr_noc64_p50_1222 \
   20260828_cmr_cfifo_tp_nogrant_p50
 do

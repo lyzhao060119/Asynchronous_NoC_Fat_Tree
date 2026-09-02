@@ -13,15 +13,19 @@ class CMRRouter(
     childLanes: Int = 1,
     parentLanes: Int = 1,
     useMeshRouting: Boolean = false,
-    meshGridSize: Int = 8
+    meshGridSize: Int = 8,
+    meshCoordShift: Int = 0
 ) extends Module {
   require(routerLevel >= 1 && routerLevel <= 3)
   require(CMRParameters.SupportedLaneGeometries.contains((childLanes, parentLanes)))
   if (useMeshRouting) {
     require(routerLevel == 1, "mesh / TopMesh routers are elaborated as level-1")
     require(meshGridSize >= 2 && meshGridSize <= 64)
+    require(meshCoordShift >= 0 && meshCoordShift <= 5)
     require(xCoordinate >= 0 && xCoordinate < meshGridSize)
     require(yCoordinate >= 0 && yCoordinate < meshGridSize)
+  } else {
+    require(meshCoordShift == 0, "quadtree routers do not shift mesh coordinates")
   }
 
   private val config = RouterModuleConfig(
@@ -64,7 +68,7 @@ class CMRRouter(
   private val InputPortModules = Seq.tabulate(PortCount) { input =>
     Module(new IPM(
       config, xCoordinate, yCoordinate, routerLevel, input,
-      useMeshRouting, meshGridSize
+      useMeshRouting, meshGridSize, meshCoordShift
     ))
   }
   private val OutputPortModules = Seq.tabulate(PortCount) { output =>
@@ -105,7 +109,12 @@ class CMRRouter(
         ipm.io.TailPassed(branch) := OutputPortModules(output).io.TailPassed(source)
       } else {
         val selector = Module(new ContinuousLaneSelector(laneCount))
+        val laneLock = Module(new WormholeLaneLock(laneCount))
         selector.io.PathEnabled := ipm.io.PathEnabled(branch)
+        laneLock.io.reset := reset.asBool
+        laneLock.io.PathEnabled := ipm.io.PathEnabled(branch)
+        laneLock.io.LaneSelect := selector.io.LaneSelect.asUInt
+        val held = VecInit(laneLock.io.HeldSelect.asBools)
         for ((output, lane) <- outputs.zipWithIndex) {
           val source = sourceIndices(lane)
           val otherGrants = OutputPortModules(output).io.Grant.zipWithIndex.collect {
@@ -115,7 +124,7 @@ class CMRRouter(
             else otherGrants.reduce(_ || _))
 
           OutputPortModules(output).io.PktPathEnable(source) :=
-            ipm.io.PathEnabled(branch) && selector.io.LaneSelect(lane)
+            ipm.io.PathEnabled(branch) && held(lane)
           OutputPortModules(output).io.Datain(source) := ipm.io.Dataout(branch)
         }
 
@@ -126,10 +135,10 @@ class CMRRouter(
 
         adapter.io.reset := reset.asBool
         adapter.io.Reqin := ipm.io.Reqout(branch)
-        adapter.io.LaneSelect := selector.io.LaneSelect.asUInt
+        adapter.io.LaneSelect := laneLock.io.HeldSelect
         for ((output, lane) <- outputs.zipWithIndex) {
           val source = sourceIndices(lane)
-          commits(lane) := selector.io.LaneSelect(lane) &&
+          commits(lane) := held(lane) &&
             OutputPortModules(output).io.Grant(source)
           laneAcks(lane) := OutputPortModules(output).io.Ackout(source)
           laneTails(lane) := commits(lane) &&
@@ -159,14 +168,19 @@ object CMRRouterEmit {
       routerLevel: Int,
       childLanes: Int,
       parentLanes: Int,
-      useMeshRouting: Boolean
+      useMeshRouting: Boolean,
+      xCoordinate: Int = 0,
+      yCoordinate: Int = 0
   ): String = {
-    if (useMeshRouting)
-      s"generated_cmr/router_l${routerLevel}_c${childLanes}_p${parentLanes}_mesh"
-    else if (childLanes == 1 && parentLanes == 1)
-      s"generated_cmr/router_l$routerLevel"
-    else
-      s"generated_cmr/router_l${routerLevel}_c${childLanes}_p${parentLanes}"
+    val base =
+      if (useMeshRouting)
+        s"generated_cmr/router_l${routerLevel}_c${childLanes}_p${parentLanes}_mesh"
+      else if (childLanes == 1 && parentLanes == 1)
+        s"generated_cmr/router_l$routerLevel"
+      else
+        s"generated_cmr/router_l${routerLevel}_c${childLanes}_p${parentLanes}"
+    if (xCoordinate == 0 && yCoordinate == 0) base
+    else s"${base}_x${xCoordinate}_y${yCoordinate}"
   }
 }
 
@@ -177,14 +191,16 @@ object CMRRouterMain extends App {
   private val meshFlag = args.drop(3).headOption.getOrElse("0")
   private val useMesh = meshFlag == "1" || meshFlag.equalsIgnoreCase("mesh")
   private val meshGrid = args.drop(4).headOption.map(_.toInt).getOrElse(8)
+  private val xCoordinate = args.drop(5).headOption.map(_.toInt).getOrElse(0)
+  private val yCoordinate = args.drop(6).headOption.map(_.toInt).getOrElse(0)
   require(routerLevel >= 1 && routerLevel <= 3)
   require(CMRParameters.SupportedLaneGeometries.contains((childLanes, parentLanes)))
   private val targetDir = CMRRouterEmit.targetDir(
-    routerLevel, childLanes, parentLanes, useMesh
+    routerLevel, childLanes, parentLanes, useMesh, xCoordinate, yCoordinate
   )
   emitVerilog(
     new CMRRouter(
-      0, 0, routerLevel, childLanes, parentLanes, useMesh, meshGrid
+      xCoordinate, yCoordinate, routerLevel, childLanes, parentLanes, useMesh, meshGrid
     ),
     Array("--target-dir", targetDir)
   )

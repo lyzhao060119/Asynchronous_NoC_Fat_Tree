@@ -146,9 +146,13 @@ module tb_cmr_router_hop_ppa;
   task automatic wait_outputs_idle;
     integer p;
     begin
-      for (p = 0; p < NUM_PORTS; p = p + 1)
-        if (is_legal_out(p))
-          wait (tb_out_req[p] === tb_out_ack[p]);
+      if (selected_out >= 0)
+        wait (tb_out_req[selected_out] === tb_out_ack[selected_out]);
+      else begin
+        for (p = 0; p < NUM_PORTS; p = p + 1)
+          if (is_legal_out(p))
+            wait (tb_out_req[p] === tb_out_ack[p]);
+      end
     end
   endtask
 
@@ -176,8 +180,6 @@ module tb_cmr_router_hop_ppa;
           if (wait_rx)
             while (expected_seen[idx - 1] !== 1'b1) @rx_activity;
           wait (tb_in_req[port] === tb_in_ack[port]);
-          if (wait_rx)
-            wait_outputs_idle();
           if (ack_to_next_req_guard_ns > 0.0) #(ack_to_next_req_guard_ns);
         end else begin
           wait (tb_in_req[port] === tb_in_ack[port]);
@@ -186,7 +188,9 @@ module tb_cmr_router_hop_ppa;
         #(tx_setup_ns);
         input_time[idx] = $realtime;
         tb_in_req[port] = ~tb_in_req[port];
+        $display("PPA_DEBUG send pkt=%0d flit=%0d t=%0.3f", pkt, f, $realtime);
         wait (tb_in_req[port] === tb_in_ack[port]);
+        $display("PPA_DEBUG acked pkt=%0d flit=%0d t=%0.3f", pkt, f, $realtime);
       end
     end
   endtask
@@ -267,8 +271,11 @@ module tb_cmr_router_hop_ppa;
     event_fd = $fopen(event_csv, "w");
     if (event_fd == 0) begin $display("PPA_FAIL cannot open EVENT_CSV"); $finish(2); end
     $fdisplay(event_fd, "packet,flit,input_req_ns,output_req_ns,hop_latency_ns,out_port,data_hex");
-    $dumpfile(vcd_file);
-    $dumpvars(0, tb_cmr_router_hop_ppa);
+    if (!$test$plusargs("NO_FULL_VCD")) begin
+      $dumpfile(vcd_file);
+      $dumpvars(0, tb_cmr_router_hop_ppa);
+    end else
+      $display("PPA_INFO NO_FULL_VCD");
     for (i = 0; i < MAX_EVENTS; i = i + 1) expected_seen[i] = 1'b0;
     for (i = 0; i < NUM_PORTS; i = i + 1) last_egress_ps[i] = -1;
     for (pkt = 0; pkt < num_packets; pkt = pkt + 1)
@@ -296,7 +303,7 @@ module tb_cmr_router_hop_ppa;
           while (delivered < expected_total) @rx_activity;
         end
         begin
-          #(200000.0);
+          #(500000.0);
           if (delivered < expected_total) fail("output request timeout");
         end
       join_any

@@ -52,6 +52,7 @@ set power_enable_multi_rail_analysis true
 set power_analysis_mode time_based
 
 proc report_vcd_window {vcd_file start_ns end_ns report_path label} {
+  global TB_STRIP
   if {$end_ns <= $start_ns} {
     puts "PPA_POWER_FAIL invalid $label window $start_ns $end_ns"
     exit 2
@@ -63,7 +64,10 @@ proc report_vcd_window {vcd_file start_ns end_ns report_path label} {
   report_power > $report_path
 }
 
-report_vcd_window $VCD_FILE $START_NS $END_NS "$REPORT_DIR/power.rpt" "packet"
+if {[catch {report_vcd_window $VCD_FILE $START_NS $END_NS "$REPORT_DIR/power.rpt" "packet"} err]} {
+  puts "PPA_POWER_FAIL $err"
+  exit 2
+}
 check_power > "$REPORT_DIR/check_power.rpt"
 report_power -hierarchy > "$REPORT_DIR/power_hierarchy.rpt"
 report_power -cell_power > "$REPORT_DIR/power_cells.rpt"

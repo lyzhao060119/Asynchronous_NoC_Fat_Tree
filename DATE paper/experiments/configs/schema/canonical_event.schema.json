@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://date-v3.local/schema/canonical_event.schema.json",
+  "title": "DATE V3 canonical original event (generation-time)",
+  "type": "object",
+  "required": [
+    "schema",
+    "original_event_id",
+    "phase",
+    "source",
+    "destinations",
+    "rect",
+    "ready_cycle",
+    "packet_flits"
+  ],
+  "properties": {
+    "schema": { "const": "date-v3-canonical-event-v1" },
+    "original_event_id": { "type": "string" },
+    "event_index": { "type": "integer" },
+    "phase": { "enum": ["warmup", "measurement"] },
+    "source": { "type": "integer" },
+    "destinations": { "type": "array", "items": { "type": "integer" }, "minItems": 1 },
+    "rect": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "multicast": { "type": "boolean" },
+    "ready_cycle": { "type": "integer", "minimum": 0 },
+    "packet_flits": { "const": 5 }
+  }
+}

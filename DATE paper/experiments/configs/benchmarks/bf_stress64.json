@@ -1,7 +1,7 @@
 {
   "schema": "date-v3-benchmark-v1",
   "benchmark_id": "BF-STRESS64",
-  "title": "64-node bounded-fat stress: dst not in same L2 subtree",
+  "title": "64-node hierarchical-width stress traffic: destination not in the same level-2 subtree",
   "traffic": "bf_stress64",
   "packet_flits": 5,
   "multicast": false,
@@ -31,10 +31,14 @@
   "applies_to_designs": [
     "THIN64",
     "PROP64",
-    "PFAT64"
+    "PFAT64",
+    "SYNC_THIN64",
+    "SYNC_PROP64"
   ],
   "paper_figures": [
     "Fig. A"
   ],
-  "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT."
+  "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT and Sync64 counterparts.",
+  "display_name": "64-node hierarchical-width stress traffic",
+  "display_description": "64-node unicast whose destination is outside the source level-2 subtree, used to stress hierarchical width."
 }

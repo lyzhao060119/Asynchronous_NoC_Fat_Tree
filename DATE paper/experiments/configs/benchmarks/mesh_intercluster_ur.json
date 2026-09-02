@@ -1,7 +1,7 @@
 {
   "schema": "date-v3-benchmark-v1",
   "benchmark_id": "MESH-INTERCLUSTER-UR",
-  "title": "100% inter-cluster UR Mesh1/2/4 sanity",
+  "title": "1024-node inter-cluster single-destination sanity traffic (backup only)",
   "traffic": "mesh_intercluster_ur",
   "packet_flits": 5,
   "multicast": false,
@@ -33,5 +33,6 @@
   "paper_figures": [
     "backup"
   ],
-  "notes": "Default backup only."
+  "notes": "Default backup only.",
+  "display_name": "1024-node inter-cluster single-destination sanity traffic (backup only)"
 }

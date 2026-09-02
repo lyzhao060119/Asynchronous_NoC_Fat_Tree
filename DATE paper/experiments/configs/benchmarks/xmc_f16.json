@@ -1,7 +1,7 @@
 {
   "schema": "date-v3-benchmark-v1",
   "benchmark_id": "XMC-F16",
-  "title": "Fixed fanout-16 cross-tier multicast, S=1/4/16",
+  "title": "1024-node fixed sixteen-destination cross-group multicast traffic, spread 1/4/16",
   "traffic": "xmc_f16",
   "packet_flits": 5,
   "multicast": true,
@@ -38,5 +38,7 @@
   "paper_figures": [
     "Fig. C"
   ],
-  "notes": ">=32 paired destination-set samples. Bootstrap 95% CI allowed."
+  "notes": ">=32 paired destination-set samples. Bootstrap 95% CI allowed.",
+  "display_name": "1024-node fixed sixteen-destination cross-group multicast traffic",
+  "display_description": "Fixed fanout-16 multicast whose destinations cross cluster groups on the 1024-node hierarchical network."
 }

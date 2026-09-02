@@ -27,6 +27,14 @@
   "properties": {
     "schema": { "const": "date-v3-design-v1" },
     "design_id": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+    "display_name": {
+      "type": "string",
+      "description": "Complete English name shown to users. Not part of config_hash."
+    },
+    "display_description": {
+      "type": "string",
+      "description": "Complete English explanation. Not part of config_hash."
+    },
     "kind": {
       "type": "string",
       "enum": ["network", "router_primitive", "fpga"]
@@ -103,6 +111,7 @@
     "clock_ns": { "type": ["number", "null"] },
     "hrep_policy": { "type": "boolean" },
     "shares_netlist_with": { "type": ["string", "null"] },
+    "paired_trace_with": { "type": ["string", "null"] },
     "fpga": {
       "type": "object",
       "additionalProperties": false,

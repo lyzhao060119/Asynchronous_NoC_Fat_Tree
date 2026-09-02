@@ -49,5 +49,6 @@
   "adapter": "dc_cmr_router",
   "paper_role": "Table I TopMesh2",
   "paper_eligible_default": true,
-  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only."
+  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
+  "display_name": "Asynchronous two-lane top-mesh router primitive"
 }

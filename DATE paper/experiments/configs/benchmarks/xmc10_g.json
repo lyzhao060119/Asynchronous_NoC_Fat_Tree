@@ -1,7 +1,7 @@
 {
   "schema": "date-v3-benchmark-v1",
   "benchmark_id": "XMC10-G",
-  "title": "90% UR + 10% multicast F=16, pre-registered S=4",
+  "title": "1024-node mixed load: 90 percent single-destination plus 10 percent sixteen-destination multicast",
   "traffic": "xmc10_g",
   "packet_flits": 5,
   "multicast": true,
@@ -35,5 +35,7 @@
   "paper_figures": [
     "Fig. C"
   ],
-  "notes": "Tmax is read at 0.25 x H-REP saturation offered load for both designs. S=16 is backup."
+  "notes": "Tmax is read at 0.25 x H-REP saturation offered load for both designs. S=16 is backup.",
+  "display_name": "1024-node mixed single-destination and multicast traffic",
+  "display_description": "Mixed load: 90 percent unicast and 10 percent fanout-16 multicast on the 1024-node hierarchical network."
 }

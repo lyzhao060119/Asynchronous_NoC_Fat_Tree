@@ -64,8 +64,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Proposed 64-node Q64",
+  "paper_role": "Asynchronous balanced hierarchical network, 64 nodes",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous balanced hierarchical network, 64 nodes",
+  "display_description": "64-node asynchronous hierarchical network with the locked 1-2-2-2 lane profile."
 }

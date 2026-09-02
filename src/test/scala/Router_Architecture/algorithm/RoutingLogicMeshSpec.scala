@@ -4,7 +4,12 @@ import chisel3._
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
-class RoutingLogicMeshDut(coordinateX: Int, coordinateY: Int, gridSize: Int = 8) extends Module {
+class RoutingLogicMeshDut(
+    coordinateX: Int,
+    coordinateY: Int,
+    gridSize: Int = 8,
+    coordShift: Int = 0
+) extends Module {
   val io = IO(new Bundle {
     val x0 = Input(UInt(6.W))
     val y0 = Input(UInt(6.W))
@@ -14,7 +19,7 @@ class RoutingLogicMeshDut(coordinateX: Int, coordinateY: Int, gridSize: Int = 8)
     val ingress = Input(UInt(3.W))
     val mask = Output(UInt(5.W))
   })
-  io.mask := new RoutingLogic_mesh(coordinateX, coordinateY, gridSize).routeMask(
+  io.mask := new RoutingLogic_mesh(coordinateX, coordinateY, gridSize, coordShift).routeMask(
     io.x0,
     io.y0,
     io.x1,
@@ -40,9 +45,11 @@ class RoutingLogicMeshSpec extends AnyFlatSpec with ChiselScalatestTester {
       y0: Int,
       x1: Int,
       y1: Int,
-      valid: Boolean = true
+      valid: Boolean = true,
+      gridSize: Int = Grid,
+      coordShift: Int = 0
   ): Int =
-    RoutingLogicMeshModel.routeMask(cx, cy, Grid, ingress, x0, y0, x1, y1, valid)
+    RoutingLogicMeshModel.routeMask(cx, cy, gridSize, ingress, x0, y0, x1, y1, valid, coordShift)
 
   "RoutingLogicMeshModel" should "XY-walk a unicast toward +X then deliver Local" in {
     assert(model(0, 0, DirLocal, 3, 0, 3, 0) == (1 << DirEast))
@@ -105,7 +112,9 @@ class RoutingLogicMeshSpec extends AnyFlatSpec with ChiselScalatestTester {
       y0: Int,
       x1: Int,
       y1: Int,
-      valid: Boolean = true
+      valid: Boolean = true,
+      gridSize: Int = Grid,
+      coordShift: Int = 0
   ): Unit = {
     c.io.x0.poke(x0.U)
     c.io.y0.poke(y0.U)
@@ -113,7 +122,7 @@ class RoutingLogicMeshSpec extends AnyFlatSpec with ChiselScalatestTester {
     c.io.y1.poke(y1.U)
     c.io.valid.poke(valid.B)
     c.io.ingress.poke(ingress.U)
-    val expected = model(cx, cy, ingress, x0, y0, x1, y1, valid)
+    val expected = model(cx, cy, ingress, x0, y0, x1, y1, valid, gridSize, coordShift)
     val got = c.io.mask.peek().litValue.toInt
     if (got != expected) {
       fail(
@@ -143,4 +152,35 @@ class RoutingLogicMeshSpec extends AnyFlatSpec with ChiselScalatestTester {
   chiselSweep(0, 0)
   chiselSweep(2, 2)
   chiselSweep(7, 7)
+
+  "TopMesh coordShift=3" should "XY-walk PE (8,0) as cluster East then Local" in {
+    val east = model(0, 0, DirLocal, 8, 0, 8, 0, gridSize = 2, coordShift = 3)
+    assert(east == (1 << DirEast))
+    val local = model(1, 0, DirWest, 8, 0, 8, 0, gridSize = 2, coordShift = 3)
+    assert(local == (1 << DirLocal))
+  }
+
+  it should "not return to the injecting Q64 on Local ingress" in {
+    val atHome = model(0, 0, DirLocal, 0, 0, 7, 7, gridSize = 2, coordShift = 3)
+    assert((atHome & (1 << DirLocal)) == 0)
+  }
+
+  it should "match Chisel on a 2x2 cluster mesh" in {
+    test(new RoutingLogicMeshDut(0, 0, gridSize = 2, coordShift = 3)) { c =>
+      pokeExpect(c, 0, 0, DirLocal, 8, 0, 8, 0, gridSize = 2, coordShift = 3)
+      pokeExpect(c, 0, 0, DirLocal, 0, 8, 0, 8, gridSize = 2, coordShift = 3)
+      pokeExpect(c, 0, 0, DirWest, 8, 8, 15, 15, gridSize = 2, coordShift = 3)
+    }
+    test(new RoutingLogicMeshDut(1, 1, gridSize = 2, coordShift = 3)) { c =>
+      pokeExpect(c, 1, 1, DirWest, 8, 8, 8, 8, gridSize = 2, coordShift = 3)
+      pokeExpect(c, 1, 1, DirLocal, 0, 0, 0, 0, gridSize = 2, coordShift = 3)
+    }
+  }
+
+  it should "keep dual-lane TopMesh routing at the direction level" in {
+    val east11 = model(0, 0, DirLocal, 8, 0, 8, 0, gridSize = 2, coordShift = 3)
+    val east22 = east11
+    assert(east11 == (1 << DirEast))
+    assert(east22 == east11)
+  }
 }

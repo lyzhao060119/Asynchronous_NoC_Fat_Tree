@@ -1,0 +1,77 @@
+{
+  "schema": "date-v3-plan-v1",
+  "plan_id": "phase6_network_gates",
+  "title": "V3.1.0 whole-network logic synthesis and maximum-delay gate-level simulation",
+  "runs": [
+    {
+      "run_id": "20260901_cmr_v31_gate_a_local",
+      "design_id": "PROP64",
+      "benchmark_id": null,
+      "adapter": "v31_gates",
+      "physical_class": "rtl",
+      "paper_eligible": false,
+      "notes": "Gate A local readiness. Not paper numbers.",
+      "env": {
+        "CMR_V31_GATE": "A"
+      }
+    },
+    {
+      "run_id": "20260901_cmr_v31_prop256_dc",
+      "design_id": "PROP256",
+      "benchmark_id": null,
+      "adapter": "network_sdf",
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Gate C synthesis of the asynchronous balanced hierarchical network, 256 nodes. Paper-eligible only after representative and formal delay simulations pass.",
+      "env": {
+        "CMR_NETWORK_DESIGN_ID": "PROP256",
+        "CMR_HIER_SKIP_GLS": "1",
+        "CMR_DESCAL_SUBMIT_ONLY": "1"
+      }
+    },
+    {
+      "run_id": "20260901_cmr_v31_fm256_dc",
+      "design_id": "FM256",
+      "benchmark_id": null,
+      "adapter": "network_sdf",
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Gate C synthesis of the asynchronous flat mesh network, 256 nodes.",
+      "env": {
+        "CMR_NETWORK_DESIGN_ID": "FM256",
+        "CMR_HIER_SKIP_GLS": "1",
+        "CMR_DESCAL_SUBMIT_ONLY": "1"
+      }
+    },
+    {
+      "run_id": "20260901_cmr_v31_prop1024_dc",
+      "design_id": "PROP1024",
+      "benchmark_id": null,
+      "adapter": "network_sdf",
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Gate E synthesis of the asynchronous balanced hierarchical network, 1024 nodes. Submit only after Gate D.",
+      "env": {
+        "CMR_NETWORK_DESIGN_ID": "PROP1024",
+        "CMR_HIER_SKIP_GLS": "1",
+        "CMR_DESCAL_SUBMIT_ONLY": "1",
+        "CMR_V31_REQUIRE_GATE": "D"
+      }
+    },
+    {
+      "run_id": "20260901_cmr_v31_fm1024_dc",
+      "design_id": "FM1024",
+      "benchmark_id": null,
+      "adapter": "network_sdf",
+      "physical_class": "post-synthesis",
+      "paper_eligible": false,
+      "notes": "Gate E synthesis of the asynchronous flat mesh network, 1024 nodes. Submit only after Gate D.",
+      "env": {
+        "CMR_NETWORK_DESIGN_ID": "FM1024",
+        "CMR_HIER_SKIP_GLS": "1",
+        "CMR_DESCAL_SUBMIT_ONLY": "1",
+        "CMR_V31_REQUIRE_GATE": "D"
+      }
+    }
+  ]
+}

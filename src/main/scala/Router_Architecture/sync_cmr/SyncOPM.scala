@@ -7,10 +7,12 @@ import Router_Architecture.ultra.UltraTopology
 import chisel3._
 import chisel3.util.{Mux1H, PriorityEncoder, UIntToOH}
 
-/**
-  * First-level clocked lane pick for one input/direction pair.  Holds the
-  * chosen lane until TailPassed; drops it if another source takes the OPM.
-  */
+  /**
+    * First-level clocked lane pick for one input/direction pair.  LaneSelect
+    * is combinational nextSel so isolated Head is one clock; selected holds
+    * the choice until TailPassed.  OtherGrant is the registered OPM grant
+    * (not liveGrant) to avoid a combinational loop.
+    */
 class SyncLaneSelector(val laneCount: Int) extends Module {
   require(Set(1, 2, 4, 8).contains(laneCount))
   override def desiredName: String = "SyncLaneSelector"
@@ -24,15 +26,16 @@ class SyncLaneSelector(val laneCount: Int) extends Module {
 
   private val selected = RegInit(0.U(laneCount.W))
   private val holding = selected.orR
+  private val tailPassedQ = RegNext(io.TailPassed.asUInt, 0.U(laneCount.W))
   private val candidate = VecInit.tabulate(laneCount) { lane =>
     io.PathEnabled && !io.OtherGrant(lane) && !holding
   }.asUInt
 
-  val nextSel = WireDefault(selected)
+  val nextSel = WireDefault(UInt(laneCount.W), selected)
   when (!io.PathEnabled) {
     nextSel := 0.U
   }.elsewhen (holding) {
-    when ((selected & io.TailPassed.asUInt).orR) {
+    when ((selected & tailPassedQ).orR) {
       nextSel := 0.U
     }.elsewhen ((selected & io.OtherGrant.asUInt).orR) {
       nextSel := 0.U
@@ -41,14 +44,16 @@ class SyncLaneSelector(val laneCount: Int) extends Module {
     nextSel := UIntToOH(PriorityEncoder(candidate), laneCount)
   }
   selected := nextSel
-  io.LaneSelect := VecInit(selected.asBools)
+  io.LaneSelect := VecInit(nextSel.asBools)
 }
 
-/**
-  * Clocked Fig. 2 OPM.  A reset-initialized rotating priority pick replaces
-  * Mutex; the chosen index is captured in Grant and held until Tail.
-  * The picker runs only while idle so Body/Tail cannot change winner.
-  */
+  /**
+    * Clocked Fig. 2 OPM.  A reset-initialized rotating priority pick replaces
+    * Mutex.  While idle, liveGrant is combinational so isolated Head is one
+    * clock; the grant register holds the winner until Tail so Body/Tail cannot
+    * change winner.  io.Grant is the register (for OtherGrant), not liveGrant,
+    * to avoid a combinational loop through LaneSelect.
+    */
 class SyncOPM(config: RouterModuleConfig, egressPort: Int) extends Module {
   override def desiredName: String = "SyncOPM"
 
@@ -75,31 +80,39 @@ class SyncOPM(config: RouterModuleConfig, egressPort: Int) extends Module {
   private val lastOH = RegInit(1.U(SourceCount.W))
   private val idle = !grant.orR
   private val reqs = io.PktPathEnable.asUInt & io.validIn.asUInt
+  private val nextGrant = WireDefault(0.U(SourceCount.W))
   when (idle && reqs.orR) {
     val above = reqs & ~(lastOH | (lastOH - 1.U))
     val pick = Mux(above.orR, above, reqs)
-    val nextGrant = UIntToOH(PriorityEncoder(pick), SourceCount)
+    nextGrant := UIntToOH(PriorityEncoder(pick), SourceCount)
+  }
+  private val liveGrant = Mux(idle && reqs.orR, nextGrant, grant)
+  when (idle && reqs.orR) {
     grant := nextGrant
     lastOH := nextGrant
   }
 
-  private val grantedValid = (grant & io.validIn.asUInt).orR
+  private val grantedValid = (liveGrant & io.validIn.asUInt).orR
   private val fire = grantedValid && io.readyOut
-  private val tailFlag = Mux(grant.orR, Mux1H(grant, io.Datain.map(_.flit(PacketLayout.IsTailIndex))), false.B)
+  private val tailFlag = Mux(
+    liveGrant.orR,
+    Mux1H(liveGrant, io.Datain.map(_.flit(PacketLayout.IsTailIndex))),
+    false.B
+  )
   when (fire && tailFlag) {
     grant := 0.U
   }
 
   val TailPassed = Wire(Vec(SourceCount, Bool()))
   for (src <- 0 until SourceCount) {
-    TailPassed(src) := grant(src) && fire && tailFlag
-    io.readyIn(src) := grant(src) && io.readyOut
+    TailPassed(src) := liveGrant(src) && fire && tailFlag
+    io.readyIn(src) := liveGrant(src) && io.readyOut
   }
 
   dontTouch(grant)
   io.Grant := VecInit(grant.asBools)
   io.validOut := grantedValid
-  io.Dataout.flit := Mux(grant.orR, Mux1H(grant, io.Datain.map(_.flit)), 0.U)
+  io.Dataout.flit := Mux(liveGrant.orR, Mux1H(liveGrant, io.Datain.map(_.flit)), 0.U)
   io.TailPassed := TailPassed
 }
 

@@ -1,7 +1,7 @@
 {
   "schema": "date-v3-benchmark-v1",
   "benchmark_id": "TOPO-UR",
-  "title": "Uniform random unicast, src != dst, same rule at 64/256/1024",
+  "title": "Uniform random single-destination traffic, source not equal to destination, same rule at 64/256/1024 nodes",
   "traffic": "topo_ur",
   "packet_flits": 5,
   "multicast": false,
@@ -36,10 +36,15 @@
     "PROP1024",
     "FM64",
     "FM256",
-    "FM1024"
+    "FM1024",
+    "SYNC_PROP64",
+    "SYNC_THIN64",
+    "THIN64"
   ],
   "paper_figures": [
     "Fig. B"
   ],
-  "notes": "Unicast only. Traversal from routing events, not theoretical hop count."
+  "notes": "Unicast only. Traversal from routing events, not theoretical hop count.",
+  "display_name": "Uniform random single-destination traffic, 64/256/1024 nodes",
+  "display_description": "Uniform random unicast with source not equal to destination, applied at 64, 256, and 1024 nodes."
 }

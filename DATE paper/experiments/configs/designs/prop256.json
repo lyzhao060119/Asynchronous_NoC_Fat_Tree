@@ -45,8 +45,16 @@
   ],
   "expected_structure": {
     "routers": 88,
+    "ports": 624,
+    "adapters": 1216,
     "interlevel_fifos": 0,
-    "max_opm_fanin": 8
+    "max_opm_fanin": 8,
+    "mutex_widths": [
+      2,
+      4,
+      5,
+      8
+    ]
   },
   "flit_width_bits": 28,
   "buffer_slots": 5,
@@ -63,8 +71,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Fig. B 2x2 Q64 clusters",
+  "paper_role": "Asynchronous balanced hierarchical network, 256 nodes",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous balanced hierarchical network, 256 nodes",
+  "display_description": "2-by-2 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 256-node network is added."
 }

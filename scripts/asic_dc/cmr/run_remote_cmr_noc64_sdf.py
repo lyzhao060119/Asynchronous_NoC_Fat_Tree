@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Remote DC + SDF GLS for 64-core CMR fat-tree.
 
-Default DUT is Fat 1-2-2-2.  1-2-4-8 remains emit-only (no network GLS).
-
-Profiles (CMR_FAT_LANE_PROFILE):
+Profiles (CMR_FAT_LANE_PROFILE or CMR_Q64_PROFILE):
   1222  L1 1->2, L2/L3 2->2, two top lanes (default)
   1248  L1 1->2, L2 2->4, L3 4->8, eight top lanes
+  thin  L1/L2/L3 1->1, one top lane.  Emit sets CMR_Q64_PROFILE=thin;
+        do not set CMR_FAT_LANE_PROFILE=thin on the Scala fat-lane parser.
 
 Does not reuse NoC16 netlists.  Unset CMR_NOC16_NETLIST_RUN_ID.
 GLS is MAXIMUM SDF only (no cmr_func patch), RX_CAPTURE=0.1 ns.
@@ -13,6 +13,12 @@ Functional GLS is opt-in via CMR_NOC64_SKIP_FUNC=0.
 Delay default is RCU 1xDEL050 / Ackin 1xDEL050.  The signed network
 netlist 20260830_095259_cmr_noc64_p50_1222 is Ackin DEL250: SKIP_DC it,
 do not overwrite it, and do not cite it as Fat vs Thin hop delay.
+
+DATE V3 5-flit cases are opt-in: CMR_NOC64_ALLOW_V3=1 and
+CMR_NOC64_V3_CASE_DIR pointing at materialized .case files.  Do not add
+V3 names to the 3-flit ALLOWED_CASES list.  CMR_DESCAL=1 refuses the
+Ackin-250 netlist unless CMR_NOC64_ALLOW_ACKIN250=1.  1-2-4-8 and thin
+network GLS are allowed on the DES-cal path.
 """
 from __future__ import annotations
 
@@ -27,6 +33,7 @@ from datetime import datetime
 from pathlib import Path
 
 from check_cmr_router_geometry import check_noc64
+from cmr_descal_env import apply_bsub, submit_only
 from cmr_frozen_run_ids import refuse_overwrite, require_emit_locked_delays
 from run_remote_cmr_flow import atomic_put_bytes, remote_run
 from run_remote_cmr_fat_tree_noc16_sdf import (
@@ -72,6 +79,9 @@ FUNC_CASES = tuple(
 SKIP_GLS = os.environ.get("CMR_NOC64_SKIP_GLS", "0") == "1"
 SKIP_FUNC = os.environ.get("CMR_NOC64_SKIP_FUNC", "1") == "1"
 SKIP_SDF = os.environ.get("CMR_NOC64_SKIP_SDF", "0") == "1"
+ALLOW_V3 = os.environ.get("CMR_NOC64_ALLOW_V3", "0") == "1"
+V3_CASE_DIR = Path(os.environ["CMR_NOC64_V3_CASE_DIR"]) if os.environ.get("CMR_NOC64_V3_CASE_DIR") else None
+DESCAL = os.environ.get("CMR_DESCAL", "0") == "1"
 INJECT_MAX_RATE = os.environ.get("CMR_NOC64_INJECT_MAX_RATE", "0") == "1"
 SIM_ARGS = os.environ.get("CMR_NOC64_SIM_ARGS", "")
 SDF_RX_CAPTURE_NS = os.environ.get("CMR_NOC64_RX_CAPTURE_NS", "0.1")
@@ -86,8 +96,9 @@ RCU_UNIT_PS = os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50")
 ACKIN_UNIT_PS = os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50")
 DC_POLLS = int(os.environ.get("CMR_NOC64_DC_POLLS", "1440"))
 GLS_POLLS = int(os.environ.get("CMR_NOC64_GLS_POLLS", "720"))
-DC_BSUB = os.environ.get("CMR_NOC64_DC_BSUB", "-n 16")
-GLS_BSUB = os.environ.get("CMR_NOC64_GLS_BSUB", "-n 8")
+DC_BSUB = apply_bsub(os.environ.get("CMR_NOC64_DC_BSUB", "-n 16"))
+GLS_BSUB = apply_bsub(os.environ.get("CMR_NOC64_GLS_BSUB", "-n 8"))
+SUBMIT_ONLY = submit_only()
 EXPECTED_ROUTERS = 21
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
@@ -106,24 +117,55 @@ PROFILES = {
         "expected_adapters": 352,
         "expected_fifos_if_enabled": 96,
     },
+    "thin": {
+        "geometry": "fat_tree_noc64_l1_1to1_l2_1to1_l3_1to1",
+        "top_lanes": 1,
+        "expected_ports": 105,
+        "expected_adapters": 0,
+        "expected_fifos_if_enabled": 80,
+    },
 }
 
 
 def selected_profiles() -> tuple[str, ...]:
-    raw = os.environ.get("CMR_FAT_LANE_PROFILE", "1222").strip().lower()
+    raw = (
+        os.environ.get("CMR_FAT_LANE_PROFILE")
+        or os.environ.get("CMR_Q64_PROFILE")
+        or "1222"
+    )
+    raw = raw.strip().lower()
     raw = raw.replace("-", "").replace("_", "")
     if raw in ("both", "all", "1248,1222", "1222,1248"):
         return ("1222", "1248")
-    if raw in ("1222", "fatlane1222", "1222"):
+    if raw in ("1222", "fatlane1222"):
         return ("1222",)
-    if raw in ("1248", "fatlane1248"):
+    if raw in ("1248", "fatlane1248", "pfat"):
         return ("1248",)
+    if raw in ("thin", "111", "1111", "thin111"):
+        return ("thin",)
     raise SystemExit(
-        "CMR_FAT_LANE_PROFILE must be 1222, 1248, or both; got %r" % raw
+        "CMR_FAT_LANE_PROFILE / CMR_Q64_PROFILE must be 1222, 1248, thin, or both; got %r"
+        % raw
     )
 
 
+def _dc_job_name(run_id: str) -> str:
+    if DESCAL:
+        return "cmr_descal_noc64_dc_%s" % run_id
+    return "cmr_noc64_dc_%s" % run_id
+
+
+def _gls_job_name(profile: str, mode: str, name: str) -> str:
+    if DESCAL:
+        return "cmr_descal_noc64_%s_%s_%s" % (profile, mode, name)
+    return "cmr_noc64_%s_%s_%s" % (profile, mode, name)
+
+
 def case_local_path(name: str) -> Path:
+    if ALLOW_V3 and V3_CASE_DIR is not None:
+        candidate = V3_CASE_DIR / (name + ".case")
+        if candidate.is_file():
+            return candidate
     if name in SMOKE_CASES:
         return REPO / "sim" / "AsyncNoC" / "testbench" / "small_cases" / (name + ".case")
     if name.startswith("TAB-"):
@@ -139,8 +181,27 @@ def case_local_path(name: str) -> Path:
     raise SystemExit("unknown NoC64 case " + name)
 
 
-def generate_cases(top_lanes: int = 2) -> dict[str, Path]:
-    needed = tuple(dict.fromkeys(FUNC_CASES + CASES))
+def generate_cases(top_lanes: int = 2, needed: tuple[str, ...] | None = None) -> dict[str, Path]:
+    needed = needed or tuple(dict.fromkeys(FUNC_CASES + CASES))
+    if ALLOW_V3:
+        paths = {}
+        for name in needed:
+            path = case_local_path(name)
+            if not path.is_file():
+                raise SystemExit("missing V3 NoC64 case " + str(path))
+            paths[name] = path
+            print("LOCAL_CASE", name, path, flush=True)
+        adapter = REPO / "sim" / "AsyncNoC" / "async_noc64_port_adapter.sv"
+        if not adapter.is_file():
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(REPO / "sim" / "AsyncNoC" / "testbench" / "gen_noc64_port_adapter.py"),
+                ],
+                cwd=REPO,
+                check=True,
+            )
+        return paths
     missing_tab = any(name.startswith("TAB-") and not case_local_path(name).is_file() for name in needed)
     missing_vctm = any(name.startswith("VCTM-") and not case_local_path(name).is_file() for name in needed)
     if missing_tab:
@@ -246,7 +307,11 @@ def generate_rtl(profile: str) -> Path:
     env = os.environ.copy()
     env["ASYNC_PRIMITIVES"] = "asic"
     env["CMR_FORCE_EMIT"] = "1"
-    env["CMR_FAT_LANE_PROFILE"] = profile
+    env["CMR_Q64_PROFILE"] = profile
+    if profile == "thin":
+        env.pop("CMR_FAT_LANE_PROFILE", None)
+    else:
+        env["CMR_FAT_LANE_PROFILE"] = profile
     env["CMR_USE_CIRCULAR_FIFO"] = "1" if USE_CIRCULAR_FIFO else "0"
     env["CMR_BYPASS_INTERLEVEL_FIFO"] = "1" if BYPASS_INTERLEVEL_FIFO else "0"
     env["CMR_RCU_MATCHED_DELAY_STEPS"] = str(RCU_STEPS)
@@ -405,7 +470,7 @@ def collect_gls_result(client, run_id, mode, name, jid):
     return client, entry, passed
 
 
-def submit_gls(client, run_id, netlist_run_id, profile, mode, name, case_path, rx_capture):
+def submit_gls(client, run_id, netlist_run_id, profile, mode, name, case_path, rx_capture, dep_job=None):
     wrapper = ROOT + "/logs/gls/%s/%s_%s.sh" % (run_id, mode, name)
     body = (
         "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
@@ -435,18 +500,21 @@ def submit_gls(client, run_id, netlist_run_id, profile, mode, name, case_path, r
         "cat > %s << 'CMR_GLS_WRAP'\n%s\nCMR_GLS_WRAP\nchmod +x %s"
         % (wrapper, body, wrapper),
     )
+    dep = ("-w %s " % shlex.quote("done(%s)" % dep_job)) if dep_job else ""
     client, submit = remote_run_retry(
         client,
-        "bsub %s -o %s/logs/gls/%s/%s_%s.bsub.log "
-        "-e %s/logs/gls/%s/%s_%s.bsub.err -J cmr_noc64_%s_%s_%s %s"
+        "bsub %s %s-o %s/logs/gls/%s/%s_%s.bsub.log "
+        "-e %s/logs/gls/%s/%s_%s.bsub.err -J %s %s"
         % (
-            GLS_BSUB, ROOT, run_id, mode, name,
+            GLS_BSUB, dep, ROOT, run_id, mode, name,
             ROOT, run_id, mode, name,
-            profile, mode, name, wrapper,
+            _gls_job_name(profile, mode, name), wrapper,
         ),
     )
     jid = job_id(submit)
     print("GLS_JOB", profile, mode, name, jid, flush=True)
+    if SUBMIT_ONLY:
+        return client, {"job_id": jid, "mode": mode, "submitted": True}, True
     client = wait_job(client, jid, "%s_%s_%s" % (profile, mode, name), polls=GLS_POLLS, allow_exit=True)
     client, entry, passed = collect_gls_result(client, run_id, mode, name, jid)
     print(
@@ -541,14 +609,17 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
             client, job_text = remote_run_retry(
                 client,
                 "bjobs -J %s -noheader -o 'jobid stat' 2>/dev/null"
-                % shlex.quote("cmr_noc64_dc_%s" % run_id),
+                % shlex.quote(_dc_job_name(run_id)),
             )
             job_match = re.search(r"(\d+)\s+(PEND|RUN)", job_text)
             if job_match:
                 dc_job = job_match.group(1)
                 print("REUSE_DC_JOB", dc_job, job_match.group(2), flush=True)
-                client = wait_job(client, dc_job, "dc_" + profile, polls=DC_POLLS)
-                client = wait_dc_marker(client, dc_log)
+                if SUBMIT_ONLY:
+                    print("SUBMIT_ONLY reuse_dc=%s profile=%s" % (dc_job, profile), flush=True)
+                else:
+                    client = wait_job(client, dc_job, "dc_" + profile, polls=DC_POLLS)
+                    client = wait_dc_marker(client, dc_log)
             else:
                 dc_wrapper = ROOT + "/logs/dc/" + run_id + ".sh"
                 dc_body = (
@@ -584,13 +655,16 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
                 client, _ = remote_run_retry(client, "chmod +x %s" % dc_wrapper)
                 client, dc_submit = remote_run_retry(
                     client,
-                    "bsub %s -o %s -e %s.err -J cmr_noc64_dc_%s %s"
-                    % (DC_BSUB, dc_log, dc_log, run_id, dc_wrapper),
+                    "bsub %s -o %s -e %s.err -J %s %s"
+                    % (DC_BSUB, dc_log, dc_log, _dc_job_name(run_id), dc_wrapper),
                 )
                 dc_job = job_id(dc_submit)
                 print("DC_JOB", profile, dc_job, flush=True)
-                client = wait_job(client, dc_job, "dc_" + profile, polls=DC_POLLS)
-                client = wait_dc_marker(client, dc_log)
+                if SUBMIT_ONLY:
+                    print("SUBMIT_ONLY dc=%s profile=%s" % (dc_job, profile), flush=True)
+                else:
+                    client = wait_job(client, dc_job, "dc_" + profile, polls=DC_POLLS)
+                    client = wait_dc_marker(client, dc_log)
 
     status = {
         "run_id": run_id,
@@ -616,6 +690,7 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
         "sdf_cases": {},
         "all_pass": True,
     }
+    gls_dep = _dc_job_name(run_id) if (SUBMIT_ONLY and not skip_dc and dc_job is not None) else None
 
     def skip_remaining(bucket, remaining, reason):
         for skipped in remaining:
@@ -628,7 +703,7 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
                 raise RuntimeError("missing uploaded func case " + name)
             client, entry, passed = submit_gls(
                 client, run_id, netlist_run_id, profile, "func",
-                name, remote_cases[name], FUNC_RX_CAPTURE_NS,
+                name, remote_cases[name], FUNC_RX_CAPTURE_NS, dep_job=gls_dep,
             )
             status["func_cases"][name] = entry
             if not passed:
@@ -642,7 +717,7 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
                 for index, name in enumerate(CASES):
                     client, entry, passed = submit_gls(
                         client, run_id, netlist_run_id, profile, "sdf",
-                        name, remote_cases[name], SDF_RX_CAPTURE_NS,
+                        name, remote_cases[name], SDF_RX_CAPTURE_NS, dep_job=gls_dep,
                     )
                     status["sdf_cases"][name] = entry
                     if not passed:
@@ -659,7 +734,7 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
         for index, name in enumerate(CASES):
             client, entry, passed = submit_gls(
                 client, run_id, netlist_run_id, profile, "sdf",
-                name, remote_cases[name], SDF_RX_CAPTURE_NS,
+                name, remote_cases[name], SDF_RX_CAPTURE_NS, dep_job=gls_dep,
             )
             status["sdf_cases"][name] = entry
             if not passed:
@@ -673,9 +748,14 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
         status["skip_gls"] = True
 
     result_dir.mkdir(parents=True, exist_ok=True)
+    status["submit_only"] = SUBMIT_ONLY
+    status["gls_dep"] = gls_dep
     (result_dir / "summary.json").write_text(
         json.dumps(status, indent=2) + "\n", encoding="utf-8"
     )
+    if SUBMIT_ONLY:
+        print("LOCAL_RESULT", result_dir, "SUBMITTED", flush=True)
+        return status
     sftp = client.open_sftp()
     fetch_list = [
         (ROOT + "/reports/dc/" + netlist_run_id, result_dir / "reports_dc"),
@@ -698,6 +778,8 @@ def run_profile(client, profile: str, case_files: dict[str, Path], upload_shared
 
 
 def main():
+    from cmr_frozen_run_ids import FROZEN_NOC64_ACKIN250_RUN_ID, refuse_overwrite
+
     if os.environ.get("CMR_NOC16_NETLIST_RUN_ID"):
         print(
             "WARN ignoring CMR_NOC16_NETLIST_RUN_ID=%s; NoC64 always synthesizes "
@@ -705,9 +787,26 @@ def main():
             % os.environ["CMR_NOC16_NETLIST_RUN_ID"],
             flush=True,
         )
-    unknown = [name for name in dict.fromkeys(FUNC_CASES + CASES) if name not in ALLOWED_CASES]
-    if unknown:
-        raise SystemExit("unsupported NoC64 cases: " + ",".join(unknown))
+    global FUNC_CASES
+    if ALLOW_V3:
+        if V3_CASE_DIR is None or not V3_CASE_DIR.is_dir():
+            raise SystemExit("CMR_NOC64_ALLOW_V3=1 requires CMR_NOC64_V3_CASE_DIR")
+        if SKIP_FUNC:
+            FUNC_CASES = tuple(name for name in FUNC_CASES if name in CASES)
+    else:
+        unknown = [name for name in dict.fromkeys(FUNC_CASES + CASES) if name not in ALLOWED_CASES]
+        if unknown:
+            raise SystemExit("unsupported NoC64 cases: " + ",".join(unknown))
+    if DESCAL:
+        refuse_overwrite(BASE_RUN_ID, action="descal-gls")
+        if (
+            NETLIST_RUN_ID_ENV == FROZEN_NOC64_ACKIN250_RUN_ID
+            and os.environ.get("CMR_NOC64_ALLOW_ACKIN250", "0") != "1"
+        ):
+            raise SystemExit(
+                "DES cal refuses Ackin-250 netlist %s; timing cal needs a new DEL050 ID"
+                % NETLIST_RUN_ID_ENV
+            )
     if not CASES:
         raise SystemExit("CMR_NOC64_CASES is empty")
     if int(LANE01_STAGES) < 0:

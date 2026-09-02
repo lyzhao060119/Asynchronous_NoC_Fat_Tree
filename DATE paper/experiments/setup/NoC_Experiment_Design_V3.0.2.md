@@ -1,6 +1,12 @@
 # NoC 实验设计 V3.0.2
 ## Novelty-Driven Minimal Evaluation Plan for DATE 2027 — Execution Control Plane
 
+> **Superseded for execution by** [`NoC_Experiment_Design_V3.1.0.md`](NoC_Experiment_Design_V3.1.0.md).
+> V3.1.0 requires whole-network logic synthesis and maximum-delay Standard Delay Format
+> gate-level simulation for every independent 64-, 256-, and 1024-node paper network,
+> and uses complete English display names. This V3.0.2 file is a historical record.
+> Machine identifiers and hashes are unchanged.
+>
 > 历史版本：[`NoC_Experiment_Design_V3.0.1.md`](NoC_Experiment_Design_V3.0.1.md) 冻结技术主张、Design ID、benchmark 与 Go/No-Go。  
 > V3.0.2 **不扩大**已删除的 benchmark 矩阵；只增补可复现执行计划、目录规范、模型校准口径、**物理口径冻结（post-synthesis only）** 与各阶段 Gate。
 >
@@ -1231,7 +1237,7 @@ Pilot Gate 清单（route 完成、结构计数、GTECH/SEQGEN=0、DEL/Mutex 保
 
 # 21. 模型校准口径
 
-DES 位于 `DATE paper/experiments/model/`（Phase 5 实现）。V3.0.2 先冻结验收阈值：
+DES 位于 `DATE paper/experiments/model/`（Phase 5 实现）。当前已锁定 isolated hop 的 post-synthesis H/B/T 与 `model_version + calibration_hash`；**网络 RTL/MAXIMUM-SDF 校准尚未签核**，`paper_matrix_allowed` 仍为 false。DES 侧校准包（seed `900001`，非论文 seed）与 GLS ingest/probe 驱动已就位；缺的是 V3 5-flit 64/256 **MAXIMUM-SDF** 迹，禁止用 3-flit archive GLS，禁止把 Ackin-250 NoC64 当 timing-cal 网表。V3.0.2 冻结验收阈值：
 
 | 检查 | 阈值 |
 |---|---|
@@ -1256,10 +1262,11 @@ DES 位于 `DATE paper/experiments/model/`（Phase 5 实现）。V3.0.2 先冻�
 |---|---|---|
 | 0 | 文档、目录、schema、registry、gitignore、orchestrator | `run_experiment.py plan/status` 本地可跑；import 的 archive-only 标记正确 |
 | 1 | P&R pilot（**已关闭**） | **2026-08-31 Gate FAIL**；冻结 post-synthesis only（§20）；不再重跑、不再等 PRTF |
-| 2 | 全部 Router primitive：emit → geometry → RTL smoke → DC → MAXIMUM-SDF GLS → PT-PX（**不做 P&R**） | Thin/Fat/PFAT 同一 DEL 配方；Sync 1.0 ns；GLS 零 X/Z/timeout；synthesis `check_power` PASS |
-| 3 | Thin64、CMR TopMesh、PROP256/1024、FM256/1024、H-REP policy | route oracle；64 directed exhaustive；256 directed+random；零 duplicate/loss/deadlock |
-| 4 | V3 traffic / TB / 统一 `Tmax` 与 saturation | 5-flit；warm-up 1000 + measurement ≥10000；3 frozen seeds；同一 canonical trace |
-| 5 | DES + 64/256 校准（post-synthesis MAXIMUM-SDF） | §21 阈值；锁定 calibration hash |
+| 2 | 全部 Router primitive：emit → geometry → RTL smoke → DC → MAXIMUM-SDF GLS → PT-PX（**不做 P&R**） | **2026-08-31 Gate PASS**（Async 冻结仍有效）。当时 Sync Head 为 Thin 2 拍 / PROP 3 拍；该 Sync 行与 `20260831_cmr_primitive_hop_ppa_ru5` 的 Sync 数字 **archive-only** |
+| 2.5 | Sync 1 拍 Head：`liveGrant` + 组合 `LaneSelect`；Scala hop spec；新 ID 重综合 Sync hop 与 Sync64（**不做 P&R**） | **2026-09-01 Gate PASS**。Thin/PROP isolated Head=Body=Tail=**1.000 ns**；hop 与 Sync64 MAXIMUM-SDF 无 X/Z/missing/timeout；结构 21/105/0 与 21/146/264；时钟保持 **1.0 ns**（Fat WNS 0.000033 ns，未放慢）。未过 Gate 不得进 Phase 4/5/6 |
+| 3 | Thin64、CMR TopMesh、PROP256/1024、FM256/1024、H-REP policy | **2026-09-01 Gate PASS（基础设施）**。Scala DUT + Python route oracle 64 exhaustive + inventory（含 `SYNC_THIN64`/`SYNC_PROP64`）。Mesh4 不 elaborate。本地 `check_phase3.py`。64 RTL directed exhaustive / FPGA 属 Phase 11；正式 SDF 记分板属 Phase 6–9 |
+| 4 | V3 traffic / TB / 统一 `Tmax` 与 saturation | **2026-09-01 Gate PASS（基础设施）**。5-flit；warm-up 1000 + measurement ≥10000；3 frozen seeds `202701/202702/202703`；同一 canonical JSONL 再物化 RTL `.case`。Async 64/256 TB 与 Sync64 TB 共用 latency CSV / `Tmax` 列（`head_inject_req_ps`）。`SYNC_THIN64`/`SYNC_PROP64` 与 `THIN64`/`PROP64` 成对。本地 `check_phase4.py`。正式 11k-event MAXIMUM-SDF 记分板属于 Phase 6–9，不是本 Gate |
+| 5 | DES + 64/256 校准（post-synthesis MAXIMUM-SDF） | **2026-09-01 Gate PASS（基础设施 / hop lock）**。packet/flit DES；isolated R-U5 H/B/T 对 `20260901_primitive_ru5_post_synthesis.json`；oracle delivery/traversal；`locked.json` 的 `paper_matrix_allowed=false`。**64/256 网络 MAXIMUM-SDF 校准 pending**（尚无 V3 5-flit 网络 SDF 迹，禁止用 3-flit archive GLS）。未 `paper_matrix_allowed` 不得写 Fig. A/B/C DES 正式矩阵。Table I 用 primitive PPA，不依赖网络 DES。本地 `check_phase5.py` |
 | 6 | Table I | 每个数字可回溯 manifest / DC+MAXIMUM-SDF report / VCD window；口径为 post-synthesis calibrated；拒绝 `post-layout` |
 | 7 | Fig. A BF-STRESS64 | PROP 对 THIN 无吞吐提升则停止 bounded-fat 核心 claim；面积用 DC cell area × 实例 |
 | 8 | Fig. B scalability | hierarchy 在 area/traversal 上无优势则停止 resource-efficient hierarchy 主张；面积同上 |
@@ -1269,7 +1276,7 @@ DES 位于 `DATE paper/experiments/model/`（Phase 5 实现）。V3.0.2 先冻�
 | 12 | 可选 SNN | 一天 timebox；不强则只归档 |
 | 13 | 聚合、审计、clean-room replay | `validate_paper_results.py` 全绿后冻结 curated/figures；拒绝自称 post-layout 的 curated 行 |
 
-实际执行顺序：文档与 orchestrator（Phase 0 已完成）→ Phase 1 **关闭** → primitive **post-synthesis** PPA → 网络 DUT → traffic/TB → 模型校准（MAXIMUM-SDF）→ P0 图（Table I → Fig. A → Fig. B → Fig. C）→ P1 FPGA → P2 backup → 审计。P&R 不进入该顺序。
+实际执行顺序：文档与 orchestrator（Phase 0 已完成）→ Phase 1 **关闭** → Async primitive **post-synthesis** PPA（Phase 2）→ **Phase 2.5 Sync 1 拍 Head 与 Sync 网表重签（2026-09-01 Gate PASS）** → 网络 DUT → **Phase 4 traffic/TB 基础设施（2026-09-01 Gate PASS）** → 模型校准（MAXIMUM-SDF）→ P0 图（Table I → Fig. A → Fig. B → Fig. C）→ P1 FPGA → P2 backup → 审计。P&R 不进入该顺序。Phase 2.5 之后才允许把 Sync 数字写入 Table I / DES。正式 11k-event SDF 记分板在 Phase 6–9。
 
 ---
 
@@ -1281,11 +1288,15 @@ DES 位于 `DATE paper/experiments/model/`（Phase 5 实现）。V3.0.2 先冻�
 |---|---|---|---|
 | 6× Async hop | `20260830_cmr_{thin,fat}_l{1,2,3}_hop_del050_ackin050` | 仅作 **post-synthesis** hop 对照 | 锁定 DEL 配方；这就是论文 hop 口径，不期待 post-route 替换 |
 | Hop PPA 汇总 | `20260830_cmr_router_level_baseline_del050` | 同上 | 禁止覆盖 |
-| Sync64 Thin | `20260831_014622_cmr_sync_noc64_thin_p50` | post-synthesis 网络 | 1.0 ns |
-| Sync64 Fat 1222 | `20260831_084457_cmr_sync_noc64_fat1222_p50` | post-synthesis 网络 | 1.0 ns |
+| Sync64 Thin（2 拍 Head） | `20260831_014622_cmr_sync_noc64_thin_p50` | **false** | Phase 2 历史；archive-only；禁止覆盖 |
+| Sync64 Fat 1222（3 拍 Head 路径） | `20260831_084457_cmr_sync_noc64_fat1222_p50` | **false** | 同上 |
 | 当前 mesh64 | registry 记录当时 `CMR_MESH64_RUN_ID` | 未签核前否 | 进行中/未完成不得进 curated |
 | Ackin-250 NoC64 | `20260830_095259_cmr_noc64_p50_1222` | **false** | archive-only |
 | Thin NoC16 CFifo | `20260828_cmr_cfifo_tp_nogrant_p50` | **false** | CFifo/`BUFFD0`，archive-only |
 | P&R pilot blocker | `20260831_cmr_pnr_pilot_blocker` | **false** | 缺 tech LEF/NDM；DATE V3 锁 post-synthesis |
+| PFAT L2/L3、TopMesh、FlatMesh | `20260831_cmr_{pfat_l2_c2p4,pfat_l3_c4p8,topmesh_c2p2,flatmesh_c1p1}_del050_ackin050` | **true**（post-synthesis） | Phase 2 Async primitive；禁止覆盖 |
+| Phase 2 Sync hop（2/3 拍 Head） | `20260831_cmr_sync_{thin_1x1,prop_2x2}_1p0ns` | **false** | archive-only；由 Phase 2.5 新 ID 替换 |
+| Primitive hop PPA（Phase 2） | `20260831_cmr_primitive_hop_ppa_ru5` | Async 行可用；Sync 行 **false** | 禁止覆盖；Table I Sync 改用 Phase 2.5 汇总 |
+| Phase 2.5 Sync hop / hop PPA / Sync64 | `20260901_cmr_sync_{thin_1x1,prop_2x2}_1p0ns`；`20260901_cmr_primitive_hop_ppa_ru5`；`20260901_cmr_sync_noc64_{thin,fat1222}_p50` | **true** | 1 拍 Head；1.0 ns；禁止覆盖旧 20260831 Sync ID |
 
 H-REP 不占用新的 Router ASIC run；与 PROP 共享 netlist hash，只改 boundary split policy。

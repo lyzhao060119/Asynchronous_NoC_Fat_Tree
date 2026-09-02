@@ -71,18 +71,36 @@
       "design_id": "SYNC_THIN_1X1",
       "benchmark_id": null,
       "adapter": "import_readonly",
-      "physical_class": "post-synthesis",
+      "physical_class": "archive-only",
       "paper_eligible": false,
-      "notes": "Clocked Thin SyncNoC64 1.0 ns SS ZeroWireload."
+      "notes": "Phase 2 Thin SyncNoC64 1.0 ns, 2-cycle Head. Archive-only. Do not overwrite."
     },
     {
       "run_id": "20260831_084457_cmr_sync_noc64_fat1222_p50",
       "design_id": "SYNC_PROP_2X2",
       "benchmark_id": null,
       "adapter": "import_readonly",
-      "physical_class": "post-synthesis",
+      "physical_class": "archive-only",
       "paper_eligible": false,
-      "notes": "Clocked Fat 1-2-2-2 SyncNoC64 1.0 ns."
+      "notes": "Phase 2 Fat 1-2-2-2 SyncNoC64 1.0 ns, 3-cycle Head path. Archive-only. Do not overwrite."
+    },
+    {
+      "run_id": "20260901_cmr_sync_noc64_thin_p50",
+      "design_id": "SYNC_THIN_1X1",
+      "benchmark_id": null,
+      "adapter": "dc_sync_noc64",
+      "physical_class": "post-synthesis",
+      "paper_eligible": true,
+      "notes": "Phase 2.5 1-cycle Head Thin SyncNoC64 1.0 ns MAXIMUM-SDF. Do not overwrite."
+    },
+    {
+      "run_id": "20260901_cmr_sync_noc64_fat1222_p50",
+      "design_id": "SYNC_PROP_2X2",
+      "benchmark_id": null,
+      "adapter": "dc_sync_noc64",
+      "physical_class": "post-synthesis",
+      "paper_eligible": true,
+      "notes": "Phase 2.5 1-cycle Head Fat 1-2-2-2 SyncNoC64 1.0 ns MAXIMUM-SDF. Do not overwrite."
     },
     {
       "run_id": "cmr_mesh64_current",

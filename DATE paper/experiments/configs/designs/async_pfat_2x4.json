@@ -51,5 +51,6 @@
   "adapter": "dc_cmr_router",
   "paper_role": "Fig. A PFAT L2 cost",
   "paper_eligible_default": true,
-  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only."
+  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
+  "display_name": "Asynchronous progressively widened level-2 router primitive"
 }

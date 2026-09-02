@@ -33,11 +33,28 @@
       "parent_lanes": 2,
       "use_mesh_routing": false,
       "count": 16
+    },
+    {
+      "primitive_id": "async_topmesh_1x2",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 2,
+      "use_mesh_routing": true,
+      "count": 16
     }
   ],
   "expected_structure": {
-    "routers": 336,
-    "interlevel_fifos": 0
+    "routers": 352,
+    "ports": 2432,
+    "adapters": 4288,
+    "interlevel_fifos": 0,
+    "max_opm_fanin": 8,
+    "mutex_widths": [
+      2,
+      4,
+      5,
+      8
+    ]
   },
   "flit_width_bits": 28,
   "buffer_slots": 5,
@@ -54,8 +71,11 @@
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Optional Mesh1 sanity; backup only",
-  "paper_eligible_default": true,
-  "notes": ""
+  "paper_role": "Single-lane top-mesh sanity; backup only, not a paper-matrix netlist",
+  "paper_eligible_default": false,
+  "notes": "Backup only. Do not use as 1024-node paper evidence.",
+  "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, single-lane top-mesh sanity (backup only)",
+  "display_description": "Backup one-lane top-mesh sanity. Not a paper-matrix netlist."
 }

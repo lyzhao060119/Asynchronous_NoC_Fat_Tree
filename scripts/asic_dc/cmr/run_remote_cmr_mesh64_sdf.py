@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 
 from check_cmr_router_geometry import check_noc64
+from cmr_descal_env import apply_bsub, submit_only
 from cmr_frozen_run_ids import refuse_overwrite, require_emit_locked_delays
 from run_remote_cmr_flow import atomic_put_bytes, remote_run
 from run_remote_cmr_fat_tree_noc16_sdf import (
@@ -64,6 +65,11 @@ FUNC_CASES = tuple(
 SKIP_GLS = os.environ.get("CMR_MESH64_SKIP_GLS", "0") == "1"
 SKIP_FUNC = os.environ.get("CMR_MESH64_SKIP_FUNC", "1") == "1"
 SKIP_SDF = os.environ.get("CMR_MESH64_SKIP_SDF", "0") == "1"
+ALLOW_V3 = os.environ.get("CMR_MESH64_ALLOW_V3", "0") == "1" or os.environ.get("CMR_NOC64_ALLOW_V3", "0") == "1"
+V3_CASE_DIR = Path(os.environ["CMR_NOC64_V3_CASE_DIR"]) if os.environ.get("CMR_NOC64_V3_CASE_DIR") else (
+    Path(os.environ["CMR_MESH64_V3_CASE_DIR"]) if os.environ.get("CMR_MESH64_V3_CASE_DIR") else None
+)
+DESCAL = os.environ.get("CMR_DESCAL", "0") == "1"
 INJECT_MAX_RATE = os.environ.get("CMR_MESH64_INJECT_MAX_RATE", "0") == "1"
 SIM_ARGS = os.environ.get("CMR_MESH64_SIM_ARGS", "")
 SDF_RX_CAPTURE_NS = os.environ.get("CMR_MESH64_RX_CAPTURE_NS", "0.1")
@@ -71,10 +77,13 @@ FUNC_RX_CAPTURE_NS = os.environ.get("CMR_MESH64_FUNC_RX_CAPTURE_NS", "5")
 RCU_STEPS = os.environ.get("CMR_RCU_MATCHED_DELAY_STEPS", "1")
 RCU_UNIT_PS = os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50")
 ACKIN_UNIT_PS = os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50")
+GRANT_HOLD_BUF = os.environ.get("CMR_EXPECTED_GRANT_HOLD_BUF", "").strip()
+LATCH_REOPEN_DEL = os.environ.get("CMR_EXPECTED_LATCH_REOPEN_DEL", "").strip()
 DC_POLLS = int(os.environ.get("CMR_MESH64_DC_POLLS", "1440"))
 GLS_POLLS = int(os.environ.get("CMR_MESH64_GLS_POLLS", "720"))
-DC_BSUB = os.environ.get("CMR_MESH64_DC_BSUB", "-n 16")
-GLS_BSUB = os.environ.get("CMR_MESH64_GLS_BSUB", "-n 8")
+DC_BSUB = apply_bsub(os.environ.get("CMR_MESH64_DC_BSUB", "-n 16"))
+GLS_BSUB = apply_bsub(os.environ.get("CMR_MESH64_GLS_BSUB", "-n 8"))
+SUBMIT_ONLY = submit_only()
 EXPECTED_ROUTERS = 64
 EXPECTED_PORTS = 320
 EXPECTED_ADAPTERS = 0
@@ -82,7 +91,23 @@ GEN_DIR = REPO / "generated_cmr" / "mesh_noc64_11"
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
 
+def _dc_job_name(run_id: str) -> str:
+    if DESCAL:
+        return "cmr_descal_mesh64_dc_%s" % run_id
+    return "cmr_mesh64_dc_%s" % run_id
+
+
+def _gls_job_name(mode: str, name: str) -> str:
+    if DESCAL:
+        return "cmr_descal_mesh64_%s_%s" % (mode, name)
+    return "cmr_mesh64_%s_%s" % (mode, name)
+
+
 def case_local_path(name: str) -> Path:
+    if ALLOW_V3 and V3_CASE_DIR is not None:
+        candidate = V3_CASE_DIR / (name + ".case")
+        if candidate.is_file():
+            return candidate
     if name in SMOKE_CASES:
         return REPO / "sim" / "AsyncNoC" / "testbench" / "small_cases" / (name + ".case")
     if name.startswith("TAB-"):
@@ -95,6 +120,25 @@ def case_local_path(name: str) -> Path:
 
 def generate_cases() -> dict[str, Path]:
     needed = tuple(dict.fromkeys(FUNC_CASES + CASES))
+    if ALLOW_V3:
+        paths = {}
+        for name in needed:
+            path = case_local_path(name)
+            if not path.is_file():
+                raise SystemExit("missing V3 mesh64 case " + str(path))
+            paths[name] = path
+            print("LOCAL_CASE", name, path, flush=True)
+        adapter = REPO / "sim" / "AsyncNoC" / "async_noc64_mesh_port_adapter.sv"
+        if not adapter.is_file():
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(REPO / "sim" / "AsyncNoC" / "testbench" / "gen_noc64_mesh_port_adapter.py"),
+                ],
+                cwd=REPO,
+                check=True,
+            )
+        return paths
     missing_tab = any(name.startswith("TAB-") and not case_local_path(name).is_file() for name in needed)
     if missing_tab:
         subprocess.run(
@@ -154,6 +198,11 @@ def _check_generated(generated: Path) -> Path:
     if async_count:
         raise SystemExit("mesh64 expected no FIFO got async=%d" % async_count)
     require_emit_locked_delays(text, label="mesh64", ackin_unit_ps=int(ACKIN_UNIT_PS))
+    if "GrantHoldBuf" in text:
+        raise SystemExit("mesh64 still has GrantHoldBuf; reopen experiment removed it")
+    reopen = "DelayElement #(.DelayUnitPs(%s), .DelayValue(1)) LatchReopenDelay" % ACKIN_UNIT_PS
+    if reopen not in text:
+        raise SystemExit("mesh64 missing %s" % reopen)
     check_noc64(generated, "mesh_noc64_11")
     print(
         "LOCAL_EMIT router=%d ipm=%d adapter=%d fifo=%d top=%d"
@@ -194,6 +243,7 @@ def shared_input_files() -> dict[Path, str]:
     files = {}
     for name in (
         "DelayElement_ASIC.v",
+        "DontTouchBuf_ASIC.v",
         "Mutex2_ASIC.v",
         "Mutex4.v",
         "MullerC2.v",
@@ -329,7 +379,7 @@ def collect_gls_result(client, run_id, mode, name, jid):
     return client, entry, passed
 
 
-def submit_gls(client, run_id, netlist_run_id, mode, name, case_path, rx_capture):
+def submit_gls(client, run_id, netlist_run_id, mode, name, case_path, rx_capture, dep_job=None):
     wrapper = ROOT + "/logs/gls/%s/%s_%s.sh" % (run_id, mode, name)
     body = (
         "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
@@ -358,18 +408,21 @@ def submit_gls(client, run_id, netlist_run_id, mode, name, case_path, rx_capture
         "cat > %s << 'CMR_GLS_WRAP'\n%s\nCMR_GLS_WRAP\nchmod +x %s"
         % (wrapper, body, wrapper),
     )
+    dep = ("-w %s " % shlex.quote("done(%s)" % dep_job)) if dep_job else ""
     client, submit = remote_run_retry(
         client,
-        "bsub %s -o %s/logs/gls/%s/%s_%s.bsub.log "
-        "-e %s/logs/gls/%s/%s_%s.bsub.err -J cmr_mesh64_%s_%s %s"
+        "bsub %s %s-o %s/logs/gls/%s/%s_%s.bsub.log "
+        "-e %s/logs/gls/%s/%s_%s.bsub.err -J %s %s"
         % (
-            GLS_BSUB, ROOT, run_id, mode, name,
+            GLS_BSUB, dep, ROOT, run_id, mode, name,
             ROOT, run_id, mode, name,
-            mode, name, wrapper,
+            _gls_job_name(mode, name), wrapper,
         ),
     )
     jid = job_id(submit)
     print("GLS_JOB", mode, name, jid, flush=True)
+    if SUBMIT_ONLY:
+        return client, {"job_id": jid, "mode": mode, "submitted": True}, True
     client = wait_job(client, jid, "%s_%s" % (mode, name), polls=GLS_POLLS, allow_exit=True)
     client, entry, passed = collect_gls_result(client, run_id, mode, name, jid)
     print(
@@ -387,16 +440,23 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
     refuse_overwrite(run_id, action="mesh64")
     if not skip_dc:
         refuse_overwrite(netlist_run_id, action="mesh64-dc")
-    generated = generate_rtl()
     files = shared_input_files()
-    files[generated / "CMRMeshNoC.v"] = "rtl/mesh64/CMRMeshNoC.v"
     dut_remote = ROOT + "/rtl/mesh64/CMRMeshNoC.v"
+    if skip_dc:
+        print(
+            "SKIP_DC omit local CMRMeshNoC.v emit; GLS uses frozen post netlist %s"
+            % netlist_run_id,
+            flush=True,
+        )
+    else:
+        generated = generate_rtl()
+        files[generated / "CMRMeshNoC.v"] = "rtl/mesh64/CMRMeshNoC.v"
     dc_tcl_dest = "scripts/dc/run_dc_cmr_mesh64.tcl"
 
     client, job_text = remote_run_retry(
         client,
         "bjobs -J %s -noheader -o 'jobid stat' 2>/dev/null"
-        % shlex.quote("cmr_mesh64_dc_%s" % run_id),
+        % shlex.quote(_dc_job_name(run_id)),
     )
     inflight_dc = bool(re.search(r"(\d+)\s+(PEND|RUN)", job_text))
     if inflight_dc:
@@ -469,15 +529,27 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
             client, job_text = remote_run_retry(
                 client,
                 "bjobs -J %s -noheader -o 'jobid stat' 2>/dev/null"
-                % shlex.quote("cmr_mesh64_dc_%s" % run_id),
+                % shlex.quote(_dc_job_name(run_id)),
             )
             job_match = re.search(r"(\d+)\s+(PEND|RUN)", job_text)
             if job_match:
                 dc_job = job_match.group(1)
                 print("REUSE_DC_JOB", dc_job, job_match.group(2), flush=True)
-                client = wait_job(client, dc_job, "dc_mesh64", polls=DC_POLLS)
-                client = wait_dc_marker(client, dc_log)
+                if SUBMIT_ONLY:
+                    print("SUBMIT_ONLY reuse_dc=%s" % dc_job, flush=True)
+                else:
+                    client = wait_job(client, dc_job, "dc_mesh64", polls=DC_POLLS)
+                    client = wait_dc_marker(client, dc_log)
             else:
+                extra_export = ""
+                if GRANT_HOLD_BUF:
+                    extra_export += (
+                        " CMR_EXPECTED_GRANT_HOLD_BUF=%s" % shlex.quote(GRANT_HOLD_BUF)
+                    )
+                if LATCH_REOPEN_DEL:
+                    extra_export += (
+                        " CMR_EXPECTED_LATCH_REOPEN_DEL=%s" % shlex.quote(LATCH_REOPEN_DEL)
+                    )
                 dc_wrapper = ROOT + "/logs/dc/" + run_id + ".sh"
                 dc_body = (
                     "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
@@ -487,7 +559,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
                     "CMR_EXPECTED_ADAPTERS=%d CMR_EXPECTED_PORTS=%d "
                     "CMR_EXPECTED_ROUTERS=%d "
                     "CMR_RCU_MATCHED_DELAY_STEPS=%s CMR_RCU_MATCHED_DELAY_UNIT_PS=%s "
-                    "CMR_OPM_ACKIN_DELAY_UNIT_PS=%s\n"
+                    "CMR_OPM_ACKIN_DELAY_UNIT_PS=%s%s\n"
                     "cd %s\nexec dc_shell-t -64 -f %s\n"
                     % (
                         ROOT,
@@ -499,6 +571,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
                         shlex.quote(str(RCU_STEPS)),
                         shlex.quote(str(RCU_UNIT_PS)),
                         shlex.quote(str(ACKIN_UNIT_PS)),
+                        extra_export,
                         ROOT,
                         dc_tcl_snap,
                     )
@@ -509,13 +582,16 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
                 client, _ = remote_run_retry(client, "chmod +x %s" % dc_wrapper)
                 client, dc_submit = remote_run_retry(
                     client,
-                    "bsub %s -o %s -e %s.err -J cmr_mesh64_dc_%s %s"
-                    % (DC_BSUB, dc_log, dc_log, run_id, dc_wrapper),
+                    "bsub %s -o %s -e %s.err -J %s %s"
+                    % (DC_BSUB, dc_log, dc_log, _dc_job_name(run_id), dc_wrapper),
                 )
                 dc_job = job_id(dc_submit)
                 print("DC_JOB", dc_job, flush=True)
-                client = wait_job(client, dc_job, "dc_mesh64", polls=DC_POLLS)
-                client = wait_dc_marker(client, dc_log)
+                if SUBMIT_ONLY:
+                    print("SUBMIT_ONLY dc=%s" % dc_job, flush=True)
+                else:
+                    client = wait_job(client, dc_job, "dc_mesh64", polls=DC_POLLS)
+                    client = wait_dc_marker(client, dc_log)
 
     status = {
         "run_id": run_id,
@@ -527,6 +603,8 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
         "rcu_matched_delay_steps": int(RCU_STEPS),
         "rcu_matched_delay_unit_ps": int(RCU_UNIT_PS),
         "opm_ackin_delay_unit_ps": int(ACKIN_UNIT_PS),
+        "grant_hold_buf": GRANT_HOLD_BUF,
+        "latch_reopen_del": LATCH_REOPEN_DEL,
         "sdf_rx_capture_ns": SDF_RX_CAPTURE_NS,
         "func_rx_capture_ns": FUNC_RX_CAPTURE_NS,
         "inject_max_rate": INJECT_MAX_RATE,
@@ -538,6 +616,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
         "sdf_cases": {},
         "all_pass": True,
     }
+    gls_dep = _dc_job_name(run_id) if (SUBMIT_ONLY and not skip_dc and dc_job is not None) else None
 
     def skip_remaining(bucket, remaining, reason):
         for skipped in remaining:
@@ -550,7 +629,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
                 raise RuntimeError("missing uploaded func case " + name)
             client, entry, passed = submit_gls(
                 client, run_id, netlist_run_id, "func",
-                name, remote_cases[name], FUNC_RX_CAPTURE_NS,
+                name, remote_cases[name], FUNC_RX_CAPTURE_NS, dep_job=gls_dep,
             )
             status["func_cases"][name] = entry
             if not passed:
@@ -564,7 +643,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
                 for index, name in enumerate(CASES):
                     client, entry, passed = submit_gls(
                         client, run_id, netlist_run_id, "sdf",
-                        name, remote_cases[name], SDF_RX_CAPTURE_NS,
+                        name, remote_cases[name], SDF_RX_CAPTURE_NS, dep_job=gls_dep,
                     )
                     status["sdf_cases"][name] = entry
                     if not passed:
@@ -580,7 +659,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
         for index, name in enumerate(CASES):
             client, entry, passed = submit_gls(
                 client, run_id, netlist_run_id, "sdf",
-                name, remote_cases[name], SDF_RX_CAPTURE_NS,
+                name, remote_cases[name], SDF_RX_CAPTURE_NS, dep_job=gls_dep,
             )
             status["sdf_cases"][name] = entry
             if not passed:
@@ -596,9 +675,14 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
         status["skip_gls"] = True
 
     result_dir.mkdir(parents=True, exist_ok=True)
+    status["submit_only"] = SUBMIT_ONLY
+    status["gls_dep"] = gls_dep
     (result_dir / "summary.json").write_text(
         json.dumps(status, indent=2) + "\n", encoding="utf-8"
     )
+    if SUBMIT_ONLY:
+        print("LOCAL_RESULT", result_dir, "SUBMITTED", flush=True)
+        return status
     sftp = client.open_sftp()
     fetch_list = [
         (ROOT + "/reports/dc/" + netlist_run_id, result_dir / "reports_dc"),
@@ -628,9 +712,18 @@ def main():
             % os.environ["CMR_NOC16_NETLIST_RUN_ID"],
             flush=True,
         )
-    unknown = [name for name in dict.fromkeys(FUNC_CASES + CASES) if name not in ALLOWED_CASES]
-    if unknown:
-        raise SystemExit("unsupported mesh64 cases: " + ",".join(unknown))
+    global FUNC_CASES
+    if ALLOW_V3:
+        if V3_CASE_DIR is None or not V3_CASE_DIR.is_dir():
+            raise SystemExit("mesh64 V3 GLS requires CMR_NOC64_V3_CASE_DIR or CMR_MESH64_V3_CASE_DIR")
+        if SKIP_FUNC:
+            FUNC_CASES = tuple(name for name in FUNC_CASES if name in CASES)
+    else:
+        unknown = [name for name in dict.fromkeys(FUNC_CASES + CASES) if name not in ALLOWED_CASES]
+        if unknown:
+            raise SystemExit("unsupported mesh64 cases: " + ",".join(unknown))
+    if DESCAL:
+        refuse_overwrite(BASE_RUN_ID, action="descal-mesh64")
     if not CASES:
         raise SystemExit("CMR_MESH64_CASES is empty")
     if int(ACKIN_UNIT_PS) != 50 or int(RCU_STEPS) != 1 or int(RCU_UNIT_PS) != 50:

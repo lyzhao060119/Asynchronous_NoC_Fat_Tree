@@ -58,3 +58,19 @@ class LanePhaseAdapter(val laneCount: Int)
   addResource("/ASYNC/CMR/LanePhaseAdapter.v")
   addResource("/ASYNC/CMR/PhaseResetDLatch.v")
 }
+
+/** Capture the first LaneSelect while PathEnabled and hold it until Tail. */
+class WormholeLaneLock(val laneCount: Int)
+    extends BlackBox(Map("LANES" -> laneCount))
+    with HasBlackBoxResource {
+  override def desiredName: String = "WormholeLaneLock"
+  require(Set(1, 2, 4, 8).contains(laneCount))
+  val io = IO(new Bundle {
+    val reset = Input(Bool())
+    val PathEnabled = Input(Bool())
+    val LaneSelect = Input(UInt(laneCount.W))
+    val HeldSelect = Output(UInt(laneCount.W))
+  })
+  addResource("/ASYNC/CMR/LanePhaseAdapter.v")
+  addResource("/ASYNC/CMR/PhaseResetDLatch.v")
+}

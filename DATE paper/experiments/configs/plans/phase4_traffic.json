@@ -1,0 +1,30 @@
+{
+  "schema": "date-v3-plan-v1",
+  "plan_id": "phase4_traffic",
+  "title": "Phase 4 V3 traffic infrastructure (local generator; not paper numbers)",
+  "runs": [
+    {
+      "run_id": "20260901_v3_traffic_smoke",
+      "design_id": "PROP64",
+      "benchmark_id": "BF-STRESS64",
+      "adapter": "v3_traffic",
+      "argv": [
+        "--smoke",
+        "--benchmark",
+        "BF-STRESS64",
+        "--materialize",
+        "--design",
+        "THIN64",
+        "--design",
+        "PROP64",
+        "--design",
+        "SYNC_THIN64",
+        "--design",
+        "SYNC_PROP64"
+      ],
+      "physical_class": "rtl",
+      "paper_eligible": false,
+      "notes": "Local canonical JSONL + paired .case smoke. Formal 11k-event maximum-delay gate-level scoreboard is Phase 6 Gates C-F."
+    }
+  ]
+}

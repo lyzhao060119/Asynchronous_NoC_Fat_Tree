@@ -232,8 +232,21 @@ module tb_sync_cmr_router_hop_ppa;
       tail_ns = hop_latency[NUM_FLITS - 1];
       cycle_ns = clock_ns;
       mflit_s = 1000.0 / clock_ns;
-      $display("PPA_RESULT PASS geometry=%s mode=%s lane=%0d head_ns=%0.3f body_ns=%0.3f tail_ns=%0.3f cycle_ns=%0.3f mflit_s=%0.3f",
-        hop_kind, hop_mode, selected_out, head_ns, body_ns, tail_ns, cycle_ns, mflit_s);
+      if (hop_mode == "isolated") begin
+        if ((head_ns > clock_ns + 0.001) || (head_ns < clock_ns - 0.001) ||
+            (body_ns > clock_ns + 0.001) || (body_ns < clock_ns - 0.001) ||
+            (tail_ns > clock_ns + 0.001) || (tail_ns < clock_ns - 0.001)) begin
+          fail("isolated hop is not 1 clock");
+          $display("PPA_RESULT FAIL isolated hop head=%0.3f body=%0.3f tail=%0.3f clock=%0.3f",
+            head_ns, body_ns, tail_ns, clock_ns);
+        end else begin
+          $display("PPA_RESULT PASS geometry=%s mode=%s lane=%0d head_ns=%0.3f body_ns=%0.3f tail_ns=%0.3f cycle_ns=%0.3f mflit_s=%0.3f",
+            hop_kind, hop_mode, selected_out, head_ns, body_ns, tail_ns, cycle_ns, mflit_s);
+        end
+      end else begin
+        $display("PPA_RESULT PASS geometry=%s mode=%s lane=%0d head_ns=%0.3f body_ns=%0.3f tail_ns=%0.3f cycle_ns=%0.3f mflit_s=%0.3f",
+          hop_kind, hop_mode, selected_out, head_ns, body_ns, tail_ns, cycle_ns, mflit_s);
+      end
     end else
       $display("PPA_RESULT FAIL failures=%0d delivered=%0d expected=%0d",
         failures, delivered, expected_total);

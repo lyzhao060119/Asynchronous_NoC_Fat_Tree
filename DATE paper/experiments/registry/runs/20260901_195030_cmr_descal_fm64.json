@@ -1,0 +1,141 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260901_195030_cmr_descal_fm64",
+  "status": "fail",
+  "design_id": "FM64",
+  "benchmark_id": null,
+  "seed": 900001,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "c6059e944c3ff0c5b14df6c8438f12d56789e1f219a9eaec88a06a3afe9f826b",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "dbe7dd51bf4f6004ad039b35fa08de959e141565af70f5b2a86b4dc89aaa4109",
+  "sdf_hash": "25e5c02477d73e34151f7da122e7f38397c9cd3e7cc28b85d3e03ad23ed999b7",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/launch_gate_b_async64.py",
+    "--design",
+    "FM64"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_DESCAL_SUBMIT_ONLY": "1",
+    "CMR_NOC64_ALLOW_V3": "1",
+    "CMR_MESH64_ALLOW_V3": "1",
+    "CMR_DES_BSUB_EXTRA": "-m \"node21 node20 node4\"",
+    "GATE_B_SMOKE": "1",
+    "NETLIST_RUN_ID": "20260901_172539_cmr_descal_fm64"
+  },
+  "lsf_jobs": [
+    "11565101",
+    "11565201",
+    "11565301",
+    "11565401"
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "summary_json": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\20260901_195030_cmr_descal_fm64\\summary.json",
+    "netlist_run_id": "20260901_172539_cmr_descal_fm64",
+    "skip_dc": true,
+    "sdf_cases": {
+      "directed": {
+        "job_id": "11565101",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": true,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": true,
+        "timing_violation_count": 0,
+        "first_failure": "TB_UNEXPECTED_FAIL t=73376000 unexpected=1 out_req=1010000100000000000000000000000000000000000000000000000010000001 out_ack=1010000100000000000000000000000000000000000000000000000010000001 out_data=0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000051051200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "result_line": null,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "KEY-64_n64_s900001_zero_FM64_top0"
+      },
+      "zero": {
+        "job_id": "11565201",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": true,
+        "hard_timeout": false,
+        "fatal_failure": true,
+        "timing_violation_count": 0,
+        "first_failure": "TB_STALL_FAIL t=108210000 idle_ns=50497.902 input_done=1111111111111111111111111111111111111111111111111111111111111111 rx=59 expected=60 tb_in_req=0000000000011100101001000100000000001000000000000000010010000000 tb_in_ack=0000000000011100101001000100000000001000000000000000010010000000 in_req=0000000000011100101001000100000000001000000000000000010010000000 in_ack=0000000000011100101001000100000000001000000000000000010010000000 out_req=0100010101100000100000000000100000000100000001000000100000100000 out_ack=0100010101100000100000000000100000000100000001000000100000100000 active0=-1",
+        "result_line": null,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_zero_FM64_top0"
+      },
+      "medium": {
+        "job_id": "11565301",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": true,
+        "hard_timeout": false,
+        "fatal_failure": true,
+        "timing_violation_count": 0,
+        "first_failure": "TB_STALL_FAIL t=55210000 idle_ns=50498.252 input_done=1111111111111111111111111111111111111111111111111111111111111111 rx=59 expected=60 tb_in_req=0000000000011100101001000100000000001000000000000000010010000000 tb_in_ack=0000000000011100101001000100000000001000000000000000010010000000 in_req=0000000000011100101001000100000000001000000000000000010010000000 in_ack=0000000000011100101001000100000000001000000000000000010010000000 out_req=0100010101100000100000000000100000000100000001000000100000100000 out_ack=0100010101100000100000000000100000000100000001000000100000100000 active0=-1",
+        "result_line": null,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_r0p10_FM64_top0"
+      },
+      "near-sat": {
+        "job_id": "11565401",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": true,
+        "hard_timeout": false,
+        "fatal_failure": true,
+        "timing_violation_count": 0,
+        "first_failure": "TB_STALL_FAIL t=51210000 idle_ns=50297.007 input_done=1111111111111111111111111111111111111111111111111111111111111111 rx=59 expected=60 tb_in_req=0000000000011100101001000100000000001000000000000000010010000000 tb_in_ack=0000000000011100101001000100000000001000000000000000010010000000 in_req=0000000000011100101001000100000000001000000000000000010010000000 in_ack=0000000000011100101001000100000000001000000000000000010010000000 out_req=0100010101100000100000000000100000000100000001000000100000100000 out_ack=0100010101100000100000000000100000000100000001000000100000100000 active0=-1",
+        "result_line": null,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_r0p30_FM64_top0"
+      }
+    },
+    "case_hashes": {
+      "KEY-64_n64_s900001_zero_FM64_top0": "baea87c8bf1307081a4ef56469f03350ce21980b597aafbd2e2b6a161c0e69bc",
+      "TOPO-UR_n64_s900001_zero_FM64_top0": "cddc183f594bada7cddc96c6ef28b60319363ded58d4b23f067a34b0f5c9026a",
+      "TOPO-UR_n64_s900001_r0p10_FM64_top0": "578e0d249bb34d21ac38975b3c7702370245ed37c9c99341325f036ba19e6ba7",
+      "TOPO-UR_n64_s900001_r0p30_FM64_top0": "75bd2bc2a894631062f7426f1f64503f7cb3f4df20fa98c752efe2e2fd615936"
+    },
+    "traffic": "KEY-64 directed + TOPO-UR smoke zero/0.10/0.30 seed 900001 5-flit",
+    "paper_matrix_allowed": false
+  },
+  "cases": [],
+  "created_utc": "2026-09-01T12:05:40+00:00",
+  "updated_utc": "2026-09-01T12:05:40+00:00",
+  "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260901_172539 DEL050 (not frozen 20260831 mesh). SDF annotate OK, 0 timing violations. Directed TB_UNEXPECTED_FAIL; TOPO-UR cases TB_STALL_FAIL at ~50us with rx=59 expected=60. Kept as fail. Not paper numbers. Do not use DES Tmax."
+}

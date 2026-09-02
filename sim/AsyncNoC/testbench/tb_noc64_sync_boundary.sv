@@ -1,7 +1,8 @@
 `timescale 1ns/1ps
 
 // Clocked valid/ready 64-core quadtree boundary.
-// Same .case format as tb_noc64_async_boundary; handshake is valid/ready.
+// Same DATE V3 .case format as tb_noc64_async_boundary; handshake is valid/ready.
+// Tmax uses source header injection (`head_inject_req_ps`), not per-packet max latency.
 // TOP_LANES=1 Thin (1,1); TOP_LANES=2 Fat 1-2-2-2 (`CMR_SYNC64_TOP2).
 // Closed-loop is MAXIMUM SDF.
 module noc64_sync_boundary_core #(
@@ -80,7 +81,7 @@ module noc64_sync_boundary_core #(
   integer inject_max_rate;
   real clock_period_ns, case_tick_ns, rx_capture_ns, timeout_scale;
   real case_epoch_ns, timeout_ns, drain_ns;
-  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file;
+  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, v3_metrics_file;
   reg [STR_CHARS*8-1:0] case_name, case_group;
   reg [2047:0] dump_vcd;
 
@@ -112,9 +113,13 @@ module noc64_sync_boundary_core #(
   reg rx_match [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   integer last_egress_ps [0:NUM_PORTS-1];
   integer packet_head_ack_ps [0:MAX_PKT_SEQ-1];
+  integer packet_head_req_ps [0:MAX_PKT_SEQ-1];
+  integer packet_event_id [0:MAX_PKT_SEQ-1];
   integer unexpected_flits, missing_flits, injected_flits, delivered_flits;
   integer delivered_packets, latency_count;
   integer latency_ps [0:MAX_EXPECT_FLITS-1];
+  integer warmup_events, measurement_events;
+  reg write_v3_metrics;
   event rx_activity;
 
   function integer now_ps;
@@ -151,12 +156,17 @@ module noc64_sync_boundary_core #(
     begin
       input_count = 0; expected_count = 0;
       reset_cycles = 32; timeout_cycles = 5000000;
+      warmup_events = 0; measurement_events = 0;
       case_name = ""; case_group = "";
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
         expected_port_count[p] = 0; expected_cursor[p] = 0; rx_count[p] = 0;
         last_egress_ps[p] = -1; active_input[p] = -1;
       end
-      for (idx = 0; idx < MAX_PKT_SEQ; idx = idx + 1) packet_head_ack_ps[idx] = -1;
+      for (idx = 0; idx < MAX_PKT_SEQ; idx = idx + 1) begin
+        packet_head_ack_ps[idx] = -1;
+        packet_head_req_ps[idx] = -1;
+        packet_event_id[idx] = -1;
+      end
       fd = $fopen(case_file, "r");
       if (fd == 0) begin $display("TB_FATAL cannot open CASE_FILE=%0s", case_file); $finish; end
       line_no = 0;
@@ -169,7 +179,17 @@ module noc64_sync_boundary_core #(
             else if (tag == "group") n = $sscanf(line, "%s %s", tag, case_group);
             else if (tag == "reset_cycles") n = $sscanf(line, "%s %d", tag, reset_cycles);
             else if (tag == "timeout_cycles") n = $sscanf(line, "%s %d", tag, timeout_cycles);
-            else if (tag == "input") begin
+            else if (tag == "meta") begin
+              n = $sscanf(line, "%s %s %d", tag, word, cyc);
+              if (word == "warmup_original_events") warmup_events = cyc;
+              else if (word == "measurement_original_events") measurement_events = cyc;
+            end else if (tag == "event_map") begin
+              n = $sscanf(line, "%s %d %d", tag, pkt, cyc);
+              if (n != 3 || pkt < 0 || pkt >= MAX_PKT_SEQ) begin
+                $display("TB_FATAL malformed event_map at line %0d", line_no); $finish;
+              end
+              packet_event_id[pkt] = cyc;
+            end else if (tag == "input") begin
               n = $sscanf(line, "%s %d %d %d %h", tag, cyc, p, pkt, flit);
               if (n != 5 || p < 0 || p >= NUM_PORTS || input_count >= MAX_INPUT_FLITS) begin
                 $display("TB_FATAL malformed input at line %0d", line_no); $finish;
@@ -225,8 +245,10 @@ module noc64_sync_boundary_core #(
         while (!(tb_in_ready[port] === 1'b1)) @(posedge clock);
         input_ack_ps[i] = now_ps();
         input_accepted[i] = 1'b1;
-        if (input_flit[i][27] && input_pkt_seq[i] >= 0 && input_pkt_seq[i] < MAX_PKT_SEQ)
+        if (input_flit[i][27] && input_pkt_seq[i] >= 0 && input_pkt_seq[i] < MAX_PKT_SEQ) begin
+          packet_head_req_ps[input_pkt_seq[i]] = input_req_ps[i];
           packet_head_ack_ps[input_pkt_seq[i]] = input_ack_ps[i];
+        end
         tb_in_valid[port] <= 1'b0;
         active_input[port] = -1;
       end
@@ -260,7 +282,7 @@ module noc64_sync_boundary_core #(
   endtask
 
   task automatic write_results;
-    integer p, s, i, j, tmp, fd_summary, fd_events, fd_latency;
+    integer p, s, i, j, tmp, fd_summary, fd_events, fd_latency, fd_v3;
     integer lat_sum, max_lat, p95_lat, p99_lat, rank95, rank99, packet, lat, injected_packets;
     real avg_lat_ns, elapsed_ns, throughput;
     reg pass_ok;
@@ -312,12 +334,23 @@ module noc64_sync_boundary_core #(
       $fclose(fd_events);
 
       fd_latency = $fopen(latency_csv_file, "w");
-      $fwrite(fd_latency, "port,pkt_seq,tail_flit,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,network_latency_ns\n");
+      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,per_dest_latency_ns,tmax_component_ns\n");
       for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s] && expected_is_tail[rx_expected_index[p][s]]) begin
         i = rx_expected_index[p][s]; packet = expected_pkt_seq[i];
-        $fwrite(fd_latency, "%0d,%0d,%h,%0d,%0d,%0d,%f\n", p, packet, rx_flit[p][s], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0);
+        $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0, (rx_egress_ps[p][s]-packet_head_req_ps[packet])/1000.0);
       end
       $fclose(fd_latency);
+      if (write_v3_metrics) begin
+        fd_v3 = $fopen(v3_metrics_file, "w");
+        $fwrite(fd_v3, "drainable,timeout,missing_flits,unexpected_flits,injected_flits,delivered_flits,inflight_end,warmup_original_events,measurement_original_events,errors,backlog_growth,pass_fail\n");
+        $fwrite(fd_v3, "%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0s\n",
+                pass_ok, timed_out, missing_flits, unexpected_flits, injected_flits, delivered_flits,
+                missing_flits, warmup_events, measurement_events,
+                missing_flits + unexpected_flits + timed_out,
+                timed_out && (missing_flits > 0),
+                pass_ok ? "PASS" : "FAIL");
+        $fclose(fd_v3);
+      end
       $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d inject_max_rate=%0d elapsed_ns=%0.3f flits_per_ns=%0.6f", pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, inject_max_rate, elapsed_ns, elapsed_ns > 0.0 ? (delivered_flits / elapsed_ns) : 0.0);
       finish_requested = 1'b1;
       #1 $finish;
@@ -357,12 +390,14 @@ module noc64_sync_boundary_core #(
 
   initial begin
     case_file = ""; csv_file = "sync_noc64_summary.csv"; event_csv_file = "sync_noc64_events.csv"; latency_csv_file = "sync_noc64_latency.csv";
+    v3_metrics_file = ""; write_v3_metrics = 1'b0;
     case_tick_ns = 20.0; rx_capture_ns = 0.0;
     timeout_scale = 1.0; inject_max_rate = 0;
     if ($value$plusargs("CASE_FILE=%s", case_file)) ;
     if ($value$plusargs("RESULT_CSV=%s", csv_file)) ;
     if ($value$plusargs("EVENT_CSV=%s", event_csv_file)) ;
     if ($value$plusargs("LATENCY_CSV=%s", latency_csv_file)) ;
+    if ($value$plusargs("V3_METRICS_CSV=%s", v3_metrics_file)) write_v3_metrics = 1'b1;
     if ($value$plusargs("CLOCK_PERIOD_NS=%f", clock_period_ns)) ;
     if ($value$plusargs("CASE_TICK_NS=%f", case_tick_ns)) ;
     if ($value$plusargs("RX_CAPTURE_NS=%f", rx_capture_ns)) ;

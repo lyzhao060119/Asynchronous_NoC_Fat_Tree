@@ -80,13 +80,15 @@ class RouteComputationLogic(
     routerLevel: Int,
     ingressPort: Int,
     useMeshRouting: Boolean = false,
-    meshGridSize: Int = 8
+    meshGridSize: Int = 8,
+    meshCoordShift: Int = 0
 ) extends Module {
   require(routerLevel >= 1 && routerLevel <= 3)
   require(ingressPort >= 0 && ingressPort < config.totalPorts)
   if (useMeshRouting) {
     require(routerLevel == 1)
     require(meshGridSize >= 2 && meshGridSize <= 64)
+    require(meshCoordShift >= 0 && meshCoordShift <= 5)
     require(xCoordinate >= 0 && xCoordinate < meshGridSize)
     require(yCoordinate >= 0 && yCoordinate < meshGridSize)
   }
@@ -108,7 +110,7 @@ class RouteComputationLogic(
   val destX1 = io.dest(PacketLayout.X1Hi - PacketLayout.X0Lo, PacketLayout.X1Lo - PacketLayout.X0Lo)
   val destY1 = io.dest(PacketLayout.Y1Hi - PacketLayout.X0Lo, PacketLayout.Y1Lo - PacketLayout.X0Lo)
   val RouteMask = if (useMeshRouting) {
-    new RoutingLogic_mesh(xCoordinate, yCoordinate, meshGridSize).routeMask(
+    new RoutingLogic_mesh(xCoordinate, yCoordinate, meshGridSize, meshCoordShift).routeMask(
       destX0,
       destY0,
       destX1,
@@ -179,7 +181,8 @@ class RCU(
     routerLevel: Int,
     ingressPort: Int,
     useMeshRouting: Boolean = false,
-    meshGridSize: Int = 8
+    meshGridSize: Int = 8,
+    meshCoordShift: Int = 0
 ) extends Module {
   override def desiredName: String = "RCU"
   require(CMRParameters.SupportedLaneGeometries.contains(
@@ -207,7 +210,7 @@ class RCU(
 
   private val RouteComputation = Module(new RouteComputationLogic(
     config, xCoordinate, yCoordinate, routerLevel, ingressPort,
-    useMeshRouting, meshGridSize
+    useMeshRouting, meshGridSize, meshCoordShift
   ))
   RouteComputation.io.dest := AddressRegister.io.dest
   RouteComputation.io.Req_rc := AddressRegister.io.Req_rc

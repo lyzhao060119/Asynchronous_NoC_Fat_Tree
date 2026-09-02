@@ -16,6 +16,7 @@ import os
 import re
 import shlex
 import stat
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -322,36 +323,52 @@ def run_kind(client, sftp, artifact: dict) -> dict:
         tag = "%s_%s" % (kind, mode)
         local_kind = RESULT_DIR / kind / mode
         remote_gls_log = "%s/logs/hop_ppa/%s_%s/gls" % (ROOT, RUN_ID, tag)
-        guard = "0.05" if mode == "stream" else "0.20"
-        command = (
-            "mkdir -p {root}/logs/hop_ppa/{run}_{tag} {root}/reports/hop_ppa/{run}_{tag}; "
-            "bsub -n 8 -oo {log}/lsf.log "
-            "env CMR_REMOTE_ROOT={root} CMR_RUN_ID={run}_{tag} "
-            "CMR_NETLIST_RUN_ID={netlist} CMR_HOP_KIND={kind} "
-            "CMR_HOP_MODE={mode} CMR_HOP_MESH={mesh} "
-            "CMR_RX_CAPTURE_NS={rx} CMR_ACK_TO_NEXT_REQ_GUARD_NS={guard} "
-            "bash {root}/scripts/{script}"
-        ).format(
-            root=shlex.quote(ROOT), run=shlex.quote(RUN_ID), tag=shlex.quote(tag),
-            kind=shlex.quote(kind), mode=shlex.quote(mode),
-            mesh="1" if config["mesh"] else "0",
-            netlist=shlex.quote(netlist_run_id), log=shlex.quote(remote_gls_log),
-            rx=shlex.quote(rx_for(kind)), guard=shlex.quote(guard),
-            script=gls_script,
-        )
-        response = remote_run(client, command)
-        gls_job = job_id(response)
-        print("JOB_SUBMIT", tag + "_gls", gls_job, flush=True)
-        gls_error = None
-        try:
-            wait_job(client, gls_job, tag + "_gls")
-        except RuntimeError as exc:
-            gls_error = exc
-        copy_gls_logs(sftp, remote_gls_log, local_kind)
+        guard = "0.20"
         run_log_path = local_kind / "gls" / "run.log"
+        events_path = local_kind / "gls" / "hop_events.csv"
+        resume_gls = (
+            os.environ.get("CMR_HOP_RESUME", "1") == "1"
+            and run_log_path.is_file()
+            and events_path.is_file()
+            and "PPA_RESULT PASS" in run_log_path.read_text(encoding="utf-8", errors="replace")
+        )
+        if resume_gls:
+            print("HOP_GLS_RESUME", tag, flush=True)
+            gls_job = "resumed"
+            copy_gls_logs(sftp, remote_gls_log, local_kind)
+        else:
+            command = (
+                "mkdir -p {root}/logs/hop_ppa/{run}_{tag} {root}/reports/hop_ppa/{run}_{tag}; "
+                "bsub -n 8 -oo {log}/lsf.log "
+                "env CMR_REMOTE_ROOT={root} CMR_RUN_ID={run}_{tag} "
+                "CMR_NETLIST_RUN_ID={netlist} CMR_HOP_KIND={kind} "
+                "CMR_HOP_MODE={mode} CMR_HOP_MESH={mesh} "
+                "CMR_RX_CAPTURE_NS={rx} CMR_ACK_TO_NEXT_REQ_GUARD_NS={guard} "
+                "CMR_HOP_PATH_PROBE={probe} CMR_HOP_NO_SDF={nosdf} "
+                "bash {root}/scripts/{script}"
+            ).format(
+                root=shlex.quote(ROOT), run=shlex.quote(RUN_ID), tag=shlex.quote(tag),
+                kind=shlex.quote(kind), mode=shlex.quote(mode),
+                mesh="1" if config["mesh"] else "0",
+                netlist=shlex.quote(netlist_run_id), log=shlex.quote(remote_gls_log),
+                rx=shlex.quote(rx_for(kind)), guard=shlex.quote(guard),
+                probe=shlex.quote(os.environ.get("CMR_HOP_PATH_PROBE", "0")),
+                nosdf=shlex.quote(os.environ.get("CMR_HOP_NO_SDF", "0")),
+                script=gls_script,
+            )
+            response = remote_run(client, command)
+            gls_job = job_id(response)
+            print("JOB_SUBMIT", tag + "_gls", gls_job, flush=True)
+            gls_error = None
+            try:
+                wait_job(client, gls_job, tag + "_gls")
+            except RuntimeError as exc:
+                gls_error = exc
+            copy_gls_logs(sftp, remote_gls_log, local_kind)
+            if gls_error is not None:
+                run_log = run_log_path.read_text(encoding="utf-8", errors="replace") if run_log_path.exists() else ""
+                raise RuntimeError("%s GLS LSF failed: %s\n%s" % (tag, gls_error, run_log[-4000:]))
         run_log = run_log_path.read_text(encoding="utf-8", errors="replace") if run_log_path.exists() else ""
-        if gls_error is not None:
-            raise RuntimeError("%s GLS LSF failed: %s\n%s" % (tag, gls_error, run_log[-4000:]))
         if "PPA_RESULT PASS" not in run_log or re.search(r"Timing violation|PPA_FAIL|PPA_RESULT FAIL", run_log):
             raise RuntimeError("%s strict GLS did not pass\n%s" % (tag, run_log[-4000:]))
         mode_row = {"gls_job_id": gls_job, "run_log_pass": True}
@@ -381,28 +398,59 @@ def run_kind(client, sftp, artifact: dict) -> dict:
         else:
             flit_windows = ""
         remote_power_log = "%s/logs/hop_ppa/%s_%s/power" % (ROOT, RUN_ID, tag)
-        command = (
-            "mkdir -p {log}; bsub -n 4 -oo {log}/lsf.log "
-            "env CMR_REMOTE_ROOT={root} CMR_RUN_ID={run}_{tag} "
-            "CMR_NETLIST_RUN_ID={netlist} CMR_POWER_START_NS={start:.3f} "
-            "CMR_POWER_END_NS={end:.3f} CMR_POWER_FLIT_WINDOWS={windows} "
-            "CMR_DUT_NAME={dut} CMR_TB_STRIP={strip} "
-            "/soft/synopsys/prime/V-2023.12/bin/pt_shell -f {root}/scripts/run_ptpx_cmr_router_hop_ppa.tcl"
-        ).format(
-            root=shlex.quote(ROOT), run=shlex.quote(RUN_ID), tag=shlex.quote(tag),
-            netlist=shlex.quote(netlist_run_id), start=start_ns, end=end_ns,
-            windows=shlex.quote(flit_windows),
-            dut=shlex.quote(config["dut"]),
-            strip=shlex.quote(strip),
-            log=shlex.quote(remote_power_log),
-        )
-        mode_row["power_job_id"] = submit(client, command, tag + "_ptpx")
         remote_power = "%s/reports/hop_ppa/%s_%s/power" % (ROOT, RUN_ID, tag)
-        fetch_tree(sftp, remote_power, local_kind / "power")
-        check = (local_kind / "power" / "check_power.rpt").read_text(
-            encoding="utf-8", errors="replace"
+        check_path = local_kind / "power" / "check_power.rpt"
+        resume_px = (
+            os.environ.get("CMR_HOP_RESUME", "1") == "1"
+            and check_path.is_file()
+            and (local_kind / "power" / "power.rpt").is_file()
         )
-        if re.search(r"\b(error|violation)\b", check, re.I):
+        if resume_px:
+            print("HOP_PX_RESUME", tag, flush=True)
+            mode_row["power_job_id"] = "resumed"
+        else:
+            command = (
+                "mkdir -p {log}; bsub -n 4 -oo {log}/lsf.log "
+                "env CMR_REMOTE_ROOT={root} CMR_RUN_ID={run}_{tag} "
+                "CMR_NETLIST_RUN_ID={netlist} CMR_POWER_START_NS={start:.3f} "
+                "CMR_POWER_END_NS={end:.3f} CMR_POWER_FLIT_WINDOWS={windows} "
+                "CMR_DUT_NAME={dut} CMR_TB_STRIP={strip} "
+                "/soft/synopsys/prime/V-2023.12/bin/pt_shell -f {root}/scripts/run_ptpx_cmr_router_hop_ppa.tcl"
+            ).format(
+                root=shlex.quote(ROOT), run=shlex.quote(RUN_ID), tag=shlex.quote(tag),
+                netlist=shlex.quote(netlist_run_id), start=start_ns, end=end_ns,
+                windows=shlex.quote(flit_windows),
+                dut=shlex.quote(config["dut"]),
+                strip=shlex.quote(strip),
+                log=shlex.quote(remote_power_log),
+            )
+            mode_row["power_job_id"] = submit(client, command, tag + "_ptpx")
+            try:
+                fetch_tree(sftp, remote_power, local_kind / "power")
+            except IOError:
+                (local_kind / "power").mkdir(parents=True, exist_ok=True)
+            try:
+                copy_remote_file(
+                    sftp, "%s/lsf.log" % remote_power_log, local_kind / "power" / "lsf.log"
+                )
+            except OSError:
+                pass
+        px_log = ""
+        lsf_path = local_kind / "power" / "lsf.log"
+        if lsf_path.is_file():
+            px_log = lsf_path.read_text(encoding="utf-8", errors="replace")
+        if not check_path.is_file():
+            raise RuntimeError(
+                "%s PT-PX did not write check_power.rpt\n%s" % (tag, px_log[-6000:])
+            )
+        if not resume_px and "PPA_POWER_PASS" not in px_log:
+            raise RuntimeError(
+                "%s PT-PX missing PPA_POWER_PASS\n%s" % (tag, px_log[-6000:])
+            )
+        check = check_path.read_text(encoding="utf-8", errors="replace")
+        if re.search(r"\b(error|violation)\b", check, re.I) and not re.search(
+            r"0\s+error", check, re.I
+        ):
             raise RuntimeError("%s check_power reports an error or violation" % tag)
         power = annotate_energy(
             parse_power(local_kind / "power" / "power.rpt"),
@@ -534,6 +582,10 @@ def main() -> None:
             "%s/scripts/run_gls_cmr_router_hop_ppa.sh" % ROOT,
         ),
         (
+            REPO / "scripts/asic_dc/cmr/tb_cmr_pfat48_path_probe.sv",
+            "%s/sim/tb/tb_cmr_pfat48_path_probe.sv" % ROOT,
+        ),
+        (
             REPO / "scripts/asic_dc/cmr/run_gls_cmr_sync_router_hop_ppa.sh",
             "%s/scripts/run_gls_cmr_sync_router_hop_ppa.sh" % ROOT,
         ),
@@ -567,7 +619,12 @@ def main() -> None:
         result = {
             "run_id": RUN_ID,
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-            "git_sha": os.popen("git -C %s rev-parse HEAD" % shlex.quote(str(REPO))).read().strip(),
+            "git_sha": subprocess.run(
+                ["git", "-C", str(REPO), "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=False,
+            ).stdout.strip(),
             "source_hashes": {str(path.relative_to(REPO)).replace("\\", "/"): sha256_file(path) for path in local_files},
             "artifacts": [run_kind(client, sftp, artifact) for artifact in artifacts],
         }

@@ -45,8 +45,16 @@
   ],
   "expected_structure": {
     "routers": 352,
+    "ports": 2496,
+    "adapters": 4864,
     "interlevel_fifos": 0,
-    "max_opm_fanin": 8
+    "max_opm_fanin": 8,
+    "mutex_widths": [
+      2,
+      4,
+      5,
+      8
+    ]
   },
   "flit_width_bits": 28,
   "buffer_slots": 5,
@@ -63,8 +71,11 @@
   "clock_ns": null,
   "hrep_policy": true,
   "shares_netlist_with": "PROP1024",
+  "paired_trace_with": null,
   "adapter": null,
-  "paper_role": "Fig. C cross-tier replication ablation; same netlist as PROP1024",
+  "paper_role": "Boundary packet-replication comparison; shares the 1024-node hierarchical netlist",
   "paper_eligible_default": true,
-  "notes": ""
+  "notes": "",
+  "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, boundary packet-replication comparison",
+  "display_description": "Same gate netlist and delay file as the 1024-node balanced hierarchical network. Only the injection policy splits a cross-cluster multicast into unicast copies."
 }

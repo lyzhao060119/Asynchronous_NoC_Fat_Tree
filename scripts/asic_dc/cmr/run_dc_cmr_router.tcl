@@ -46,6 +46,10 @@ if {[info exists ::env(CMR_LANE01_BUF_STAGES)] && $::env(CMR_LANE01_BUF_STAGES) 
   set lane01_stages $::env(CMR_LANE01_BUF_STAGES)
 }
 set expected_adapters [expr {[info exists ::env(CMR_EXPECTED_ADAPTERS)] ? $::env(CMR_EXPECTED_ADAPTERS) : 0}]
+set expected_ackout_close 0
+if {[info exists ::env(CMR_EXPECTED_ACKOUT_CLOSE_DELAY)] && $::env(CMR_EXPECTED_ACKOUT_CLOSE_DELAY) ne ""} {
+  set expected_ackout_close $::env(CMR_EXPECTED_ACKOUT_CLOSE_DELAY)
+}
 if {$rcu_steps == 0 && $buf_stages > 0} {
   puts "CMR_DC_FAIL rcu_buf_without_matched_delay steps=$rcu_steps buf=$buf_stages"
   exit 2
@@ -280,6 +284,18 @@ source "$RTL_DIR/async_primitives.tcl"
 
 set_ungroup [get_designs *] false
 set_boundary_optimization [get_designs *] false
+if {[info exists ::env(CMR_DONT_TOUCH_ADAPTERS)] && $::env(CMR_DONT_TOUCH_ADAPTERS) eq "1"} {
+  set adapter_ds [get_designs -quiet LanePhaseAdapter*]
+  if {[sizeof_collection $adapter_ds] > 0} {
+    set_dont_touch $adapter_ds true
+    puts "INFO: set_dont_touch on [sizeof_collection $adapter_ds] LanePhaseAdapter designs"
+  }
+  set mutex_ds [get_designs -quiet {CMRMutexN* CMRFlatArbiter* CMRTAC*}]
+  if {[sizeof_collection $mutex_ds] > 0} {
+    set_dont_touch $mutex_ds true
+    puts "INFO: set_dont_touch on [sizeof_collection $mutex_ds] CMR mutex/TAC designs"
+  }
+}
 set_critical_range 0.05 [current_design]
 
 if {$seed_run ne ""} {
@@ -383,6 +399,8 @@ if {$ackin_use_buf} {
   set ackin_delayed [sizeof_collection [get_cells -hierarchical -quiet -filter "ref_name =~ $ackin_glob && full_name =~ *AckinDelay*"]]
 }
 set matched_buf [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *rcu_matched_buf_s*}]]
+set ackout_close_glob [cmr_router_matched_leaf_glob $opm_ackin_unit_ps]
+set ackout_close_delay [sizeof_collection [get_cells -hierarchical -quiet -filter "ref_name =~ $ackout_close_glob && full_name =~ *AckoutCloseDelay*"]]
 set adapter_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ LanePhaseAdapter*}]]
 set acklatch_e_count [sizeof_collection [cmr_router_acklatch_e_pins]]
 set lane01_buf [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *lane01_acklatch_e_buf_s*}]]
@@ -414,12 +432,13 @@ puts $structure_fd "OPM_ACKIN_DELAY_UNIT_PS=$opm_ackin_unit_ps"
 puts $structure_fd "OPM_ACKIN_DELAY_STEPS=$opm_ackin_steps"
 puts $structure_fd "OPM_ACKIN_USE_BUF=$ackin_use_buf"
 puts $structure_fd "OPM_ACKIN_DEL_COUNT=$ackin_del"
+puts $structure_fd "OPM_ACKOUT_CLOSE_DELAY_COUNT=$ackout_close_delay"
 puts $structure_fd "RCU_MATCHED_BUF_COUNT=$matched_buf"
 puts $structure_fd "RCU_MATCHED_BUF_STAGES=$buf_stages"
 puts $structure_fd "RCU_MATCHED_DELAY_UNIT_PS=$rcu_unit_ps"
 puts $structure_fd "RCU_MATCHED_DELAY_STEPS=$rcu_steps"
 close $structure_fd
-puts "CMR_STRUCTURE IPM=$ipm_count OPM=$opm_count MUTEX4=$mutex4_count MUTEX2=$mutex2_count ADAPTER=$adapter_count ACKLATCH_E=$acklatch_e_count LANE01_BUF=$lane01_buf stages=$lane01_stages RESET_LATCH=$reset_latch_count SET_RESET_LATCH=$set_reset_latch_count SR_LATCH=$sr_latch_count CLOSE_EVENT=$close_event_count COMPLETE=$handshake_complete_count DEL050=$del050_rcu DEL075=$del075_rcu DEL100=$del100_rcu DEL150=$del150_rcu ACKIN_DELAY=$ackin_delayed ACKIN_UNIT=$opm_ackin_unit_ps ACKIN_STEPS=$opm_ackin_steps ACKIN_BUF=$ackin_use_buf ACKIN_DEL=$ackin_del BUF=$matched_buf stages=$buf_stages"
+puts "CMR_STRUCTURE IPM=$ipm_count OPM=$opm_count MUTEX4=$mutex4_count MUTEX2=$mutex2_count ADAPTER=$adapter_count ACKLATCH_E=$acklatch_e_count LANE01_BUF=$lane01_buf stages=$lane01_stages RESET_LATCH=$reset_latch_count SET_RESET_LATCH=$set_reset_latch_count SR_LATCH=$sr_latch_count CLOSE_EVENT=$close_event_count COMPLETE=$handshake_complete_count DEL050=$del050_rcu DEL075=$del075_rcu DEL100=$del100_rcu DEL150=$del150_rcu ACKIN_DELAY=$ackin_delayed ACKIN_UNIT=$opm_ackin_unit_ps ACKIN_STEPS=$opm_ackin_steps ACKIN_BUF=$ackin_use_buf ACKIN_DEL=$ackin_del ACKOUT_CLOSE=$ackout_close_delay BUF=$matched_buf stages=$buf_stages"
 
 if {$n_gtech > 0 || $n_unmapped > 0} {
   puts "CMR_DC_FAIL unmapped gtech=$n_gtech generic=$n_unmapped"
@@ -492,6 +511,10 @@ if {$matched_buf != $expected_buf} {
 }
 if {$expected_adapters > 0 && $acklatch_e_count != $expected_adapters} {
   puts "CMR_DC_FAIL acklatch_e_count actual=$acklatch_e_count expected=$expected_adapters"
+  exit 2
+}
+if {$ackout_close_delay != $expected_ackout_close} {
+  puts "CMR_DC_FAIL opm_ackout_close_delay actual=$ackout_close_delay expected=$expected_ackout_close"
   exit 2
 }
 set expected_lane01_buf [expr {$expected_adapters * $lane01_stages}]

@@ -1495,9 +1495,11 @@ Not this recipe (archive only; not Fat vs Thin delay numbers):
 - Fat hop `20260830_cmr_fat_l1_hop` (Ackin DEL250)
 - Fat NoC16 `20260829_cmr_ft_noc16_lane01_0` (Ackin 250)
 - Fat NoC64 `20260830_095259_cmr_noc64_p50_1222` (network SDF PASS, Ackin DEL250)
-- Clocked SyncNoC64 1.0 ns Thin `20260831_014622_cmr_sync_noc64_thin_p50` and
-  Fat 1-2-2-2 `20260831_084457_cmr_sync_noc64_fat1222_p50`.  Valid/ready global
-  clock, ZeroWireload.  See [`CMR_Sync64_Clock_Freeze.md`](CMR_Sync64_Clock_Freeze.md).
-  Not hop Head.
+- Clocked SyncNoC64 1.0 ns (not hop Head). Phase 2 archive 2/3-cycle Head:
+  Thin `20260831_014622_cmr_sync_noc64_thin_p50`, Fat
+  `20260831_084457_cmr_sync_noc64_fat1222_p50`. Phase 2.5 paper 1-cycle Head:
+  Thin `20260901_cmr_sync_noc64_thin_p50`, Fat
+  `20260901_cmr_sync_noc64_fat1222_p50`. Valid/ready global clock,
+  ZeroWireload. See [`CMR_Sync64_Clock_Freeze.md`](CMR_Sync64_Clock_Freeze.md).
 
 DC/GLS launchers refuse those frozen run IDs unless `CMR_FORCE_OVERWRITE_FROZEN=1`.

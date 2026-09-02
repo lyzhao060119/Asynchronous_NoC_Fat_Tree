@@ -78,7 +78,7 @@ object NoCScaleConfig {
   )
 
   /** Thin (1,1) at L1/L2/L3: one child lane, one parent lane, one top port.
-    * Sync 64-core counterpart only; async Fat stays on FatLane1222/1248.
+    * Async THIN64 and the Sync 64-core counterpart share this geometry.
     */
   val ThinLane111: NoCRouterChannelConfig = NoCRouterChannelConfig(
     l1ChildLanes = 1,
@@ -115,6 +115,35 @@ object NoCScaleConfig {
 
   /** One 64-core Thin quadtree: 16 L1 + 4 L2 + 1 L3, all (1,1). */
   def thinTree64: NoCScaleConfig = NoCScaleConfig(1, 1, ThinLane111)
+
+  /** Q64 tile for DATE V3 network DUTs.  `CMR_Q64_PROFILE=thin|1222|1248`
+    * selects the tree; omitted falls back to `CMR_FAT_LANE_PROFILE`.
+    */
+  def q64TreeFromEnv: NoCScaleConfig = {
+    sys.env.get("CMR_Q64_PROFILE").map(_.trim.toLowerCase.replace("-", "").replace("_", "")) match {
+      case Some("thin") | Some("1111") | Some("thin111") => thinTree64
+      case Some("1248") | Some("pfat") | Some("fatlane1248") =>
+        NoCScaleConfig(1, 1, FatLane1248)
+      case Some("1222") | Some("prop") | Some("fatlane1222") =>
+        NoCScaleConfig(1, 1, FatLane1222)
+      case Some(other) =>
+        throw new IllegalArgumentException(
+          s"Unknown CMR_Q64_PROFILE='$other'. Supported: thin, 1222, 1248."
+        )
+      case None => fatTree64
+    }
+  }
+
+  /** PROP 256/1024 cluster grid: `grid` Q64 tiles on a side, Mesh1/2 top. */
+  def propClustered(clusterGrid: Int, meshLanes: Int = 2): NoCScaleConfig = {
+    require(Set(2, 4).contains(clusterGrid), s"PROP cluster grid must be 2 or 4, got $clusterGrid")
+    require(Set(1, 2).contains(meshLanes),
+      s"TopMesh lanes must be 1 or 2 (Mesh4 needs an unsupported (4,2) geometry), got $meshLanes")
+    val channels =
+      if (meshLanes == 2) FatLane1222
+      else FatLane1222.copy(topChildLanes = 1)
+    NoCScaleConfig(clusterGrid, clusterGrid, channels)
+  }
 
   /** Sync Fat 1-2-2-2 64-core tile.  Pinned so CMR_FAT_LANE_PROFILE cannot
     * silently switch this DUT to 1-2-4-8.

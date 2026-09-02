@@ -1,0 +1,90 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260901_cmr_sync_noc64_fat1222_p50",
+  "status": "pass",
+  "design_id": "SYNC_PROP_2X2",
+  "benchmark_id": null,
+  "seed": null,
+  "adapter": "dc_sync_noc64",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "b7fa96549b322aa3ca26d7c00074b27db3e204f619054feefbf4c13d2ee6c545",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "32b1ab0c59c49c49b9d019ca5b8c8f87d549777ec0ce3faa0cfad5e2cfdff002",
+  "sdf_hash": "e75fb2933c1b4a4ba54ce4dcc04b296aab3aa378c75e1b96dd41fa95455859e3",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [],
+  "env": {},
+  "lsf_jobs": [
+    "11525401",
+    "11526601",
+    "11526801"
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": true,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "local_dc": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_noc64_fat1222_p50",
+    "summary_json": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_noc64_fat1222_p50/summary.json",
+    "structure_rpt": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_noc64_fat1222_p50/reports_dc/cmr_sync_noc64_structure.rpt",
+    "clock_period_ns": "1.0",
+    "wns_ns": 3.3319e-05,
+    "cell_area_um2": 212200.125939,
+    "expected_ports": 146,
+    "expected_selectors": 264,
+    "top_lanes": 2,
+    "structure": "ROUTER_COUNT=21\nIPM_COUNT=146\nOPM_COUNT=146\nMUTEX_COUNT=0\nDELAY_CELL_COUNT=0\nADAPTER_COUNT=0\nFIFO_COUNT=0\nSELECTOR_COUNT=264\nLATCH_COUNT=0\nWNS=3.3319e-05\nWHS=0.0372301",
+    "sdf_cases": {
+      "TAB-NET-UR-3f-r0p50": {
+        "job_id": "11526601",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=23007.000 flits_per_ns=0.130395",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false
+      },
+      "VCTM-MC5-NM-3f-r0p50": {
+        "job_id": "11526801",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": "TB_RESULT PASS injected=3000 delivered=4500 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=23087.000 flits_per_ns=0.194915",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false
+      }
+    }
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T17:26:42+00:00",
+  "updated_utc": "2026-08-31T17:26:42+00:00",
+  "notes": "Phase 2.5 1-cycle Head Fat 1-2-2-2 SyncNoC64 1.0 ns DC + MAXIMUM-SDF TAB+VCTM. Structure 21/146/264. No P&R."
+}

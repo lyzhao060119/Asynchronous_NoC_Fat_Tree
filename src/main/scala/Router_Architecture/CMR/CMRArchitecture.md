@@ -409,7 +409,9 @@ post-synthesis SDF（SYNTH-CLOSED）证据，尚不替代 post-layout/PVT 签核
 
 时钟版 `SyncCmrFatTree` 与异步树同几何、层间 bypass。Thin 全 `(1,1)` 一
 条 top；Fat **1-2-2-2** 为 L1 `(1,2)`、L2/L3 `(2,2)`、两条 top。模块名都
-是 `SyncNoC_64nodes`，网表目录分开。签核时钟 **1.0 ns**（SS ZeroWireload），
-Fat 关键路径 L2 `destReg` → L1 buffer，WNS 0.083 ns，同网表下限约 0.92 ns，
-**不要改到 0.90 ns**。细节、run id 与 TAB/VCTM SDF：
+是 `SyncNoC_64nodes`，网表目录分开。签核时钟首选 **1.0 ns**（SS ZeroWireload）。
+Phase 2.5 把 isolated Head 压成 **1 拍**（组合 Grant / LaneSelect）。Fat 关键路径
+为 L2 `destReg` → Mat → LaneSelect → OPM PE → L1 buffer。**1.0 ns 已合上**
+（Thin NoC64 WNS 0.000667 ns，Fat 0.000033 ns），**不要改到 0.90 ns**。
+论文网表 `20260901_cmr_sync_noc64_{thin,fat1222}_p50`。细节与 TAB/VCTM SDF：
 [`docs/CMR_Sync64_Clock_Freeze.md`](../../../../../docs/CMR_Sync64_Clock_Freeze.md)。

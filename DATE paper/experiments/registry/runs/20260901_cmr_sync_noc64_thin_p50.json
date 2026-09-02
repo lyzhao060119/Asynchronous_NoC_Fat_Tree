@@ -1,0 +1,73 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260901_cmr_sync_noc64_thin_p50",
+  "status": "pass",
+  "design_id": "SYNC_THIN_1X1",
+  "benchmark_id": null,
+  "seed": null,
+  "adapter": "dc_sync_noc64",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "a45f3ecc4e2c59a76ade6e98f58a4cdd93ef41ac5844d8d745f8022cf20c8965",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "12e5234e60d9a879fc2600a9abdfaf2cefc509f53cfb48890c47f802655f0f94",
+  "sdf_hash": "e14c5b9c9f11dfc0825aaad1c1c7393a002c017a9bbdc097ea01eac8ecc21c3b",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [],
+  "env": {},
+  "lsf_jobs": [
+    "11525201",
+    "11526001"
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": true,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "local_dc": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_noc64_thin_p50",
+    "summary_json": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_noc64_thin_p50/summary.json",
+    "structure_rpt": "d:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260901_cmr_sync_noc64_thin_p50/reports_dc/cmr_sync_noc64_structure.rpt",
+    "clock_period_ns": "1.0",
+    "wns_ns": 0.000666916,
+    "cell_area_um2": 141222.814728,
+    "expected_ports": 105,
+    "expected_selectors": 0,
+    "top_lanes": 1,
+    "structure": "ROUTER_COUNT=21\nIPM_COUNT=105\nOPM_COUNT=105\nMUTEX_COUNT=0\nDELAY_CELL_COUNT=0\nADAPTER_COUNT=0\nFIFO_COUNT=0\nSELECTOR_COUNT=0\nLATCH_COUNT=0\nWNS=0.000666916\nWHS=0.0372301",
+    "sdf_cases": {
+      "TAB-NET-UR-3f-r0p50": {
+        "job_id": "11526001",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": "TB_RESULT PASS injected=3000 delivered=3000 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=23079.000 flits_per_ns=0.129988",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false
+      }
+    }
+  },
+  "cases": [],
+  "created_utc": "2026-08-31T17:26:42+00:00",
+  "updated_utc": "2026-08-31T17:26:42+00:00",
+  "notes": "Phase 2.5 1-cycle Head Thin SyncNoC64 1.0 ns DC + MAXIMUM-SDF TAB. Structure 21/105/0. No P&R."
+}

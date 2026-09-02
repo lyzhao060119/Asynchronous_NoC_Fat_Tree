@@ -1,0 +1,141 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260901_195030_cmr_descal_pfat64_1248",
+  "status": "fail",
+  "design_id": "PFAT64",
+  "benchmark_id": null,
+  "seed": 900001,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "5aaf9b4325b1cb3295822936f285c817a75355c12adf92b333644eac1c9ffe89",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "41b2ad04f5f21160713121230c4664564111d77a9f49afc31e939cb6bbf85b17",
+  "sdf_hash": "a20106565f9cef3aded921e4cb5cc18fc304c6cbabfc28017605f16e1891d39d",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/launch_gate_b_async64.py",
+    "--design",
+    "PFAT64"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_DESCAL_SUBMIT_ONLY": "1",
+    "CMR_NOC64_ALLOW_V3": "1",
+    "CMR_MESH64_ALLOW_V3": "1",
+    "CMR_DES_BSUB_EXTRA": "-m \"node21 node20 node4\"",
+    "GATE_B_SMOKE": "1",
+    "NETLIST_RUN_ID": "20260901_140918_cmr_descal_pfat64_1248"
+  },
+  "lsf_jobs": [
+    "11564701",
+    "11564801",
+    "11564901",
+    "11565001"
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "summary_json": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\20260901_195030_cmr_descal_pfat64_1248\\summary.json",
+    "netlist_run_id": "20260901_140918_cmr_descal_pfat64_1248",
+    "skip_dc": true,
+    "sdf_cases": {
+      "directed": {
+        "job_id": "11564701",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 39,
+        "first_failure": "\"/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140.v\", 21305: Timing violation in tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc.noc.dut.tree.routersL2_1_1.OutputPortModules_11.L1_L4_5.\\resettable_latch[0].latch_cell ",
+        "result_line": "TB_RESULT PASS injected=100 delivered=100 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=119742.618 flits_per_ns=0.000835",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "KEY-64_n64_s900001_zero_PFAT64_top8"
+      },
+      "zero": {
+        "job_id": "11564801",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 39,
+        "first_failure": "\"/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140.v\", 21305: Timing violation in tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc.noc.dut.tree.routersL2_1_1.OutputPortModules_11.L1_L4_5.\\resettable_latch[0].latch_cell ",
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=77982.625 flits_per_ns=0.000769",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_zero_PFAT64_top8"
+      },
+      "medium": {
+        "job_id": "11564901",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 39,
+        "first_failure": "\"/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140.v\", 21305: Timing violation in tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc.noc.dut.tree.routersL2_1_1.OutputPortModules_11.L1_L4_5.\\resettable_latch[0].latch_cell ",
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=24982.630 flits_per_ns=0.002402",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_r0p10_PFAT64_top8"
+      },
+      "near-sat": {
+        "job_id": "11565001",
+        "mode": "sdf",
+        "tb_pass": true,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 39,
+        "first_failure": "\"/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140.v\", 21305: Timing violation in tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc.noc.dut.tree.routersL2_1_1.OutputPortModules_11.L1_L4_5.\\resettable_latch[0].latch_cell ",
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=21182.753 flits_per_ns=0.002832",
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_r0p30_PFAT64_top8"
+      }
+    },
+    "case_hashes": {
+      "KEY-64_n64_s900001_zero_PFAT64_top8": "b8cfa3a1b13a3cdc4b5ca6550f71d73b1d6a727644d064f223c80a3f33288406",
+      "TOPO-UR_n64_s900001_zero_PFAT64_top8": "c65ade72194b4d9a3eb135d76246a44d650be7bdb1cba49fe79c5a9890eaddd4",
+      "TOPO-UR_n64_s900001_r0p10_PFAT64_top8": "3e7fc07874dd150cfedbcd2cc07fa23203fb4bbe31e632f42e27626d9266601c",
+      "TOPO-UR_n64_s900001_r0p30_PFAT64_top8": "f795d8a976a3f9615b32a2c8631e8b302395298a65ec384f162a623cfa2bca0a"
+    },
+    "traffic": "KEY-64 directed + TOPO-UR smoke zero/0.10/0.30 seed 900001 5-flit",
+    "paper_matrix_allowed": false
+  },
+  "cases": [],
+  "created_utc": "2026-09-01T12:01:10+00:00",
+  "updated_utc": "2026-09-01T12:01:10+00:00",
+  "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260901_140918 DEL050. All four 5-flit cases TB_RESULT PASS and SDF annotate errors=0, but each has 39 MAXIMUM-SDF timing violations on OPM resettable_latch. Kept as fail. Not paper numbers. Do not use DES Tmax."
+}

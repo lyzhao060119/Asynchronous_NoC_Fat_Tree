@@ -99,10 +99,23 @@ EOF
 fi
 
 cd "$WORK"
+# NFS compute nodes can lag the login-node clock; VCS/make then reports
+# clock skew and can exit non-zero after a complete simv link.
+find "$WORK" -exec touch -c {} + 2>/dev/null || true
+set +e
 # shellcheck disable=SC2086
 vcs -full64 -sverilog -timescale=1ns/1ps $TIMING_ARGS $TB_DEFINE -f filelist.f \
   -top tb_cmr_noc64_async_boundary_failfast $TOP_EXTRA \
   -o simv -l "$LOG/compile.log"
+vcs_rc=$?
+set -e
+if [[ ! -x ./simv ]]; then
+  echo "CMR_MESH64_GLS_FAIL vcs rc=$vcs_rc simv missing under $WORK" >&2
+  exit 2
+fi
+if [[ "$vcs_rc" -ne 0 ]]; then
+  echo "CMR_MESH64_GLS_WARN vcs rc=$vcs_rc continuing because simv exists" >&2
+fi
 
 INJECT_ARG=""
 if [[ "$INJECT_MAX_RATE" == "1" ]]; then
@@ -121,6 +134,7 @@ fi
 ./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   $SIMV_TIMING \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
+  +V3_METRICS_CSV="$LOG/v3_metrics.csv" \
   +CASE_TICK_NS=20 +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
   +STALL_TIMEOUT_NS="$STALL_TIMEOUT_NS" +HARD_TIMEOUT_NS="$HARD_TIMEOUT_NS" \
   $INJECT_ARG $EXTRA_SIM_ARGS \

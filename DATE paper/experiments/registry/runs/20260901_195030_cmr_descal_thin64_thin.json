@@ -1,0 +1,142 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260901_195030_cmr_descal_thin64_thin",
+  "status": "fail",
+  "design_id": "THIN64",
+  "benchmark_id": null,
+  "seed": 900001,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "507b6f1230bba0a51c7cc9a64eea820cd4549138",
+    "dirty": true,
+    "describe": "507b6f1-dirty"
+  },
+  "config_hash": "0c400d758feef6c0fdea696e091b7b9d3d4daf65d973e94c657de9286b13c9ec",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": null,
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/launch_gate_b_async64.py",
+    "--design",
+    "THIN64"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_DESCAL_SUBMIT_ONLY": "1",
+    "CMR_NOC64_ALLOW_V3": "1",
+    "CMR_MESH64_ALLOW_V3": "1",
+    "CMR_DES_BSUB_EXTRA": "-m \"node21 node20 node4\"",
+    "GATE_B_SMOKE": "1",
+    "NETLIST_RUN_ID": "20260901_195030_cmr_descal_thin64_thin"
+  },
+  "lsf_jobs": [
+    "11563801",
+    "11563901",
+    "11564001",
+    "11564101",
+    "11564201"
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "summary_json": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\20260901_195030_cmr_descal_thin64_thin\\summary.json",
+    "netlist_run_id": "20260901_195030_cmr_descal_thin64_thin",
+    "skip_dc": false,
+    "sdf_cases": {
+      "directed": {
+        "job_id": "11563901",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": null,
+        "annotation_done": false,
+        "annotation_errors": null,
+        "ifnsdfa": false,
+        "case": "KEY-64_n64_s900001_zero_THIN64_top1"
+      },
+      "zero": {
+        "job_id": "11564001",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": null,
+        "annotation_done": false,
+        "annotation_errors": null,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_zero_THIN64_top1"
+      },
+      "medium": {
+        "job_id": "11564101",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": null,
+        "annotation_done": false,
+        "annotation_errors": null,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_r0p10_THIN64_top1"
+      },
+      "near-sat": {
+        "job_id": "11564201",
+        "mode": "sdf",
+        "tb_pass": false,
+        "x_failure": false,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "hard_timeout": false,
+        "fatal_failure": false,
+        "timing_violation_count": 0,
+        "first_failure": null,
+        "result_line": null,
+        "annotation_done": false,
+        "annotation_errors": null,
+        "ifnsdfa": false,
+        "case": "TOPO-UR_n64_s900001_r0p30_THIN64_top1"
+      }
+    },
+    "case_hashes": {
+      "KEY-64_n64_s900001_zero_THIN64_top1": "d9f2207cd7f0d86605902301090358a373b552311bb1655d4049529115031833",
+      "TOPO-UR_n64_s900001_zero_THIN64_top1": "1dd196a00f3e0d9e455a8f3fc4d45c5348ed3bac2f24e179cd624a699f5df66f",
+      "TOPO-UR_n64_s900001_r0p10_THIN64_top1": "16a6909557ddc05208559538bc7920c120778e2138840c40eb57fe882aca5076",
+      "TOPO-UR_n64_s900001_r0p30_THIN64_top1": "9119d3b92da3afd07eada7d5907cb537121c4777c88c10702bde41c11450eb7d"
+    },
+    "traffic": "KEY-64 directed + TOPO-UR smoke zero/0.10/0.30 seed 900001 5-flit",
+    "paper_matrix_allowed": false
+  },
+  "cases": [],
+  "created_utc": "2026-09-01T12:14:14+00:00",
+  "updated_utc": "2026-09-01T12:14:14+00:00",
+  "notes": "V3.1.0 Gate B smoke. First THIN64 full-network DC (11563801) stopped in run_dc_cmr_fat_tree_noc64.tcl while writing the structure report (CMD-081 missing quote). No post.v/SDF. Superseded by 20260901_201853_cmr_descal_thin64_thin. Not paper numbers. Do not use DES Tmax."
+}

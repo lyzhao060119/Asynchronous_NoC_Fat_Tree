@@ -84,4 +84,20 @@ def curated_gate(manifest: dict[str, Any], *, has_traffic: bool) -> list[str]:
         errors.append("paper_eligible is false")
     if manifest.get("status") != "pass":
         errors.append("status is not pass")
+    design_id = manifest.get("design_id") or ""
+    if manifest.get("paper_eligible") and design_id in (
+        "PROP256",
+        "FM256",
+        "PROP1024",
+        "HREP1024",
+        "FM1024",
+    ):
+        if not manifest.get("netlist_hash"):
+            errors.append("256/1024 paper point missing netlist_hash")
+        if not manifest.get("sdf_hash"):
+            errors.append("256/1024 paper point missing sdf_hash")
+        if manifest.get("physical_class") != "post-synthesis":
+            errors.append("256/1024 paper point must be post-synthesis whole-network evidence")
+        if design_id == "PROP1024_MESH4":
+            errors.append("unsupported four-lane geometry cannot be paper-eligible")
     return errors

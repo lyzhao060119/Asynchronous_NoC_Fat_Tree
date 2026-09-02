@@ -89,6 +89,7 @@ sim/AsyncRouterL1/testbench/cases
 DUT/
 sim/AsyncNoC/testbench/generated_cases
 sim/AsyncNoC/testbench/generated_cases_noc64
+sim/AsyncNoC/testbench/generated_cases_topmesh2/
 
 scripts/asic_dc/timing
 scripts/asic_dc/sim_gls/results
@@ -100,6 +101,7 @@ test_run_dir/
 
 ### Local reference documents ###
 /docs/*.pdf
+/DATE paper/previous DATE/*.pdf
 
 ### DATE V3 experiment bulky artifacts ###
 DATE paper/experiments/raw/

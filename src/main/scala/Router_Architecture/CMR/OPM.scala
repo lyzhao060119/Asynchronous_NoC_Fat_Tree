@@ -86,18 +86,42 @@ class OPM(config: RouterModuleConfig, egressPort: Int) extends Module {
   }
   val RegEnable = !(Reqout ^ delayedAckin)
   private val RegClose = Module(new V2CloseEvent)
+  // TailPassed/Ackout still sample the undelayed close so packet completion
+  // is not postponed.  Delay only L5/DataReg reopen after Ackin matches.
   RegClose.io.latch_enable := RegEnable
 
+  val LatchReopenDelay = Module(new DelayElement(
+    1, DelayUnitPs = CMRParameters.OpmAckinDelayUnitPs
+  ))
+  LatchReopenDelay.suggestName("LatchReopenDelay")
+  LatchReopenDelay.io.I := RegEnable
+  val outputLatchEnable = LatchReopenDelay.io.Z
+
   L5.io.reset := reset.asBool
-  L5.io.en := RegEnable
+  L5.io.en := outputLatchEnable
   // Data mux settling before the V2 request latch is a physical bundled-data
   // obligation, constrained during DC/P&R rather than by an RTL delay line.
   L5.io.d := ReqMerged.asUInt
   DataReg.io.reset := reset.asBool
-  DataReg.io.en := RegEnable
+  DataReg.io.en := outputLatchEnable
   DataReg.io.d := DataSelected
 
-  private val Ackout = withClockAndReset(RegClose.io.close_clock.asClock, reset.asAsyncReset) {
+  // Wide OPMs share ReqMerged (xorR of 16/20 ReqSelection bits) with the
+  // V2 close edge.  MAXIMUM-SDF glitches on that cone can clock Ackout
+  // before D is stable.  Delay only the Ackout sample clock; TailPassed
+  // stays on the undelayed close so packet completion is unchanged.
+  val ackoutSampleClock = Wire(Clock())
+  if (SourceCount >= 16) {
+    val AckoutCloseDelay = Module(new DelayElement(
+      1, DelayUnitPs = CMRParameters.OpmAckinDelayUnitPs
+    ))
+    AckoutCloseDelay.io.I := RegClose.io.close_clock
+    ackoutSampleClock := AckoutCloseDelay.io.Z.asClock
+  } else {
+    ackoutSampleClock := RegClose.io.close_clock.asClock
+  }
+
+  private val Ackout = withClockAndReset(ackoutSampleClock, reset.asAsyncReset) {
     val FF0_FF3 = RegInit(VecInit(Seq.fill(SourceCount)(false.B)))
     FF0_FF3 := ReqSelection
     FF0_FF3

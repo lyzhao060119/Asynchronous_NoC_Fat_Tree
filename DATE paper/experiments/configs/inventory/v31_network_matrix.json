@@ -1,0 +1,465 @@
+{
+  "schema": "date-v3.1-network-matrix-v1",
+  "logic_synthesis": "Design Compiler maps register-transfer-level Verilog to a standard-cell gate netlist (post-synthesis, zero wire load). It is not place-and-route.",
+  "maximum_delay_standard_delay_format": "Slow-corner MAXIMUM delay annotation on that netlist. Gate-level simulation must complete annotation with zero errors, zero timing violations, no unknown values, and no loss, duplication, deadlock, or timeout.",
+  "no_synchronous_256_or_1024": true,
+  "independent_netlists": [
+    "THIN64",
+    "PROP64",
+    "PFAT64",
+    "FM64",
+    "SYNC_THIN64",
+    "SYNC_PROP64",
+    "PROP256",
+    "FM256",
+    "PROP1024",
+    "FM1024"
+  ],
+  "paper_matrix": [
+    "THIN64",
+    "PROP64",
+    "PFAT64",
+    "FM64",
+    "SYNC_THIN64",
+    "SYNC_PROP64",
+    "PROP256",
+    "FM256",
+    "PROP1024",
+    "HREP1024",
+    "FM1024"
+  ],
+  "shared_netlists": {
+    "HREP1024": "PROP1024",
+    "PROP1024_MESH2": "PROP1024"
+  },
+  "unsupported": {
+    "PROP1024_MESH4": "Four-lane top mesh requires router geometry (4,2), which is not in the supported lane set. Do not elaborate, synthesize, or fabricate a delay file."
+  },
+  "backup_only": [
+    "PROP1024_MESH1",
+    "PROP1024_MESH2"
+  ],
+  "representative_case_classes": [
+    "directed",
+    "zero_load",
+    "medium_load",
+    "near_saturation"
+  ],
+  "formal_seeds": [
+    202701,
+    202702,
+    202703
+  ],
+  "gate_order": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "duts": [
+    {
+      "design_id": "THIN64",
+      "display_name": "Asynchronous narrow hierarchical network, 64 nodes",
+      "display_description": "64-node asynchronous hierarchical network with one lane on every tree level.",
+      "nodes": 64,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "THIN64",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRFatTreeNoC64Main",
+        "sbt_args": "",
+        "env": {
+          "CMR_Q64_PROFILE": "thin"
+        },
+        "gen_dir": "generated_cmr/fat_tree_noc64_thin",
+        "dut_file": "NoC_64nodes.v",
+        "top": "NoC_64nodes",
+        "hier_kind": "thin",
+        "legacy_adapter": "noc64_async",
+        "gls_shell": "legacy_noc64"
+      },
+      "expected": {
+        "routers": 21,
+        "ports": 105,
+        "adapters": 0
+      }
+    },
+    {
+      "design_id": "PROP64",
+      "display_name": "Asynchronous balanced hierarchical network, 64 nodes",
+      "display_description": "64-node asynchronous hierarchical network with the locked 1-2-2-2 lane profile.",
+      "nodes": 64,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "PROP64",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRFatTreeNoC64Main",
+        "sbt_args": "",
+        "env": {
+          "CMR_Q64_PROFILE": "1222",
+          "CMR_FAT_LANE_PROFILE": "1222"
+        },
+        "gen_dir": "generated_cmr/fat_tree_noc64_1222",
+        "dut_file": "NoC_64nodes.v",
+        "top": "NoC_64nodes",
+        "hier_kind": "1222",
+        "legacy_adapter": "noc64_async",
+        "gls_shell": "legacy_noc64"
+      },
+      "expected": {
+        "routers": 21,
+        "ports": 146,
+        "adapters": 264
+      }
+    },
+    {
+      "design_id": "PFAT64",
+      "display_name": "Asynchronous progressively widened hierarchical network, 64 nodes",
+      "display_description": "64-node asynchronous hierarchical network that widens upper-level lanes to 1-2-4-8.",
+      "nodes": 64,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "PFAT64",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRFatTreeNoC64Main",
+        "sbt_args": "",
+        "env": {
+          "CMR_Q64_PROFILE": "1248",
+          "CMR_FAT_LANE_PROFILE": "1248"
+        },
+        "gen_dir": "generated_cmr/fat_tree_noc64_1248",
+        "dut_file": "NoC_64nodes.v",
+        "top": "NoC_64nodes",
+        "hier_kind": "1248",
+        "legacy_adapter": "noc64_async",
+        "gls_shell": "legacy_noc64"
+      },
+      "expected": {
+        "routers": 21,
+        "ports": 168,
+        "adapters": 352
+      }
+    },
+    {
+      "design_id": "FM64",
+      "display_name": "Asynchronous flat mesh network, 64 nodes",
+      "display_description": "8-by-8 asynchronous flat mesh of narrow routers.",
+      "nodes": 64,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "FM64",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRMeshNoCMain",
+        "sbt_args": "8 1 1",
+        "env": {},
+        "gen_dir": "generated_cmr/mesh_noc64_11",
+        "dut_file": "CMRMeshNoC.v",
+        "top": "CMRMeshNoC",
+        "hier_kind": "mesh",
+        "legacy_adapter": "mesh64",
+        "gls_shell": "legacy_mesh64"
+      },
+      "expected": {
+        "routers": 64,
+        "ports": 320,
+        "adapters": 0
+      }
+    },
+    {
+      "design_id": "FM256",
+      "display_name": "Asynchronous flat mesh network, 256 nodes",
+      "display_description": "16-by-16 asynchronous flat mesh. Compared with the 256-node hierarchical network at the same node count.",
+      "nodes": 256,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "FM256",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRMeshNoCMain",
+        "sbt_args": "16 1 1",
+        "env": {},
+        "gen_dir": "generated_cmr/mesh_noc256_11",
+        "dut_file": "CMRMeshNoC.v",
+        "top": "CMRMeshNoC",
+        "hier_kind": "mesh256",
+        "legacy_adapter": "network_sdf",
+        "gls_shell": "network",
+        "kind": "mesh"
+      },
+      "expected": {
+        "routers": 256,
+        "ports": 1280,
+        "adapters": 0
+      }
+    },
+    {
+      "design_id": "FM1024",
+      "display_name": "Asynchronous flat mesh network, 1024 nodes",
+      "display_description": "32-by-32 asynchronous flat mesh. Compared with the 1024-node hierarchical network at the same node count.",
+      "nodes": 1024,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "FM1024",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRMeshNoCMain",
+        "sbt_args": "32 1 1",
+        "env": {},
+        "gen_dir": "generated_cmr/mesh_noc1024_11",
+        "dut_file": "CMRMeshNoC.v",
+        "top": "CMRMeshNoC",
+        "hier_kind": "mesh1024",
+        "legacy_adapter": "network_sdf",
+        "gls_shell": "network",
+        "kind": "mesh"
+      },
+      "expected": {
+        "routers": 1024,
+        "ports": 5120,
+        "adapters": 0
+      }
+    },
+    {
+      "design_id": "PROP256",
+      "display_name": "Asynchronous balanced hierarchical network, 256 nodes",
+      "display_description": "2-by-2 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 256-node network is added.",
+      "nodes": 256,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "PROP256",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRClusteredNoCMain",
+        "sbt_args": "2 2",
+        "env": {},
+        "gen_dir": "generated_cmr/clustered_noc_g2_m2",
+        "dut_file": "NoC_256nodes.v",
+        "top": "NoC_256nodes",
+        "hier_kind": "prop256",
+        "legacy_adapter": "network_sdf",
+        "gls_shell": "network",
+        "kind": "hierarchical"
+      },
+      "expected": {
+        "routers": 88,
+        "ports": 624,
+        "adapters": 1216
+      }
+    },
+    {
+      "design_id": "PROP1024",
+      "display_name": "Asynchronous balanced hierarchical network, 1024 nodes",
+      "display_description": "4-by-4 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 1024-node network is added.",
+      "nodes": 1024,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "PROP1024",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRClusteredNoCMain",
+        "sbt_args": "4 2",
+        "env": {},
+        "gen_dir": "generated_cmr/clustered_noc_g4_m2",
+        "dut_file": "NoC_1024nodes.v",
+        "top": "NoC_1024nodes",
+        "hier_kind": "prop1024",
+        "legacy_adapter": "network_sdf",
+        "gls_shell": "network",
+        "kind": "hierarchical"
+      },
+      "expected": {
+        "routers": 352,
+        "ports": 2496,
+        "adapters": 4864
+      }
+    },
+    {
+      "design_id": "HREP1024",
+      "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, boundary packet-replication comparison",
+      "display_description": "Same gate netlist and delay file as the 1024-node balanced hierarchical network. Only the injection policy splits a cross-cluster multicast into unicast copies.",
+      "nodes": 1024,
+      "independent_netlist": false,
+      "shares_netlist_with": "PROP1024",
+      "netlist_owner": "PROP1024",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRClusteredNoCMain",
+        "sbt_args": "4 2",
+        "env": {},
+        "gen_dir": "generated_cmr/clustered_noc_g4_m2",
+        "dut_file": "NoC_1024nodes.v",
+        "top": "NoC_1024nodes",
+        "hier_kind": "prop1024",
+        "legacy_adapter": "network_sdf",
+        "gls_shell": "network",
+        "kind": "hierarchical"
+      },
+      "expected": {
+        "routers": 352,
+        "ports": 2496,
+        "adapters": 4864
+      }
+    },
+    {
+      "design_id": "PROP1024_MESH1",
+      "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, single-lane top-mesh sanity (backup only)",
+      "display_description": "Backup one-lane top-mesh sanity. Not a paper-matrix netlist.",
+      "nodes": 1024,
+      "independent_netlist": false,
+      "shares_netlist_with": null,
+      "netlist_owner": "PROP1024_MESH1",
+      "paper_matrix": false,
+      "backup_only": true,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": null,
+      "expected": {
+        "routers": 352,
+        "ports": 2432,
+        "adapters": 4288
+      }
+    },
+    {
+      "design_id": "PROP1024_MESH2",
+      "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, two-lane top-mesh alias of the main 1024-node hierarchical netlist",
+      "display_description": "Alias of the main 1024-node balanced hierarchical netlist.",
+      "nodes": 1024,
+      "independent_netlist": false,
+      "shares_netlist_with": "PROP1024",
+      "netlist_owner": "PROP1024",
+      "paper_matrix": false,
+      "backup_only": true,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.CMRClusteredNoCMain",
+        "sbt_args": "4 2",
+        "env": {},
+        "gen_dir": "generated_cmr/clustered_noc_g4_m2",
+        "dut_file": "NoC_1024nodes.v",
+        "top": "NoC_1024nodes",
+        "hier_kind": "prop1024",
+        "legacy_adapter": "network_sdf",
+        "gls_shell": "network",
+        "kind": "hierarchical"
+      },
+      "expected": {
+        "routers": 352,
+        "ports": 2496,
+        "adapters": 4864
+      }
+    },
+    {
+      "design_id": "PROP1024_MESH4",
+      "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, four-lane top-mesh variation (unsupported)",
+      "display_description": "Four-lane top mesh needs unsupported router geometry (4,2). Do not fabricate synthesis or delay-format results.",
+      "nodes": 1024,
+      "independent_netlist": false,
+      "shares_netlist_with": null,
+      "netlist_owner": "PROP1024_MESH4",
+      "paper_matrix": false,
+      "backup_only": false,
+      "synthesis_supported": false,
+      "unsupported_reason": "Four-lane top mesh requires router geometry (4,2), which is not in the supported lane set. Do not elaborate, synthesize, or fabricate a delay file.",
+      "emit": null,
+      "expected": {
+        "routers": 336,
+        "ports": 0,
+        "adapters": 0
+      }
+    },
+    {
+      "design_id": "SYNC_THIN64",
+      "display_name": "Synchronous narrow hierarchical network, 64 nodes",
+      "display_description": "Clocked 64-node narrow hierarchical counterpart of the asynchronous narrow 64-node network. Signed at 1.0 ns with a one-cycle head.",
+      "nodes": 64,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "SYNC_THIN64",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.SyncCmrFatTreeNoC64Main",
+        "sbt_args": "",
+        "env": {},
+        "gen_dir": "generated_sync_cmr/fat_tree_noc64_thin",
+        "dut_file": "SyncNoC_64nodes.v",
+        "top": "SyncNoC_64nodes",
+        "hier_kind": null,
+        "legacy_adapter": "noc64_sync",
+        "gls_shell": "legacy_sync64",
+        "signed_run_id": "20260901_cmr_sync_noc64_thin_p50"
+      },
+      "expected": {
+        "routers": 21,
+        "ports": 105,
+        "adapters": 0
+      }
+    },
+    {
+      "design_id": "SYNC_PROP64",
+      "display_name": "Synchronous balanced hierarchical network, 64 nodes",
+      "display_description": "Clocked 64-node balanced hierarchical counterpart of the asynchronous balanced 64-node network. Signed at 1.0 ns with a one-cycle head.",
+      "nodes": 64,
+      "independent_netlist": true,
+      "shares_netlist_with": null,
+      "netlist_owner": "SYNC_PROP64",
+      "paper_matrix": true,
+      "backup_only": false,
+      "synthesis_supported": true,
+      "unsupported_reason": null,
+      "emit": {
+        "main": "NoC.CMR.SyncCmrFatTreeNoC64Fat1222Main",
+        "sbt_args": "",
+        "env": {},
+        "gen_dir": "generated_sync_cmr/fat_tree_noc64_1222",
+        "dut_file": "SyncNoC_64nodes.v",
+        "top": "SyncNoC_64nodes",
+        "hier_kind": null,
+        "legacy_adapter": "noc64_sync",
+        "gls_shell": "legacy_sync64",
+        "signed_run_id": "20260901_cmr_sync_noc64_fat1222_p50"
+      },
+      "expected": {
+        "routers": 21,
+        "ports": 146,
+        "adapters": 264
+      }
+    }
+  ]
+}
