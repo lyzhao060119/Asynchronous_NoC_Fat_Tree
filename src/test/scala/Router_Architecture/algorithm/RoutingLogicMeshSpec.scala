@@ -132,26 +132,48 @@ class RoutingLogicMeshSpec extends AnyFlatSpec with ChiselScalatestTester {
     }
   }
 
-  private def chiselSweep(cx: Int, cy: Int): Unit = {
-    it should s"match the Scala mesh model in Chisel at ($cx,$cy)" in {
-      test(new RoutingLogicMeshDut(cx, cy)) { c =>
+  private def chiselSweep(
+      cx: Int,
+      cy: Int,
+      gridSize: Int = Grid,
+      coordShift: Int = 0
+  ): Unit = {
+    val last = gridSize - 1
+    it should s"match the Scala mesh model in Chisel at ($cx,$cy) grid=$gridSize" in {
+      test(new RoutingLogicMeshDut(cx, cy, gridSize, coordShift)) { c =>
         for (ingress <- 0 to 4) {
-          pokeExpect(c, cx, cy, ingress, 0, 0, 0, 0, valid = false)
+          pokeExpect(c, cx, cy, ingress, 0, 0, 0, 0, valid = false, gridSize, coordShift)
         }
-        for (x <- 0 until Grid; y <- 0 until Grid; ingress <- 0 to 4) {
-          pokeExpect(c, cx, cy, ingress, x, y, x, y)
+        val unicastStep = if (gridSize <= 8) 1 else math.max(1, gridSize / 4)
+        for (x <- 0 until gridSize by unicastStep; y <- 0 until gridSize by unicastStep; ingress <- 0 to 4) {
+          pokeExpect(c, cx, cy, ingress, x, y, x, y, gridSize = gridSize, coordShift = coordShift)
         }
-        val rects = Seq((0, 0, 1, 1), (1, 1, 3, 3), (0, 0, 7, 7), (7, 0, 0, 7), (3, 3, 1, 5))
+        val rects = Seq(
+          (0, 0, 1, 1),
+          (1, 1, 3, 3),
+          (0, 0, last, last),
+          (last, 0, 0, last),
+          (3, 3, 1, 5),
+          (cx, cy, math.min(cx + 2, last), math.min(cy + 2, last))
+        )
         for ((x0, y0, x1, y1) <- rects; ingress <- 0 to 4) {
-          pokeExpect(c, cx, cy, ingress, x0, y0, x1, y1)
+          pokeExpect(c, cx, cy, ingress, x0, y0, x1, y1, gridSize = gridSize, coordShift = coordShift)
         }
       }
     }
   }
 
   chiselSweep(0, 0)
-  chiselSweep(2, 2)
+  chiselSweep(7, 0)
+  chiselSweep(0, 7)
   chiselSweep(7, 7)
+  chiselSweep(3, 3)
+  chiselSweep(2, 2)
+  chiselSweep(0, 0, gridSize = 16)
+  chiselSweep(15, 15, gridSize = 16)
+  chiselSweep(13, 7, gridSize = 16)
+  chiselSweep(7, 0, gridSize = 16)
+  chiselSweep(8, 8, gridSize = 16)
 
   "TopMesh coordShift=3" should "XY-walk PE (8,0) as cluster East then Local" in {
     val east = model(0, 0, DirLocal, 8, 0, 8, 0, gridSize = 2, coordShift = 3)

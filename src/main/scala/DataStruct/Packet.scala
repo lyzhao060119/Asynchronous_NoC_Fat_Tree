@@ -27,8 +27,8 @@ class Packet extends Bundle {
   val flit = UInt(PacketLayout.FlitWidth.W)
 
   // payload[27]:isHead payload[26]:isTail
-  // payload[25:20]:y1 payload[19:14]:x1
-  // payload[13:8]:y0 payload[7:2]:x0
+  // payload[25:20]:y1 payload[19:14]:x1  (Head only; Body/Tail leave 0)
+  // payload[13:8]:y0 payload[7:2]:x0     (Head only; Body/Tail leave 0)
   // payload[1:0]:id
 
 }

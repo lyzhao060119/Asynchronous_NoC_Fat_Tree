@@ -41,6 +41,26 @@ class ContinuousLaneSelector(val laneCount: Int) extends Module {
   io.LaneSelect := VecInit(mutex.io.grant.asBools)
 }
 
+/** C-element packet-lifetime selector. A lost OPM contest waits on the
+  * selected lane until packet completion; it intentionally does not retry. */
+class LaneSelecterCelement(val laneCount: Int)
+    extends BlackBox(Map("LANES" -> laneCount)) with HasBlackBoxResource {
+  require(Set(2, 4, 8).contains(laneCount))
+  override def desiredName: String = "LaneSelecterCelement"
+  val io = IO(new Bundle {
+    val reset = Input(Bool())
+    val LaneIsEmpty = Input(UInt(laneCount.W))
+    val PacketActive = Input(Bool())
+    val LaneSelect = Output(UInt(laneCount.W))
+  })
+  addResource("/ASYNC/CMR/LaneSelecterCelement.v")
+  addResource("/ASYNC/CMR/CMRMutexN.v")
+  addResource("/ASYNC/CMR/CMRFlattenedTAC.v")
+  addResource("/ASYNC/MullerC2.v")
+  addResource("/ASYNC/Mutex4.v")
+  addResource(AsyncPrimitiveProfile.mutex2Resource)
+}
+
 class LanePhaseAdapter(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount))
     with HasBlackBoxResource {
@@ -57,6 +77,27 @@ class LanePhaseAdapter(val laneCount: Int)
   })
   addResource("/ASYNC/CMR/LanePhaseAdapter.v")
   addResource("/ASYNC/CMR/PhaseResetDLatch.v")
+}
+
+/** Per-lane two-phase adapter built from the request and acknowledgement
+  * Toggle Q states.  LaneSelect must be held through the physical OPM
+  * acknowledgement; LaneSelecterCelement provides that packet-lifetime hold.
+  */
+class LanePhaseAdapterDFF(val laneCount: Int)
+    extends BlackBox(Map("LANES" -> laneCount))
+    with HasBlackBoxResource {
+  override def desiredName: String = "LanePhaseAdapterDFF"
+  require(Set(2, 4, 8).contains(laneCount))
+  val io = IO(new Bundle {
+    val reset = Input(Bool())
+    val LaneSelect = Input(UInt(laneCount.W))
+    val IPMReqOut = Input(UInt(laneCount.W))
+    val OPMAckOut = Input(UInt(laneCount.W))
+    val IPMAckIn = Output(UInt(laneCount.W))
+    val OPMReqIn = Output(UInt(laneCount.W))
+  })
+  addResource("/ASYNC/CMR/LanePhaseAdapterDFF.v")
+  addResource("/ASYNC/CMR/Toggle.v")
 }
 
 /** Capture the first LaneSelect while PathEnabled and hold it until Tail. */

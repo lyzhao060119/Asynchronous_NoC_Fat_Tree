@@ -74,6 +74,10 @@ module LanePhaseAdapter #(
     // While arbitration is unresolved, continuously prepare the phase offset
     // for the currently selected lane.  Commit closes this latch before the
     // selected channel is allowed to carry a request.
+    // CMR-LANE-02: D = Ackout^SelectedAck must settle before Assigned closes E.
+    // While ~Assigned, AckLatch is opaque so Ackout is stable; the hazard is
+    // Assigned↑ opening AckLatch before OffsetLatch.E falls — fix with
+    // CMR_LANE01_BUF_STAGES on AckLatch.E (never pad OffsetLatch.E).
     PhaseResetDLatch #(.INITIAL_PHASE(1'b0)) OffsetLatch (
         .reset(reset),
         .en(~Assigned & SelectionValid),
@@ -81,9 +85,7 @@ module LanePhaseAdapter #(
         .q(PhaseOffset)
     );
 
-    // Only the committed lane may advance the direction-level acknowledgement.
-    // The Ack data/Assigned-close relationship is a paired relative-timing
-    // constraint recorded for DC/P&R, not an RTL buffer.
+    // CMR-LANE-01: AckLatch.D vs enable; DC may pad AckLatch.E.
     PhaseResetDLatch #(.INITIAL_PHASE(1'b0)) AckLatch (
         .reset(reset),
         .en(Assigned),

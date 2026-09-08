@@ -150,7 +150,7 @@ class RouteComputationLogic(
   val BundlingSignal = if (CMRParameters.RcuMatchedDelaySteps > 0) {
     val MatchedDelay = Module(new DelayElement(
       CMRParameters.RcuMatchedDelaySteps,
-      DelayUnitPs = CMRParameters.RcuMatchedDelayUnitPs
+      DelayUnitPs = CMRParameters.rcuMatchedDelayUnitPs(useMeshRouting)
     ))
     MatchedDelay.io.I := io.Req_rc
     MatchedDelay.io.Z ^ Ack_rc

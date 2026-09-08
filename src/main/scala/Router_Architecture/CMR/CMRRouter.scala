@@ -108,46 +108,43 @@ class CMRRouter(
         ipm.io.Ackin(branch) := OutputPortModules(output).io.Ackout(source)
         ipm.io.TailPassed(branch) := OutputPortModules(output).io.TailPassed(source)
       } else {
-        val selector = Module(new ContinuousLaneSelector(laneCount))
-        val laneLock = Module(new WormholeLaneLock(laneCount))
-        selector.io.PathEnabled := ipm.io.PathEnabled(branch)
-        laneLock.io.reset := reset.asBool
-        laneLock.io.PathEnabled := ipm.io.PathEnabled(branch)
-        laneLock.io.LaneSelect := selector.io.LaneSelect.asUInt
-        val held = VecInit(laneLock.io.HeldSelect.asBools)
-        for ((output, lane) <- outputs.zipWithIndex) {
+        val selector = Module(new LaneSelecterCelement(laneCount))
+        selector.io.reset := reset.asBool
+        selector.io.PacketActive := ipm.io.PathEnabled(branch)
+        val held = VecInit(selector.io.LaneSelect.asBools)
+        val laneIsEmpty = outputs.zipWithIndex.map { case (output, lane) =>
           val source = sourceIndices(lane)
           val otherGrants = OutputPortModules(output).io.Grant.zipWithIndex.collect {
             case (grant, index) if index != source => grant
           }
-          selector.io.OtherGrant(lane) := (if (otherGrants.isEmpty) false.B
-            else otherGrants.reduce(_ || _))
-
+          !(if (otherGrants.isEmpty) false.B else otherGrants.reduce(_ || _))
+        }
+        selector.io.LaneIsEmpty := VecInit(laneIsEmpty).asUInt
+        for ((output, lane) <- outputs.zipWithIndex) {
+          val source = sourceIndices(lane)
           OutputPortModules(output).io.PktPathEnable(source) :=
             ipm.io.PathEnabled(branch) && held(lane)
           OutputPortModules(output).io.Datain(source) := ipm.io.Dataout(branch)
         }
 
-        val adapter = Module(new LanePhaseAdapter(laneCount))
-        val commits = Wire(Vec(laneCount, Bool()))
+        val adapter = Module(new LanePhaseAdapterDFF(laneCount))
         val laneAcks = Wire(Vec(laneCount, Bool()))
         val laneTails = Wire(Vec(laneCount, Bool()))
 
         adapter.io.reset := reset.asBool
-        adapter.io.Reqin := ipm.io.Reqout(branch)
-        adapter.io.LaneSelect := laneLock.io.HeldSelect
+        adapter.io.LaneSelect := selector.io.LaneSelect
         for ((output, lane) <- outputs.zipWithIndex) {
           val source = sourceIndices(lane)
-          commits(lane) := held(lane) &&
-            OutputPortModules(output).io.Grant(source)
           laneAcks(lane) := OutputPortModules(output).io.Ackout(source)
-          laneTails(lane) := commits(lane) &&
+          laneTails(lane) := held(lane) &&
             OutputPortModules(output).io.TailPassed(source)
-          OutputPortModules(output).io.Reqin(source) := adapter.io.Reqout(lane)
+          OutputPortModules(output).io.Reqin(source) := adapter.io.OPMReqIn(lane)
         }
-        adapter.io.Commit := commits.asUInt
-        adapter.io.Ackin := laneAcks.asUInt
-        ipm.io.Ackin(branch) := adapter.io.Ackout
+        adapter.io.IPMReqOut :=
+          VecInit(Seq.fill(laneCount)(ipm.io.Reqout(branch))).asUInt
+        adapter.io.OPMAckOut := laneAcks.asUInt
+        ipm.io.Ackin(branch) :=
+          (adapter.io.IPMAckIn & selector.io.LaneSelect).orR
         ipm.io.TailPassed(branch) := laneTails.asUInt.orR
       }
     }

@@ -86,16 +86,12 @@ class OPM(config: RouterModuleConfig, egressPort: Int) extends Module {
   }
   val RegEnable = !(Reqout ^ delayedAckin)
   private val RegClose = Module(new V2CloseEvent)
-  // TailPassed/Ackout still sample the undelayed close so packet completion
-  // is not postponed.  Delay only L5/DataReg reopen after Ackin matches.
+  // L5/DataReg must close on the same transition that produces the packet
+  // completion event.  Delaying this enable delays its falling edge too:
+  // TailPassed can then release the IPM while the transparent DataReg still
+  // follows an invalidated mux input.
   RegClose.io.latch_enable := RegEnable
-
-  val LatchReopenDelay = Module(new DelayElement(
-    1, DelayUnitPs = CMRParameters.OpmAckinDelayUnitPs
-  ))
-  LatchReopenDelay.suggestName("LatchReopenDelay")
-  LatchReopenDelay.io.I := RegEnable
-  val outputLatchEnable = LatchReopenDelay.io.Z
+  val outputLatchEnable = RegEnable
 
   L5.io.reset := reset.asBool
   L5.io.en := outputLatchEnable

@@ -148,7 +148,51 @@ class RoutingLogic_mesh(
   private val DirNorth = 3.U(3.W)
   private val DirLocal = 4.U(3.W)
 
-  private def absDiff(a: UInt, b: UInt): UInt = Mux(a >= b, a - b, b - a)
+  /** 6-bit <= compile-time constant.  Power-of-two-minus-one collapses. */
+  private def leU6(a: UInt, c: Int): Bool = {
+    require(c >= 0 && c <= 63)
+    val aa = a.asTypeOf(UInt(6.W))
+    if (c >= 63) true.B
+    else if (c == 0) aa === 0.U
+    else if (((c + 1) & c) == 0) {
+      val k = Integer.numberOfTrailingZeros(c + 1)
+      if (k >= 6) true.B else aa(5, k) === 0.U
+    } else {
+      aa <= c.U(6.W)
+    }
+  }
+
+  /** 6-bit >= compile-time constant.  Power-of-two bounds collapse to orR. */
+  private def geU6(a: UInt, c: Int): Bool = {
+    require(c >= 0 && c <= 63)
+    val aa = a.asTypeOf(UInt(6.W))
+    if (c <= 0) true.B
+    else if ((c & (c - 1)) == 0) {
+      val k = Integer.numberOfTrailingZeros(c)
+      aa(5, k).orR
+    } else {
+      aa >= c.U(6.W)
+    }
+  }
+
+  /** True if compile-time c lies in the unordered interval [a, b]. */
+  private def inIntervalU6(a: UInt, b: UInt, c: Int): Bool = {
+    val bothBelow =
+      if (c <= 0) false.B else leU6(a, c - 1) && leU6(b, c - 1)
+    val bothAbove =
+      if (c >= 63) false.B else geU6(a, c + 1) && geU6(b, c + 1)
+    !(bothBelow || bothAbove)
+  }
+
+  /**
+    * True iff the unordered pair is strictly closer to the high endpoint.
+    * `|c-max| < |c-min|` iff `a+b < 2c`.  Sum is commutative, so `a`/`b`
+    * need not be ordered; adding them in parallel with min/max avoids
+    * sitting the 7-bit adder behind the compare-mux.
+    */
+  private def closerHiU6(a: UInt, b: UInt, c: Int): Bool = {
+    (a +& b) < (2 * c).U(7.W)
+  }
 
   def routeMask(
       x0: UInt,
@@ -158,117 +202,91 @@ class RoutingLogic_mesh(
       packetValid: Bool,
       ingressDir: UInt
   ): UInt = {
-    val xLo = Wire(UInt(6.W))
-    val xHi = Wire(UInt(6.W))
-    val yLo = Wire(UInt(6.W))
-    val yHi = Wire(UInt(6.W))
-    val xLoRaw = Mux(x0 <= x1, x0, x1)
-    val xHiRaw = Mux(x0 <= x1, x1, x0)
-    val yLoRaw = Mux(y0 <= y1, y0, y1)
-    val yHiRaw = Mux(y0 <= y1, y1, y0)
-    if (coordShift == 0) {
-      xLo := xLoRaw
-      xHi := xHiRaw
-      yLo := yLoRaw
-      yHi := yHiRaw
-    } else {
-      xLo := xLoRaw >> coordShift
-      xHi := xHiRaw >> coordShift
-      yLo := yLoRaw >> coordShift
-      yHi := yHiRaw >> coordShift
+    def shifted(raw: UInt): UInt = {
+      val bits = raw.asTypeOf(UInt(6.W))
+      if (coordShift == 0) bits else (bits >> coordShift).asTypeOf(UInt(6.W))
     }
+    val xs0 = shifted(x0)
+    val xs1 = shifted(x1)
+    val ys0 = shifted(y0)
+    val ys1 = shifted(y1)
 
-    val cx = coordinate_x.U(6.W)
-    val cy = coordinate_y.U(6.W)
-    val inRectColumn = (cx >= xLo) && (cx <= xHi)
-    val inRectRow = (cy >= yLo) && (cy <= yHi)
+    val cx = coordinate_x
+    val cy = coordinate_y
+
+    // Unordered vs compile-time c: no 6-bit min/max on the Mat cone.
+    val ltMaxX = !(leU6(xs0, cx) && leU6(xs1, cx))
+    val gtMinX = !(geU6(xs0, cx) && geU6(xs1, cx))
+    val ltMinX =
+      if (cx >= 63) false.B else geU6(xs0, cx + 1) && geU6(xs1, cx + 1)
+    val gtMaxX =
+      if (cx <= 0) false.B else leU6(xs0, cx - 1) && leU6(xs1, cx - 1)
+    val ltMaxY = !(leU6(ys0, cy) && leU6(ys1, cy))
+    val gtMinY = !(geU6(ys0, cy) && geU6(ys1, cy))
+    val ltMinY =
+      if (cy >= 63) false.B else geU6(ys0, cy + 1) && geU6(ys1, cy + 1)
+    val gtMaxY =
+      if (cy <= 0) false.B else leU6(ys0, cy - 1) && leU6(ys1, cy - 1)
+
+    val inRectColumn = !(gtMaxX || ltMinX)
+    val inRectRow = !(gtMaxY || ltMinY)
     val localHit = inRectColumn && inRectRow
 
-    val dLL = absDiff(cx, xLo) +& absDiff(cy, yLo)
-    val dLH = absDiff(cx, xLo) +& absDiff(cy, yHi)
-    val dHL = absDiff(cx, xHi) +& absDiff(cy, yLo)
-    val dHH = absDiff(cx, xHi) +& absDiff(cy, yHi)
+    // closerHi is a+b<2c (parallel with the compares).  Walk flags are
+    // 1-bit muxes of those compares, not (cx < Mux(min,max)).
+    val closerXHi = closerHiU6(xs0, xs1, cx)
+    val closerYHi = closerHiU6(ys0, ys1, cy)
+    val xyEast = Mux(closerXHi, ltMaxX, ltMinX)
+    val xyWest = Mux(closerXHi, gtMaxX, gtMinX)
+    val atTargetX = !(xyEast || xyWest)
+    val xyNorth = atTargetX && Mux(closerYHi, ltMaxY, ltMinY)
+    val xySouth = atTargetX && Mux(closerYHi, gtMaxY, gtMinY)
 
-    val chooseLH = dLH < dLL
-    val bestXLeft = xLo
-    val bestYLeft = Mux(chooseLH, yHi, yLo)
-    val bestDLeft = Mux(chooseLH, dLH, dLL)
+    val eastNeeded = ltMaxX
+    val westNeeded = gtMinX
+    val northNeeded = inRectColumn && ltMaxY
+    val southNeeded = inRectColumn && gtMinY
+    val atMaxY = !(ltMaxY || gtMaxY)
+    val atMinY = !(ltMinY || gtMinY)
 
-    val chooseHH = dHH < dHL
-    val bestXRight = xHi
-    val bestYRight = Mux(chooseHH, yHi, yLo)
-    val bestDRight = Mux(chooseHH, dHH, dHL)
-
-    val chooseRight = bestDRight < bestDLeft
-    val targetX = Mux(chooseRight, bestXRight, bestXLeft)
-    val targetY = Mux(chooseRight, bestYRight, bestYLeft)
-
-    val eastNeeded = cx < xHi
-    val westNeeded = cx > xLo
-    val northNeeded = inRectColumn && (cy < yHi)
-    val southNeeded = inRectColumn && (cy > yLo)
-
-    val goWest = WireInit(false.B)
-    val goSouth = WireInit(false.B)
-    val goEast = WireInit(false.B)
-    val goNorth = WireInit(false.B)
-    val goLocal = WireInit(false.B)
-
-    when(packetValid) {
-      when(!localHit) {
-        when(cx < targetX) {
-          goEast := true.B
-        }.elsewhen(cx > targetX) {
-          goWest := true.B
-        }.elsewhen(cy < targetY) {
-          goNorth := true.B
-        }.elsewhen(cy > targetY) {
-          goSouth := true.B
-        }
-      }.otherwise {
-        when(ingressDir =/= DirLocal) {
-          goLocal := true.B
-        }
-        switch(ingressDir) {
-          is(DirWest) {
-            goEast := eastNeeded
-            goNorth := northNeeded
-            goSouth := southNeeded
-          }
-          is(DirEast) {
-            goWest := westNeeded
-            goNorth := northNeeded
-            goSouth := southNeeded
-          }
-          is(DirNorth) {
-            when(cy === yHi) {
-              goWest := westNeeded
-              goEast := eastNeeded
-            }
-            goSouth := southNeeded
-          }
-          is(DirSouth) {
-            when(cy === yLo) {
-              goWest := westNeeded
-              goEast := eastNeeded
-            }
-            goNorth := northNeeded
-          }
-          is(DirLocal) {
-            when(cx < xLo) {
-              goEast := true.B
-            }.elsewhen(cx > xHi) {
-              goWest := true.B
-            }.otherwise {
-              goWest := westNeeded
-              goEast := eastNeeded
-            }
-            goNorth := northNeeded
-            goSouth := southNeeded
-          }
-        }
+    val expandWest = WireInit(false.B)
+    val expandSouth = WireInit(false.B)
+    val expandEast = WireInit(false.B)
+    val expandNorth = WireInit(false.B)
+    switch(ingressDir) {
+      is(DirWest) {
+        expandEast := eastNeeded
+        expandNorth := northNeeded
+        expandSouth := southNeeded
+      }
+      is(DirEast) {
+        expandWest := westNeeded
+        expandNorth := northNeeded
+        expandSouth := southNeeded
+      }
+      is(DirNorth) {
+        expandWest := atMaxY && westNeeded
+        expandEast := atMaxY && eastNeeded
+        expandSouth := southNeeded
+      }
+      is(DirSouth) {
+        expandWest := atMinY && westNeeded
+        expandEast := atMinY && eastNeeded
+        expandNorth := northNeeded
+      }
+      is(DirLocal) {
+        expandWest := westNeeded
+        expandEast := eastNeeded
+        expandNorth := northNeeded
+        expandSouth := southNeeded
       }
     }
+
+    val goWest = packetValid && Mux(localHit, expandWest, xyWest)
+    val goSouth = packetValid && Mux(localHit, expandSouth, xySouth)
+    val goEast = packetValid && Mux(localHit, expandEast, xyEast)
+    val goNorth = packetValid && Mux(localHit, expandNorth, xyNorth)
+    val goLocal = packetValid && localHit && (ingressDir =/= DirLocal)
 
     val westOut = if (coordinate_x == 0) false.B else goWest
     val eastOut = if (coordinate_x == gridSize - 1) false.B else goEast

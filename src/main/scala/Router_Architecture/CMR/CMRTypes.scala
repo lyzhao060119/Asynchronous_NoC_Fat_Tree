@@ -12,16 +12,23 @@ object CMRParameters {
 
   require(AddressWidth == 24)
 
-  // Locked Fat vs Thin hop recipe: 1xDEL050 and no rcu_matched_buf chain.
-  // RouteComputation's combinational Mat bits must settle before Req_rc opens
-  // RouteSel and its self-acknowledging Toggle feedback loop.  Steps 0
-  // omits the DelayElement (diagnostic hop netlists only).
+  // Locked hop recipe (2026-09-06): tree and mesh RCU 1xDEL150; Ackin
+  // 1xDEL050.  No rcu_matched_buf chain.  RouteComputation's combinational
+  // Mat bits must settle before Req_rc opens RouteSel.  Steps 0 omits the
+  // DelayElement (diagnostic hop netlists only).
   val RcuMatchedDelaySteps: Int =
     sys.env.get("CMR_RCU_MATCHED_DELAY_STEPS").map(_.toInt).getOrElse(1)
-  val RcuMatchedDelayUnitPs: Int =
-    sys.env.get("CMR_RCU_MATCHED_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
+  val TreeRcuMatchedDelayUnitPs: Int =
+    sys.env.get("CMR_RCU_MATCHED_DELAY_UNIT_PS").map(_.toInt).getOrElse(150)
+  val MeshRcuMatchedDelayUnitPs: Int =
+    sys.env.get("CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS").map(_.toInt).getOrElse(150)
+  val RcuMatchedDelayUnitPs: Int = TreeRcuMatchedDelayUnitPs
   require(RcuMatchedDelaySteps >= 0)
-  require(Set(50, 75, 100, 150, 250).contains(RcuMatchedDelayUnitPs))
+  require(Set(50, 75, 100, 150, 250).contains(TreeRcuMatchedDelayUnitPs))
+  require(Set(50, 75, 100, 150, 250).contains(MeshRcuMatchedDelayUnitPs))
+
+  def rcuMatchedDelayUnitPs(useMeshRouting: Boolean): Int =
+    if (useMeshRouting) MeshRcuMatchedDelayUnitPs else TreeRcuMatchedDelayUnitPs
 
   // V2 close-event clocks Ackout/TailPassed on RegEnable falling. A
   // combinational downstream Ack can keep XNOR(Reqout, Ackin) high, so L5
