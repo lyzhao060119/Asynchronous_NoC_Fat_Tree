@@ -49,7 +49,7 @@
   "frozen_structure_ok": true,
   "paper_eligible": false,
   "physical_class": "post-synthesis",
-  "archive_only_reason": null,
+  "archive_only_reason": "RCU 1xDEL050 FM64 whole-network MAXIMUM-SDF fail. Paper recipe is 1xDEL150.",
   "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
   "artifacts": {
     "summary_json": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\20260901_195030_cmr_descal_fm64\\summary.json",
@@ -137,5 +137,5 @@
   "cases": [],
   "created_utc": "2026-09-01T12:05:40+00:00",
   "updated_utc": "2026-09-01T12:05:40+00:00",
-  "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260901_172539 DEL050 (not frozen 20260831 mesh). SDF annotate OK, 0 timing violations. Directed TB_UNEXPECTED_FAIL; TOPO-UR cases TB_STALL_FAIL at ~50us with rx=59 expected=60. Kept as fail. Not paper numbers. Do not use DES Tmax."
+  "notes": "V3.1.0 Gate B smoke on DEL050 netlist 20260901_172539. Extra-body / stall. Archive. Paper FM64 baseline is 20260903_101701_cmr_descal_fm64_del150 (RCU 1xDEL150). Do not use DES Tmax."
 }

@@ -9,6 +9,7 @@ from typing import Any
 
 from .display_names import display_description, display_name
 from .network_inventory import by_id
+from .schema import locked_delay_recipe
 
 # Independent whole-network netlists that must each produce a synthesis netlist,
 # maximum-delay file, area/timing/structure reports, hashes, and a manifest.
@@ -95,7 +96,7 @@ EMIT: dict[str, dict[str, Any]] = {
     "FM64": {
         "main": "NoC.CMR.CMRMeshNoCMain",
         "sbt_args": "8 1 1",
-        "env": {},
+        "env": {"CMR_RCU_MATCHED_DELAY_UNIT_PS": "150"},
         "gen_dir": "generated_cmr/mesh_noc64_11",
         "dut_file": "CMRMeshNoC.v",
         "top": "CMRMeshNoC",
@@ -142,7 +143,7 @@ EMIT: dict[str, dict[str, Any]] = {
     "FM256": {
         "main": "NoC.CMR.CMRMeshNoCMain",
         "sbt_args": "16 1 1",
-        "env": {},
+        "env": {"CMR_RCU_MATCHED_DELAY_UNIT_PS": "150"},
         "gen_dir": "generated_cmr/mesh_noc256_11",
         "dut_file": "CMRMeshNoC.v",
         "top": "CMRMeshNoC",
@@ -166,7 +167,7 @@ EMIT: dict[str, dict[str, Any]] = {
     "FM1024": {
         "main": "NoC.CMR.CMRMeshNoCMain",
         "sbt_args": "32 1 1",
-        "env": {},
+        "env": {"CMR_RCU_MATCHED_DELAY_UNIT_PS": "150"},
         "gen_dir": "generated_cmr/mesh_noc1024_11",
         "dut_file": "CMRMeshNoC.v",
         "top": "CMRMeshNoC",
@@ -223,6 +224,7 @@ def matrix_row(design_id: str) -> dict[str, Any]:
         "synthesis_supported": (not unsupported) and bool(inventory.get("elaborated", True)),
         "unsupported_reason": UNSUPPORTED.get(design_id),
         "emit": EMIT.get(owner),
+        "delay_recipe": locked_delay_recipe(label=design_id),
         "expected": {
             "routers": inventory.get("routers"),
             "ports": inventory.get("ports") or inventory.get("ipms"),
@@ -246,6 +248,8 @@ def dump_matrix() -> dict[str, Any]:
             "values, and no loss, duplication, deadlock, or timeout."
         ),
         "no_synchronous_256_or_1024": True,
+        "flat_mesh_rcu_unit_ps": 150,
+        "hierarchical_rcu_unit_ps": 50,
         "independent_netlists": list(INDEPENDENT_NETLISTS),
         "paper_matrix": list(PAPER_MATRIX_NETWORKS),
         "shared_netlists": dict(SHARED_NETLISTS),

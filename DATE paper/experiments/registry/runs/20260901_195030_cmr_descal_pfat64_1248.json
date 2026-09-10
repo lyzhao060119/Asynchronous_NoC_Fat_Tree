@@ -1,7 +1,7 @@
 {
   "schema": "date-experiment-run-v1",
   "run_id": "20260901_195030_cmr_descal_pfat64_1248",
-  "status": "fail",
+  "status": "archived",
   "design_id": "PFAT64",
   "benchmark_id": null,
   "seed": 900001,
@@ -48,8 +48,8 @@
   ],
   "frozen_structure_ok": true,
   "paper_eligible": false,
-  "physical_class": "post-synthesis",
-  "archive_only_reason": null,
+  "physical_class": "archive-only",
+  "archive_only_reason": "39 L1_L4 setuphold violations on 20260901_140918. Replaced by L14 SDC netlist 20260904_102919_cmr_noc64_p50_1248 and GLS 20260904_145049_cmr_noc64_p50_1248. Do not overwrite hashes.",
   "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
   "artifacts": {
     "summary_json": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\20260901_195030_cmr_descal_pfat64_1248\\summary.json",
@@ -136,6 +136,6 @@
   },
   "cases": [],
   "created_utc": "2026-09-01T12:01:10+00:00",
-  "updated_utc": "2026-09-01T12:01:10+00:00",
+  "updated_utc": "2026-09-04T11:34:20+00:00",
   "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260901_140918 DEL050. All four 5-flit cases TB_RESULT PASS and SDF annotate errors=0, but each has 39 MAXIMUM-SDF timing violations on OPM resettable_latch. Kept as fail. Not paper numbers. Do not use DES Tmax."
 }

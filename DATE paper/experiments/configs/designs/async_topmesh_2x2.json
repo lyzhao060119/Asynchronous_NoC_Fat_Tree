@@ -35,14 +35,6 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "n/a",
-  "delay_recipe": {
-    "rcu_steps": 1,
-    "rcu_unit_ps": 50,
-    "buf_stages": 0,
-    "ackin_steps": 1,
-    "ackin_unit_ps": 50,
-    "ackin_use_buf": false
-  },
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
@@ -50,5 +42,13 @@
   "paper_role": "Table I TopMesh2",
   "paper_eligible_default": true,
   "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
   "display_name": "Asynchronous two-lane top-mesh router primitive"
 }

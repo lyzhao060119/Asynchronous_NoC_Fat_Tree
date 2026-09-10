@@ -25,12 +25,16 @@ from date_v3.canonical_trace import (  # noqa: E402
 )
 from date_v3.designs import NETWORK_IDS, materialize_opts  # noqa: E402
 from date_v3.materialize_case import materialize_path  # noqa: E402
+from date_v3.offered_load import SMOKE_LOAD  # noqa: E402
 from date_v3.paths import INTERMEDIATE  # noqa: E402
 from date_v3.saturation import coarse_loads  # noqa: E402
 
 BENCHMARKS = (
     "BF-STRESS64",
     "TOPO-UR",
+    "MC-UR-F4",
+    "MC-UR-F8",
+    "MC-XQ-F8",
     "XMC-F16",
     "XMC10-G",
     "MESH-INTERCLUSTER-UR",
@@ -53,6 +57,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--keycase-256", action="store_true")
     parser.add_argument("--hrep", action="store_true")
     parser.add_argument("--out", type=Path, default=INTERMEDIATE / "traces")
+    parser.add_argument(
+        "--case-out",
+        type=Path,
+        help="Directory for materialized .case files (default: <jsonl parent>/cases)",
+    )
+    parser.add_argument(
+        "--no-sidecars",
+        action="store_true",
+        help="Write only .case files (skip packets.json / model.json)",
+    )
     return parser.parse_args()
 
 
@@ -62,10 +76,10 @@ def selected_loads(args: argparse.Namespace, bench: dict) -> list[float]:
     if not bench.get("load_sweep", {}).get("enabled"):
         return [0.0]
     if args.smoke and not (args.full or args.paper):
-        return [0.10]
+        return [SMOKE_LOAD]
     if args.full or args.paper:
         return coarse_loads(include_zero=True)
-    return [0.10]
+    return [SMOKE_LOAD]
 
 
 def selected_spreads(args: argparse.Namespace, bench: dict) -> list[int | None]:
@@ -89,7 +103,16 @@ def selected_designs(args: argparse.Namespace, nodes: int, bench: dict | None) -
     if not args.materialize:
         return []
     if args.design:
-        return list(args.design)
+        allowed = set(bench.get("applies_to_designs") or []) if bench else None
+        out = []
+        for design_id in args.design:
+            if design_id not in NETWORK_IDS:
+                continue
+            if allowed is not None and design_id not in allowed:
+                continue
+            if materialize_opts(design_id)["nodes"] == nodes:
+                out.append(design_id)
+        return out
     if (args.paper or args.full) and bench is not None:
         out = []
         for design_id in bench.get("applies_to_designs") or []:
@@ -105,18 +128,28 @@ def selected_designs(args: argparse.Namespace, nodes: int, bench: dict | None) -
     return ["PROP1024"]
 
 
-def emit_materialize(path: Path, designs: list[str], *, hrep: bool, nodes: int) -> None:
+def emit_materialize(
+    path: Path,
+    designs: list[str],
+    *,
+    hrep: bool,
+    nodes: int,
+    case_out: Path | None = None,
+    sidecars: bool = True,
+) -> None:
+    out_dir = case_out if case_out is not None else (path.parent / "cases")
     for design in designs:
         opts = materialize_opts(design)
         if opts["nodes"] != nodes:
             continue
         case_path = materialize_path(
             path,
-            path.parent / "cases",
+            out_dir,
             top_lanes=opts["top_lanes"],
             hrep=hrep or opts["hrep"],
             routing=opts["routing"],
             design_id=design,
+            sidecars=sidecars,
         )
         print("CASE", design, case_path, flush=True)
 
@@ -145,6 +178,8 @@ def main() -> int:
                 selected_designs(args, header["nodes"], None),
                 hrep=args.hrep,
                 nodes=header["nodes"],
+                case_out=args.case_out,
+                sidecars=not args.no_sidecars,
             )
         print("GEN_CASES_V3_DONE traces=%d" % written, flush=True)
         return 0
@@ -173,6 +208,8 @@ def main() -> int:
                             selected_designs(args, header["nodes"], bench),
                             hrep=args.hrep,
                             nodes=header["nodes"],
+                            case_out=args.case_out,
+                            sidecars=not args.no_sidecars,
                         )
     print("GEN_CASES_V3_DONE traces=%d" % written, flush=True)
     return 0

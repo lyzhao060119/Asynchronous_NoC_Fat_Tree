@@ -34,6 +34,7 @@ On this DUT that is `TCF-RD-01` (16×`BUFFD0` on the Reqout XOR).  On
 | CMR-OPM-01-CE | yes | `Ackout` / `TailPassed` DFF D | `V2CloseEvent.close_clock↑` | Same-close **measurement** sub-clause, not an inner-loop ID. Pulse width is a functional floor (Ackin 1×DEL250), not this RTC. |
 | CMR-TP-01 | yes | `TailPassed` at `OPMSelector.PathLatch.R` and `MG = Grant & !TP` closing L1–L4 | next `PktPathEnable` / `Reqin` into that OPM | **New ID.** Packet-lifetime release must beat the next packet.  No explicit DEL. |
 | CMR-LANE-01 | **N/A** | `SelectedAck ^ PhaseOffset` at `LanePhaseAdapter.AckLatch.D` | `Assigned` closing `AckLatch` | Fat-tree / multi-lane only.  Thin DUT has `ADAPTER=0`. |
+| CMR-LANE-02 | **N/A** | `Ackout ^ SelectedAck` at `LanePhaseAdapter.OffsetLatch.D` | `Assigned` closing `OffsetLatch.E` (`en=~Assigned&SelectionValid`) | Fat-tree / multi-lane only.  Distinct from LANE-01 (AckLatch).  Do **not** casually pad `OffsetLatch.E` (keeps latch transparent while `LaneSelect` may still move).  Constrain / speed the **D** cone (`set_max_delay`).  Existing LANE-01 ECO (`cmr_*_acklatch_e_pins`) **excludes** `OffsetLatch.E` by design. |
 | CMR-HS-01 | yes | whole input flit (`Head`/`Tail`/`Address`/`Reqin`) at the AddressRegister complete CP | `HeadPredictor.en_state_reg.CP` = `~(Reqin^Ackout)` | Preserve the **whole** bundle.  Head/Tail-only buffer experiment is disabled.  Never delay `complete`.  Current `PhaseSelector` has no `phase_reg`. |
 | CMR-HS-02 | yes | `HandshakeComplete` `0→1` at `WriteCounter` CK | next `Reqin` returning complete to 0 | Library pulse width / recovery at CK.  Do not `+neg_tchk`.  Do not global min-delay `Reqin → CellFull.D`. |
 | CMR-WP-01 | yes | `WritePointer` rotation finished (`CellFullLatch.E` closed/next open; next `CellFull` still current `Reqin`) | next `Reqin`/`Datain`/`Head`/`Tail` at any still-transparent `D` | Endpoint `DEL150+DEL050` = 0.20 ns (and TB `ACK_TO_NEXT_REQ_GUARD_NS`).  Do not change Fig. 7 XOR or add write-interface `DelayElement`. |
@@ -290,6 +291,38 @@ ctrl (min):  Assigned closing AckLatch.E
 existing:    none (comment in LanePhaseAdapter.v: paired RTC, not RTL buffer)
 forbid:      do not instantiate adapters on the thin DUT to "exercise" this ID
 deferred:    fat-tree / L1 1→2 and above (step H)
+```
+
+### CMR-LANE-02  |  thin: **N/A**
+
+OffsetLatch captures `PhaseOffset = Ackout ^ SelectedAck` while arbitration
+is open (`en = ~Assigned & SelectionValid`).  While `~Assigned`, AckLatch is
+opaque so `Ackout` is stable; the GLS hazard is `Assigned↑` opening AckLatch
+before `OffsetLatch.E` falls.  `Commit`/`Assigned↑` closes `en`.  If `D` is
+still moving at close, the wrong offset is locked and
+`Reqout = Reqin ^ bad_offset` corrupts the lane phase (GLS OffsetLatch TV
+→ early body mismatch / misroute on PROP64).
+
+```text
+DUT:         LanePhaseAdapter count must be 0 on this freeze (thin).
+data (max):  OffsetLatch.D = Ackout ^ SelectedAck
+             *LanePhaseAdapter/OffsetLatch/*/latch_cell/D
+ctrl (min):  Assigned closing OffsetLatch.E
+             *LanePhaseAdapter/OffsetLatch/*/latch_cell/E
+existing:    none (LANE-01 ECO deliberately excludes OffsetLatch.E)
+DC:          CMR_LANE02_MAX_NS (default 0.15) set_max_delay -to OffsetLatch.D
+             before compile_ultra on hier-child / router / fat-tree flows.
+             Count LANE-02 separately; do not fold into LANE01_ACKLATCH_BUF.
+forbid:      do not casually insert_buffer on OffsetLatch.E to "buy time"
+             (keeps offset transparent after Commit while AckLatch may open);
+             never use DelayElement as OffsetLatch buffer; do not retarget
+             Fig.6 PhaseSelector or RCU DEL for this ID
+DC:          CMR_LANE02_MAX_NS set_max_delay -to OffsetLatch.D;
+             CMR_LANE01_MAX_NS set_max_delay -to AckLatch.D;
+             CMR_LANE01_BUF_STAGES on AckLatch.E so Ack opens after Offset
+             closes; keep CMR_LANE02_E_BUF_STAGES=0 unless measured residual
+deferred:    fat-tree PROP / PFAT (adapters present).  paper_eligible=false
+             until RTC is written into the freeze document for that netlist.
 ```
 
 ### CMR-HS-01  |  thin: yes
@@ -1472,23 +1505,38 @@ dequeue X (`20260824_cmr_thin_acg_fifo3_dc_01`).  After `Out.Req` 1×DEL150
 then stalls at 586/3366 / 53.21 µs with L1 parent and L2 child decoupled.
 See [`CMRRouter_Debug_Log.md`](CMRRouter_Debug_Log.md) §20–§22.
 
-## Paper hop delay recipe (RCU 1×DEL050 / Buffer=0 / Ackin DEL050)
+## Paper hop delay recipe (RCU 1×DEL150 / Buffer=0 / Ackin DEL050 / Mat ≤0.20 ns)
 
-Fat vs Thin isolated-Router PPA uses the same delay on every level:
+Fat vs Thin isolated-Router PPA and flat-mesh hops share the same delay
+recipe on every level (2026-09-06 tree freeze aligned with mesh Mat-0.20):
 
-- RCU `MatchedDelay`: 1×`DEL050` (`CMR_RCU_MATCHED_DELAY_STEPS=1`, `UNIT_PS=50`)
+- RCU `MatchedDelay`: 1×`DEL150` (`CMR_RCU_MATCHED_DELAY_STEPS=1`, `UNIT_PS=150`)
+- RCU Mat cone: dest Q → `RouteSelAnd.g/A1` **`set_max_delay` ≤ 0.20 ns**
 - RCU matched buffer: **0** (not Thin CFifo 16×`BUFFD0`, not standalone `buf2`)
 - OPM `AckinDelay`: **1×`DEL050` on Fat and Thin** (not Fat `DEL250`, not `CMR_OPM_ACKIN_USE_BUF=1`)
 - LANE01: 0
 
-Frozen netlists (do not overwrite):
-`20260830_cmr_thin_{l1,l2,l3}_hop_del050_ackin050`,
-`20260830_cmr_fat_{l1,l2,l3}_hop_del050_ackin050`.
-PPA folder: `20260830_cmr_router_level_baseline_del050`.
-Pointer:
-[`CURRENT_HOP_DELAY_BASELINE.json`](timing_baselines/CURRENT_HOP_DELAY_BASELINE.json).
+Frozen tree hop netlists (do not overwrite):
+`20260906_112525_cmr_thin_l1_del150_ackin050_mat0p20`,
+`20260906_112525_cmr_fat_l1_del150_ackin050_mat0p20`,
+`20260906_112525_cmr_prop_l2_del150_ackin050_mat0p20`,
+`20260906_112525_cmr_pfat_l2_del150_ackin050_mat0p20`,
+`20260906_112525_cmr_pfat_l3_del150_ackin050_mat0p20`.
 
-Not this recipe (archive only; not Fat vs Thin delay numbers):
+Frozen flat-mesh unique-router parents:
+`20260905_103344_cmr_descal_fm64_mat020`,
+`20260905_103344_cmr_descal_fm256_mat020`.
+See `DATE paper/experiments/setup/CMR_Router_Structure_Freeze.md` §4.1 / §4.1b–§4.1c.
+
+Archived (RTM open at 1×DEL050; not paper):
+`20260830_cmr_thin_{l1,l2,l3}_hop_del050_ackin050`,
+`20260830_cmr_fat_{l1,l2,l3}_hop_del050_ackin050`,
+`20260831_cmr_pfat_l{2,3}_*_del050_ackin050`.
+PPA folder pointer still:
+[`CURRENT_HOP_DELAY_BASELINE.json`](timing_baselines/CURRENT_HOP_DELAY_BASELINE.json)
+(must be regenerated against DEL150 hops before Table I intake).
+
+Not this recipe (archive only):
 
 - Thin NoC16 CURRENT `20260828_cmr_cfifo_tp_nogrant_p50` and standalone `*_del050_buf2`
 - Thin hop `20260830_cmr_thin_l1_hop` (16×BUFFD0)

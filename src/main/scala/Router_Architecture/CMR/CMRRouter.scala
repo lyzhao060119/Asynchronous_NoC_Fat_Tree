@@ -108,9 +108,9 @@ class CMRRouter(
         ipm.io.Ackin(branch) := OutputPortModules(output).io.Ackout(source)
         ipm.io.TailPassed(branch) := OutputPortModules(output).io.TailPassed(source)
       } else {
-        val selector = Module(new LaneSelecterCelement(laneCount))
+        val selector = Module(new LaneSelectorSRLatch(laneCount))
         selector.io.reset := reset.asBool
-        selector.io.PacketActive := ipm.io.PathEnabled(branch)
+        selector.io.PPE := ipm.io.PathEnabled(branch)
         val held = VecInit(selector.io.LaneSelect.asBools)
         val laneIsEmpty = outputs.zipWithIndex.map { case (output, lane) =>
           val source = sourceIndices(lane)
@@ -143,8 +143,7 @@ class CMRRouter(
         adapter.io.IPMReqOut :=
           VecInit(Seq.fill(laneCount)(ipm.io.Reqout(branch))).asUInt
         adapter.io.OPMAckOut := laneAcks.asUInt
-        ipm.io.Ackin(branch) :=
-          (adapter.io.IPMAckIn & selector.io.LaneSelect).orR
+        ipm.io.Ackin(branch) := adapter.io.IPMAckIn
         ipm.io.TailPassed(branch) := laneTails.asUInt.orR
       }
     }

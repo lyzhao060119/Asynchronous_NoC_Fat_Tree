@@ -1,0 +1,125 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260904_145049_cmr_noc64_p50_1248",
+  "status": "pass",
+  "design_id": "PFAT64",
+  "benchmark_id": null,
+  "seed": 900001,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "3632e4fbb27ac6d4e6c60dccf7871d4d4dfa6511",
+    "dirty": true,
+    "describe": "3632e4f-dirty"
+  },
+  "config_hash": "5aaf9b4325b1cb3295822936f285c817a75355c12adf92b333644eac1c9ffe89",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "e0c4bb30ed30a67eaf25d2ae5b76c71d4cfbec40d8036409d54aa7b4e4b507b6",
+  "sdf_hash": "6f81e479e0c81b77fee6448b5a442a941c49da48c0fb4773990eac070f73b8f6",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/import_signed_pfat64.py"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_NOC64_NETLIST_RUN_ID": "20260904_102919_cmr_noc64_p50_1248",
+    "CMR_PFAT_L14_MODE": "apply",
+    "CMR_PFAT_L14_SETUP_MIN_NS": "0.376",
+    "NETLIST_RUN_ID": "20260904_102919_cmr_noc64_p50_1248",
+    "GATE_B_SMOKE": "1"
+  },
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "netlist_run_id": "20260904_102919_cmr_noc64_p50_1248",
+    "skip_dc": true,
+    "l14_sdc": "scripts/asic_dc/cmr/async_cmr_pfat_l14.sdc",
+    "delay_recipe": "RCU 1xDEL050 / Ackin 1xDEL050",
+    "dc_mark": [
+      "CMR_PFAT_L14_SOURCE mode=apply file=/home/ghy19/Asynchronous_Router_CMR/scripts/asic_dc/cmr/async_cmr_pfat_l14.sdc",
+      "CMR_PFAT_L14_BIND mode=apply opms=168 l14_latches=1344 fanin_hist={5 64 4 32 10 32 8 16 20 16 16 8}",
+      "CMR_PFAT_L14_APPLY pairs=1344 setup_min=0.376 setup_max=0.0 hold_min=0.0 data_check=0.0",
+      "CMR_NOC64_STRUCTURE ROUTER=21 FIFO=0 ASYNC_FIFO=0 CIRCULAR_FIFO=0 IPM=168 OPM=168 ADAPTER=352 ACKLATCH_E=352 LANE01_BUF=0 stages=0 MUTEX4=240 MUTEX2=2008 CLEAR=40520 SET=3024 SR=0 CLOSE=336 COMPLETE=0 ROUTESEL_AND2=672 ROUTESEL_AN2D0=672 DEL050=168 ACKIN=168 ACKIN_UNIT=50 ACKIN250=0 HS02=0 RD01=0 FIFO_OUTREQ_DEL150=0",
+      "CMR_NOC64_DC_PASS output=/home/ghy19/Asynchronous_Router_CMR/outputs/20260904_102919_cmr_noc64_p50_1248"
+    ],
+    "sdf_cases": {
+      "directed": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=100 delivered=100 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=119742.618 flits_per_ns=0.000835",
+        "missing_log": false,
+        "case": "KEY-64_n64_s900001_zero_PFAT64_top8"
+      },
+      "zero": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=77982.625 flits_per_ns=0.000769",
+        "missing_log": false,
+        "case": "TOPO-UR_n64_s900001_zero_PFAT64_top8"
+      },
+      "medium": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=24982.630 flits_per_ns=0.002402",
+        "missing_log": false,
+        "case": "TOPO-UR_n64_s900001_r0p10_PFAT64_top8"
+      },
+      "near-sat": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=21182.753 flits_per_ns=0.002832",
+        "missing_log": false,
+        "case": "TOPO-UR_n64_s900001_r0p30_PFAT64_top8"
+      }
+    },
+    "case_hashes": {
+      "KEY-64_n64_s900001_zero_PFAT64_top8": "fd27e58ea34b478076216c9957f801ce8fac21266a2833c0b095a975190c507b",
+      "TOPO-UR_n64_s900001_zero_PFAT64_top8": "bb96df410be7b897451b80044054c9b29090fc1a5276ce2c0b1d9fec47e4df9e",
+      "TOPO-UR_n64_s900001_r0p10_PFAT64_top8": "018ff2e07c954e365b81b04fd99f2f2fa789b81b765b9f5ef44fa845e18bc753",
+      "TOPO-UR_n64_s900001_r0p30_PFAT64_top8": "aa806fdfa81f4c6fc2cdc0dba975db1fde8fe4a6cbd68579439f71534840aff5"
+    },
+    "traffic": "KEY-64 directed + TOPO-UR smoke zero/0.10/0.30 seed 900001 5-flit",
+    "paper_matrix_allowed": false
+  },
+  "cases": [],
+  "created_utc": "2026-09-04T11:34:20+00:00",
+  "updated_utc": "2026-09-04T11:34:20+00:00",
+  "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260904_102919_cmr_noc64_p50_1248 with L14 SDC apply setup_min=0.376 (1344 pairs). STRUCTURE ROUTER=21 IPM/OPM=168 ADAPTER=352 DEL050=168 ACKIN 1xDEL050. Four 5-flit cases TB_RESULT PASS, SDF annotate Done, timing_violation_count=0. Replaces 20260901_195030_cmr_descal_pfat64_1248. Not paper 11k. paper_eligible=false. Do not use DES Tmax. A separate TAB-NET 3000-packet job on the same netlist reported 1 OffsetLatch timing violation; it is not part of Gate B smoke."
+}

@@ -8,8 +8,8 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any, Iterable
 
-COARSE_LOADS = (0.02, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50)
-FINE_STEP = 0.01
+from .offered_load import COARSE_LOADS, FINE_STEP
+
 PLATEAU_REL_EPS = 0.02
 
 

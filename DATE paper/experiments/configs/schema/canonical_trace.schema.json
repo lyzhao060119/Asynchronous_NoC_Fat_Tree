@@ -29,6 +29,8 @@
     "measurement_original_events": { "type": "integer", "minimum": 0 },
     "offered_load": { "type": "number" },
     "load_tag": { "type": "string" },
+    "load_unit": { "type": "string" },
+    "case_tick_ns": { "type": "number" },
     "spread_S": { "type": ["integer", "null"] },
     "paired_trace": { "const": true },
     "tmax_definition": { "type": ["string", "null"] }

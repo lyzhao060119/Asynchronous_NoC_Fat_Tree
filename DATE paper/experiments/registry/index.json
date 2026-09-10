@@ -1,6 +1,6 @@
 {
   "schema": "date-v3-registry-v1",
-  "updated_utc": "2026-09-01T12:44:52+00:00",
+  "updated_utc": "2026-09-05T14:07:36+00:00",
   "notes": "Empty index; populated by run_experiment.py plan.",
   "runs": [
     {
@@ -129,11 +129,11 @@
       "design_id": "ASYNC_FLATMESH_1X1",
       "benchmark_id": "R-U5",
       "status": "pass",
-      "paper_eligible": true,
+      "paper_eligible": false,
       "physical_class": "post-synthesis",
       "config_hash": "0a1434c188bcdc405dc504f5b76fa58d7acff8ad98b41abffe7c820a1cebb9ca",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260831_cmr_flatmesh_c1p1_del050_ackin050.json",
-      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+      "notes": "Archive: RCU 1xDEL050 flat-mesh leaf hop. Table I mesh leaf must use the 1xDEL150 hop."
     },
     {
       "run_id": "20260831_cmr_pfat_l2_c2p4_del050_ackin050",
@@ -227,12 +227,12 @@
       "run_id": "20260901_195030_cmr_descal_pfat64_1248",
       "design_id": "PFAT64",
       "benchmark_id": null,
-      "status": "fail",
+      "status": "archived",
       "paper_eligible": false,
-      "physical_class": "post-synthesis",
+      "physical_class": "archive-only",
       "config_hash": "5aaf9b4325b1cb3295822936f285c817a75355c12adf92b333644eac1c9ffe89",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260901_195030_cmr_descal_pfat64_1248.json",
-      "notes": "V3.1.0 Gate B whole-network MAXIMUM-SDF smoke (seed 900001, 5-flit). Not paper 11k. paper_eligible=false. Do not use DES Tmax as a substitute."
+      "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260901_140918 DEL050. All four 5-flit cases TB_RESULT PASS and SDF annotate errors=0, but each has 39 MAXIMUM-SDF timing violations on OPM resettable_latch. Kept as fail. Not paper numbers. Do not use DES Tmax."
     },
     {
       "run_id": "20260901_195030_cmr_descal_prop64_1222",
@@ -323,15 +323,125 @@
       "notes": "DATE V3 Phase 2.5 Sync 1-cycle Head post-synthesis DC + R-U5 hop PPA. No P&R."
     },
     {
+      "run_id": "20260903_101701_cmr_descal_fm64_del100",
+      "design_id": "FM64",
+      "benchmark_id": null,
+      "status": "fail",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "ca1d418a37630b8aff5250d3fb0017023207bd909eeb1279c0d84717e5e2b45c",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260903_101701_cmr_descal_fm64_del100.json",
+      "notes": "Archive: 64-node asynchronous flat mesh at RCU 1xDEL100 / Ackin 1xDEL050. Isolation 6to44 passed; KEY-64 / TOPO-UR missing one 5-flit packet. Paper netlist is 20260905_103344_cmr_descal_fm64_mat020. Do not overwrite."
+    },
+    {
+      "run_id": "20260903_101701_cmr_descal_fm64_del150",
+      "design_id": "FM64",
+      "benchmark_id": null,
+      "status": "archived",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "c119f16f66466b85bda02e1d75c007d712b87cc63352b38f80e574a9e696f8f0",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260903_101701_cmr_descal_fm64_del150.json",
+      "notes": "Archived pre-AABB FM64 DEL150. Remote outputs/rtl deleted 2026-09-06. Paper netlist is 20260905_103344_cmr_descal_fm64_mat020."
+    },
+    {
+      "run_id": "20260903_182634_cmr_descal_fm256",
+      "design_id": "FM256",
+      "benchmark_id": null,
+      "status": "archived",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "9481597bc5dddb8c33a880c3b87e30827cd01108c22bf3ad204dcbd74e97a2d3",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260903_182634_cmr_descal_fm256.json",
+      "notes": "Whole-network hierarchical DC + stitch at RCU 1xDEL150 / Ackin 1xDEL050. Calibration/template netlist only; no Gate C GLS. paper_eligible=false."
+    },
+    {
+      "run_id": "20260903_182634_cmr_descal_prop256",
+      "design_id": "PROP256",
+      "benchmark_id": null,
+      "status": "archived",
+      "paper_eligible": false,
+      "physical_class": "archive-only",
+      "config_hash": "63374782794b922bd119044264faa17a21979194b03b27de205738d0e25bb112",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260903_182634_cmr_descal_prop256.json",
+      "notes": "Whole-network hierarchical DC + stitch at RCU 1xDEL050 / Ackin 1xDEL050. Calibration/template netlist only; no Gate C GLS. paper_eligible=false."
+    },
+    {
+      "run_id": "20260903_cmr_flatmesh_c1p1_del150_ackin050",
+      "design_id": "ASYNC_FLATMESH_1X1",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "ef55af7758c42f7d8dca9bad896838fa4511d7ccb8edf664f759b83f5e8f69ba",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260903_cmr_flatmesh_c1p1_del150_ackin050.json",
+      "notes": "Mesh Router hop DC at RCU 1xDEL150 / Ackin 1xDEL050. Hop MAXIMUM-SDF PPA not run this round. Not Table I until hop GLS."
+    },
+    {
+      "run_id": "20260904_092245_cmr_descal_prop256_gls_retry",
+      "design_id": "PROP256",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "63374782794b922bd119044264faa17a21979194b03b27de205738d0e25bb112",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260904_092245_cmr_descal_prop256_gls_retry.json",
+      "notes": "256-node asynchronous balanced hierarchical MAXIMUM-SDF smoke. Netlist 20260903_221710_cmr_descal_prop256 mixed RCU DEL050=584/584 + TopMesh DEL150=40/40, Ackin 1xDEL050. GLS KEY-256 + TOPO-UR zero from 20260904_092245_cmr_descal_prop256_gls_retry; TOPO-UR 0.05/0.10/0.30 + MC-UR from 20260904_083822_cmr_descal_prop256_gls. Calibration/template seed 900001, not the 11k formal matrix. paper_eligible=false. Replaces obsolete all-DEL050 20260903_182634_cmr_descal_prop256."
+    },
+    {
+      "run_id": "20260904_145049_cmr_noc64_p50_1248",
+      "design_id": "PFAT64",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "5aaf9b4325b1cb3295822936f285c817a75355c12adf92b333644eac1c9ffe89",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260904_145049_cmr_noc64_p50_1248.json",
+      "notes": "V3.1.0 Gate B smoke. SKIP_DC 20260904_102919_cmr_noc64_p50_1248 with L14 SDC apply setup_min=0.376 (1344 pairs). STRUCTURE ROUTER=21 IPM/OPM=168 ADAPTER=352 DEL050=168 ACKIN 1xDEL050. Four 5-flit cases TB_RESULT PASS, SDF annotate Done, timing_violation_count=0. Replaces 20260901_195030_cmr_descal_pfat64_1248. Not paper 11k. paper_eligible=false. Do not use DES Tmax. A separate TAB-NET 3000-packet job on the same netlist reported 1 OffsetLatch timing violation; it is not part of Gate B smoke."
+    },
+    {
+      "run_id": "20260904_235105_cmr_descal_fm256_del250_gls",
+      "design_id": "FM256",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "9481597bc5dddb8c33a880c3b87e30827cd01108c22bf3ad204dcbd74e97a2d3",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260904_235105_cmr_descal_fm256_del250_gls.json",
+      "notes": "256-node asynchronous flat mesh MAXIMUM-SDF smoke at RCU 1xDEL250 / Ackin 1xDEL050. DEL150 netlist 20260903_182634_cmr_descal_fm256 KEY-256 passed but TOPO-UR/MC-UR stalled (missing port 189). DEL250 stitch DEL250=1280/1280; six calibration cases TB_RESULT PASS, annotate Done, timing_violation_count=0. Not the locked paper mesh recipe (FM64 remains 1xDEL150). paper_eligible=false. Calibration/template seed 900001, not the 11k formal matrix."
+    },
+    {
+      "run_id": "20260905_203649_cmr_descal_prop1024_gls",
+      "design_id": "PROP1024",
+      "benchmark_id": null,
+      "status": "fail",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "793697d37e6e447c258c3299383ade1edf856b6ef6627aadefb04a4b3ea4e9d5",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260905_203649_cmr_descal_prop1024_gls.json",
+      "notes": "PROP1024 mixed-delay netlist 20260905_003827_cmr_descal_prop1024 was hashed, but required MAXIMUM-SDF cases are not all clean. Keep paper_eligible=false."
+    },
+    {
       "run_id": "cmr_mesh64_current",
       "design_id": "FM64",
       "benchmark_id": null,
       "status": "imported_readonly",
       "paper_eligible": false,
-      "physical_class": "unknown",
+      "physical_class": "archive-only",
       "config_hash": "1f0471cafaf9e37b45ab057bb1995c014338185b723e7e88b93c4afefb9b878b",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/cmr_mesh64_current.json",
-      "notes": "Placeholder for the in-flight mesh64 run. Replace run_id with CMR_MESH64_RUN_ID when DC/GLS finishes. Not curated."
+      "notes": "Superseded placeholder. Paper 64-node flat mesh netlist is 20260905_103344_cmr_descal_fm64_mat020. Not a netlist owner."
+    },
+    {
+      "run_id": "20260905_103344_cmr_descal_fm64_mat020",
+      "design_id": "FM64",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": null,
+      "manifest": null,
+      "notes": "Current paper FM64 netlist: AABB RoutingLogic_mesh / Mat-0.20 / RCU 1xDEL150. TOPO-UR coarse 18/18 MAXIMUM-SDF PASS (20260906_101804_cmr_descal_fm64_mat020_gls, tviol=0). paper_eligible=false until curated; no fine 25 MFlit yet."
     }
   ]
 }

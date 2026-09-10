@@ -54,6 +54,8 @@ set router_sources [list \
   [file join $router_l1_dir "OPMSelector.v"] \
   [file join $router_l1_dir "PhaseResetDLatch.v"] \
   [file join $router_l1_dir "LanePhaseAdapter.v"] \
+  [file join $router_l1_dir "LanePhaseAdapterDFF.v"] \
+  [file join $router_l1_dir "LaneSelectorCelement.v"] \
   [file join $router_l1_dir "WriteControlUnit.v"] \
   [file join $router_l1_dir "WriteCounter.v"] \
   [file join $router_l1_dir "WriteAckGenerator.v"] \

@@ -89,12 +89,105 @@ REQUIRED = {
 
 LOCKED_DELAY = {
     "rcu_steps": 1,
-    "rcu_unit_ps": 50,
+    "rcu_unit_ps": 150,
     "buf_stages": 0,
     "ackin_steps": 1,
     "ackin_unit_ps": 50,
     "ackin_use_buf": False,
+    "mat_max_ns": 0.20,
 }
+
+LOCKED_DELAY_MESH = {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": False,
+    "mat_max_ns": 0.20,
+}
+
+LOCKED_DELAY_MIXED = {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 150,
+    "mesh_rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": False,
+    "mat_max_ns": 0.20,
+}
+
+FLAT_MESH_DESIGN_IDS = frozenset(
+    {
+        "ASYNC_FLATMESH_1X1",
+        "FM64",
+        "FM256",
+        "FM1024",
+    }
+)
+
+MESH_ROUTER_DESIGN_IDS = FLAT_MESH_DESIGN_IDS | {"ASYNC_TOPMESH_2X2"}
+
+MIXED_TREE_MESH_DESIGN_IDS = frozenset(
+    {
+        "PROP256",
+        "PROP1024",
+        "HREP1024",
+        "PROP1024_MESH1",
+        "PROP1024_MESH2",
+    }
+)
+
+
+def uses_flat_mesh_delay(
+    design: dict[str, Any] | str | None = None, *, label: str = ""
+) -> bool:
+    """True when every router in the design is mesh-routed (DEL150).
+
+    Includes the flat-mesh family and the isolated TopMesh hop.
+    Clustered PROP256/1024 keep mixed tree + TopMesh refs; both sides are
+    RCU 1xDEL150 Mat-0.20 after the 2026-09-06 tree freeze (formerly tree
+    DEL050 + TopMesh DEL150).
+    """
+    if isinstance(design, str) and design:
+        return design in MESH_ROUTER_DESIGN_IDS
+    if isinstance(design, dict):
+        design_id = str(design.get("design_id") or "")
+        if design_id in MESH_ROUTER_DESIGN_IDS:
+            return True
+        if design.get("kind") == "router_primitive":
+            prims = design.get("router_primitives") or []
+            return bool(prims) and all(p.get("use_mesh_routing") for p in prims)
+        return design.get("family") == "FM" and design.get("routing") == "mesh"
+    return label in MESH_ROUTER_DESIGN_IDS
+
+
+def uses_mixed_tree_mesh_delay(
+    design: dict[str, Any] | str | None = None, *, label: str = ""
+) -> bool:
+    """True for clustered hierarchical networks with TopMesh routers."""
+    if isinstance(design, str) and design:
+        return design in MIXED_TREE_MESH_DESIGN_IDS
+    if isinstance(design, dict):
+        design_id = str(design.get("design_id") or "")
+        if design_id in MIXED_TREE_MESH_DESIGN_IDS:
+            return True
+        prims = design.get("router_primitives") or []
+        mesh = [p for p in prims if p.get("use_mesh_routing")]
+        tree = [p for p in prims if not p.get("use_mesh_routing")]
+        return bool(mesh) and bool(tree)
+    return label in MIXED_TREE_MESH_DESIGN_IDS
+
+
+def locked_delay_recipe(
+    *, label: str = "", design: dict[str, Any] | str | None = None
+) -> dict[str, Any]:
+    if uses_flat_mesh_delay(design, label=label):
+        return dict(LOCKED_DELAY_MESH)
+    if uses_mixed_tree_mesh_delay(design, label=label):
+        return dict(LOCKED_DELAY_MIXED)
+    return dict(LOCKED_DELAY)
 
 
 def validate_required(obj: dict[str, Any], *, label: str) -> None:
@@ -115,8 +208,14 @@ def validate_file(path: Path) -> dict[str, Any]:
     return obj
 
 
-def assert_locked_delay(recipe: dict[str, Any], *, label: str) -> None:
-    for key, expected in LOCKED_DELAY.items():
+def assert_locked_delay(
+    recipe: dict[str, Any],
+    *,
+    label: str,
+    design: dict[str, Any] | str | None = None,
+) -> None:
+    expected_recipe = locked_delay_recipe(label=label, design=design)
+    for key, expected in expected_recipe.items():
         if recipe.get(key) != expected:
             raise ValueError(
                 "%s delay recipe %s=%r, locked is %s"

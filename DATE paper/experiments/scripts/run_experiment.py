@@ -26,7 +26,7 @@ def load_design(design_id: str) -> dict:
         raise SystemExit("missing design config %s" % path)
     design = validate_file(path)
     if design.get("kind") != "fpga":
-        assert_locked_delay(design["delay_recipe"], label=design_id)
+        assert_locked_delay(design["delay_recipe"], label=design_id, design=design)
     return design
 
 

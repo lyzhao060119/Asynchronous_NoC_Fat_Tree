@@ -147,12 +147,12 @@ def make_flit(
     is_head: bool,
     is_tail: bool,
 ) -> int:
-    flit = 0
-    flit |= pkt_id & 0x3
-    flit |= (x0 & 0x3F) << 2
-    flit |= (y0 & 0x3F) << 8
-    flit |= (x1 & 0x3F) << 14
-    flit |= (y1 & 0x3F) << 20
+    flit = pkt_id & 0x3
+    if is_head:
+        flit |= (x0 & 0x3F) << 2
+        flit |= (y0 & 0x3F) << 8
+        flit |= (x1 & 0x3F) << 14
+        flit |= (y1 & 0x3F) << 20
     flit |= (1 if is_tail else 0) << 26
     flit |= (1 if is_head else 0) << 27
     if flit >= (1 << FLIT_W):

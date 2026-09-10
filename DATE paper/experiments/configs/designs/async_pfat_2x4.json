@@ -37,6 +37,13 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "n/a",
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "adapter": "dc_cmr_router",
+  "paper_role": "Fig. A PFAT L2 cost",
+  "paper_eligible_default": true,
+  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
   "delay_recipe": {
     "rcu_steps": 1,
     "rcu_unit_ps": 50,
@@ -45,12 +52,5 @@
     "ackin_unit_ps": 50,
     "ackin_use_buf": false
   },
-  "clock_ns": null,
-  "hrep_policy": false,
-  "shares_netlist_with": null,
-  "adapter": "dc_cmr_router",
-  "paper_role": "Fig. A PFAT L2 cost",
-  "paper_eligible_default": true,
-  "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
   "display_name": "Asynchronous progressively widened level-2 router primitive"
 }

@@ -36,6 +36,7 @@ from date_v3.designs import materialize_opts  # noqa: E402
 from date_v3.event_record import dump_event_jsonl  # noqa: E402
 from date_v3.hashutil import write_json  # noqa: E402
 from date_v3.materialize_case import materialize_path  # noqa: E402
+from date_v3.offered_load import GATE_B_MEDIUM_LOAD, GATE_B_NEAR_SAT_LOAD, GATE_CD_LOW_LOAD, GATE_CD_MEDIUM_LOAD, load_tag, trace_load_fields  # noqa: E402
 from date_v3.paths import INTERMEDIATE  # noqa: E402
 from des import CALIBRATION_SEED, MODEL_VERSION, PAPER_SEEDS, PHYSICAL_CLASS  # noqa: E402
 from des.run import oracle_errors, simulate  # noqa: E402
@@ -72,12 +73,11 @@ DUT_STATUS = {
         ),
     },
     "FM64": {
-        "network_sdf": "have_candidate_need_recipe_check",
-        "netlist_run_id": "20260831_115856_cmr_mesh64_p50",
+        "network_sdf": "have_del150_netlist",
+        "netlist_run_id": "20260903_101701_cmr_descal_fm64_del150",
         "note": (
-            "mesh64 20260831_115856 is a read-only candidate if Ackin is DelayUnitPs50. "
-            "Do not overwrite that directory. Otherwise hierarchical unique-router DC "
-            "or one full-network DC on a new cmr_descal_ ID."
+            "Signed 64-node flat mesh whole-network netlist at RCU 1xDEL150 / Ackin 1xDEL050. "
+            "Do not overwrite. 20260831_115856 and 20260901_172539 are archive only."
         ),
     },
     "PROP256": {
@@ -155,12 +155,11 @@ def directed_corners(*, nodes: int, seed: int, corners: list[int], random_unicas
         "packet_flits": PACKET_FLITS,
         "warmup_original_events": 0,
         "measurement_original_events": len(events),
-        "offered_load": 0.0,
-        "load_tag": "zero",
         "spread_S": None,
         "paired_trace": True,
         "tmax_definition": "last destination tail minus source header injection",
     }
+    header.update(trace_load_fields(0.0))
     return {"header": header, "events": events}
 
 
@@ -233,15 +232,21 @@ def main() -> int:
             generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=0.0),
             z64,
         )
-        l64 = traces / "TOPO-UR_n64_s900001_r0p10.jsonl"
+        l64 = traces / ("TOPO-UR_n64_s900001_%s.jsonl" % load_tag(GATE_B_MEDIUM_LOAD))
         dump_jsonl(
-            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=0.10),
+            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=GATE_B_MEDIUM_LOAD),
             l64,
+        )
+        n64 = traces / ("TOPO-UR_n64_s900001_%s.jsonl" % load_tag(GATE_B_NEAR_SAT_LOAD))
+        dump_jsonl(
+            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=GATE_B_NEAR_SAT_LOAD),
+            n64,
         )
         for design_id in CAL64:
             jobs.append(_materialize_job(design_id, "directed", p64, cases, True))
             jobs.append(_materialize_job(design_id, "zero", z64, cases, True))
             jobs.append(_materialize_job(design_id, "loaded", l64, cases, False))
+            jobs.append(_materialize_job(design_id, "near_sat", n64, cases, False))
 
         p256 = traces / "KEY-256_n256_s900001_corners.jsonl"
         dump_jsonl(
@@ -250,14 +255,14 @@ def main() -> int:
             ),
             p256,
         )
-        u256 = traces / "TOPO-UR_n256_s900001_r0p05.jsonl"
+        u256 = traces / ("TOPO-UR_n256_s900001_%s.jsonl" % load_tag(GATE_CD_LOW_LOAD))
         dump_jsonl(
-            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=256, smoke=True, load_point=0.05),
+            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=256, smoke=True, load_point=GATE_CD_LOW_LOAD),
             u256,
         )
-        m256 = traces / "TOPO-UR_n256_s900001_r0p10.jsonl"
+        m256 = traces / ("TOPO-UR_n256_s900001_%s.jsonl" % load_tag(GATE_CD_MEDIUM_LOAD))
         dump_jsonl(
-            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=256, smoke=True, load_point=0.10),
+            generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=256, smoke=True, load_point=GATE_CD_MEDIUM_LOAD),
             m256,
         )
         for design_id in CAL256:

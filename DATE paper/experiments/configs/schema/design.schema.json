@@ -102,6 +102,7 @@
       "properties": {
         "rcu_steps": { "type": "integer" },
         "rcu_unit_ps": { "type": "integer" },
+        "mesh_rcu_unit_ps": { "type": "integer" },
         "buf_stages": { "type": "integer" },
         "ackin_steps": { "type": "integer" },
         "ackin_unit_ps": { "type": "integer" },

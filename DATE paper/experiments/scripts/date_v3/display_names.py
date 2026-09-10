@@ -44,13 +44,17 @@ DISPLAY_NAMES: dict[str, str] = {
         "Asynchronous balanced hierarchical network, 1024 nodes, "
         "four-lane top-mesh variation (unsupported)"
     ),
+    "FPGA_ASYNC_PROP64": "Field-programmable gate-array wrap of the asynchronous balanced hierarchical 64-node network",
+    "FPGA_SYNC_PROP64": "Field-programmable gate-array wrap of the synchronous balanced hierarchical 64-node network",
     "R-U5": "Isolated five-flit hop characterization",
     "BF-STRESS64": "64-node hierarchical-width stress traffic",
     "TOPO-UR": "Uniform random single-destination traffic, 64/256/1024 nodes",
     "XMC-F16": "1024-node fixed sixteen-destination cross-group multicast traffic",
     "XMC10-G": "1024-node mixed single-destination and multicast traffic",
     "MESH-INTERCLUSTER-UR": "1024-node inter-cluster single-destination sanity traffic (backup only)",
-    "SNN-TRACE1024": "Frozen spiking-neural-network multicast trace replay, 1024 nodes (optional)",
+    "FPGA-DIRECTED": "Field-programmable gate-array directed source-destination pairs",
+    "FPGA-UR": "Field-programmable gate-array uniform random traffic",
+    "FPGA-MULTICAST": "Field-programmable gate-array multicast completion traffic",
 }
 
 DISPLAY_DESCRIPTIONS: dict[str, str] = {
@@ -72,10 +76,6 @@ DISPLAY_DESCRIPTIONS: dict[str, str] = {
     "TOPO-UR": "Uniform random unicast with source not equal to destination, applied at 64, 256, and 1024 nodes.",
     "XMC-F16": "Fixed fanout-16 multicast whose destinations cross cluster groups on the 1024-node hierarchical network.",
     "XMC10-G": "Mixed load: 90 percent unicast and 10 percent fanout-16 multicast on the 1024-node hierarchical network.",
-    "SNN-TRACE1024": (
-        "Optional replay of one frozen spiking-neural-network trace on the "
-        "signed 1024-node hierarchical netlist and its boundary packet-replication policy."
-    ),
 }
 
 # First-use definitions for method names that would otherwise appear as jargon.

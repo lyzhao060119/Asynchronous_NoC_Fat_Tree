@@ -1,8 +1,8 @@
 # DATE 实验 DUT 冻结：CMRRouter 结构 / 同步时钟 / 异步 DEL
 
-> **冻结日期：2026-08-31**  
+> **冻结日期：2026-08-31；平面网格 DEL 修订：2026-09-03；平面网格 Mat-0.20 综合：2026-09-05；层次树 RCU DEL150 + Mat-0.20：2026-09-06**  
 > **适用范围：** DATE V3 全部主实验（THIN / PROP / PFAT / SYNC / FM / H-REP）。  
-> **原则：** Thin 与 Fat 共用同一套 Router 微架构；只改 **lane 几何** 和 **路由模式**（四叉树 vs Mesh）。不同时改 Buffer 深度、flit 宽度、握手协议、异步 DEL 配方或同步时钟。  
+> **原则：** Thin 与 Fat 共用同一套 Router 微架构；只改 **lane 几何** 和 **路由模式**（四叉树 vs Mesh）。不同时改 Buffer 深度、flit 宽度、握手协议或同步时钟。异步 DEL 配方统一锁定：层次树与平面网格 RCU **1×DEL150**，Ackin **1×DEL050**，matched buffer = **0**；unique-router DC 另锁定 **Mat cone ≤ 0.20 ns**（见 §4.1c / §4.1d）。层次树旧 **1×DEL050** hop 因 RCU-01 RTM 不闭合已归档。  
 > **论文 PPA 口径：** DC ZeroWireload + MAXIMUM-SDF GLS + PT-PX。DATE V3 **不做 P&R**；不得把面积/时序写成 post-layout。
 
 实现源：
@@ -28,10 +28,10 @@ $$
 }
 $$
 
-- **Async：** 两相 bundled-data；显式 DEL 只有两处，且 **Thin/Fat、L1/L2/L3 完全相同**：RCU `MatchedDelay` = **1×`DEL050`**，OPM `AckinDelay` = **1×`DEL050`**，RCU matched buffer = **0**。
+- **Async：** 两相 bundled-data；显式 DEL 只有两处。层次树（Thin/Fat、L1/L2/L3）与 mesh 路由路由器相同：RCU `MatchedDelay` = **1×`DEL150`**，OPM `AckinDelay` = **1×`DEL050`**，RCU matched buffer = **0**；unique-router Mat cone **`set_max_delay` ≤ 0.20 ns**。旧层次树 1×DEL050 hop（`20260830_*_del050_ackin050` / `20260831_cmr_pfat_*`）仅作归档，不得进论文。
 - **Sync：** 功能等价 valid/ready 对照；**无 `DelayElement`、无 Mutex、无 `LanePhaseAdapter`**；全局时钟 **1.0 ns**（TSMC 28 nm SS ZeroWireload），Thin 与 Fat 1-2-2-2 共用该周期。
 
-任何新的 DC / SDF / PPA 若改了上述三项中的任意一项，都不得写入 DATE 主文，也不得覆盖已冻结 run ID。
+任何新的 DC / SDF / PPA 若改了上述锁定配方中的任意一项，都不得写入 DATE 主文，也不得覆盖已冻结 run ID。平面网格与层次树均不得再使用 1×DEL050 / DEL100 / DEL250 作为论文网表（Ackin 仍为 1×DEL050）。
 
 ---
 
@@ -153,38 +153,104 @@ Async Thin Q64（21 个 `(1,1)` Router）与 Sync Thin 同几何；当前 `CMRFa
 
 ---
 
-## 4. 异步 DEL 冻结（Thin = Fat = 全层级）
+## 4. 异步 DEL 冻结
 
 工艺：TSMC 28HPC+ `tcbn28hpcplus` / `BWP12T30P140`。  
-单元：`DelayElement_ASIC.v` 中 `DelayUnitPs=50` → **`DEL050D1BWP12T30P140`**。  
+单元：`DelayElement_ASIC.v` 中 `DelayUnitPs=50` → **`DEL050D1BWP12T30P140`**；`DelayUnitPs=100` → **`DEL100D1BWP12T30P140`**；`DelayUnitPs=150` → **`DEL150D1BWP12T30P140`**。  
 DC：`dont_touch` 该链，并核对个数；禁止用 WritePointer SDC 或 `insert_buffer` 冒充 RCU matched delay。
 
-### 4.1 论文 hop / Table I 唯一配方
+### 4.1 层次树 hop / Table I 配方（Thin = Fat = 全层级；2026-09-06 修订）
+
+2026-09-06 RCU-01 STA（`20260906_110945_*`）显示全部 DEL050 树 hop 的
+`Tctrl_min < 1.05×Tdata_max`（RTM 不闭合）。试综合 **1×DEL150 + Mat ≤0.20 ns**
+后 Mat `viol=0`，且 DEL150 STA RTM 全部闭合。论文层次树锁定：
 
 | 位置 | 作用 | 冻结值 | 禁止 |
 | --- | --- | --- | --- |
-| RCU `MatchedDelay`（`Req_rc`） | Fig. 6：`Mat` 稳定后再打开 `RouteSel` | **1 × `DEL050`** | 4×`DEL150`；`STEPS=0`；其后插 `BUFFD0` |
+| RCU `MatchedDelay`（`Req_rc`） | Fig. 6：`Mat` 稳定后再打开 `RouteSel` | **1 × `DEL150`** | 1×`DEL050`（归档）；4×`DEL150`；`STEPS=0`；其后插 `BUFFD0` |
+| RCU Mat cone | dest Q → `RouteSelAnd.g/A1` | **`set_max_delay` ≤ 0.20 ns** | 无 Mat 保护的论文 hop |
 | RCU matched buffer | 历史 Thin CFifo / standalone 实验 | **0** | `CMR_RCU_MATCHED_BUF_STAGES≠0` |
 | OPM `AckinDelay` | V2 close-event：避免组合 Ack 使 L5 永不关闭 | **1 × `DEL050`**（Fat 与 Thin 相同） | Fat `DEL250`；`CMR_OPM_ACKIN_USE_BUF=1` |
 | `LanePhaseAdapter` 数据缓冲 | AckLatch D vs `Assigned` 关闭 | **0** | RTL 内固定 buffer |
 | Write / Read 接口 | Fig. 7/8 | **无 `DelayElement`** | 在 `WriteCounter` 里加 DEL |
 | 层间 FIFO DEL | 论文 DUT 已 bypass | **N/A** | 把 CFifo `16×BUFFD0` 算进 hop |
 
-默认 Scala / 发射环境（不要覆盖）：
+默认 Scala / 发射环境（层次树；不要覆盖）：
 
 ```text
 CMR_RCU_MATCHED_DELAY_STEPS=1
-CMR_RCU_MATCHED_DELAY_UNIT_PS=50
+CMR_RCU_MATCHED_DELAY_UNIT_PS=150
 CMR_RCU_MATCHED_BUF_STAGES=0
 CMR_OPM_ACKIN_DELAY_STEPS=1
 CMR_OPM_ACKIN_DELAY_UNIT_PS=50
+CMR_RCU_MAT_MAX_NS=0.20
 CMR_LANE01_BUF_STAGES=0
 # 不要设置 CMR_OPM_ACKIN_USE_BUF
 CMR_BYPASS_INTERLEVEL_FIFO=1          # 64 核论文 DUT
 ```
 
+签核树 hop（禁止覆盖）：
+
+- Thin (1,1)：`20260906_112525_cmr_thin_l1_del150_ackin050_mat0p20`（L1/L2/L3 共用几何）
+- Fat L1 (1,2)：`20260906_112525_cmr_fat_l1_del150_ackin050_mat0p20`
+- PROP (2,2)：`20260906_112525_cmr_prop_l2_del150_ackin050_mat0p20`（L2/L3）
+- PFAT L2 (2,4)：`20260906_112525_cmr_pfat_l2_del150_ackin050_mat0p20`
+- PFAT L3 (4,8)：`20260906_112525_cmr_pfat_l3_del150_ackin050_mat0p20`
+
 保护脚本：`cmr_frozen_run_ids.require_locked_delay_structure`。  
 覆盖冻结目录必须显式 `CMR_FORCE_OVERWRITE_FROZEN=1`，且仍不得把新配方写进主文。
+
+### 4.1b 平面网格配方（叶 hop 与 FM64 / FM256 / FM1024）
+
+8×8 XY 路径上 1×DEL050 的 `Mat` 在 `RouteSel` / `InternalAck` 打开前未收敛，MAXIMUM-SDF 出现尾后多余体微片或缺包超时。1×DEL100 去掉了隔离 extra-body，但 KEY/UR 仍缺一个 5-flit 包。论文平面网格锁定：
+
+| 位置 | 冻结值 |
+| --- | --- |
+| RCU `MatchedDelay` | **1 × `DEL150`** |
+| RCU matched buffer | **0** |
+| OPM `AckinDelay` | **1 × `DEL050`** |
+
+```text
+CMR_RCU_MATCHED_DELAY_STEPS=1
+CMR_RCU_MATCHED_DELAY_UNIT_PS=150
+CMR_RCU_MATCHED_BUF_STAGES=0
+CMR_OPM_ACKIN_DELAY_STEPS=1
+CMR_OPM_ACKIN_DELAY_UNIT_PS=50
+```
+
+签核整网 unique-router（Mat-0.20 锥，禁止覆盖）：  
+- FM64：`20260905_103344_cmr_descal_fm64_mat020`  
+- FM256：`20260905_103344_cmr_descal_fm256_mat020`  
+
+前驱整网（只读归档，不得再作论文 stitch 源）：  
+- FM64 DEL150（旧锥）：`20260903_101701_cmr_descal_fm64_del150`  
+- FM256 DEL150（旧锥，TOPO-UR/MC-UR stall）：`20260903_182634_cmr_descal_fm256`  
+- FM256 DEL250（调试 MAXIMUM-SDF，非论文配方）：`20260904_193201_cmr_descal_fm256_del250`  
+
+叶 hop Table I：`20260903_cmr_flatmesh_c1p1_del150_ackin050`（替换中；旧 ID `20260831_cmr_flatmesh_c1p1_del050_ackin050` 只读归档）。  
+DEL100 / DEL250 平面网格作业只作调试，不得进论文。TopMesh `(2,2)` 与平面网格叶相同，使用 **1×DEL150** mesh Mat；PROP256/1024 等混合网为 tree **1×DEL050** + TopMesh **1×DEL150**。
+
+### 4.1c 平面网格 Mat-0.20 综合冻结（2026-09-05）
+
+在 §4.1b DEL 配方之上，平面网格 unique-router DC **必须** 满足以下综合实现；不得再抬 DEL、不得改 AABB 语义、不得覆盖已冻结 mat020 run ID。
+
+| 项 | 冻结值 |
+| --- | --- |
+| Mesh 路由语义 | AABB / XY / multicast；`RoutingLogicMeshModel` 为 golden oracle（spec 21/21） |
+| Mat RTL 锥 | 无序区间比较 + `closerHiU6`；XY 为 1-bit mux；`Mux(localHit, expand, xy)`；无 6-bit target 先 mux 再比 |
+| RCU mesh | `packetValid = true.B`；`ingressDir` 按端口编译期折叠 |
+| DC Mat 约束 | dest Q → `RouteSelAnd.g/A1`，`CMR_RCU_MAT_MAX_NS=0.20`；任一 unique ref 违例则 child FAIL，禁止 stitch |
+| Compile 加压 | `CMR_RCU_MAT_COMPILE_NS=0.18`（可选）+ `set_critical_range 0.05`，检查仍按 0.20 |
+| Pass 定义 | 每个 uniquified `(x,y)` ref 均有 `CMR_HIER_CHILD_DC_PASS` 且 Mat slack 无 viol |
+
+已签核证据（unique-router；**整网 stitch / MAXIMUM-SDF 尚未签**）：
+
+| 网络 | unique DC | Mat slack | RCU-01 STA（采样） |
+| --- | --- | --- | --- |
+| FM64 | 64/64 PASS | 首轮缺 `WORST_SLACK` 行；不得单独当 0.20 证明 | 未作为本冻结必选项 |
+| FM256 | 256/256 PASS，`viol=0` | 最紧贴 0.20 | 8/8 PASS，`T_mat_max≤0.20`，5% RTM 闭合（`mesh_mat020_sta_summary.json`） |
+
+**下一步（不打开 DEL / 不改锥）：** 对上述两个 mat020 parent 做 hierarchical **Stitch**，再跑 MAXIMUM-SDF GLS 验收。Stitch 使用 `CMR_HIER_STITCH_ONLY=1`（禁止重提已 PASS child）；GLS 新 run ID，`SKIP_DC` 指向 mat020 netlist。
 
 ### 4.2 已冻结 Async hop 网表（Table I / Fig. A Router 点）
 
@@ -198,8 +264,9 @@ CMR_BYPASS_INTERLEVEL_FIFO=1          # 64 核论文 DUT
 | Fat L1 `(1,2)` | `20260830_cmr_fat_l1_hop_del050_ackin050` |
 | PROP L2 `(2,2)` | `20260830_cmr_fat_l2_hop_del050_ackin050` |
 | PROP L3 `(2,2)` | `20260830_cmr_fat_l3_hop_del050_ackin050` |
-| FlatMesh `(1,1)` mesh Mat | `20260831_cmr_flatmesh_c1p1_del050_ackin050` |
-| TopMesh2 `(2,2)` mesh Mat | `20260831_cmr_topmesh_c2p2_del050_ackin050` |
+| FlatMesh `(1,1)` mesh Mat | `20260831_cmr_flatmesh_c1p1_del050_ackin050`（归档，DEL050） |
+| FlatMesh `(1,1)` mesh Mat DEL150 | `20260903_cmr_flatmesh_c1p1_del150_ackin050`（Table I 替换中） |
+| TopMesh2 `(2,2)` mesh Mat | `20260903_cmr_topmesh_c2p2_del150_ackin050`（论文）；`20260831_cmr_topmesh_c2p2_del050_ackin050`（归档 DEL050） |
 | PFAT L2 `(2,4)` | `20260831_cmr_pfat_l2_c2p4_del050_ackin050` |
 | PFAT L3 `(4,8)` | `20260831_cmr_pfat_l3_c4p8_del050_ackin050` |
 | Sync Thin isolated（2 拍 Head，archive） | `20260831_cmr_sync_thin_1x1_1p0ns` |
@@ -209,7 +276,7 @@ CMR_BYPASS_INTERLEVEL_FIFO=1          # 64 核论文 DUT
 
 DATE V3 Table I / Fig. A 的 **Async** Router PPA 仍引用 `20260831_cmr_primitive_hop_ppa_ru5` 的 Async 行。Sync 行改为 Phase 2.5 汇总 `20260901_cmr_primitive_hop_ppa_ru5`（1 拍 Head）。历史 hop 对照目录 `20260830_cmr_router_level_baseline_del050` 与 Phase 2 Sync hop ID 保留、禁止覆盖。
 
-该配方上已测得的 hop Head（**引用用，不是新的调时目标**）：Thin / FlatMesh ≈ **0.681 ns**；PROP L2/L3 / TopMesh2 ≈ **0.956–0.958 ns**；PFAT L2 ≈ **1.022 ns**；PFAT L3 ≈ **1.328 ns**。面积与 energy 以 `20260831_cmr_primitive_hop_ppa_ru5` 为准。
+该配方上已测得的 hop Head（**层次树引用用，不是新的调时目标**）：Thin ≈ **0.681 ns**；PROP L2/L3 / TopMesh2 ≈ **0.956–0.958 ns**；PFAT L2 ≈ **1.022 ns**；PFAT L3 ≈ **1.328 ns**。面积与 energy 以 `20260831_cmr_primitive_hop_ppa_ru5` 的层次树行为准。平面网格叶 Head 必须改用 DEL150 hop，不得继续引用与 Thin 相同的 0.681 ns。
 
 ### 4.3 明确不是论文 hop 对照的网表
 
@@ -220,9 +287,15 @@ DATE V3 Table I / Fig. A 的 **Async** Router PPA 仍引用 `20260831_cmr_primit
 | `20260830_cmr_fat_l1_hop` | Ackin **DEL250** |
 | Fat NoC16 `20260829_cmr_ft_noc16_lane01_0` | Ackin 250 |
 | Fat NoC64 `20260830_095259_cmr_noc64_p50_1222` | 网络 SDF PASS，Ackin **DEL250**（网络稳健性前驱，不是 hop 配方） |
-| 历史 Fig. 6 默认 4×`DEL150` | 实现笔记残留，代码默认已是 1×`DEL050` |
+| 历史 Fig. 6 默认 4×`DEL150` | 实现笔记残留，代码层次树默认已是 1×`DEL050` |
+| Mesh64 `20260831_115856_cmr_mesh64_p50` | TAB 3-flit 候选，归档 |
+| Mesh64 `20260901_172539_cmr_descal_fm64` | RCU 1×DEL050 整网；MAXIMUM-SDF extra-body / stall，归档 |
+| Mesh64 `20260903_101701_cmr_descal_fm64_del100` | RCU 1×DEL100 试探；隔离 PASS，KEY/UR 缺一包，归档 |
+| Mesh64 `20260903_101701_cmr_descal_fm64_del150` | 旧锥 DEL150 unique/整网前驱；已被 mat020 综合冻结替换为论文候选源 |
+| Mesh64/256 `*_mat020` 以外的 DEL250 整网 | 调试 MAXIMUM-SDF，不是论文配方 |
+| Mesh64 DEL250 调试作业 | 不是论文配方 |
 
-PFAT L2 `(2,4)` / L3 `(4,8)` 隔离 hop 已进入冻结集（同一 `1×DEL050` 配方），见上表。不得拿 Ackin-250 或旧 1248 实验室网表替换。
+PFAT L2 `(2,4)` / L3 `(4,8)` 隔离 hop 已进入冻结集（层次树 `1×DEL050` 配方），见上表。不得拿 Ackin-250 或旧 1248 实验室网表替换。平面网格不得拿 DEL050 叶 hop、DEL100 整网、DEL050 整网、旧锥 `20260903_101701_cmr_descal_fm64_del150`、或 DEL250 FM256 替换 mat020 网表。
 
 ---
 
@@ -302,11 +375,12 @@ Phase 2.5 论文入口网表（**2026-09-01 Gate PASS**，禁止覆盖）：
 
 ## 9. 尚未冻结、但不改变本文结构的后续项
 
-这些项 **不打开** 微架构或 DEL/时钟，只补 DUT 入口：
+这些项 **不打开** 微架构或 DEL/时钟，只补 DUT 入口或签核：
 
 1. Async Thin 64 核 tile 生成器（21×`(1,1)`，bypass），与 Sync Thin 对齐。
 2. PFAT L2 `(2,4)` / L3 `(4,8)` hop DC/SDF：**已完成**（`20260831_cmr_pfat_l2_c2p4_del050_ackin050` / `20260831_cmr_pfat_l3_c4p8_del050_ackin050`）。
 3. Q64 之上的 Top Mesh2 改为 `CMRRouter`（PROP 256/1024）。
 4. Sync `CMRMeshNoC` 对照（若 FM 需要 Sync 点）。
+5. **平面网格下一步（结构已冻）：** FM64 / FM256 mat020 **Stitch + MAXIMUM-SDF 验收**；通过前不得把 mat020 写入 `curated/` 论文表。
 
 完成以上入口时，仍必须满足第 1 节冻结声明。

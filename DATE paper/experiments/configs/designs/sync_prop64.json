@@ -53,14 +53,6 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "bypass",
-  "delay_recipe": {
-    "rcu_steps": 1,
-    "rcu_unit_ps": 50,
-    "buf_stages": 0,
-    "ackin_steps": 1,
-    "ackin_unit_ps": 50,
-    "ackin_use_buf": false
-  },
   "clock_ns": 1.0,
   "hrep_policy": false,
   "shares_netlist_with": null,
@@ -69,6 +61,14 @@
   "paper_role": "Synchronous balanced hierarchical network, 64 nodes; same traces as the asynchronous balanced 64-node network",
   "paper_eligible_default": true,
   "notes": "Phase 2.5 one-cycle head; frozen clock 1.0 ns. Shares case format with the asynchronous balanced 64-node network.",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
   "display_name": "Synchronous balanced hierarchical network, 64 nodes",
   "display_description": "Clocked 64-node balanced hierarchical counterpart of the asynchronous balanced 64-node network. Signed at 1.0 ns with a one-cycle head."
 }

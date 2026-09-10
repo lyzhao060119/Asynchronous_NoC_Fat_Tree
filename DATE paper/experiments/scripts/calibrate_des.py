@@ -240,8 +240,10 @@ def main() -> int:
         from date_v3.designs import materialize_opts
         from date_v3.materialize_case import materialize
 
+        from date_v3.offered_load import SMOKE_LOAD
+
         loaded = generate_trace(
-            "TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=0.10
+            "TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=SMOKE_LOAD
         )
         for design_id in CAL64:
             opts = materialize_opts(design_id)

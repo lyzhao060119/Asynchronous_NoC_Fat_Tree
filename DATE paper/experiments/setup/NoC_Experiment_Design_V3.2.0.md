@@ -42,6 +42,23 @@ work:
 No synchronous 256-node or 1024-node network is added. The four-lane top-mesh
 variation is unsupported and has no synthesis or delay-format result.
 
+## Offered load
+
+Paper and template injection rates are **MFlit per injection port per second**.
+The coarse grid is **100 / 200 / 300 / 400 / 500** (plus zero-load). The
+scheduling tick is **1.0 ns**, so 100 MFlit/Port/s is 0.10 flit per tick and
+the one-flit-per-tick ceiling is 1000 MFlit/Port/s. Case tags are `m100`,
+`m200`, … .
+
+Gate B representatives: directed, zero, **100**, **300** MFlit/Port/s.
+Gate C/D representatives: directed, zero, **100 / 200 / 400**, mixed multicast
+at **200** MFlit/Port/s.
+
+Historical `r0p10` / `r0p30` MAXIMUM-SDF smokes used a 20 ns tick and a
+dimensionless flit/cycle offered load. They correspond to about 5 / 15
+MFlit/Port/s and must not be relabeled as 100 / 300. Formal paper sweeps
+must emit new `m*` cases.
+
 ## Optional spiking-neural-network trace replay
 
 One spiking-neural-network trace replay may be considered only after all
@@ -76,7 +93,8 @@ completion time. Otherwise archive the evidence and omit it.
 1. Gate A: local structure, route oracle, five-flit traffic, and testbench
    readiness.
 2. Gate B: all independent 64-node networks synthesize and pass directed,
-   zero-load, medium-load, and near-saturation maximum-delay gate simulations.
+   zero-load, 100 MFlit/Port/s, and 300 MFlit/Port/s maximum-delay gate
+   simulations.
 3. Gate C/D: 256-node pilot then formal three-seed gate-level sweep.
 4. Gate E/F: 1024-node pilot then formal three-seed gate-level sweep.
 5. Aggregate Table I and Figures A–C from signed manifests only.
@@ -91,8 +109,29 @@ gate-array prototype, or an unvalidated application trace.
 ## Current status
 
 - Gate A local readiness has passed.
-- The asynchronous 64-node whole-network maximum-delay traces required by Gate
-  B are still missing; 256-node and 1024-node submissions remain blocked.
+- Flat-mesh unique-router synthesis is frozen at Mat-0.20 / 1×DEL150
+  (2026-09-05): FM64 `20260905_103344_cmr_descal_fm64_mat020`, FM256
+  `20260905_103344_cmr_descal_fm256_mat020`. Recipe and cone lock live in
+  [`CMR_Router_Structure_Freeze.md`](CMR_Router_Structure_Freeze.md) §4.1b–§4.1c.
+  FM64/FM256 stitch + MAXIMUM-SDF acceptance have passed on mat020 netlists.
+- Hierarchical tree hops are frozen at **1×DEL150 + Mat-0.20** (2026-09-06):
+  Thin/Fat/PROP/PFAT L1–L3 under `20260906_112525_cmr_*_del150_ackin050_mat0p20`.
+  Baseline DEL050 RCU-01 STA was RTM-open; DEL150 STA retest closed at 5% RTM
+  with Mat `viol=0`. Old `*_del050_ackin050` tree hops are archive-only.
+- The asynchronous hierarchical 64-node whole-network maximum-delay traces
+  required by Gate B must be re-run on tree DEL150 netlists (PROP64/PFAT64);
+  prior DEL050 whole-network IDs are not paper sources.
 - Field-programmable gate-array validation is cancelled due to lookup-table
   capacity, not interpreted as a network-performance failure.
 - No spiking-neural-network trace has been selected, frozen, or run.
+
+## Next actions (hierarchical tree)
+
+1. Unique-router DC + stitch PROP64 (and PFAT64) at RCU 1×DEL150 Mat-0.20.
+2. Gate B / descal MAXIMUM-SDF acceptance on the new netlists.
+3. Then expand PROP256 / PROP1024 (tree+TopMesh both DEL150).
+
+## Next actions (flat mesh)
+
+1. Register paper-eligible manifests for FM64/FM256 mat020 after curated review.
+2. Keep mat020 parents frozen (`CMR_HIER_STITCH_ONLY=1` only for stitch resume).

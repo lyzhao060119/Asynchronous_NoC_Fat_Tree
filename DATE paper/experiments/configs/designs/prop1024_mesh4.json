@@ -43,14 +43,6 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "bypass",
-  "delay_recipe": {
-    "rcu_steps": 1,
-    "rcu_unit_ps": 50,
-    "buf_stages": 0,
-    "ackin_steps": 1,
-    "ackin_unit_ps": 50,
-    "ackin_use_buf": false
-  },
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
@@ -59,6 +51,14 @@
   "paper_role": "Four-lane top-mesh variation; unsupported geometry, not elaborated",
   "paper_eligible_default": false,
   "notes": "Unsupported. Do not fabricate logic-synthesis or delay-format results.",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
   "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, four-lane top-mesh variation (unsupported)",
   "display_description": "Four-lane top mesh needs unsupported router geometry (4,2). Do not fabricate synthesis or delay-format results."
 }

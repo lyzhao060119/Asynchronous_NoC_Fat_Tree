@@ -43,17 +43,37 @@ class ContinuousLaneSelector(val laneCount: Int) extends Module {
 
 /** C-element packet-lifetime selector. A lost OPM contest waits on the
   * selected lane until packet completion; it intentionally does not retry. */
-class LaneSelecterCelement(val laneCount: Int)
+class LaneSelectorCelement(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount)) with HasBlackBoxResource {
   require(Set(2, 4, 8).contains(laneCount))
-  override def desiredName: String = "LaneSelecterCelement"
+  override def desiredName: String = "LaneSelectorCelement"
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val LaneIsEmpty = Input(UInt(laneCount.W))
     val PacketActive = Input(Bool())
     val LaneSelect = Output(UInt(laneCount.W))
   })
-  addResource("/ASYNC/CMR/LaneSelecterCelement.v")
+  addResource("/ASYNC/CMR/LaneSelectorCelement.v")
+  addResource("/ASYNC/CMR/CMRMutexN.v")
+  addResource("/ASYNC/CMR/CMRFlattenedTAC.v")
+  addResource("/ASYNC/MullerC2.v")
+  addResource("/ASYNC/Mutex4.v")
+  addResource(AsyncPrimitiveProfile.mutex2Resource)
+}
+
+/** Packet-lifetime lane selector.  Mutex grant feeds back into the request
+  * so the first winner is held until PathEnabled falls, without an SR latch. */
+class LaneSelectorSRLatch(val laneCount: Int)
+    extends BlackBox(Map("LANES" -> laneCount)) with HasBlackBoxResource {
+  require(Set(2, 4, 8).contains(laneCount))
+  override def desiredName: String = "LaneSelectorSRLatch"
+  val io = IO(new Bundle {
+    val reset = Input(Bool())
+    val LaneIsEmpty = Input(UInt(laneCount.W))
+    val PPE = Input(Bool())
+    val LaneSelect = Output(UInt(laneCount.W))
+  })
+  addResource("/ASYNC/CMR/LaneSelectorSRLatch.v")
   addResource("/ASYNC/CMR/CMRMutexN.v")
   addResource("/ASYNC/CMR/CMRFlattenedTAC.v")
   addResource("/ASYNC/MullerC2.v")
@@ -81,7 +101,7 @@ class LanePhaseAdapter(val laneCount: Int)
 
 /** Per-lane two-phase adapter built from the request and acknowledgement
   * Toggle Q states.  LaneSelect must be held through the physical OPM
-  * acknowledgement; LaneSelecterCelement provides that packet-lifetime hold.
+  * acknowledgement; LaneSelectorSRLatch provides that packet-lifetime hold.
   */
 class LanePhaseAdapterDFF(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount))
@@ -93,7 +113,7 @@ class LanePhaseAdapterDFF(val laneCount: Int)
     val LaneSelect = Input(UInt(laneCount.W))
     val IPMReqOut = Input(UInt(laneCount.W))
     val OPMAckOut = Input(UInt(laneCount.W))
-    val IPMAckIn = Output(UInt(laneCount.W))
+    val IPMAckIn = Output(Bool())
     val OPMReqIn = Output(UInt(laneCount.W))
   })
   addResource("/ASYNC/CMR/LanePhaseAdapterDFF.v")

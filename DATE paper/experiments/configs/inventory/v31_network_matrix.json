@@ -3,6 +3,8 @@
   "logic_synthesis": "Design Compiler maps register-transfer-level Verilog to a standard-cell gate netlist (post-synthesis, zero wire load). It is not place-and-route.",
   "maximum_delay_standard_delay_format": "Slow-corner MAXIMUM delay annotation on that netlist. Gate-level simulation must complete annotation with zero errors, zero timing violations, no unknown values, and no loss, duplication, deadlock, or timeout.",
   "no_synchronous_256_or_1024": true,
+  "flat_mesh_rcu_unit_ps": 150,
+  "hierarchical_rcu_unit_ps": 50,
   "independent_netlists": [
     "THIN64",
     "PROP64",
@@ -84,6 +86,14 @@
         "legacy_adapter": "noc64_async",
         "gls_shell": "legacy_noc64"
       },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 21,
         "ports": 105,
@@ -115,6 +125,14 @@
         "hier_kind": "1222",
         "legacy_adapter": "noc64_async",
         "gls_shell": "legacy_noc64"
+      },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
       },
       "expected": {
         "routers": 21,
@@ -148,6 +166,14 @@
         "legacy_adapter": "noc64_async",
         "gls_shell": "legacy_noc64"
       },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 21,
         "ports": 168,
@@ -169,13 +195,23 @@
       "emit": {
         "main": "NoC.CMR.CMRMeshNoCMain",
         "sbt_args": "8 1 1",
-        "env": {},
+        "env": {
+          "CMR_RCU_MATCHED_DELAY_UNIT_PS": "150"
+        },
         "gen_dir": "generated_cmr/mesh_noc64_11",
         "dut_file": "CMRMeshNoC.v",
         "top": "CMRMeshNoC",
         "hier_kind": "mesh",
         "legacy_adapter": "mesh64",
         "gls_shell": "legacy_mesh64"
+      },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 150,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
       },
       "expected": {
         "routers": 64,
@@ -198,7 +234,9 @@
       "emit": {
         "main": "NoC.CMR.CMRMeshNoCMain",
         "sbt_args": "16 1 1",
-        "env": {},
+        "env": {
+          "CMR_RCU_MATCHED_DELAY_UNIT_PS": "150"
+        },
         "gen_dir": "generated_cmr/mesh_noc256_11",
         "dut_file": "CMRMeshNoC.v",
         "top": "CMRMeshNoC",
@@ -206,6 +244,14 @@
         "legacy_adapter": "network_sdf",
         "gls_shell": "network",
         "kind": "mesh"
+      },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 150,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
       },
       "expected": {
         "routers": 256,
@@ -228,7 +274,9 @@
       "emit": {
         "main": "NoC.CMR.CMRMeshNoCMain",
         "sbt_args": "32 1 1",
-        "env": {},
+        "env": {
+          "CMR_RCU_MATCHED_DELAY_UNIT_PS": "150"
+        },
         "gen_dir": "generated_cmr/mesh_noc1024_11",
         "dut_file": "CMRMeshNoC.v",
         "top": "CMRMeshNoC",
@@ -236,6 +284,14 @@
         "legacy_adapter": "network_sdf",
         "gls_shell": "network",
         "kind": "mesh"
+      },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 150,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
       },
       "expected": {
         "routers": 1024,
@@ -267,6 +323,14 @@
         "gls_shell": "network",
         "kind": "hierarchical"
       },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 88,
         "ports": 624,
@@ -296,6 +360,14 @@
         "legacy_adapter": "network_sdf",
         "gls_shell": "network",
         "kind": "hierarchical"
+      },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
       },
       "expected": {
         "routers": 352,
@@ -327,6 +399,14 @@
         "gls_shell": "network",
         "kind": "hierarchical"
       },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 352,
         "ports": 2496,
@@ -346,6 +426,14 @@
       "synthesis_supported": true,
       "unsupported_reason": null,
       "emit": null,
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 352,
         "ports": 2432,
@@ -376,6 +464,14 @@
         "gls_shell": "network",
         "kind": "hierarchical"
       },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 352,
         "ports": 2496,
@@ -395,6 +491,14 @@
       "synthesis_supported": false,
       "unsupported_reason": "Four-lane top mesh requires router geometry (4,2), which is not in the supported lane set. Do not elaborate, synthesize, or fabricate a delay file.",
       "emit": null,
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 336,
         "ports": 0,
@@ -425,6 +529,14 @@
         "gls_shell": "legacy_sync64",
         "signed_run_id": "20260901_cmr_sync_noc64_thin_p50"
       },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
+      },
       "expected": {
         "routers": 21,
         "ports": 105,
@@ -454,6 +566,14 @@
         "legacy_adapter": "noc64_sync",
         "gls_shell": "legacy_sync64",
         "signed_run_id": "20260901_cmr_sync_noc64_fat1222_p50"
+      },
+      "delay_recipe": {
+        "rcu_steps": 1,
+        "rcu_unit_ps": 50,
+        "buf_stages": 0,
+        "ackin_steps": 1,
+        "ackin_unit_ps": 50,
+        "ackin_use_buf": false
       },
       "expected": {
         "routers": 21,

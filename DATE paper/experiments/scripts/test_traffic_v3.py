@@ -20,7 +20,19 @@ from date_v3.canonical_trace import (  # noqa: E402
     width_of,
 )
 from date_v3.hrep_policy import cluster_of_pe, prop_packet, split_dest_set  # noqa: E402
-from date_v3.materialize_case import materialize, write_case  # noqa: E402
+from date_v3.materialize_case import IDENTITY_MAGIC, make_flit, materialize, write_case  # noqa: E402
+from date_v3.offered_load import (  # noqa: E402
+    CASE_TICK_NS,
+    COARSE_LOADS,
+    DEFAULT_LOAD,
+    LOAD_UNIT,
+    SMOKE_LOAD,
+    ZERO_LOAD_GAP,
+    flits_per_case_tick,
+    header_rate_per_ns,
+    load_tag,
+    packet_start_probability,
+)
 from date_v3.saturation import next_fine_loads, saturation_point  # noqa: E402
 from date_v3.schema import validate_required  # noqa: E402
 from date_v3.tmax import summarize_tmax, tmax_by_original_event, tmax_ns  # noqa: E402
@@ -35,11 +47,79 @@ def test_seeds() -> None:
     assert_true(load_seeds() == [202701, 202702, 202703], "frozen seeds")
 
 
+def test_offered_load_axis() -> None:
+    from date_v3.canonical_trace import schedule_pairs
+    from date_v3.offered_load import LINE_RATE_MFLIT, assert_offered_mflit, parse_load_tag
+    from random import Random
+
+    assert_true(COARSE_LOADS == (100.0, 300.0, 500.0, 700.0, 900.0), "coarse grid")
+    assert_true(abs(flits_per_case_tick(100.0) - 0.10) < 1e-12, "100 MFlit is 0.10 flit/tick")
+    assert_true(abs(packet_start_probability(100.0, 5) - 0.02) < 1e-12, "Bernoulli analog")
+    assert_true(abs(header_rate_per_ns(100.0, 5) - 0.02) < 1e-12, "0.02 headers/ns")
+    assert_true(load_tag(0.0) == "zero" and load_tag(400.0) == "m400", "tags")
+    assert_true(parse_load_tag("m200") == 200.0, "parse m-tag")
+    assert_true(parse_load_tag("r0p10") == 0.10, "legacy tag still readable")
+    try:
+        assert_offered_mflit(0.10)
+        raise AssertionError("legacy flit/cycle must be rejected")
+    except ValueError as exc:
+        assert_true("MFlit" in str(exc), str(exc))
+    try:
+        schedule_pairs(
+            [{"source": 0, "destinations": [1], "rect": [1, 0, 1, 0], "multicast": False}],
+            nodes=4,
+            packet_flits=5,
+            load_point=0.10,
+            rng=Random(1),
+        )
+        raise AssertionError("schedule must reject legacy unit")
+    except ValueError:
+        pass
+    assert_true(LINE_RATE_MFLIT == 1000.0, "1 ns line rate")
+    zero = schedule_pairs(
+        [{"source": 0, "destinations": [1], "rect": [1, 0, 1, 0], "multicast": False}] * 3,
+        nodes=4,
+        packet_flits=5,
+        load_point=0.0,
+        rng=Random(1),
+    )
+    assert_true(zero == [0, 5 + ZERO_LOAD_GAP, 2 * (5 + ZERO_LOAD_GAP)], "zero isolation gap")
+    loaded = [{"source": 0, "destinations": [1], "rect": [1, 0, 1, 0], "multicast": False}] * 400
+    ready = schedule_pairs(loaded, nodes=2, packet_flits=5, load_point=100.0, rng=Random(7))
+    gaps = [ready[i] - ready[i - 1] for i in range(1, len(ready))]
+    mean_gap = sum(gaps) / len(gaps)
+    assert_true(40.0 <= mean_gap <= 60.0, "100 MFlit header mean ~50 ns, got %s" % mean_gap)
+
+
+def test_serialized_flits() -> None:
+    trace = generate_trace("TOPO-UR", seed=202701, nodes=64, smoke=True, load_point=SMOKE_LOAD)
+    case = materialize(trace, top_lanes=0, hrep=False)
+    by_pkt: dict[int, list[int]] = {}
+    by_port: dict[int, list[int]] = {}
+    for cycle, port, pkt_seq, _flit, _comment in case["inputs"]:
+        by_pkt.setdefault(int(pkt_seq), []).append(int(cycle))
+        by_port.setdefault(int(port), []).append(int(cycle))
+    assert_true(by_pkt, "materialized inputs")
+    for cycles in by_pkt.values():
+        ordered = sorted(cycles)
+        assert_true(len(ordered) == PACKET_FLITS, "five flit offer times")
+        assert_true(
+            ordered == list(range(ordered[0], ordered[0] + PACKET_FLITS)),
+            "one flit per tick inside a packet",
+        )
+    for cycles in by_port.values():
+        assert_true(sorted(cycles) == sorted(set(cycles)), "one source flit per tick")
+
+
 def test_bf_stress() -> None:
-    trace = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=0.10)
+    trace = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=SMOKE_LOAD)
     header = trace["header"]
     validate_required(header, label="bf header")
     assert_true(header["packet_flits"] == PACKET_FLITS, "5-flit")
+    assert_true(header["offered_load"] == SMOKE_LOAD, "100 MFlit")
+    assert_true(header["load_tag"] == "m100", "m100 tag")
+    assert_true(header["load_unit"] == LOAD_UNIT, "load unit")
+    assert_true(header["case_tick_ns"] == CASE_TICK_NS, "1 ns tick")
     assert_true(header["warmup_original_events"] == 4, "smoke warmup")
     assert_true(header["measurement_original_events"] == 8, "smoke measurement")
     width = width_of(header["nodes"])
@@ -53,8 +133,8 @@ def test_bf_stress() -> None:
 
 
 def test_paired_thin_prop() -> None:
-    a = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=0.10)
-    b = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=0.10)
+    a = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=SMOKE_LOAD)
+    b = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=SMOKE_LOAD)
     dests_a = [(e["source"], tuple(e["destinations"])) for e in a["events"]]
     dests_b = [(e["source"], tuple(e["destinations"])) for e in b["events"]]
     assert_true(dests_a == dests_b, "paired traces share src/dst")
@@ -62,11 +142,30 @@ def test_paired_thin_prop() -> None:
 
 def test_topo_ur_scales() -> None:
     for nodes in (64, 256, 1024):
-        trace = generate_trace("TOPO-UR", seed=202702, nodes=nodes, smoke=True, load_point=0.05)
+        trace = generate_trace("TOPO-UR", seed=202702, nodes=nodes, smoke=True, load_point=SMOKE_LOAD)
         assert_true(trace["header"]["nodes"] == nodes, "nodes")
         for event in trace["events"]:
             assert_true(event["source"] != event["destinations"][0], "ur src!=dst")
             assert_true(len(event["destinations"]) == 1, "unicast")
+
+
+def test_64_multicast_sets() -> None:
+    for benchmark_id, fanout, cross_l2 in (
+        ("MC-UR-F4", 4, False),
+        ("MC-UR-F8", 8, False),
+        ("MC-XQ-F8", 8, True),
+    ):
+        trace = generate_trace(benchmark_id, seed=202701, nodes=64, smoke=True, load_point=SMOKE_LOAD)
+        for event in trace["events"]:
+            dests = event["destinations"]
+            assert_true(event["multicast"], benchmark_id + " multicast")
+            assert_true(len(dests) == fanout and len(set(dests)) == fanout, benchmark_id + " unique fanout")
+            assert_true(event["source"] not in dests, benchmark_id + " no self destination")
+            if cross_l2:
+                width = width_of(64)
+                remote = {d for d in range(64) if not same_l2_subtree(event["source"], d, width)}
+                assert_true(all(dest in remote for dest in dests), benchmark_id + " remote L2 only")
+                assert_true(len({(d % width // 4, d // width // 4) for d in dests}) >= 2, benchmark_id + " spans L2 subtrees")
 
 
 def test_xmc_spread() -> None:
@@ -91,7 +190,7 @@ def test_xmc_spread() -> None:
 
 
 def test_xmc10_fraction() -> None:
-    trace = generate_trace("XMC10-G", seed=202703, nodes=1024, smoke=False, load_point=0.10)
+    trace = generate_trace("XMC10-G", seed=202703, nodes=1024, smoke=False, load_point=SMOKE_LOAD)
     n = len(trace["events"])
     mc = sum(1 for event in trace["events"] if event["multicast"])
     frac = mc / n
@@ -111,19 +210,100 @@ def test_hrep_split() -> None:
 
 
 def test_materialize_64() -> None:
-    trace = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=0.10)
+    trace = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=SMOKE_LOAD)
     case = materialize(trace, top_lanes=1, hrep=False)
     assert_true(len(case["event_map"]) == 12, "12 original events -> 12 packets")
     flits = [row for row in case["inputs"] if row[0] >= 0]
     assert_true(len(flits) == 12 * 5, "5 flits each")
     assert_true(all("flit" in row[4] for row in case["inputs"]), "flit comments")
+    addr_mask = (0x3F << 2) | (0x3F << 8) | (0x3F << 14) | (0x3F << 20)
+    for packet in case["packets"]:
+        encoded = [int(value, 16) for value in packet["flits"]]
+        x0, y0, x1, y1 = packet["rect"]
+        head_addr = (
+            ((x0 & 0x3F) << 2)
+            | ((y0 & 0x3F) << 8)
+            | ((x1 & 0x3F) << 14)
+            | ((y1 & 0x3F) << 20)
+        )
+        assert_true(encoded[0] & (1 << 27), "head type bit")
+        assert_true((encoded[0] & addr_mask) == head_addr, "head carries AABB")
+        src_tag = packet["source"] & 0x3
+        pkt_tag = packet["pkt_seq"] & 0x3FFF
+        assert_true((encoded[0] & 0x3) == src_tag, "head carries source[1:0]")
+        for idx, body in enumerate(encoded[1:], start=1):
+            assert_true(((body >> 12) & 0x3FFF) == pkt_tag, "body/tail packet tag")
+            assert_true(((body >> 9) & 0x7) == idx, "body/tail flit index")
+            assert_true(((body >> 6) & 0x7) == IDENTITY_MAGIC, "identity magic 101")
+            assert_true(((body >> 5) & 0x1) == 0, "unicast mc bit")
+            assert_true((body & 0x3) == src_tag, "body/tail source[1:0]")
+            assert_true((body & (1 << 27)) == 0, "body/tail is not head")
+        assert_true(encoded[-1] & (1 << 26), "tail type bit")
+    cycles_by_pkt: dict[int, list[int]] = {}
+    for cycle, _port, pkt_seq, _flit, _comment in flits:
+        cycles_by_pkt.setdefault(int(pkt_seq), []).append(int(cycle))
+    for cycles in cycles_by_pkt.values():
+        ordered = sorted(cycles)
+        assert_true(ordered == list(range(ordered[0], ordered[0] + PACKET_FLITS)), "serialized flits")
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "bf.case"
         write_case(case, path)
         text = path.read_text(encoding="utf-8")
         assert_true("event_map" in text, "event_map")
         assert_true("meta top_lanes 1" in text, "thin top lanes")
+        assert_true("meta load_unit MFlit_per_port_s" in text, "MFlit unit")
+        assert_true("meta case_tick_ns 1.000" in text, "1 ns tick")
+        assert_true("meta load_point 100.00" in text, "100 MFlit")
+        assert_true("meta packet_tag_bits 14" in text, "router identity packet tag")
+        assert_true("meta payload_encoding router_identity" in text, "router identity encoding")
         assert_true(path.with_suffix(".packets.json").is_file(), "packets sidecar")
+
+
+def test_router_identity_make_flit() -> None:
+    head = make_flit(
+        pkt_id=20,
+        x0=0,
+        y0=0,
+        x1=1,
+        y1=1,
+        is_head=True,
+        is_tail=False,
+        source=36,
+        flit_index=0,
+        multicast=True,
+    )
+    body = make_flit(
+        pkt_id=20,
+        x0=0,
+        y0=0,
+        x1=1,
+        y1=1,
+        is_head=False,
+        is_tail=False,
+        source=36,
+        flit_index=2,
+        multicast=True,
+    )
+    tail = make_flit(
+        pkt_id=20,
+        x0=0,
+        y0=0,
+        x1=1,
+        y1=1,
+        is_head=False,
+        is_tail=True,
+        source=36,
+        flit_index=4,
+        multicast=True,
+    )
+    assert_true(head & (1 << 27) and not (head & (1 << 26)), "head flags")
+    assert_true((head & 0x3) == (36 & 3), "head source")
+    assert_true(((head >> 2) & 0x3F) == 0 and ((head >> 20) & 0x3F) == 1, "head AABB")
+    assert_true(((body >> 12) & 0x3FFF) == 20, "body pkt")
+    assert_true(((body >> 9) & 7) == 2, "body flit index")
+    assert_true(((body >> 6) & 7) == IDENTITY_MAGIC, "body magic")
+    assert_true((body >> 5) & 1, "body mc")
+    assert_true(tail & (1 << 26) and ((tail >> 9) & 7) == 4, "tail index")
 
 
 def test_tmax() -> None:
@@ -145,7 +325,7 @@ def test_tmax() -> None:
 def test_saturation() -> None:
     rows = []
     for seed in (202701, 202702, 202703):
-        for load, err in ((0.10, 0), (0.20, 0), (0.30, 1)):
+        for load, err in ((100.0, 0), (200.0, 0), (300.0, 1)):
             rows.append(
                 {
                     "seed": seed,
@@ -158,10 +338,10 @@ def test_saturation() -> None:
                 }
             )
     sat = saturation_point(rows, seeds=(202701, 202702, 202703))
-    assert_true(sat is not None and sat["offered_load"] == 0.20, "sat at 0.20")
+    assert_true(sat is not None and sat["offered_load"] == 200.0, "sat at 200 MFlit")
     fine = next_fine_loads(rows, seeds=(202701, 202702, 202703))
-    assert_true(fine[0] == 0.18, "fine below knee")
-    assert_true(0.21 in fine and fine[-1] == 0.29, "fine between 0.20 and 0.30")
+    assert_true(fine[0] == 150.0, "fine below knee")
+    assert_true(225.0 in fine and fine[-1] == 275.0, "fine between 200 and 300")
 
 
 def test_mesh_intercluster() -> None:
@@ -174,7 +354,7 @@ def test_mesh_intercluster() -> None:
 
 
 def test_paper_warmup_measurement() -> None:
-    trace = generate_trace("BF-STRESS64", seed=202701, smoke=False, load_point=0.10)
+    trace = generate_trace("BF-STRESS64", seed=202701, smoke=False, load_point=SMOKE_LOAD)
     header = trace["header"]
     assert_true(header["warmup_original_events"] == 1000, "warmup 1000")
     assert_true(header["measurement_original_events"] == 10000, "measurement 10000")
@@ -186,7 +366,7 @@ def test_paper_warmup_measurement() -> None:
 
 def test_three_seeds_distinct() -> None:
     traces = [
-        generate_trace("TOPO-UR", seed=seed, smoke=True, load_point=0.10)
+        generate_trace("TOPO-UR", seed=seed, smoke=True, load_point=SMOKE_LOAD)
         for seed in load_seeds()
     ]
     dests = [tuple((e["source"], tuple(e["destinations"])) for e in t["events"]) for t in traces]
@@ -316,17 +496,19 @@ def test_stats_and_fine_loads() -> None:
     ci = bootstrap_ci([float(i) for i in range(32)], seed=1)
     assert_true(ci["low"] is not None and ci["high"] >= ci["low"], "bootstrap")
     assert_true(coarse_loads()[0] == 0.0, "zero load first")
-    assert_true(hrep_common_tmax_load(0.40) == 0.10, "0.25 x H-REP sat")
+    assert_true(coarse_loads()[1] == 100.0, "first coarse is 100 MFlit")
+    assert_true(hrep_common_tmax_load(400.0) == 100.0, "0.25 x H-REP sat")
     assert_true(next_coarse_load([], last_ok=True, plateau=False) == 0.0, "start at zero")
-    assert_true(next_coarse_load([0.0], last_ok=True, plateau=False) == 0.02, "next coarse")
-    assert_true(next_coarse_load([0.50], last_ok=True, plateau=False) is None, "end of coarse")
-    assert_true(next_coarse_load([0.10], last_ok=False, plateau=False) is None, "stop on fail")
+    assert_true(next_coarse_load([0.0], last_ok=True, plateau=False) == 100.0, "next coarse")
+    assert_true(next_coarse_load([500.0], last_ok=True, plateau=False) == 700.0, "after 500")
+    assert_true(next_coarse_load([900.0], last_ok=True, plateau=False) is None, "end of coarse")
+    assert_true(next_coarse_load([100.0], last_ok=False, plateau=False) is None, "stop on fail")
     plateau_rows = []
     for seed in (202701, 202702, 202703):
         plateau_rows.append(
             {
                 "seed": seed,
-                "offered_load": 0.20,
+                "offered_load": 200.0,
                 "errors": 0,
                 "drainable": True,
                 "backlog_growth": False,
@@ -337,7 +519,7 @@ def test_stats_and_fine_loads() -> None:
         plateau_rows.append(
             {
                 "seed": seed,
-                "offered_load": 0.30,
+                "offered_load": 300.0,
                 "errors": 0,
                 "drainable": True,
                 "backlog_growth": False,
@@ -466,7 +648,7 @@ def test_hrep_traversal_sum() -> None:
 
 
 def test_paired_sync_async_case() -> None:
-    trace = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=0.10)
+    trace = generate_trace("BF-STRESS64", seed=202701, smoke=True, load_point=SMOKE_LOAD)
     from date_v3.designs import materialize_opts
 
     keys = ("top_lanes", "hrep", "routing")
@@ -490,13 +672,17 @@ def test_paired_sync_async_case() -> None:
 def main() -> int:
     tests = [
         test_seeds,
+        test_offered_load_axis,
+        test_serialized_flits,
         test_bf_stress,
         test_paired_thin_prop,
         test_topo_ur_scales,
+        test_64_multicast_sets,
         test_xmc_spread,
         test_xmc10_fraction,
         test_hrep_split,
         test_materialize_64,
+        test_router_identity_make_flit,
         test_tmax,
         test_saturation,
         test_mesh_intercluster,

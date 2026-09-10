@@ -38,8 +38,9 @@ def path_tmax_ns(
         last_tail = prim.tail_ns
     bodies = max(0, packet_flits - 2)
     if case_tick_ns > 1e-12:
-        # TB spaces flits by CASE_TICK_NS.  At 20 ns the Head has already
-        # drained the path, so Tail pays per-hop tail_ns after the last inject.
+        # TB spaces flits by CASE_TICK_NS.  At the 1 ns DATE V3 tick the Head
+        # may still occupy the path, so Tail waits for the remaining hop tails
+        # after the last inject.
         tmax = (packet_flits - 1) * case_tick_ns + sum(tails)
     else:
         tmax = sum(heads) + bodies * float(last_body) + float(last_tail)

@@ -1,0 +1,115 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260903_101701_cmr_descal_fm64_del150",
+  "status": "pass",
+  "design_id": "FM64",
+  "benchmark_id": null,
+  "seed": 900001,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "3632e4fbb27ac6d4e6c60dccf7871d4d4dfa6511",
+    "dirty": true,
+    "describe": "3632e4f-dirty"
+  },
+  "config_hash": "c119f16f66466b85bda02e1d75c007d712b87cc63352b38f80e574a9e696f8f0",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "ffb77667ff248bfce9802674e46afda5bfc9a80acc3b3dff6efb8afd1631247e",
+  "sdf_hash": "1a8c3d343996be2c934f60fb4877ab74af290575590ce096fdedf7c4c5422d46",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/import_signed_fm64_del150.py"
+  ],
+  "env": {
+    "CMR_RCU_MATCHED_DELAY_UNIT_PS": "150",
+    "CMR_OPM_ACKIN_DELAY_UNIT_PS": "50",
+    "NETLIST_RUN_ID": "20260903_101701_cmr_descal_fm64_del150"
+  },
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "archive-only",
+  "archive_only_reason": "Pre-Mat020 mesh routing cone. Remote netlist deleted 2026-09-06.",
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "netlist_run_id": "20260903_101701_cmr_descal_fm64_del150",
+    "delay_recipe": "RCU 1xDEL150 / Ackin 1xDEL050",
+    "sdf_cases": {
+      "directed": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "result_line": "TB_RESULT PASS injected=100 delivered=100 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=119742.716 flits_per_ns=0.000835",
+        "missing_log": false,
+        "case": "KEY-64_n64_s900001_zero_FM64_top0"
+      },
+      "zero": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=77982.198 flits_per_ns=0.000769",
+        "missing_log": false,
+        "case": "TOPO-UR_n64_s900001_zero_FM64_top0"
+      },
+      "medium": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=24981.848 flits_per_ns=0.002402",
+        "missing_log": false,
+        "case": "TOPO-UR_n64_s900001_r0p10_FM64_top0"
+      },
+      "iso-6to44": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "result_line": "TB_RESULT PASS injected=5 delivered=5 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=20563.603 flits_per_ns=0.000243",
+        "missing_log": false,
+        "case": "DBG-64_fm64_6to44"
+      },
+      "iso-body0": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "result_line": "TB_RESULT PASS injected=5 delivered=5 missing=0 unexpected=0 timeout=0 inject_max_rate=0 elapsed_ns=20563.603 flits_per_ns=0.000243",
+        "missing_log": false,
+        "case": "DBG-64_fm64_6to44_body0"
+      }
+    },
+    "dc_mark": [
+      "ModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'INVS211'",
+      "ModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'IC618'",
+      "ModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'QUANTUS23.1'"
+    ],
+    "traffic": "KEY-64 directed + TOPO-UR zero/0.10 + isolation 6to44 seed 900001 5-flit",
+    "paper_matrix_allowed": false
+  },
+  "cases": [],
+  "created_utc": "2026-09-03T08:00:51+00:00",
+  "updated_utc": "2026-09-03T08:00:51+00:00",
+  "notes": "Archived pre-AABB FM64 DEL150. Remote outputs/rtl deleted 2026-09-06. Paper netlist is 20260905_103344_cmr_descal_fm64_mat020."
+}

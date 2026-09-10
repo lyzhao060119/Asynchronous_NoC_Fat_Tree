@@ -1,0 +1,31 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "MC-UR-F8",
+  "title": "64-node uniform random multicast with eight unique destinations",
+  "traffic": "mc_ur64",
+  "packet_flits": 5,
+  "multicast": true,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": 8,
+  "spread_S": null,
+  "multicast_fraction": 1.0,
+  "destination_set_samples": null,
+  "warmup_original_events": 1000,
+  "measurement_original_events": 10000,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": true,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [100, 300, 500, 700, 900],
+    "saturation_rule": "window throughput plateau plus nonzero or growing source backlog; drain is completeness only"
+  },
+  "metrics": ["saturation_throughput", "offer_to_tail_mean", "offer_to_tail_p95", "source_backlog", "delivered_copies"],
+  "tmax_definition": "last destination tail minus source offer",
+  "applies_to_designs": ["PROP64", "PFAT64", "FM64"],
+  "paper_figures": ["Fig. multicast-64"],
+  "notes": "Every event targets eight globally uniform, unique, non-self destinations."
+}

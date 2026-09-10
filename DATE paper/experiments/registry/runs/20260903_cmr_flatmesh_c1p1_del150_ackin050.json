@@ -1,0 +1,51 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260903_cmr_flatmesh_c1p1_del150_ackin050",
+  "status": "pass",
+  "design_id": "ASYNC_FLATMESH_1X1",
+  "benchmark_id": null,
+  "seed": null,
+  "adapter": "dc_cmr_router",
+  "git": {
+    "sha": "3632e4fbb27ac6d4e6c60dccf7871d4d4dfa6511",
+    "dirty": true,
+    "describe": "3632e4f-dirty"
+  },
+  "config_hash": "ef55af7758c42f7d8dca9bad896838fa4511d7ccb8edf664f759b83f5e8f69ba",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "d43049098cf020c630c7a2b51d2330485b8bdf70deae10da87582f129101841d",
+  "sdf_hash": "13b66642f58b53ba643e35d0ba8f92d364b539f1fdab15c41e999e35072a93c2",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/launch_256_dc_prep.py"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_HIER_SKIP_GLS": "1"
+  },
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "remote_post": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260903_cmr_flatmesh_c1p1_del150_ackin050/CMRRouter_post.v",
+    "remote_sdf": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260903_cmr_flatmesh_c1p1_del150_ackin050/CMRRouter.sdf",
+    "dc_log": "puts \"CMR_STRUCTURE IPM=$ipm_count OPM=$opm_count MUTEX4=$mutex4_count MUTEX2=$mutex2_count ADAPTER=$adapter_count ACKLATCH_E=$acklatch_e_count LANE01_BUF=$lane01_buf stages=$lane01_stages RESET_LATCH=$reset_latch_count SET_RESET_LATCH=$set_reset_latch_count SR_LATCH=$sr_latch_count CLOSE_EVENT=$close_event_count COMPLETE=$handshake_complete_count DEL050=$del050_rcu DEL075=$del075_rcu DEL100=$del100_rcu DEL150=$del150_rcu ACKIN_DELAY=$ackin_delayed ACKIN_UNIT=$opm_ackin_unit_ps ACKIN_STEPS=$opm_ackin_steps ACKIN_BUF=$ackin_use_buf ACKIN_DEL=$ackin_del ACKOUT_CLOSE=$ackout_close_delay BUF=$matched_buf stages=$buf_stages\""
+  },
+  "cases": [],
+  "created_utc": "2026-09-03T19:16:43+00:00",
+  "updated_utc": "2026-09-03T19:16:43+00:00",
+  "notes": "Mesh Router hop DC at RCU 1xDEL150 / Ackin 1xDEL050. Hop MAXIMUM-SDF PPA not run this round. Not Table I until hop GLS."
+}

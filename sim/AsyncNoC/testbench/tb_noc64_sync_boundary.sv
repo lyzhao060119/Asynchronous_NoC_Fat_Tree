@@ -90,9 +90,9 @@ module noc64_sync_boundary_core #(
   integer input_port [0:MAX_INPUT_FLITS-1];
   integer input_pkt_seq [0:MAX_INPUT_FLITS-1];
   reg [FLIT_W-1:0] input_flit [0:MAX_INPUT_FLITS-1];
-  integer input_offer_ps [0:MAX_INPUT_FLITS-1];
-  integer input_req_ps [0:MAX_INPUT_FLITS-1];
-  integer input_ack_ps [0:MAX_INPUT_FLITS-1];
+  longint input_offer_ps [0:MAX_INPUT_FLITS-1];
+  longint input_req_ps [0:MAX_INPUT_FLITS-1];
+  longint input_ack_ps [0:MAX_INPUT_FLITS-1];
   reg input_accepted [0:MAX_INPUT_FLITS-1];
   integer active_input [0:NUM_PORTS-1];
 
@@ -106,27 +106,25 @@ module noc64_sync_boundary_core #(
   reg expected_seen [0:MAX_EXPECT_FLITS-1];
 
   integer rx_count [0:NUM_PORTS-1];
-  integer rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
-  integer rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  longint rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  longint rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   integer rx_expected_index [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg [FLIT_W-1:0] rx_flit [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg rx_match [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
-  integer last_egress_ps [0:NUM_PORTS-1];
-  integer packet_head_ack_ps [0:MAX_PKT_SEQ-1];
-  integer packet_head_req_ps [0:MAX_PKT_SEQ-1];
+  longint last_egress_ps [0:NUM_PORTS-1];
+  longint packet_head_ack_ps [0:MAX_PKT_SEQ-1];
+  longint packet_head_req_ps [0:MAX_PKT_SEQ-1];
   integer packet_event_id [0:MAX_PKT_SEQ-1];
   integer unexpected_flits, missing_flits, injected_flits, delivered_flits;
   integer delivered_packets, latency_count;
-  integer latency_ps [0:MAX_EXPECT_FLITS-1];
+  longint latency_ps [0:MAX_EXPECT_FLITS-1];
   integer warmup_events, measurement_events;
   reg write_v3_metrics;
   event rx_activity;
 
-  function integer now_ps;
-    real t;
+  function longint now_ps;
     begin
-      t = $realtime * 1000.0;
-      now_ps = $rtoi(t + 0.5);
+      now_ps = longint'($realtime * 1000.0 + 0.5);
     end
   endfunction
 
@@ -282,9 +280,10 @@ module noc64_sync_boundary_core #(
   endtask
 
   task automatic write_results;
-    integer p, s, i, j, tmp, fd_summary, fd_events, fd_latency, fd_v3;
-    integer lat_sum, max_lat, p95_lat, p99_lat, rank95, rank99, packet, lat, injected_packets;
-    real avg_lat_ns, elapsed_ns, throughput;
+    integer p, s, i, j, fd_summary, fd_events, fd_latency, fd_v3;
+    integer rank95, rank99, packet, injected_packets;
+    longint tmp, max_lat, p95_lat, p99_lat, lat;
+    real lat_sum, avg_lat_ns, elapsed_ns, throughput;
     reg pass_ok;
     begin
       injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();

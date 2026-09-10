@@ -1,0 +1,16 @@
+# Local Mesh64 RTL copy of the directed V3 Body-zero debug case.
+case DBG-64_fm64_6to44_body0
+group DBG-64
+reset_cycles 10
+timeout_cycles 5000000
+event_map 0 0
+input 0 6 0 8510510
+input 1 6 0 0000000
+input 2 6 0 0000000
+input 3 6 0 0000000
+input 4 6 0 4000000
+expect 0000100000000000 0 0 8510510
+expect 0000100000000000 0 0 0000000
+expect 0000100000000000 0 0 0000000
+expect 0000100000000000 0 0 0000000
+expect 0000100000000000 0 1 4000000

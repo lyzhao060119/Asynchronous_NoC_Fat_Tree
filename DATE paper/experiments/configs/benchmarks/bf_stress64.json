@@ -18,6 +18,9 @@
   "load_sweep": {
     "enabled": true,
     "coarse_then_fine": true,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [100, 300, 500, 700, 900],
     "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load"
   },
   "metrics": [
@@ -38,7 +41,7 @@
   "paper_figures": [
     "Fig. A"
   ],
-  "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT and Sync64 counterparts.",
+  "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT and Sync64 counterparts. Offered load is MFlit per injection port per second.",
   "display_name": "64-node hierarchical-width stress traffic",
   "display_description": "64-node unicast whose destination is outside the source level-2 subtree, used to stress hierarchical width."
 }

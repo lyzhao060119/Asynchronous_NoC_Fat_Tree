@@ -12,8 +12,16 @@ keys so historical hashes remain valid.
 **Logic synthesis** (Design Compiler) maps register-transfer-level Verilog to a
 standard-cell gate netlist. **Maximum-delay Standard Delay Format gate-level
 simulation** annotates that netlist at the slow corner. Both are still
-post-synthesis (zero wire load), not place-and-route. The software event
+post-synthesis (zero wire load), not place-and-route. Hierarchical quadtree
+routers use routing-control **1×DEL050**. Every mesh-routed router (flat-mesh
+leaf, FM64/256/1024 whole networks, and PROP TopMesh `(2,2)`) is locked to
+routing-control **1×DEL150**; acknowledge-in delay stays 1×DEL050. Flat-mesh
+unique-router synthesis additionally locks the Mat cone to **≤ 0.20 ns**
+(2026-09-05 mat020 freeze). Mixed networks such as PROP256 combine both
+recipes per router ref. The software event
 network simulator in `model/des/` is a predictor and cross-check only.
+Field-programmable gate-array validation is cancelled: the available target
+cannot fit either complete 64-node balanced hierarchical network.
 
 | Path | Git | Role |
 |---|---|---|
@@ -30,8 +38,8 @@ network simulator in `model/des/` is a predictor and cross-check only.
 ```text
 python "DATE paper/experiments/scripts/run_experiment.py" plan --plan phase0_import
 python "DATE paper/experiments/scripts/run_experiment.py" status
-python "DATE paper/experiments/scripts/print_v32_status.py"
-python "DATE paper/experiments/scripts/check_v32_gates.py" --include-v31-gate-a
+python "DATE paper/experiments/scripts/print_v31_status.py"
+python "DATE paper/experiments/scripts/check_v31_gates.py" --gate A
 python "DATE paper/experiments/scripts/validate_paper_results.py"
 ```
 
@@ -43,16 +51,16 @@ A run cannot enter `curated/` without a manifest, config hash, traffic hash
 (when applicable), netlist hash, delay-file hash (for 256/1024 paper points),
 and `frozen_structure_ok`. Archive-only identifiers remain `paper_eligible=false`.
 
-## Whole-network matrix (V3.2.0)
+## Whole-network matrix (V3.1.0)
 
 Independent netlists that each need their own synthesis netlist and
 maximum-delay file:
 
 - Asynchronous narrow / balanced / progressively widened hierarchical networks, 64 nodes
-- Asynchronous flat mesh network, 64 nodes
+- Asynchronous flat mesh network, 64 nodes (unique-router Mat-0.20 / 1×DEL150 signed; stitch + SDF next)
 - Synchronous narrow / balanced hierarchical networks, 64 nodes (already signed)
 - Asynchronous balanced hierarchical network, 256 nodes
-- Asynchronous flat mesh network, 256 nodes
+- Asynchronous flat mesh network, 256 nodes (unique-router Mat-0.20 / 1×DEL150 signed; stitch + SDF next)
 - Asynchronous balanced hierarchical network, 1024 nodes
 - Asynchronous flat mesh network, 1024 nodes
 
@@ -80,7 +88,11 @@ python "DATE paper/experiments/scripts/gen_cases_v3.py" --paper --materialize --
 python "DATE paper/experiments/scripts/gen_cases_v3.py" --keycase-256 --materialize --design PROP256
 ```
 
-`--paper` / `--full` = 3 seeds + 1000 warmup + 10000 measurement + coarse loads.
+`--paper` / `--full` = 3 seeds + 1000 warmup + 10000 measurement + coarse loads
+of **100 / 300 / 500 / 700 / 900 MFlit/Port/s** (plus zero) at a 1 ns scheduling
+tick. Case tags are `m100`, `m300`, … . Do not relabel historical `r0p10`
+MAXIMUM-SDF smokes as 100 MFlit/Port/s; those used a 20 ns tick and were
+about 5 MFlit/Port/s.
 Display names for those benchmarks:
 
 - 64-node hierarchical-width stress traffic
@@ -92,27 +104,12 @@ Display names for those benchmarks:
 (`head_inject_req_ps`). Formal 11k-event post-synthesis delay-format runs are
 Phase 6 Gates C–F, not this generator gate.
 
-## Removed field-programmable gate-array work and optional trace replay
-
-The available field-programmable gate-array target cannot fit either complete
-64-node balanced hierarchical network in its lookup-table capacity. V3.2.0
-therefore has no field-programmable gate-array design, traffic benchmark, or
-paper result. A 4-by-4 prototype is not a reduced 64-node validation and must
-not be reported as one.
-
-After Gate F, one frozen spiking-neural-network multicast trace may be replayed
-as optional application evidence. It must preserve one spike as one multicast
-injection and include source hash, provenance/license, and a logical-to-1024
-endpoint mapping. It runs only on the signed 1024-node hierarchical netlist and
-its boundary packet-replication policy. See
-[`configs/application_traces/`](configs/application_traces/).
-
 ## Phase 5 software event model
 
 Packet/flit-level model in `model/des/`, timed from
 `model/calibration/20260901_primitive_ru5_post_synthesis.json`.
 Every model number is **post-synthesis calibrated**. Do not write post-layout.
-V3.2.0 does not use this model as the 256/1024 paper source.
+V3.1.0 does not use this model as the 256/1024 paper source.
 
 ```text
 python "DATE paper/experiments/scripts/test_des_v3.py"

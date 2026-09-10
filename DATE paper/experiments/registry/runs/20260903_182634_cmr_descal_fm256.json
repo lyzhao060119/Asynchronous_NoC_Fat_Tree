@@ -1,0 +1,82 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260903_182634_cmr_descal_fm256",
+  "status": "archived",
+  "design_id": "FM256",
+  "benchmark_id": null,
+  "seed": null,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "3632e4fbb27ac6d4e6c60dccf7871d4d4dfa6511",
+    "dirty": true,
+    "describe": "3632e4f-dirty"
+  },
+  "config_hash": "9481597bc5dddb8c33a880c3b87e30827cd01108c22bf3ad204dcbd74e97a2d3",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "8521bede2e59ebd231444f374c004efa4d410f0eba2fdc27fdb43d1549e03b6c",
+  "sdf_hash": "b4367c36d6f0d04e15f7ca681de1b774483a7a9a7fc80a85b9f9744c8401a657",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/launch_256_dc_prep.py"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_HIER_SKIP_GLS": "1"
+  },
+  "lsf_jobs": [
+    "11639301",
+    "11639701",
+    "11640101",
+    "11640501",
+    "11640901",
+    "11641201",
+    "11641601",
+    "11642001",
+    "11642401",
+    "11642901",
+    "11643201",
+    "11643701",
+    "11644001",
+    "11644401",
+    "11644901",
+    "11645301",
+    "11645601",
+    "11645901",
+    "11646301",
+    "11646701",
+    "11647101",
+    "11647501",
+    "11647901",
+    "11648301",
+    "11648701",
+    "11649201",
+    "11649701",
+    "11650201",
+    "11650601"
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "archive-only",
+  "archive_only_reason": "RCU 1xDEL150 FM256 stitch. KEY-256 GLS passed; TOPO-UR/MC-UR stalled. Replaced as working 256-node mesh evidence by DEL250 20260904_193201_cmr_descal_fm256_del250 / GLS 20260904_235105_cmr_descal_fm256_del250_gls. Not paper. Do not overwrite hashes.",
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "remote_post": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260903_182634_cmr_descal_fm256/CMRMeshNoC_post.v",
+    "remote_sdf": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260903_182634_cmr_descal_fm256/CMRMeshNoC.sdf",
+    "counts": "CMR_HIER_STITCH_COUNTS router=256 expected_r=256 ipm=1280 opm=1280 expected_p=1280 DEL050=0/0 DEL150=1280/1280 unit=150",
+    "hier_plan": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260903_182634_cmr_descal_fm256/hier_plan.json"
+  },
+  "cases": [],
+  "created_utc": "2026-09-03T19:18:26+00:00",
+  "updated_utc": "2026-09-04T16:16:11+00:00",
+  "notes": "Whole-network hierarchical DC + stitch at RCU 1xDEL150 / Ackin 1xDEL050. Calibration/template netlist only; no Gate C GLS. paper_eligible=false."
+}

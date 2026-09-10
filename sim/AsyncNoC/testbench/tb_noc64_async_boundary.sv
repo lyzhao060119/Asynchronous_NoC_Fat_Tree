@@ -11,8 +11,13 @@ module noc64_async_boundary_core #(
   localparam integer FLIT_W = 28;
   localparam integer NUM_PORTS = NUM_CORES + TOP_LANES;
   localparam integer MAX_INPUT_FLITS = 131072;
-  localparam integer MAX_EXPECT_FLITS = 262144;
-  localparam integer MAX_RX_PER_PORT = 8192;
+  // F8 multicast expands 11,000 source packets into 440,000 matched egress
+  // flits, so the old 262k scoreboard capacity is insufficient.
+  localparam integer MAX_EXPECT_FLITS = 524288;
+  // Per-destination expect/RX queue. F8 mean is ~6.9k flits/port, but UR
+  // hotspots exceeded 8192 (TB_FATAL p=27/p=35). Worst case one dest is in
+  // every packet: 11,000 * 5 = 55,000 flits.
+  localparam integer MAX_RX_PER_PORT = 65536;
   localparam integer MAX_PKT_SEQ = 262144;
   localparam integer STR_CHARS = 256;
   localparam integer MASK_W = 128;
@@ -58,9 +63,9 @@ module noc64_async_boundary_core #(
   integer input_port [0:MAX_INPUT_FLITS-1];
   integer input_pkt_seq [0:MAX_INPUT_FLITS-1];
   reg [FLIT_W-1:0] input_flit [0:MAX_INPUT_FLITS-1];
-  integer input_offer_ps [0:MAX_INPUT_FLITS-1];
-  integer input_req_ps [0:MAX_INPUT_FLITS-1];
-  integer input_ack_ps [0:MAX_INPUT_FLITS-1];
+  longint input_offer_ps [0:MAX_INPUT_FLITS-1];
+  longint input_req_ps [0:MAX_INPUT_FLITS-1];
+  longint input_ack_ps [0:MAX_INPUT_FLITS-1];
   reg input_accepted [0:MAX_INPUT_FLITS-1];
   integer active_input [0:NUM_PORTS-1];
 
@@ -74,28 +79,35 @@ module noc64_async_boundary_core #(
   reg expected_seen [0:MAX_EXPECT_FLITS-1];
 
   integer rx_count [0:NUM_PORTS-1];
-  integer rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
-  integer rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  longint rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  longint rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   integer rx_expected_index [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg [FLIT_W-1:0] rx_flit [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg rx_match [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
-  integer last_egress_ps [0:NUM_PORTS-1];
-  integer packet_head_ack_ps [0:MAX_PKT_SEQ-1];
-  integer packet_head_req_ps [0:MAX_PKT_SEQ-1];
+  longint last_egress_ps [0:NUM_PORTS-1];
+  longint packet_head_ack_ps [0:MAX_PKT_SEQ-1];
+  longint packet_head_req_ps [0:MAX_PKT_SEQ-1];
+  longint packet_offer_ps [0:MAX_PKT_SEQ-1];
   integer packet_event_id [0:MAX_PKT_SEQ-1];
+  integer port_first_input [0:NUM_PORTS-1];
+  integer port_input_count [0:NUM_PORTS-1];
+  integer port_arrived_count [0:NUM_PORTS-1];
+  integer port_served_count [0:NUM_PORTS-1];
+  integer source_queue_flits [0:NUM_PORTS-1];
+  integer measurement_start_cycle, measurement_end_cycle;
+  integer measurement_backlog_snapshot;
+  longint measurement_start_ps, measurement_end_ps;
   integer unexpected_flits, missing_flits, injected_flits, delivered_flits;
   integer delivered_packets, latency_count;
-  integer latency_ps [0:MAX_EXPECT_FLITS-1];
+  longint latency_ps [0:MAX_EXPECT_FLITS-1];
   integer warmup_events, measurement_events;
   reg write_v3_metrics;
   reg csv_dumped;
-  event rx_activity;
+  event rx_activity, source_arrival;
 
-  function integer now_ps;
-    real t;
+  function longint now_ps;
     begin
-      t = $realtime * 1000.0;
-      now_ps = $rtoi(t + 0.5);
+      now_ps = longint'($realtime * 1000.0 + 0.5);
     end
   endfunction
 
@@ -200,10 +212,14 @@ module noc64_async_boundary_core #(
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
         expected_port_count[p] = 0; expected_cursor[p] = 0; rx_count[p] = 0;
         last_egress_ps[p] = -1; active_input[p] = -1;
+        port_first_input[p] = -1; port_input_count[p] = 0;
+        port_arrived_count[p] = 0; port_served_count[p] = 0;
+        source_queue_flits[p] = 0;
       end
       for (idx = 0; idx < MAX_PKT_SEQ; idx = idx + 1) begin
         packet_head_ack_ps[idx] = -1;
         packet_head_req_ps[idx] = -1;
+        packet_offer_ps[idx] = -1;
         packet_event_id[idx] = -1;
       end
       fd = $fopen(case_file, "r");
@@ -235,6 +251,11 @@ module noc64_async_boundary_core #(
               end
               input_cycle[input_count] = cyc; input_port[input_count] = p;
               input_pkt_seq[input_count] = pkt; input_flit[input_count] = flit;
+              if (port_first_input[p] < 0) port_first_input[p] = input_count;
+              else if (input_count != port_first_input[p] + port_input_count[p]) begin
+                $display("TB_FATAL inputs must be grouped by port; p=%0d line=%0d", p, line_no); $finish;
+              end
+              port_input_count[p] = port_input_count[p] + 1;
               input_offer_ps[input_count] = -1; input_req_ps[input_count] = -1;
               input_ack_ps[input_count] = -1; input_accepted[input_count] = 1'b0;
               input_count = input_count + 1;
@@ -260,23 +281,50 @@ module noc64_async_boundary_core #(
       if (total_expected() != expected_count) begin
         $display("TB_FATAL expected masks must be one-hot: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
       end
+      measurement_start_cycle = -1; measurement_end_cycle = -1;
+      for (idx = 0; idx < input_count; idx = idx + 1)
+        if (input_flit[idx][27] && (packet_event_id[input_pkt_seq[idx]] < 0 || packet_event_id[input_pkt_seq[idx]] >= warmup_events)) begin
+          if (measurement_start_cycle < 0 || input_cycle[idx] < measurement_start_cycle)
+            measurement_start_cycle = input_cycle[idx];
+          if (measurement_end_cycle < input_cycle[idx] + 1)
+            measurement_end_cycle = input_cycle[idx] + 1;
+        end
+      if (measurement_start_cycle < 0 || measurement_end_cycle <= measurement_start_cycle) begin
+        $display("TB_FATAL missing measurement packet window"); $finish;
+      end
     end
   endtask
 
-  task automatic drive_port(input integer port);
+  // Arrival is open-loop: a due flit is queued even while the DUT applies
+  // backpressure.  Service below is the only process allowed to consume it.
+  task automatic arrive_port(input integer port);
     integer i;
     real due_ns;
+    begin
+      wait (running);
+      for (i = port_first_input[port];
+           i < port_first_input[port] + port_input_count[port]; i = i + 1) begin
+        due_ns = case_epoch_ns + input_cycle[i] * case_tick_ns;
+        if (!inject_max_rate && $realtime < due_ns) #(due_ns - $realtime);
+        input_offer_ps[i] = inject_max_rate ? now_ps() : longint'(due_ns * 1000.0 + 0.5);
+        if (input_flit[i][27] && input_pkt_seq[i] >= 0 && input_pkt_seq[i] < MAX_PKT_SEQ)
+          packet_offer_ps[input_pkt_seq[i]] = input_offer_ps[i];
+        port_arrived_count[port] = port_arrived_count[port] + 1;
+        source_queue_flits[port] = source_queue_flits[port] + 1;
+        -> source_arrival;
+      end
+    end
+  endtask
+
+  task automatic service_port(input integer port);
+    integer i;
     reg old_noc_req;
     begin
       wait (running);
-      for (i = 0; i < input_count; i = i + 1) if (input_port[i] == port) begin
-        if (!inject_max_rate) begin
-          due_ns = case_epoch_ns + input_cycle[i] * case_tick_ns;
-          if ($realtime < due_ns) #(due_ns - $realtime);
-          input_offer_ps[i] = $rtoi(due_ns * 1000.0 + 0.5);
-        end
+      while (port_served_count[port] < port_input_count[port]) begin
+        wait (source_queue_flits[port] > 0);
+        i = port_first_input[port] + port_served_count[port];
         wait ((noc_in_req[port] === noc_in_ack[port]) && (tb_in_req[port] === tb_in_ack[port]));
-        if (inject_max_rate) input_offer_ps[i] = now_ps();
         tb_in_data[port*FLIT_W +: FLIT_W] = input_flit[i];
         #(tx_setup_ns);
         active_input[port] = i;
@@ -297,6 +345,8 @@ module noc64_async_boundary_core #(
           packet_head_ack_ps[input_pkt_seq[i]] = input_ack_ps[i];
         end
         active_input[port] = -1;
+        source_queue_flits[port] = source_queue_flits[port] - 1;
+        port_served_count[port] = port_served_count[port] + 1;
         if (ack_to_next_req_guard_ns > 0.0) #(ack_to_next_req_guard_ns);
       end
       input_done[port] = 1'b1;
@@ -337,26 +387,43 @@ module noc64_async_boundary_core #(
   endtask
 
   task automatic dump_csv_results;
-    integer p, s, i, j, tmp, fd_summary, fd_events, fd_latency, fd_v3;
-    integer lat_sum, max_lat, p95_lat, p99_lat, rank95, rank99, packet, lat, injected_packets;
-    real avg_lat_ns, elapsed_ns, throughput;
+    integer p, s, i, j, fd_summary, fd_events, fd_latency, fd_v3;
+    integer rank50, rank95, rank99, packet, injected_packets;
+    integer measurement_offered_flits, measurement_delivered_flits, measurement_delivered_copies, measurement_backlog_flits;
+    longint tmp, max_lat, p50_lat, p95_lat, p99_lat, lat;
+    real lat_sum, avg_lat_ns, window_ns, offered_throughput, delivered_throughput;
     reg pass_ok;
     begin
       if (csv_dumped) disable dump_csv_results;
       csv_dumped = 1'b1;
       injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();
+      measurement_offered_flits = 0; measurement_delivered_flits = 0; measurement_delivered_copies = 0;
+      measurement_backlog_flits = measurement_backlog_snapshot;
       delivered_packets = 0; latency_count = 0; lat_sum = 0; max_lat = 0;
       for (i = 0; i < input_count; i = i + 1) if (input_accepted[i]) begin
         injected_flits = injected_flits + 1;
         if (input_flit[i][27]) injected_packets = injected_packets + 1;
       end
+      for (i = 0; i < input_count; i = i + 1)
+        if ((packet_event_id[input_pkt_seq[i]] < 0 || packet_event_id[input_pkt_seq[i]] >= warmup_events) &&
+            input_offer_ps[i] >= measurement_start_ps && input_offer_ps[i] < measurement_end_ps) begin
+          measurement_offered_flits = measurement_offered_flits + 1;
+        end
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
         for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s]) begin
           i = rx_expected_index[p][s];
+          if ((packet_event_id[expected_pkt_seq[i]] < 0 || packet_event_id[expected_pkt_seq[i]] >= warmup_events) &&
+              rx_egress_ps[p][s] >= measurement_start_ps && rx_egress_ps[p][s] < measurement_end_ps) begin
+            measurement_delivered_flits = measurement_delivered_flits + 1;
+            if (expected_is_tail[i]) measurement_delivered_copies = measurement_delivered_copies + 1;
+          end
           if (expected_is_tail[i]) begin
             packet = expected_pkt_seq[i];
-            if (packet >= 0 && packet < MAX_PKT_SEQ && packet_head_ack_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0) begin
-              lat = rx_egress_ps[p][s] - packet_head_ack_ps[packet];
+            if (packet >= 0 && packet < MAX_PKT_SEQ && packet_offer_ps[packet] >= 0 &&
+                (packet_event_id[packet] < 0 || packet_event_id[packet] >= warmup_events) &&
+                packet_offer_ps[packet] >= measurement_start_ps && packet_offer_ps[packet] < measurement_end_ps &&
+                rx_egress_ps[p][s] >= measurement_start_ps && rx_egress_ps[p][s] < measurement_end_ps) begin
+              lat = rx_egress_ps[p][s] - packet_offer_ps[packet];
               latency_ps[latency_count] = lat; latency_count = latency_count + 1;
               lat_sum = lat_sum + lat; if (lat > max_lat) max_lat = lat;
               delivered_packets = delivered_packets + 1;
@@ -368,18 +435,20 @@ module noc64_async_boundary_core #(
       for (i = 0; i < latency_count; i = i + 1) for (j = i + 1; j < latency_count; j = j + 1)
         if (latency_ps[j] < latency_ps[i]) begin tmp = latency_ps[i]; latency_ps[i] = latency_ps[j]; latency_ps[j] = tmp; end
       if (latency_count > 0) begin
+        rank50 = (50 * latency_count + 99) / 100; if (rank50 > latency_count) rank50 = latency_count;
         rank95 = (95 * latency_count + 99) / 100; if (rank95 > latency_count) rank95 = latency_count;
         rank99 = (99 * latency_count + 99) / 100; if (rank99 > latency_count) rank99 = latency_count;
-        p95_lat = latency_ps[rank95-1]; p99_lat = latency_ps[rank99-1];
-      end else begin p95_lat = 0; p99_lat = 0; end
+        p50_lat = latency_ps[rank50-1]; p95_lat = latency_ps[rank95-1]; p99_lat = latency_ps[rank99-1];
+      end else begin p50_lat = 0; p95_lat = 0; p99_lat = 0; end
       avg_lat_ns = latency_count ? (lat_sum * 1.0 / latency_count / 1000.0) : 0.0;
-      elapsed_ns = $realtime - case_epoch_ns;
-      throughput = elapsed_ns > 0.0 ? (delivered_flits * case_tick_ns / elapsed_ns) : 0.0;
+      window_ns = (measurement_end_ps - measurement_start_ps) / 1000.0;
+      offered_throughput = window_ns > 0.0 ? measurement_offered_flits / window_ns : 0.0;
+      delivered_throughput = window_ns > 0.0 ? measurement_delivered_flits / window_ns : 0.0;
       pass_ok = !timed_out && (injected_flits == input_count) && (missing_flits == 0) && (unexpected_flits == 0);
 
       fd_summary = $fopen(csv_file, "w");
-      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail\n");
-      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0,%0d,%f,%f,%f,%f,%f,%0s\n", case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, $rtoi(elapsed_ns/case_tick_ns), throughput, avg_lat_ns, max_lat/1000.0, p95_lat/1000.0, p99_lat/1000.0, pass_ok ? "PASS" : "FAIL");
+      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,warmup_original_events,measurement_original_events,measurement_start_ps,measurement_end_ps,measurement_offered_flits,measurement_delivered_flits,measurement_delivered_copies,measurement_backlog_flits,offered_throughput_flit_ns,delivered_throughput_flit_ns,offer_to_tail_mean_ns,offer_to_tail_p50_ns,offer_to_tail_max_ns,offer_to_tail_p95_ns,offer_to_tail_p99_ns,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail\n");
+      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%0s\n", case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, warmup_events, measurement_events, measurement_start_ps, measurement_end_ps, measurement_offered_flits, measurement_delivered_flits, measurement_delivered_copies, measurement_backlog_flits, offered_throughput, delivered_throughput, avg_lat_ns, p50_lat/1000.0, max_lat/1000.0, p95_lat/1000.0, p99_lat/1000.0, delivered_throughput, avg_lat_ns, max_lat/1000.0, p95_lat/1000.0, p99_lat/1000.0, pass_ok ? "PASS" : "FAIL");
       $fclose(fd_summary);
 
       fd_events = $fopen(event_csv_file, "w");
@@ -391,10 +460,10 @@ module noc64_async_boundary_core #(
       $fclose(fd_events);
 
       fd_latency = $fopen(latency_csv_file, "w");
-      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,per_dest_latency_ns,tmax_component_ns\n");
+      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_offer_ps,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,offer_to_tail_ns,ingress_service_ns\n");
       for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s] && expected_is_tail[rx_expected_index[p][s]]) begin
         i = rx_expected_index[p][s]; packet = expected_pkt_seq[i];
-        $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0, (rx_egress_ps[p][s]-packet_head_req_ps[packet])/1000.0);
+        $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s], packet_offer_ps[packet], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_offer_ps[packet])/1000.0, (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0);
       end
       $fclose(fd_latency);
       if (write_v3_metrics) begin
@@ -404,11 +473,11 @@ module noc64_async_boundary_core #(
                 pass_ok, timed_out, missing_flits, unexpected_flits, injected_flits, delivered_flits,
                 missing_flits, warmup_events, measurement_events,
                 missing_flits + unexpected_flits + timed_out,
-                timed_out && (missing_flits > 0),
+                measurement_backlog_flits > 0,
                 pass_ok ? "PASS" : "FAIL");
         $fclose(fd_v3);
       end
-      $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d inject_max_rate=%0d elapsed_ns=%0.3f flits_per_ns=%0.6f", pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, inject_max_rate, elapsed_ns, elapsed_ns > 0.0 ? (delivered_flits / elapsed_ns) : 0.0);
+      $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d metrics_v2 offered=%0.6f delivered_rate=%0.6f backlog=%0d offer_tail_mean_ns=%0.3f", pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, offered_throughput, delivered_throughput, measurement_backlog_flits, avg_lat_ns);
     end
   endtask
 
@@ -425,12 +494,18 @@ module noc64_async_boundary_core #(
     for (gp = 0; gp < NUM_PORTS; gp = gp + 1) begin : g_boundary_monitors
       always @(noc_out_req[gp]) if (running && noc_out_req[gp] !== noc_out_ack[gp]) last_egress_ps[gp] = now_ps();
       initial receive_port(gp);
-      initial drive_port(gp);
+      initial arrive_port(gp);
+      initial service_port(gp);
     end
   endgenerate
 
   initial begin
-    case_file = ""; csv_file = "async_noc64_summary.csv"; event_csv_file = "async_noc64_events.csv"; latency_csv_file = "async_noc64_latency.csv";
+`ifdef CMR_LOCAL_MESH64_HEADONLY_CASE
+    case_file = "sim/CMR/testbench/DBG-64_fm64_6to44_body0.case";
+`else
+    case_file = "";
+`endif
+    csv_file = "async_noc64_summary.csv"; event_csv_file = "async_noc64_events.csv"; latency_csv_file = "async_noc64_latency.csv";
     v3_metrics_file = ""; write_v3_metrics = 1'b0;
     case_tick_ns = 20.0; tx_setup_ns = 0.05; rx_capture_ns = 0.05;
     ack_to_next_req_guard_ns = 0.20; timeout_scale = 1.0; inject_max_rate = 0;
@@ -445,20 +520,39 @@ module noc64_async_boundary_core #(
     if ($value$plusargs("ACK_TO_NEXT_REQ_GUARD_NS=%f", ack_to_next_req_guard_ns)) ;
     if ($value$plusargs("TIMEOUT_SCALE=%f", timeout_scale)) ;
     if ($test$plusargs("INJECT_MAX_RATE")) inject_max_rate = 1;
+    // `noc` is a generate-local instance and cannot be named from this common
+    // initialization scope; retain a compile-safe dump root for GLS.  PT-PX
+    // uses its strip_path to retain only DUT activity.
     if ($value$plusargs("DUMP_VCD=%s", dump_vcd)) begin $dumpfile(dump_vcd); $dumpvars(0, noc64_async_boundary_core); end
     if (case_file == "") begin $display("TB_FATAL +CASE_FILE=<case> is required"); $finish; end
     $display("TB_INFO NUM_CORES=%0d TOP_LANES=%0d NUM_PORTS=%0d ACK_TO_NEXT_REQ_GUARD_NS=%0.3f INJECT_MAX_RATE=%0d CASE_TICK_NS=%0.3f RX_CAPTURE_NS=%0.3f", NUM_CORES, TOP_LANES, NUM_PORTS, ack_to_next_req_guard_ns, inject_max_rate, case_tick_ns, rx_capture_ns);
     parse_case();
     reset = 1'b1; tb_in_req = '0; tb_in_data = '0; tb_out_ack = '0; input_done = '0;
     running = 1'b0; timed_out = 1'b0; finish_requested = 1'b0; unexpected_flits = 0;
+    measurement_backlog_snapshot = 0;
     csv_dumped = 1'b0;
     #(reset_cycles * case_tick_ns);
     reset = 1'b0;
     #10.0;
     case_epoch_ns = $realtime;
+    measurement_start_ps = longint'((case_epoch_ns + measurement_start_cycle * case_tick_ns) * 1000.0 + 0.5);
+    measurement_end_ps = longint'((case_epoch_ns + measurement_end_cycle * case_tick_ns) * 1000.0 + 0.5);
+    $display("TB_METRICS_V2 window_ps=%0d:%0d warmup_events=%0d measurement_events=%0d",
+             measurement_start_ps, measurement_end_ps, warmup_events, measurement_events);
     timeout_ns = timeout_cycles * case_tick_ns * timeout_scale;
     drain_ns = 1024.0 * case_tick_ns;
     running = 1'b1;
+    // Snapshot only the explicit source queues at the boundary.  A flit already
+    // handed to the DUT is not source backlog, even if its ACK arrives later.
+    fork
+      begin : snapshot_measurement_source_backlog
+        integer snapshot_port;
+        #(measurement_end_cycle * case_tick_ns);
+        measurement_backlog_snapshot = 0;
+        for (snapshot_port = 0; snapshot_port < NUM_PORTS; snapshot_port = snapshot_port + 1)
+          measurement_backlog_snapshot = measurement_backlog_snapshot + source_queue_flits[snapshot_port];
+      end
+    join_none
   end
 
   initial begin : completion_watchdog

@@ -29,9 +29,9 @@
   "env": {},
   "lsf_jobs": [],
   "frozen_structure_ok": true,
-  "paper_eligible": true,
+  "paper_eligible": false,
   "physical_class": "post-synthesis",
-  "archive_only_reason": null,
+  "archive_only_reason": "RCU 1xDEL050 flat-mesh leaf hop. Paper mesh hop is 1xDEL150.",
   "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
   "artifacts": {
     "local_dc": "D:/NoC/asynchronous_fat_tree_multicast/scripts/asic_dc/cmr/results/20260831_cmr_flatmesh_c1p1_del050_ackin050",
@@ -45,5 +45,5 @@
   "cases": [],
   "created_utc": "2026-08-31T15:52:38+00:00",
   "updated_utc": "2026-08-31T15:52:38+00:00",
-  "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+  "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. Archive: RCU 1xDEL050. Table I mesh leaf must use the 1xDEL150 hop."
 }

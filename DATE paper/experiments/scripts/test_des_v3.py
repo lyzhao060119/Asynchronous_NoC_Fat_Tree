@@ -225,7 +225,9 @@ def test_arb_seed_independent() -> None:
 
 def test_loaded_smoke_no_deadlock() -> None:
     table = TimingTable()
-    trace = generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=0.10)
+    from date_v3.offered_load import SMOKE_LOAD
+
+    trace = generate_trace("TOPO-UR", seed=CALIBRATION_SEED, nodes=64, smoke=True, load_point=SMOKE_LOAD)
     case = materialize(trace, top_lanes=1, hrep=False, routing="quadtree")
     sim, result = simulate("THIN64", case["packets"], timing=table, arb_seed=CALIBRATION_SEED)
     assert_true(not sim.grants_leaked(), sim.grants_leaked())

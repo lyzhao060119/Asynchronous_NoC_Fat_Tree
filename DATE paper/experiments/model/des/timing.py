@@ -8,14 +8,15 @@ from typing import Any
 from . import MODEL_VERSION, PHYSICAL_CLASS
 from ._path import MODEL
 from date_v3.hashutil import load_json, sha256_file
-from date_v3.schema import LOCKED_DELAY, assert_locked_delay
+from date_v3.offered_load import CASE_TICK_NS
+from date_v3.schema import assert_locked_delay, locked_delay_recipe
 
 DEFAULT_CALIBRATION = MODEL / "calibration" / "20260901_primitive_ru5_post_synthesis.json"
 LOCKED_PATH = MODEL / "calibration" / "locked.json"
 
 # ZeroWireload network stitch: no extra wire delay.  Inter-level FIFO is bypass.
 DEFAULT_LINK_NS = 0.0
-DEFAULT_CASE_TICK_NS = 20.0
+DEFAULT_CASE_TICK_NS = CASE_TICK_NS
 DEFAULT_ACK_GUARD_NS = 0.20
 DEFAULT_TX_SETUP_NS = 0.05
 
@@ -161,8 +162,9 @@ class TimingTable:
 
 def assert_locked_recipe(design: dict[str, Any]) -> None:
     recipe = design.get("delay_recipe") or {}
-    assert_locked_delay(recipe, label=design.get("design_id") or "design")
-    for key, expected in LOCKED_DELAY.items():
+    label = design.get("design_id") or "design"
+    assert_locked_delay(recipe, label=label, design=design)
+    for key, expected in locked_delay_recipe(label=label, design=design).items():
         if recipe.get(key) != expected:
             raise ValueError("delay recipe drift")
 

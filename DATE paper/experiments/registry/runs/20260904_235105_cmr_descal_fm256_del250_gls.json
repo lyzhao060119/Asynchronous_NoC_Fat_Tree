@@ -1,0 +1,148 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260904_235105_cmr_descal_fm256_del250_gls",
+  "status": "pass",
+  "design_id": "FM256",
+  "benchmark_id": null,
+  "seed": 900001,
+  "adapter": "network_sdf",
+  "git": {
+    "sha": "3632e4fbb27ac6d4e6c60dccf7871d4d4dfa6511",
+    "dirty": true,
+    "describe": "3632e4f-dirty"
+  },
+  "config_hash": "9481597bc5dddb8c33a880c3b87e30827cd01108c22bf3ad204dcbd74e97a2d3",
+  "case_hash": null,
+  "trace_hash": null,
+  "netlist_hash": "4870e59fead15e8aea7d5847603ef3a148945862234b5df9aeecff81361f0995",
+  "sdf_hash": "7951dc0f1003b8fe73fb21c761111fed646afd20f3e69645afe7d67e087d39c8",
+  "spef_hash": null,
+  "model_version": null,
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python",
+    "scripts/asic_dc/cmr/import_signed_fm256_del250.py"
+  ],
+  "env": {
+    "CMR_DESCAL": "1",
+    "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS": "250",
+    "CMR_NETWORK_NETLIST_RUN_ID": "20260904_193201_cmr_descal_fm256_del250",
+    "NETLIST_RUN_ID": "20260904_193201_cmr_descal_fm256_del250"
+  },
+  "lsf_jobs": [],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": null,
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "netlist_run_id": "20260904_193201_cmr_descal_fm256_del250",
+    "skip_dc": true,
+    "delay_recipe": "RCU 1xDEL250 / Ackin 1xDEL050",
+    "paper_delay_recipe": "RCU 1xDEL150 / Ackin 1xDEL050",
+    "dc_mark": [
+      "CMR_HIER_STITCH_COUNTS router=256 expected_r=256 ipm=1280 opm=1280 expected_p=1280 DEL050=0/0 DEL150=0/0 DEL250=1280/1280 unit=250",
+      "CMR_NETWORK_DC_PASS output=/home/ghy19/Asynchronous_Router_CMR/outputs/20260904_193201_cmr_descal_fm256_del250 top=CMRMeshNoC routers=256 ipm=1280 adapters=0 fifos=0"
+    ],
+    "sdf_cases": {
+      "directed": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=80 delivered=80 missing=0 unexpected=0 timeout=0 drainable=1",
+        "missing_log": false,
+        "case": "KEY-256_n256_s900001_zero_FM256_top0"
+      },
+      "zero": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 drainable=1",
+        "missing_log": false,
+        "case": "TOPO-UR_n256_s900001_zero_FM256_top0"
+      },
+      "low": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 drainable=1",
+        "missing_log": false,
+        "case": "TOPO-UR_n256_s900001_r0p05_FM256_top0"
+      },
+      "medium": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 drainable=1",
+        "missing_log": false,
+        "case": "TOPO-UR_n256_s900001_r0p10_FM256_top0"
+      },
+      "near-sat": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=60 delivered=60 missing=0 unexpected=0 timeout=0 drainable=1",
+        "missing_log": false,
+        "case": "TOPO-UR_n256_s900001_r0p30_FM256_top0"
+      },
+      "multicast": {
+        "tb_pass": true,
+        "annotation_done": true,
+        "annotation_errors": 0,
+        "timing_violation_count": 0,
+        "unexpected_failure": false,
+        "stall_failure": false,
+        "x_failure": false,
+        "ifnsdfa": false,
+        "result_line": "TB_RESULT PASS injected=80 delivered=675 missing=0 unexpected=0 timeout=0 drainable=1",
+        "missing_log": false,
+        "case": "MC-UR_n256_s900001_r0p10_FM256_top0"
+      }
+    },
+    "case_hashes": {
+      "KEY-256_n256_s900001_zero_FM256_top0": "d73a7bb2213607190caf6a00ffbe6f7f511a36bb499e272cb6cc44bf724c383e",
+      "TOPO-UR_n256_s900001_zero_FM256_top0": "0a99267c4f120f328385b70a46799ae908352a9c9bfa12bd1c27286fba1d57ed",
+      "TOPO-UR_n256_s900001_r0p05_FM256_top0": "32ed25b5e322519b58eddf96db092e8eaac499382ec0bf1e5255205a8c8305e1",
+      "TOPO-UR_n256_s900001_r0p10_FM256_top0": "8a01920ad1e8af4cfd604dac6eb7209528b8bd77d190ac8229413ba83f61c7a0",
+      "TOPO-UR_n256_s900001_r0p30_FM256_top0": "373a232eeaeae75b93d287a5e2708d599dc581494ebd6ca28a3569ff8a7a8366",
+      "MC-UR_n256_s900001_r0p10_FM256_top0": "3df8f23b36fba29d7229a1e8cf7e236502d84e4466b55c25016755329a6ef39d"
+    },
+    "traffic": "KEY-256 + TOPO-UR zero/0.05/0.10/0.30 + MC-UR 0.10 seed 900001 5-flit",
+    "paper_matrix_allowed": false
+  },
+  "cases": [],
+  "created_utc": "2026-09-04T16:16:11+00:00",
+  "updated_utc": "2026-09-04T16:16:11+00:00",
+  "notes": "256-node asynchronous flat mesh MAXIMUM-SDF smoke at RCU 1xDEL250 / Ackin 1xDEL050. DEL150 netlist 20260903_182634_cmr_descal_fm256 KEY-256 passed but TOPO-UR/MC-UR stalled (missing port 189). DEL250 stitch DEL250=1280/1280; six calibration cases TB_RESULT PASS, annotate Done, timing_violation_count=0. Not the locked paper mesh recipe (FM64 remains 1xDEL150). paper_eligible=false. Calibration/template seed 900001, not the 11k formal matrix."
+}

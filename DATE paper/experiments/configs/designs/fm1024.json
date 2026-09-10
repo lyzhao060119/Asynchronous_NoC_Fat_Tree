@@ -34,14 +34,6 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "bypass",
-  "delay_recipe": {
-    "rcu_steps": 1,
-    "rcu_unit_ps": 50,
-    "buf_stages": 0,
-    "ackin_steps": 1,
-    "ackin_unit_ps": 50,
-    "ackin_use_buf": false
-  },
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
@@ -50,6 +42,14 @@
   "paper_role": "Asynchronous flat mesh network, 1024 nodes",
   "paper_eligible_default": true,
   "notes": "",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
   "display_name": "Asynchronous flat mesh network, 1024 nodes",
   "display_description": "32-by-32 asynchronous flat mesh. Compared with the 1024-node hierarchical network at the same node count."
 }

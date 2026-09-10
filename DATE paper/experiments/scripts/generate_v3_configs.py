@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write frozen DATE V3.2.0 design / benchmark / seed / plan JSON files.
+"""Write frozen DATE V3.1.0 design / benchmark / seed / plan JSON files.
 
 Machine identifiers are unchanged from V3.0.2. Display names are complete English.
 """
@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from date_v3.display_names import attach_display  # noqa: E402
+from date_v3.offered_load import CASE_TICK_NS, COARSE_LOADS, LOAD_UNIT  # noqa: E402
+from date_v3.schema import locked_delay_recipe  # noqa: E402
 
 DESIGNS = ROOT / "configs" / "designs"
 BENCHMARKS = ROOT / "configs" / "benchmarks"
@@ -27,6 +29,20 @@ LOCKED = {
     "ackin_unit_ps": 50,
     "ackin_use_buf": False,
 }
+
+LOCKED_MESH = {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": False,
+}
+
+
+def attach_delay_recipe(obj: dict) -> dict:
+    obj["delay_recipe"] = locked_delay_recipe(design=obj)
+    return obj
 
 
 def dump(path: Path, obj: dict) -> None:
@@ -52,7 +68,7 @@ def primitive(
     adapter: str = "dc_cmr_router",
     clock_ns=None,
 ) -> dict:
-    return {
+    obj = {
         "schema": "date-v3-design-v1",
         "design_id": design_id,
         "kind": "router_primitive",
@@ -86,7 +102,6 @@ def primitive(
         "buffer_slots": 5,
         "no_uturn": True,
         "interlevel_fifo": "n/a",
-        "delay_recipe": dict(LOCKED),
         "clock_ns": clock_ns,
         "hrep_policy": False,
         "shares_netlist_with": None,
@@ -95,6 +110,7 @@ def primitive(
         "paper_eligible_default": True,
         "notes": "Table I / calibration primitive. Same CMR microarchitecture; geometry only.",
     }
+    return attach_delay_recipe(obj)
 
 
 def network(
@@ -118,7 +134,7 @@ def network(
     notes="",
     paper_eligible_default=True,
 ) -> dict:
-    return {
+    obj = {
         "schema": "date-v3-design-v1",
         "design_id": design_id,
         "kind": "network",
@@ -135,7 +151,6 @@ def network(
         "buffer_slots": 5,
         "no_uturn": True,
         "interlevel_fifo": "bypass",
-        "delay_recipe": dict(LOCKED),
         "clock_ns": clock_ns,
         "hrep_policy": hrep,
         "shares_netlist_with": shares,
@@ -145,19 +160,10 @@ def network(
         "paper_eligible_default": paper_eligible_default,
         "notes": notes,
     }
+    return attach_delay_recipe(obj)
 
 
 def main() -> int:
-    # V3.2 removes FPGA validation completely.  Delete stale generated inputs
-    # so a repeated generator invocation cannot revive that experiment path.
-    for stale in (
-        DESIGNS / "fpga_async_prop64.json",
-        DESIGNS / "fpga_sync_prop64.json",
-        BENCHMARKS / "fpga_directed.json",
-        BENCHMARKS / "fpga_ur.json",
-        BENCHMARKS / "fpga_multicast.json",
-    ):
-        stale.unlink(missing_ok=True)
     designs = [
         primitive(
             "ASYNC_THIN_1X1", "THIN", 1, 1, 1, mesh=False, async_design=True,
@@ -370,9 +376,50 @@ def main() -> int:
     for design in designs:
         dump(DESIGNS / ("%s.json" % design["design_id"].lower()), design)
 
+    for design_id, async_fpga in (("FPGA_ASYNC_PROP64", True), ("FPGA_SYNC_PROP64", False)):
+        dump(
+            DESIGNS / ("%s.json" % design_id.lower()),
+            {
+                "schema": "date-v3-design-v1",
+                "design_id": design_id,
+                "kind": "fpga",
+                "family": "FPGA",
+                "nodes": 64,
+                "async": async_fpga,
+                "routing": "fpga_wrap",
+                "lane_profile": "1-2-2-2",
+                "top_mesh_lanes": 2,
+                "cluster_grid": 1,
+                "router_primitives": [],
+                "expected_structure": {"routers": 21},
+                "flit_width_bits": 28,
+                "buffer_slots": 5,
+                "no_uturn": True,
+                "interlevel_fifo": "bypass",
+                "delay_recipe": dict(LOCKED),
+                "clock_ns": None if async_fpga else 1.0,
+                "hrep_policy": False,
+                "shares_netlist_with": "PROP64",
+                "fpga": {
+                    "board": None,
+                    "part": None,
+                    "vivado": None,
+                    "host_interface": None,
+                    "hardware_validation": False,
+                },
+                "adapter": None,
+                "paper_role": "Phase 11 64-node hardware validation",
+                "paper_eligible_default": False,
+                "notes": "Board/part/Vivado must be frozen before bitstream can count as hardware validation.",
+            },
+        )
+
     saturation = {
         "enabled": True,
         "coarse_then_fine": True,
+        "load_unit": LOAD_UNIT,
+        "case_tick_ns": CASE_TICK_NS,
+        "coarse_loads": list(COARSE_LOADS),
         "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load",
     }
     tmax = "last destination tail minus source header injection"
@@ -426,7 +473,7 @@ def main() -> int:
         "tmax_definition": tmax,
         "applies_to_designs": ["THIN64", "PROP64", "PFAT64", "SYNC_THIN64", "SYNC_PROP64"],
         "paper_figures": ["Fig. A"],
-        "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT and Sync64 counterparts.",
+        "notes": "Same 3 seeds and canonical traces across THIN/PROP/PFAT and Sync64 counterparts. Offered load is MFlit per injection port per second.",
     })
     dump(BENCHMARKS / "topo_ur.json", {
         "schema": "date-v3-benchmark-v1",
@@ -450,7 +497,7 @@ def main() -> int:
         "tmax_definition": tmax,
         "applies_to_designs": ["PROP64", "PROP256", "PROP1024", "FM64", "FM256", "FM1024", "SYNC_PROP64", "SYNC_THIN64", "THIN64"],
         "paper_figures": ["Fig. B"],
-        "notes": "Unicast only. Traversal from routing events, not theoretical hop count.",
+        "notes": "Unicast only. Traversal from routing events, not theoretical hop count. Offered load is MFlit per injection port per second (100/300/500/700/900) at a 1 ns scheduling tick.",
     })
     dump(BENCHMARKS / "xmc_f16.json", {
         "schema": "date-v3-benchmark-v1",
@@ -498,7 +545,7 @@ def main() -> int:
         "tmax_definition": tmax,
         "applies_to_designs": ["PROP1024", "HREP1024"],
         "paper_figures": ["Fig. C"],
-        "notes": "Tmax is read at 0.25 x H-REP saturation offered load for both designs. S=16 is backup.",
+        "notes": "Tmax is read at 0.25 x H-REP saturation offered load (MFlit/Port/s) for both designs. S=16 is backup.",
     })
     dump(BENCHMARKS / "mesh_intercluster_ur.json", {
         "schema": "date-v3-benchmark-v1",
@@ -524,13 +571,13 @@ def main() -> int:
         "paper_figures": ["backup"],
         "notes": "Default backup only.",
     })
-    dump(BENCHMARKS / "snn_trace1024.json", {
+    dump(BENCHMARKS / "fpga_directed.json", {
         "schema": "date-v3-benchmark-v1",
-        "benchmark_id": "SNN-TRACE1024",
-        "title": "Frozen spiking-neural-network multicast trace replay, 1024 nodes (optional)",
-        "traffic": "snn_trace1024",
+        "benchmark_id": "FPGA-DIRECTED",
+        "title": "FPGA 4032 directed src-dst pairs, 5 flit",
+        "traffic": "fpga_directed",
         "packet_flits": 5,
-        "multicast": True,
+        "multicast": False,
         "src_neq_dst": True,
         "dst_not_same_l2_subtree": False,
         "fanout_F": None,
@@ -538,22 +585,63 @@ def main() -> int:
         "multicast_fraction": None,
         "destination_set_samples": None,
         "warmup_original_events": 0,
-        "measurement_original_events": 0,
+        "measurement_original_events": 4032,
         "seed_set_id": "v3_main_seeds",
         "paired_trace": True,
-        "load_sweep": {"enabled": False, "coarse_then_fine": False, "saturation_rule": "trace replay"},
-        "metrics": [
-            "useful_destinations",
-            "region_covered_destinations",
-            "region_efficiency",
-            "top_mesh_link_traversals",
-            "tmax",
-            "energy_per_original_event",
-        ],
+        "load_sweep": {"enabled": False, "coarse_then_fine": False, "saturation_rule": "n/a"},
+        "metrics": ["errors", "timeouts", "drops"],
         "tmax_definition": tmax,
-        "applies_to_designs": ["PROP1024", "HREP1024"],
-        "paper_figures": ["optional_inset"],
-        "notes": "Optional only after Gate F. Requires a frozen source trace, provenance, endpoint mapping, and preserved one-spike-to-one-multicast semantics.",
+        "applies_to_designs": ["FPGA_ASYNC_PROP64", "FPGA_SYNC_PROP64"],
+        "paper_figures": ["Table I", "fpga_validation"],
+        "notes": "Zero errors/loss/timeout required.",
+    })
+    dump(BENCHMARKS / "fpga_ur.json", {
+        "schema": "date-v3-benchmark-v1",
+        "benchmark_id": "FPGA-UR",
+        "title": "FPGA UR low/medium/near-max-stable, >=1e6 original events",
+        "traffic": "fpga_ur",
+        "packet_flits": 5,
+        "multicast": False,
+        "src_neq_dst": True,
+        "dst_not_same_l2_subtree": False,
+        "fanout_F": None,
+        "spread_S": None,
+        "multicast_fraction": 0.0,
+        "destination_set_samples": None,
+        "warmup_original_events": 1000,
+        "measurement_original_events": 1000000,
+        "seed_set_id": "v3_main_seeds",
+        "paired_trace": True,
+        "load_sweep": {"enabled": True, "coarse_then_fine": False, "saturation_rule": "hardware sustained"},
+        "metrics": ["errors", "sustained_throughput"],
+        "tmax_definition": tmax,
+        "applies_to_designs": ["FPGA_ASYNC_PROP64", "FPGA_SYNC_PROP64"],
+        "paper_figures": ["fpga_validation"],
+        "notes": "FPGA latency is a hardware behavior metric, not an ASIC model calibration source.",
+    })
+    dump(BENCHMARKS / "fpga_multicast.json", {
+        "schema": "date-v3-benchmark-v1",
+        "benchmark_id": "FPGA-MULTICAST",
+        "title": "FPGA F=4, F=16, Q64 broadcast, all-destination completion",
+        "traffic": "fpga_multicast",
+        "packet_flits": 5,
+        "multicast": True,
+        "src_neq_dst": True,
+        "dst_not_same_l2_subtree": False,
+        "fanout_F": 16,
+        "spread_S": None,
+        "multicast_fraction": 1.0,
+        "destination_set_samples": None,
+        "warmup_original_events": 0,
+        "measurement_original_events": 64,
+        "seed_set_id": "v3_main_seeds",
+        "paired_trace": True,
+        "load_sweep": {"enabled": False, "coarse_then_fine": False, "saturation_rule": "n/a"},
+        "metrics": ["all_destination_completion", "tmax"],
+        "tmax_definition": tmax,
+        "applies_to_designs": ["FPGA_ASYNC_PROP64", "FPGA_SYNC_PROP64"],
+        "paper_figures": ["fpga_validation"],
+        "notes": "",
     })
 
     dump(SEEDS / "v3_main_seeds.json", {
@@ -632,13 +720,23 @@ def main() -> int:
             "notes": "Phase 2.5 1-cycle Head Fat 1-2-2-2 SyncNoC64 1.0 ns MAXIMUM-SDF. Do not overwrite.",
         },
         {
-            "run_id": "cmr_mesh64_current",
+            "run_id": "20260903_101701_cmr_descal_fm64_del150",
             "design_id": "FM64",
             "benchmark_id": None,
-            "adapter": "import_readonly",
-            "physical_class": "unknown",
+            "adapter": "network_sdf",
+            "physical_class": "archive-only",
             "paper_eligible": False,
-            "notes": "Placeholder for the in-flight mesh64 run. Replace run_id with CMR_MESH64_RUN_ID when DC/GLS finishes. Not curated.",
+            "archive_only_reason": "Pre-Mat020 mesh routing cone. Remote netlist deleted 2026-09-06.",
+            "notes": "Archived pre-AABB FM64 DEL150. Paper netlist is 20260905_103344_cmr_descal_fm64_mat020.",
+        },
+        {
+            "run_id": "20260905_103344_cmr_descal_fm64_mat020",
+            "design_id": "FM64",
+            "benchmark_id": None,
+            "adapter": "network_sdf",
+            "physical_class": "post-synthesis",
+            "paper_eligible": False,
+            "notes": "Current paper FM64 netlist: AABB RoutingLogic_mesh / Mat-0.20 / RCU 1xDEL150. TOPO-UR coarse 18/18 MAXIMUM-SDF PASS (20260906_101804_cmr_descal_fm64_mat020_gls, tviol=0). paper_eligible=false until curated; no fine 25 MFlit yet.",
         },
         {
             "run_id": "20260830_095259_cmr_noc64_p50_1222",

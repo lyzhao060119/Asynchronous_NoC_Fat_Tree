@@ -3,6 +3,7 @@ package Router_Architecture.CMR
 import DataStruct.Packet
 import Router_Architecture.common.RouterModuleConfig
 import chisel3._
+import tool.DelayElement
 
 /**
   * Continuous paper Fig. 5 Input Port Module.
@@ -68,7 +69,12 @@ class IPM(
   dontTouch(RouteComputationUnit.io.Mat)
   dontTouch(RouteComputationUnit.io.RouteSel)
 
-  io.Ackout := Buffer.io.Ackout
+  // Delay only the upstream Ack.  HeadPredictor.complete and the write
+  // counter still see Buffer.io.Ackout so En can close while Head remains
+  // on Datain.
+  private val AckoutGuard = Module(new DelayElement(1, DelayUnitPs = 150))
+  AckoutGuard.io.I := Buffer.io.Ackout
+  io.Ackout := AckoutGuard.io.Z
   io.Reqout := Buffer.io.Reqout
   io.Dataout := Buffer.io.Dataout
   io.PathEnabled := RouteComputationUnit.io.PathEnabled

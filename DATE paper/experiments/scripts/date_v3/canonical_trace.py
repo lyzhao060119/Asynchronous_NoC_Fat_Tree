@@ -13,14 +13,24 @@ from typing import Any, Iterable
 
 from .hashutil import sha256_text
 from .hrep_policy import cluster_of_pe, pe_index, pe_xy
+from .offered_load import (  # noqa: F401 — re-export for callers
+    CASE_TICK_NS,
+    COARSE_LOADS,
+    DEFAULT_LOAD,
+    LOAD_UNIT,
+    XMC_GAP,
+    ZERO_LOAD_GAP,
+    header_rate_per_ns,
+    load_tag,
+    load_tag_int,
+    packet_start_probability,
+    trace_load_fields,
+)
 from .paths import BENCHMARKS, SEEDS
 
 PACKET_FLITS = 5
 TILE = 8
-COARSE_LOADS = (0.02, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50)
 ZERO_LOAD = 0.0
-ZERO_LOAD_GAP = 256
-XMC_GAP = 64
 TRACE_SCHEMA = "date-v3-canonical-trace-v1"
 EVENT_SCHEMA = "date-v3-canonical-event-v1"
 
@@ -59,14 +69,6 @@ def cluster_grid_of(nodes: int, tile: int = TILE) -> int:
     if width % tile != 0:
         raise ValueError("width %s is not a multiple of tile %s" % (width, tile))
     return width // tile
-
-
-def load_tag(load_point: float) -> str:
-    if load_point <= 0.0:
-        return "zero"
-    whole = int(load_point)
-    frac = int(round((load_point - whole) * 100))
-    return "r%dp%02d" % (whole, frac)
 
 
 def l2_key(pe: int, width: int, tile: int = TILE) -> tuple[int, int, int, int]:
@@ -113,6 +115,33 @@ def choose_intercluster_dest(rng: Random, source: int, n: int) -> int:
     if not choices:
         raise RuntimeError("no inter-cluster destination for source %s" % source)
     return rng.choice(choices)
+
+
+def sample_rect_multicast_dests(
+    rng: Random, source: int, n: int, fanout: int, *, cross_l2: bool
+) -> list[int]:
+    """Pick a hardware-representable AABB destination set of exactly F cores."""
+    width = width_of(n)
+    shapes = {4: ((2, 2),), 8: ((4, 2), (2, 4))}.get(fanout)
+    if not shapes:
+        raise ValueError("no AABB encoding for multicast fanout %s" % fanout)
+    src_key = l2_key(source, width)
+    for _ in range(512):
+        rect_w, rect_h = rng.choice(shapes)
+        x0 = rng.randrange(width - rect_w + 1)
+        y0 = rng.randrange(width - rect_h + 1)
+        dests = [
+            pe_index(x, y, width)
+            for y in range(y0, y0 + rect_h)
+            for x in range(x0, x0 + rect_w)
+        ]
+        keys = {l2_key(dest, width) for dest in dests}
+        if source in dests:
+            continue
+        if cross_l2 and (src_key in keys or len(keys) < 2):
+            continue
+        return dests
+    raise RuntimeError("could not sample F%s %s-AABB multicast" % (fanout, "cross-L2" if cross_l2 else "uniform"))
 
 
 def sample_xmc_dests(
@@ -185,6 +214,12 @@ def draw_pairs(
             dests = [choose_bf_dest(rng, source, nodes)]
         elif traffic == "topo_ur":
             dests = [choose_other(rng, source, nodes)]
+        elif traffic == "mc_ur64":
+            dests = sample_rect_multicast_dests(rng, source, nodes, fanout, cross_l2=False)
+            multicast = True
+        elif traffic == "mc_xq64":
+            dests = sample_rect_multicast_dests(rng, source, nodes, fanout, cross_l2=True)
+            multicast = True
         elif traffic == "mesh_intercluster_ur":
             dests = [choose_intercluster_dest(rng, source, nodes)]
         elif traffic == "xmc_f16":
@@ -223,30 +258,21 @@ def schedule_pairs(
 ) -> list[int]:
     if load_point <= 0.0:
         return [idx * (packet_flits + ZERO_LOAD_GAP) for idx in range(len(pairs))]
-    start_prob = load_point / packet_flits
-    if not (0.0 < start_prob <= 1.0):
-        raise ValueError("bad packet-start probability %s" % start_prob)
+    rate = header_rate_per_ns(load_point, packet_flits)
     queues: dict[int, deque[int]] = defaultdict(deque)
     for idx, pair in enumerate(pairs):
-        queues[pair["source"]].append(idx)
+        source = int(pair["source"])
+        if source < 0 or source >= nodes:
+            raise ValueError("source %s out of range for %s nodes" % (source, nodes))
+        queues[source].append(idx)
     ready = [-1] * len(pairs)
-    busy_until = [0] * nodes
-    placed = 0
-    cycle = 0
-    while placed < len(pairs):
-        for source in range(nodes):
-            if cycle < busy_until[source] or not queues[source]:
-                continue
-            if rng.random() < start_prob:
-                idx = queues[source].popleft()
-                ready[idx] = cycle
-                busy_until[source] = cycle + packet_flits
-                placed += 1
-                if placed >= len(pairs):
-                    break
-        cycle += 1
-        if cycle > 10_000_000:
-            raise RuntimeError("schedule did not finish")
+    for source in range(nodes):
+        t_ns = 0.0
+        for idx in queues[source]:
+            t_ns += rng.expovariate(rate)
+            ready[idx] = int(round(t_ns / CASE_TICK_NS))
+    if any(cycle < 0 for cycle in ready):
+        raise RuntimeError("schedule produced a negative ready cycle")
     return ready
 
 
@@ -282,7 +308,7 @@ def generate_trace(
     *,
     seed: int,
     nodes: int | None = None,
-    load_point: float = 0.10,
+    load_point: float = DEFAULT_LOAD,
     warmup: int | None = None,
     measurement: int | None = None,
     spread: int | None = None,
@@ -310,6 +336,8 @@ def generate_trace(
             nodes = 64
     if traffic == "bf_stress64" and nodes != 64:
         raise ValueError("BF-STRESS64 is 64-node only")
+    if traffic in ("mc_ur64", "mc_xq64") and nodes != 64:
+        raise ValueError("%s is 64-node only" % traffic)
     if traffic == "xmc_f16" and not smoke and measurement < 32:
         raise ValueError("XMC-F16 needs at least 32 destination-set samples")
     if traffic == "xmc_f16":
@@ -346,17 +374,12 @@ def generate_trace(
         "packet_flits": packet_flits,
         "warmup_original_events": warmup,
         "measurement_original_events": measurement,
-        "offered_load": load_point,
-        "load_tag": load_tag(load_point),
         "spread_S": spread,
         "paired_trace": True,
         "tmax_definition": bench.get("tmax_definition"),
     }
+    header.update(trace_load_fields(load_point))
     return {"header": header, "events": events}
-
-
-def load_tag_int(load_point: float) -> int:
-    return int(round(load_point * 1000))
 
 
 def paper_nodes_for(benchmark_id: str) -> list[int]:
@@ -365,6 +388,8 @@ def paper_nodes_for(benchmark_id: str) -> list[int]:
         return [64]
     if benchmark_id == "TOPO-UR":
         return [64, 256, 1024]
+    if benchmark_id in ("MC-UR-F4", "MC-UR-F8", "MC-XQ-F8"):
+        return [64]
     if benchmark_id in ("XMC-F16", "XMC10-G", "MESH-INTERCLUSTER-UR"):
         return [1024]
     if benchmark_id == "KEY-256":
@@ -484,10 +509,9 @@ def generate_directed_keycase(
         "packet_flits": packet_flits,
         "warmup_original_events": 0,
         "measurement_original_events": len(events),
-        "offered_load": 0.0,
-        "load_tag": "zero",
         "spread_S": None,
         "paired_trace": True,
         "tmax_definition": "last destination tail minus source header injection",
     }
+    header.update(trace_load_fields(0.0))
     return {"header": header, "events": events}

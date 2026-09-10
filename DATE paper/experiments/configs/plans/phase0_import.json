@@ -103,13 +103,13 @@
       "notes": "Phase 2.5 1-cycle Head Fat 1-2-2-2 SyncNoC64 1.0 ns MAXIMUM-SDF. Do not overwrite."
     },
     {
-      "run_id": "cmr_mesh64_current",
+      "run_id": "20260903_101701_cmr_descal_fm64_del150",
       "design_id": "FM64",
       "benchmark_id": null,
-      "adapter": "import_readonly",
-      "physical_class": "unknown",
-      "paper_eligible": false,
-      "notes": "Placeholder for the in-flight mesh64 run. Replace run_id with CMR_MESH64_RUN_ID when DC/GLS finishes. Not curated."
+      "adapter": "network_sdf",
+      "physical_class": "post-synthesis",
+      "paper_eligible": true,
+      "notes": "Signed 64-node flat mesh paper baseline, RCU 1xDEL150 / Ackin 1xDEL050. Replaces placeholder cmr_mesh64_current. Do not overwrite."
     },
     {
       "run_id": "20260830_095259_cmr_noc64_p50_1222",

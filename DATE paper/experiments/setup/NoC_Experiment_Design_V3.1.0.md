@@ -1,15 +1,8 @@
 # NoC Experiment Design V3.1.0
 ## Whole-network logic synthesis and maximum-delay gate-level simulation
 
-> **Superseded for execution by**
+> Historical V3.1.0 record. Current execution is
 > [`NoC_Experiment_Design_V3.2.0.md`](NoC_Experiment_Design_V3.2.0.md).
-> V3.2.0 removes field-programmable gate-array validation because the
-> available target cannot fit the complete 64-node networks, and retains only
-> a non-blocking, post-Gate-F spiking-neural-network trace replay option.
-> This V3.1.0 file is historical.
->
-> Historical V3.0.2 remains at
-> [`NoC_Experiment_Design_V3.0.2.md`](NoC_Experiment_Design_V3.0.2.md).
 > Machine identifiers (`design_id`, benchmark keys, run identifiers) are
 > unchanged so existing hashes and registry rows stay valid.
 
@@ -94,7 +87,7 @@ Machine freeze: [`configs/inventory/v31_network_matrix.json`](../configs/invento
 Large jobs are not launched until the previous size is green.
 
 - **Gate A — local readiness.** Scala network tests, route oracle, structure inventory, five-flit directed smoke, unified scoreboard, and a dry-run of the synthesis/simulation driver. Unsupported geometry is refused.
-- **Gate B — 64-node template.** All six independent 64-node netlists complete synthesis. Directed, zero-load, medium-load, and near-saturation maximum-delay simulations pass. Synchronous 64-node networks already signed in Phase 2.5 count if their manifests remain write-protected and paper-eligible.
+- **Gate B — 64-node template.** All six independent 64-node netlists complete synthesis. Directed, zero-load, medium-load, and near-saturation maximum-delay simulations pass. Synchronous 64-node networks already signed in Phase 2.5 count if their manifests remain write-protected and paper-eligible. The asynchronous flat mesh network, 64 nodes, is signed at routing-control **1×DEL150**; hierarchical 64-node five-flit traces are still required before this gate is fully green. Later flat-mesh 256/1024 jobs inherit 1×DEL150.
 - **Gate C — 256-node pilot.** Synthesize both 256-node asynchronous networks. Check mapped cells, structure counts, and a valid timing report. Then one directed delay simulation each. Then representative zero-load / medium / near-saturation cases.
 - **Gate D — 256-node formal.** Full three-seed formal load sweep at gate level. Those traces are the 256-node paper data.
 - **Gate E — 1024-node pilot.** Only after Gate D. Synthesize both 1024-node asynchronous networks, review memory and runtime, then the same four delay-simulation classes in order. Any failure stops the remaining batch.
@@ -125,14 +118,15 @@ Run `python DATE paper/experiments/scripts/print_v31_status.py` for a regenerate
 
 | Item | Status |
 |---|---|
-| Isolated asynchronous router primitives | Signed post-synthesis hop evidence (do not re-synthesize) |
+| Isolated asynchronous router primitives | Hierarchical hops signed at 1×DEL050 (do not re-synthesize). Flat-mesh leaf hop must be re-signed at 1×DEL150 |
 | Isolated synchronous router primitives | Signed, one-cycle head, 1.0 ns |
 | Synchronous narrow hierarchical network, 64 nodes | Signed whole-network maximum-delay simulation |
 | Synchronous balanced hierarchical network, 64 nodes | Signed whole-network maximum-delay simulation |
-| Asynchronous 64-node independent netlists | Gate B: template scripts exist; locked-delay five-flit whole-network delay traces are still missing, so 256-node jobs are blocked |
-| Asynchronous balanced hierarchical network, 256 nodes | Driver ready; not started (Gate B hold) |
-| Asynchronous flat mesh network, 256 nodes | Driver ready; not started (Gate B hold) |
-| Asynchronous 1024-node networks | Driver ready; not started (Gate B hold) |
+| Asynchronous flat mesh network, 64 nodes | Signed whole-network maximum-delay simulation at RCU 1×DEL150 (`20260903_101701_cmr_descal_fm64_del150`) |
+| Asynchronous hierarchical 64-node independent netlists | Gate B: five-flit whole-network delay traces still missing, so 256-node jobs stay blocked |
+| Asynchronous balanced hierarchical network, 256 nodes | Driver ready; not started (Gate B hold). Recipe remains 1×DEL050 |
+| Asynchronous flat mesh network, 256 nodes | Driver ready; not started (Gate B hold). Recipe locked to 1×DEL150; do not reuse DEL050 or DEL100 |
+| Asynchronous 1024-node networks | Driver ready; not started (Gate B hold). Flat mesh at 1×DEL150, hierarchical at 1×DEL050 |
 | Four-lane top-mesh variation | Unsupported; driver refuses; no fabricated results |
 | Gate A local readiness | Passed (Scala network spec, inventory, five-flit traffic, driver input check) |
 | Software event model | Calibrated hops; network paper-matrix flag remains false until Gate D/F traces exist |

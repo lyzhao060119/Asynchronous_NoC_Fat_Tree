@@ -32,12 +32,12 @@
   "lsf_jobs": [],
   "frozen_structure_ok": null,
   "paper_eligible": false,
-  "physical_class": "unknown",
-  "archive_only_reason": null,
+  "physical_class": "archive-only",
+  "archive_only_reason": "Placeholder superseded by 20260903_101701_cmr_descal_fm64_del150.",
   "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
   "artifacts": {},
   "cases": [],
   "created_utc": "2026-08-31T05:50:02+00:00",
   "updated_utc": "2026-08-31T05:50:02+00:00",
-  "notes": "In-flight mesh64 runs observed on the remote: 20260831_115856_cmr_mesh64_p50 (newer) and 20260831_094757_cmr_mesh64_p50. Not curated until DC/GLS PASS and frozen-structure check."
+  "notes": "Superseded placeholder. Paper 64-node flat mesh baseline is 20260903_101701_cmr_descal_fm64_del150 (RCU 1xDEL150). DEL100 20260903_101701_cmr_descal_fm64_del100 is isolation-only archive. 20260831_115856 remains TAB 3-flit archive."
 }

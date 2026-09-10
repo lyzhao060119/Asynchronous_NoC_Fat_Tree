@@ -50,14 +50,6 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "bypass",
-  "delay_recipe": {
-    "rcu_steps": 1,
-    "rcu_unit_ps": 50,
-    "buf_stages": 0,
-    "ackin_steps": 1,
-    "ackin_unit_ps": 50,
-    "ackin_use_buf": false
-  },
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": null,
@@ -66,6 +58,14 @@
   "paper_role": "Asynchronous narrow hierarchical network, 64 nodes; hierarchical-width ablation",
   "paper_eligible_default": true,
   "notes": "",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
   "display_name": "Asynchronous narrow hierarchical network, 64 nodes",
   "display_description": "64-node asynchronous hierarchical network with one lane on every tree level."
 }

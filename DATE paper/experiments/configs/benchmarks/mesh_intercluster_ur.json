@@ -18,6 +18,9 @@
   "load_sweep": {
     "enabled": true,
     "coarse_then_fine": true,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [100, 200, 300, 400, 500],
     "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load"
   },
   "metrics": [

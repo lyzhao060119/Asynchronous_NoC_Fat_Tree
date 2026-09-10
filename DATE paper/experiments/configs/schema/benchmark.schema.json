@@ -32,8 +32,12 @@
         "topo_ur",
         "xmc_f16",
         "xmc10_g",
+        "mc_ur64",
+        "mc_xq64",
         "mesh_intercluster_ur",
-        "snn_trace1024"
+        "fpga_directed",
+        "fpga_ur",
+        "fpga_multicast"
       ]
     },
     "packet_flits": { "type": "integer", "enum": [1, 5] },
@@ -56,7 +60,10 @@
       "properties": {
         "enabled": { "type": "boolean" },
         "coarse_then_fine": { "type": "boolean" },
-        "saturation_rule": { "type": "string" }
+        "saturation_rule": { "type": "string" },
+        "load_unit": { "type": "string" },
+        "case_tick_ns": { "type": "number" },
+        "coarse_loads": { "type": "array", "items": { "type": "number" } }
       }
     },
     "metrics": {

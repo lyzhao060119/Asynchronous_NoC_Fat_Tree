@@ -7,6 +7,8 @@ module tb_rcu_smoke;
   reg Ackout = 1'b0;
   reg [27:0] Datain = 28'b0;
   reg [3:0] TailPassed = 4'b0;
+  reg [23:0] saved_dest;
+  reg saved_req_pc;
   wire [3:0] RouteSel;
   wire [3:0] PathEnabled;
 
@@ -57,6 +59,7 @@ module tb_rcu_smoke;
   );
     begin
       set_flit(1'b1, 1'b0, x0, y0, x1, y1);
+      saved_req_pc = dut.AddressRegister.PhaseSelectorBlock.Req_pc;
       Reqin = ~Reqin;
       // Req_rc first crosses the dedicated two-stage AddressRegister control
       // guard (0.4 ns in this functional model), then RouteSel crosses the
@@ -65,6 +68,10 @@ module tb_rcu_smoke;
       #3.0;
       check(PathEnabled === expected_path, "Head selected wrong quadtree path set");
       check(RouteSel === 4'b0000, "Internal Ack did not close RouteSel pulse");
+      check(dut.AddressRegister.dest === Datain[25:2],
+        "Head address was not captured exactly");
+      check(dut.AddressRegister.PhaseSelectorBlock.Req_pc !== saved_req_pc,
+        "Head did not advance packet request phase");
       Ackout = Reqin;
       #0.4;
     end
@@ -72,10 +79,16 @@ module tb_rcu_smoke;
 
   task automatic complete_body;
     begin
+      saved_dest = dut.AddressRegister.dest;
+      saved_req_pc = dut.AddressRegister.PhaseSelectorBlock.Req_pc;
       Reqin = ~Reqin;
       #0.2;
       Ackout = Reqin;
       #0.4;
+      check(dut.AddressRegister.dest === saved_dest,
+        "Body changed captured Head address");
+      check(dut.AddressRegister.PhaseSelectorBlock.Req_pc === saved_req_pc,
+        "Body changed packet request phase");
     end
   endtask
 
@@ -98,6 +111,8 @@ module tb_rcu_smoke;
     // TailPassed releases the selected OPM before Tail Ackout reopens the
     // Address Register for the next packet.
     set_flit(1'b0, 1'b1, 2, 2, 3, 3);
+    saved_dest = dut.AddressRegister.dest;
+    saved_req_pc = dut.AddressRegister.PhaseSelectorBlock.Req_pc;
     Reqin = ~Reqin;
     #0.2;
     TailPassed = 4'b1000;
@@ -107,6 +122,10 @@ module tb_rcu_smoke;
     #0.4;
     TailPassed = 4'b0000;
     #1.0;
+    check(dut.AddressRegister.dest === saved_dest,
+      "Tail changed captured Head address");
+    check(dut.AddressRegister.PhaseSelectorBlock.Req_pc === saved_req_pc,
+      "Tail changed packet request phase");
     check(PathEnabled === 4'b0000 && RouteSel === 4'b0000,
       "Tail completion replayed the old route while input was idle");
 

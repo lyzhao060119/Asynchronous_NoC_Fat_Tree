@@ -18,6 +18,9 @@
   "load_sweep": {
     "enabled": true,
     "coarse_then_fine": true,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [100, 300, 500, 700, 900],
     "saturation_rule": "highest offered load with zero errors on all 3 seeds, drainable after measurement, no sustained backlog growth; report delivered throughput and mean latency; do not use 2x zero-load"
   },
   "metrics": [
@@ -39,12 +42,13 @@
     "FM1024",
     "SYNC_PROP64",
     "SYNC_THIN64",
-    "THIN64"
+    "THIN64",
+    "PFAT64"
   ],
   "paper_figures": [
     "Fig. B"
   ],
-  "notes": "Unicast only. Traversal from routing events, not theoretical hop count.",
+  "notes": "Unicast only. Traversal from routing events, not theoretical hop count. Offered load is MFlit per injection port per second (100/300/500/700/900) at a 1 ns scheduling tick.",
   "display_name": "Uniform random single-destination traffic, 64/256/1024 nodes",
   "display_description": "Uniform random unicast with source not equal to destination, applied at 64, 256, and 1024 nodes."
 }

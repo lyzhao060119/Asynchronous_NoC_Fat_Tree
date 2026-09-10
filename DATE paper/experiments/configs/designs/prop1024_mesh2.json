@@ -60,14 +60,6 @@
   "buffer_slots": 5,
   "no_uturn": true,
   "interlevel_fifo": "bypass",
-  "delay_recipe": {
-    "rcu_steps": 1,
-    "rcu_unit_ps": 50,
-    "buf_stages": 0,
-    "ackin_steps": 1,
-    "ackin_unit_ps": 50,
-    "ackin_use_buf": false
-  },
   "clock_ns": null,
   "hrep_policy": false,
   "shares_netlist_with": "PROP1024",
@@ -76,6 +68,15 @@
   "paper_role": "Two-lane top-mesh alias of the 1024-node hierarchical netlist; backup only",
   "paper_eligible_default": false,
   "notes": "",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "mesh_rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
   "display_name": "Asynchronous balanced hierarchical network, 1024 nodes, two-lane top-mesh alias of the main 1024-node hierarchical netlist",
   "display_description": "Alias of the main 1024-node balanced hierarchical netlist."
 }

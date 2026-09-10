@@ -73,7 +73,7 @@ module noc_async_keycase_core #(
   integer reset_cycles, timeout_cycles, inject_max_rate;
   integer warmup_events, measurement_events;
   real case_tick_ns, tx_setup_ns, rx_capture_ns, ack_to_next_req_guard_ns, timeout_scale;
-  real case_epoch_ns, timeout_ns, drain_ns;
+  real case_epoch_ns, timeout_ns, drain_ns, stall_timeout_ns, hard_timeout_ns;
   reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, v3_metrics_file;
   reg [STR_CHARS*8-1:0] case_name, case_group;
 
@@ -82,9 +82,9 @@ module noc_async_keycase_core #(
   integer input_port [0:MAX_INPUT_FLITS-1];
   integer input_pkt_seq [0:MAX_INPUT_FLITS-1];
   reg [FLIT_W-1:0] input_flit [0:MAX_INPUT_FLITS-1];
-  integer input_offer_ps [0:MAX_INPUT_FLITS-1];
-  integer input_req_ps [0:MAX_INPUT_FLITS-1];
-  integer input_ack_ps [0:MAX_INPUT_FLITS-1];
+  longint input_offer_ps [0:MAX_INPUT_FLITS-1];
+  longint input_req_ps [0:MAX_INPUT_FLITS-1];
+  longint input_ack_ps [0:MAX_INPUT_FLITS-1];
   reg input_accepted [0:MAX_INPUT_FLITS-1];
   integer active_input [0:NUM_PORTS-1];
 
@@ -96,24 +96,25 @@ module noc_async_keycase_core #(
   integer expected_matched [0:NUM_PORTS-1];
 
   integer rx_count [0:NUM_PORTS-1];
-  integer rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
-  integer rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  longint rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  longint rx_egress_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   integer rx_pkt_seq [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg rx_is_tail [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg [FLIT_W-1:0] rx_flit [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg rx_match [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
-  integer last_egress_ps [0:NUM_PORTS-1];
-  integer packet_head_ack_ps [0:MAX_PACKETS-1];
-  integer packet_head_req_ps [0:MAX_PACKETS-1];
+  longint last_egress_ps [0:NUM_PORTS-1];
+  longint packet_head_ack_ps [0:MAX_PACKETS-1];
+  longint packet_head_req_ps [0:MAX_PACKETS-1];
   integer packet_event_id [0:MAX_PACKETS-1];
   integer unexpected_flits, missing_flits, injected_flits, delivered_flits;
+  integer delivered_packets, latency_count;
+  longint latency_ps [0:MAX_INPUT_FLITS-1];
+  reg csv_dumped;
   event rx_activity;
 
-  function integer now_ps;
-    real t;
+  function longint now_ps;
     begin
-      t = $realtime * 1000.0;
-      now_ps = $rtoi(t + 0.5);
+      now_ps = longint'($realtime * 1000.0 + 0.5);
     end
   endfunction
 
@@ -141,7 +142,7 @@ module noc_async_keycase_core #(
     reg [FLIT_W-1:0] flit;
     begin
       input_count = 0; expected_count = 0;
-      reset_cycles = 10; timeout_cycles = 2000000;
+      reset_cycles = 10; timeout_cycles = 5000000;
       warmup_events = 0; measurement_events = 0;
       case_name = ""; case_group = "";
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
@@ -218,7 +219,7 @@ module noc_async_keycase_core #(
         if (!inject_max_rate) begin
           due_ns = case_epoch_ns + input_cycle[i] * case_tick_ns;
           if ($realtime < due_ns) #(due_ns - $realtime);
-          input_offer_ps[i] = $rtoi(due_ns * 1000.0 + 0.5);
+          input_offer_ps[i] = longint'(due_ns * 1000.0 + 0.5);
         end
         wait ((noc_in_req[port] === noc_in_ack[port]) && (tb_in_req[port] === tb_in_ack[port]));
         if (inject_max_rate) input_offer_ps[i] = now_ps();
@@ -290,12 +291,16 @@ module noc_async_keycase_core #(
   endtask
 
   task automatic write_results;
-    integer p, s, i, fd_summary, fd_events, fd_latency, fd_v3;
-    integer packet, injected_packets, unmatched;
-    real elapsed_ns;
+    integer p, s, i, j, fd_summary, fd_events, fd_latency, fd_v3;
+    integer packet, injected_packets, unmatched, rank95, rank99;
+    longint tmp, max_lat, p95_lat, p99_lat, lat;
+    real lat_sum, avg_lat_ns, elapsed_ns, throughput;
     reg pass_ok, drainable, backlog_growth;
     begin
+      if (csv_dumped) disable write_results;
+      csv_dumped = 1'b1;
       injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();
+      delivered_packets = 0; latency_count = 0; lat_sum = 0; max_lat = 0;
       for (i = 0; i < input_count; i = i + 1) if (input_accepted[i]) begin
         injected_flits = injected_flits + 1;
         if (input_flit[i][27]) injected_packets = injected_packets + 1;
@@ -304,7 +309,30 @@ module noc_async_keycase_core #(
       for (p = 0; p < NUM_PORTS; p = p + 1)
         unmatched = unmatched + (expected_port_count[p] - expected_matched[p]);
       missing_flits = unmatched;
+      for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1)
+        if (rx_match[p][s] && rx_is_tail[p][s]) begin
+          packet = rx_pkt_seq[p][s];
+          if (packet >= 0 && packet < MAX_PACKETS && packet_head_ack_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0) begin
+            lat = rx_egress_ps[p][s] - packet_head_ack_ps[packet];
+            if (latency_count < MAX_INPUT_FLITS) begin
+              latency_ps[latency_count] = lat;
+              latency_count = latency_count + 1;
+            end
+            lat_sum = lat_sum + lat;
+            if (lat > max_lat) max_lat = lat;
+            delivered_packets = delivered_packets + 1;
+          end
+        end
+      for (i = 0; i < latency_count; i = i + 1) for (j = i + 1; j < latency_count; j = j + 1)
+        if (latency_ps[j] < latency_ps[i]) begin tmp = latency_ps[i]; latency_ps[i] = latency_ps[j]; latency_ps[j] = tmp; end
+      if (latency_count > 0) begin
+        rank95 = (95 * latency_count + 99) / 100; if (rank95 > latency_count) rank95 = latency_count;
+        rank99 = (99 * latency_count + 99) / 100; if (rank99 > latency_count) rank99 = latency_count;
+        p95_lat = latency_ps[rank95-1]; p99_lat = latency_ps[rank99-1];
+      end else begin p95_lat = 0; p99_lat = 0; end
+      avg_lat_ns = latency_count ? (lat_sum * 1.0 / latency_count / 1000.0) : 0.0;
       elapsed_ns = $realtime - case_epoch_ns;
+      throughput = elapsed_ns > 0.0 ? (delivered_flits * case_tick_ns / elapsed_ns) : 0.0;
       drainable = !timed_out && !x_failed && (injected_flits == input_count) && (missing_flits == 0) && (unexpected_flits == 0);
       backlog_growth = timed_out && (missing_flits > 0);
       pass_ok = drainable;
@@ -314,10 +342,11 @@ module noc_async_keycase_core #(
                    p, expected_matched[p], expected_port_count[p], rx_count[p]);
 
       fd_summary = $fopen(csv_file, "w");
-      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,warmup_original_events,measurement_original_events,drainable,backlog_growth,pass_fail\n");
-      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0s\n",
-              case_group, case_name, injected_packets, delivered_flits, missing_flits, unexpected_flits,
-              timed_out, warmup_events, measurement_events, drainable, backlog_growth, pass_ok ? "PASS" : "FAIL");
+      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail\n");
+      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0,%0d,%f,%f,%f,%f,%f,%0s\n",
+              case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits,
+              timed_out, $rtoi(elapsed_ns / case_tick_ns), throughput, avg_lat_ns, max_lat / 1000.0, p95_lat / 1000.0, p99_lat / 1000.0,
+              pass_ok ? "PASS" : "FAIL");
       $fclose(fd_summary);
 
       fd_events = $fopen(event_csv_file, "w");
@@ -350,12 +379,251 @@ module noc_async_keycase_core #(
         $fclose(fd_v3);
       end
       if (x_failed) $display("TB_X_FAIL handshake_or_data");
+`ifdef CMR_NOC_FM
+`ifdef CMR_NOC_256
+      dump_mesh256_path_counts();
+`endif
+`endif
       $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d drainable=%0d",
                pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, drainable);
       finish_requested = 1'b1;
       #1 $finish;
     end
   endtask
+
+`ifdef CMR_NOC_FM
+`ifdef CMR_NOC_256
+  // Path probe for FM256 77->189 (column 13 north chain).
+  integer hop_pe77_tx, hop_pe189_rx;
+  integer hop_13_4_li, hop_13_4_no, hop_13_4_eo, hop_13_4_wo;
+  integer hop_13_5_si, hop_13_5_no, hop_13_6_si, hop_13_6_no;
+  integer hop_13_7_si, hop_13_7_no, hop_13_8_si, hop_13_8_no;
+  integer hop_13_9_si, hop_13_9_no, hop_13_10_si, hop_13_10_no;
+  integer hop_13_11_si, hop_13_11_lo;
+
+  `define TB_MESH256_HOP(req, ack, flit, nm, cnt) \
+    always @(req) begin \
+      if (running && $test$plusargs("MESH256_PATH_PROBE")) begin \
+        cnt = cnt + 1; \
+        $display("TB_HOP t=%0t link=%s n=%0d req=%b ack=%b ht=%0d flit=%h", \
+                 $time, nm, cnt, req, ack, flit[27], flit); \
+      end \
+    end
+
+  always @(tb_in_req[77]) begin
+    if (running && $test$plusargs("MESH256_PATH_PROBE") && tb_in_req[77]) begin
+      hop_pe77_tx = hop_pe77_tx + 1;
+      $display("TB_HOP t=%0t link=PE77.tx n=%0d req=%b ack=%b flit=%h",
+               $time, hop_pe77_tx, tb_in_req[77], tb_in_ack[77], tb_in_data[77*FLIT_W +: FLIT_W]);
+    end
+  end
+  always @(noc_out_req[189]) begin
+    if (running && $test$plusargs("MESH256_PATH_PROBE") && noc_out_req[189]) begin
+      hop_pe189_rx = hop_pe189_rx + 1;
+      $display("TB_HOP t=%0t link=PE189.rx n=%0d req=%b ack=%b flit=%h",
+               $time, hop_pe189_rx, noc_out_req[189], noc_out_ack[189], noc_out_data[189*FLIT_W +: FLIT_W]);
+    end
+  end
+
+  `TB_MESH256_HOP(noc.dut.meshR_13_4.io_inputs_parent_0_HS_Req,
+                  noc.dut.meshR_13_4.io_inputs_parent_0_HS_Ack,
+                  noc.dut.meshR_13_4.io_inputs_parent_0_Data_flit,
+                  "meshR_13_4.local_in", hop_13_4_li)
+  `TB_MESH256_HOP(noc.dut.meshR_13_4.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_4.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_4.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_4.north_out", hop_13_4_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_4.io_outputs_child_0_0_HS_Req,
+                  noc.dut.meshR_13_4.io_outputs_child_0_0_HS_Ack,
+                  noc.dut.meshR_13_4.io_outputs_child_0_0_Data_flit,
+                  "meshR_13_4.west_out", hop_13_4_wo)
+  `TB_MESH256_HOP(noc.dut.meshR_13_4.io_outputs_child_2_0_HS_Req,
+                  noc.dut.meshR_13_4.io_outputs_child_2_0_HS_Ack,
+                  noc.dut.meshR_13_4.io_outputs_child_2_0_Data_flit,
+                  "meshR_13_4.east_out", hop_13_4_eo)
+
+  `TB_MESH256_HOP(noc.dut.meshR_13_5.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_5.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_5.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_5.south_in", hop_13_5_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_5.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_5.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_5.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_5.north_out", hop_13_5_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_6.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_6.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_6.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_6.south_in", hop_13_6_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_6.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_6.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_6.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_6.north_out", hop_13_6_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_7.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_7.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_7.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_7.south_in", hop_13_7_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_7.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_7.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_7.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_7.north_out", hop_13_7_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_8.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_8.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_8.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_8.south_in", hop_13_8_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_8.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_8.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_8.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_8.north_out", hop_13_8_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_9.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_9.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_9.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_9.south_in", hop_13_9_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_9.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_9.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_9.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_9.north_out", hop_13_9_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_10.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_10.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_10.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_10.south_in", hop_13_10_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_10.io_outputs_child_3_0_HS_Req,
+                  noc.dut.meshR_13_10.io_outputs_child_3_0_HS_Ack,
+                  noc.dut.meshR_13_10.io_outputs_child_3_0_Data_flit,
+                  "meshR_13_10.north_out", hop_13_10_no)
+  `TB_MESH256_HOP(noc.dut.meshR_13_11.io_inputs_child_1_0_HS_Req,
+                  noc.dut.meshR_13_11.io_inputs_child_1_0_HS_Ack,
+                  noc.dut.meshR_13_11.io_inputs_child_1_0_Data_flit,
+                  "meshR_13_11.south_in", hop_13_11_si)
+  `TB_MESH256_HOP(noc.dut.meshR_13_11.io_outputs_parent_0_HS_Req,
+                  noc.dut.meshR_13_11.io_outputs_parent_0_HS_Ack,
+                  noc.dut.meshR_13_11.io_outputs_parent_0_Data_flit,
+                  "meshR_13_11.local_out", hop_13_11_lo)
+
+  // Focused meshR_13_7 port watch (200-350 us window) for bodytag debug runs.
+  `define TB_R137_FOCUS(linkname, req, ack, flit) \
+    always @(req or ack) begin \
+      if (running && $test$plusargs("MESH256_R137_FOCUS") \
+          && ($time >= 200000) && ($time <= 350000)) begin \
+        $display("TB_R137 t=%0t link=%s req=%b ack=%b ht=%b tl=%b flit=%h", \
+                 $time, linkname, req, ack, flit[27], flit[26], flit); \
+      end \
+    end
+
+  `TB_R137_FOCUS("r137.local_in", noc.dut.meshR_13_7.io_inputs_parent_0_HS_Req,
+                 noc.dut.meshR_13_7.io_inputs_parent_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_inputs_parent_0_Data_flit)
+  `TB_R137_FOCUS("r137.west_in", noc.dut.meshR_13_7.io_inputs_child_0_0_HS_Req,
+                 noc.dut.meshR_13_7.io_inputs_child_0_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_inputs_child_0_0_Data_flit)
+  `TB_R137_FOCUS("r137.south_in", noc.dut.meshR_13_7.io_inputs_child_1_0_HS_Req,
+                 noc.dut.meshR_13_7.io_inputs_child_1_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_inputs_child_1_0_Data_flit)
+  `TB_R137_FOCUS("r137.east_in", noc.dut.meshR_13_7.io_inputs_child_2_0_HS_Req,
+                 noc.dut.meshR_13_7.io_inputs_child_2_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_inputs_child_2_0_Data_flit)
+  `TB_R137_FOCUS("r137.local_out", noc.dut.meshR_13_7.io_outputs_parent_0_HS_Req,
+                 noc.dut.meshR_13_7.io_outputs_parent_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_outputs_parent_0_Data_flit)
+  `TB_R137_FOCUS("r137.west_out", noc.dut.meshR_13_7.io_outputs_child_0_0_HS_Req,
+                 noc.dut.meshR_13_7.io_outputs_child_0_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_outputs_child_0_0_Data_flit)
+  `TB_R137_FOCUS("r137.south_out", noc.dut.meshR_13_7.io_outputs_child_1_0_HS_Req,
+                 noc.dut.meshR_13_7.io_outputs_child_1_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_outputs_child_1_0_Data_flit)
+  `TB_R137_FOCUS("r137.east_out", noc.dut.meshR_13_7.io_outputs_child_2_0_HS_Req,
+                 noc.dut.meshR_13_7.io_outputs_child_2_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_outputs_child_2_0_Data_flit)
+  `TB_R137_FOCUS("r137.north_out", noc.dut.meshR_13_7.io_outputs_child_3_0_HS_Req,
+                 noc.dut.meshR_13_7.io_outputs_child_3_0_HS_Ack,
+                 noc.dut.meshR_13_7.io_outputs_child_3_0_Data_flit)
+  `TB_R137_FOCUS("r136.north_in", noc.dut.meshR_13_6.io_outputs_child_3_0_HS_Req,
+                 noc.dut.meshR_13_6.io_outputs_child_3_0_HS_Ack,
+                 noc.dut.meshR_13_6.io_outputs_child_3_0_Data_flit)
+
+  // meshR_13_7 internal probe: south IPM (InputPortModules_1) -> north OPM (OutputPortModules_3).
+  // South branch 2 = North; south is OPM source index 1 on OutputPortModules_3.
+  `define R137_INT noc.dut.meshR_13_7
+  `define R137_SIPM `R137_INT.InputPortModules_1
+  `define R137_NOPM `R137_INT.OutputPortModules_3
+  `define R137_SBUF `R137_SIPM.Buffer
+  `define R137_SRCU `R137_SIPM.RouteComputationUnit
+
+  task automatic r137_internal_dump(input string tag);
+    begin
+      if (running && $test$plusargs("MESH256_R137_INTERNAL")
+          && ($time >= 200000) && ($time <= 350000)) begin
+        $display(
+          "TB_R137_INT t=%0t tag=%s si_req=%b si_ack=%b flit=%h mat=%b%b%b%b rsel=%b%b%b%b ppe=%b%b%b%b ro=%b%b%b%b ai=%b%b%b%b wp=%b%b%b%b%b full=%b%b%b%b%b ceN=%b%b%b%b%b ppeN=%b grantN=%b nopm_req=%b nopm_ack=%b nopm_out=%h link_no_req=%b link_no_ack=%b",
+          $time, tag,
+          `R137_SIPM.io_Reqin, `R137_SIPM.io_Ackout, `R137_SIPM.io_Datain_flit,
+          `R137_SRCU.io_Mat_3, `R137_SRCU.io_Mat_2, `R137_SRCU.io_Mat_1, `R137_SRCU.io_Mat_0,
+          `R137_SRCU.io_RouteSel_3, `R137_SRCU.io_RouteSel_2, `R137_SRCU.io_RouteSel_1, `R137_SRCU.io_RouteSel_0,
+          `R137_SIPM.io_PathEnabled_3, `R137_SIPM.io_PathEnabled_2, `R137_SIPM.io_PathEnabled_1, `R137_SIPM.io_PathEnabled_0,
+          `R137_SIPM.io_Reqout_3, `R137_SIPM.io_Reqout_2, `R137_SIPM.io_Reqout_1, `R137_SIPM.io_Reqout_0,
+          `R137_SIPM.io_Ackin_3, `R137_SIPM.io_Ackin_2, `R137_SIPM.io_Ackin_1, `R137_SIPM.io_Ackin_0,
+          `R137_SBUF.WriteInterface_io_WritePointer_4, `R137_SBUF.WriteInterface_io_WritePointer_3,
+          `R137_SBUF.WriteInterface_io_WritePointer_2, `R137_SBUF.WriteInterface_io_WritePointer_1,
+          `R137_SBUF.WriteInterface_io_WritePointer_0,
+          `R137_SBUF.WriteInterface_io_CellFull_4, `R137_SBUF.WriteInterface_io_CellFull_3,
+          `R137_SBUF.WriteInterface_io_CellFull_2, `R137_SBUF.WriteInterface_io_CellFull_1,
+          `R137_SBUF.WriteInterface_io_CellFull_0,
+          `R137_SBUF.ReadInterface_2_io_CellEmpty_4, `R137_SBUF.ReadInterface_2_io_CellEmpty_3,
+          `R137_SBUF.ReadInterface_2_io_CellEmpty_2, `R137_SBUF.ReadInterface_2_io_CellEmpty_1,
+          `R137_SBUF.ReadInterface_2_io_CellEmpty_0,
+          `R137_NOPM.io_PktPathEnable_1, `R137_NOPM.io_Grant_1,
+          `R137_NOPM.io_Reqout, `R137_NOPM.io_Ackin, `R137_NOPM.io_Dataout_flit,
+          noc.dut.meshR_13_7.io_outputs_child_3_0_HS_Req,
+          noc.dut.meshR_13_7.io_outputs_child_3_0_HS_Ack);
+      end
+    end
+  endtask
+
+  // Sample when south link toggles (known-good boundary trigger).
+  always @(noc.dut.meshR_13_7.io_inputs_child_1_0_HS_Req or
+           noc.dut.meshR_13_7.io_inputs_child_1_0_HS_Ack or
+           noc.dut.meshR_13_7.io_inputs_child_1_0_Data_flit) begin
+    if (running && $test$plusargs("MESH256_R137_INTERNAL"))
+      r137_internal_dump("link");
+  end
+
+  initial begin
+    if ($test$plusargs("MESH256_R137_INTERNAL")) begin
+      wait(running);
+      #200000;
+      while ($time <= 350000) begin
+        r137_internal_dump("poll");
+        #500;
+      end
+    end
+  end
+
+  always @(`R137_SIPM.io_Reqin or `R137_SIPM.io_Ackout or
+           `R137_SRCU.io_Mat_2 or `R137_SRCU.io_RouteSel_2 or
+           `R137_SIPM.io_PathEnabled_2 or `R137_SIPM.io_Reqout_2 or `R137_SIPM.io_Ackin_2 or
+           `R137_NOPM.io_Grant_1 or `R137_NOPM.io_PktPathEnable_1 or
+           `R137_NOPM.io_Reqout or `R137_NOPM.io_Ackin or
+           `R137_SBUF.WriteInterface_io_CellFull_0 or
+           `R137_SBUF.WriteInterface_io_CellFull_1 or
+           `R137_SBUF.WriteInterface_io_CellFull_2 or
+           `R137_SBUF.WriteInterface_io_CellFull_3 or
+           `R137_SBUF.WriteInterface_io_CellFull_4) begin
+    r137_internal_dump("event");
+  end
+
+  task automatic dump_mesh256_path_counts;
+    begin
+      if ($test$plusargs("MESH256_PATH_PROBE"))
+        $display("TB_HOP_COUNTS pe77=%0d pe189=%0d r134_li=%0d no=%0d wo=%0d eo=%0d r135_si=%0d no=%0d r136_si=%0d no=%0d r137_si=%0d no=%0d r138_si=%0d no=%0d r139_si=%0d no=%0d r1310_si=%0d no=%0d r1311_si=%0d lo=%0d",
+                 hop_pe77_tx, hop_pe189_rx,
+                 hop_13_4_li, hop_13_4_no, hop_13_4_wo, hop_13_4_eo,
+                 hop_13_5_si, hop_13_5_no, hop_13_6_si, hop_13_6_no,
+                 hop_13_7_si, hop_13_7_no, hop_13_8_si, hop_13_8_no,
+                 hop_13_9_si, hop_13_9_no, hop_13_10_si, hop_13_10_no,
+                 hop_13_11_si, hop_13_11_lo);
+    end
+  endtask
+`endif
+`endif
 
   genvar gp;
   generate
@@ -378,6 +646,7 @@ module noc_async_keycase_core #(
     latency_csv_file = "async_noc_latency.csv"; v3_metrics_file = "";
     case_tick_ns = 20.0; tx_setup_ns = 0.05; rx_capture_ns = 0.05;
     ack_to_next_req_guard_ns = 0.20; timeout_scale = 1.0; inject_max_rate = 0; write_v3_metrics = 0;
+    stall_timeout_ns = 0.0; hard_timeout_ns = 0.0;
     x_failed = 1'b0;
     if ($value$plusargs("CASE_FILE=%s", case_file)) ;
     if ($value$plusargs("RESULT_CSV=%s", csv_file)) ;
@@ -389,17 +658,22 @@ module noc_async_keycase_core #(
     if ($value$plusargs("RX_CAPTURE_NS=%f", rx_capture_ns)) ;
     if ($value$plusargs("ACK_TO_NEXT_REQ_GUARD_NS=%f", ack_to_next_req_guard_ns)) ;
     if ($value$plusargs("TIMEOUT_SCALE=%f", timeout_scale)) ;
+    if ($value$plusargs("STALL_TIMEOUT_NS=%f", stall_timeout_ns)) ;
+    if ($value$plusargs("HARD_TIMEOUT_NS=%f", hard_timeout_ns)) ;
     if ($test$plusargs("INJECT_MAX_RATE")) inject_max_rate = 1;
     if (case_file == "") begin $display("TB_FATAL +CASE_FILE=<case> is required"); $finish; end
-    $display("TB_INFO NUM_CORES=%0d KEYCASE async-only", NUM_CORES);
+    $display("TB_INFO NUM_CORES=%0d KEYCASE async-only ACK_TO_NEXT_REQ_GUARD_NS=%0.3f INJECT_MAX_RATE=%0d CASE_TICK_NS=%0.3f RX_CAPTURE_NS=%0.3f", NUM_CORES, ack_to_next_req_guard_ns, inject_max_rate, case_tick_ns, rx_capture_ns);
     parse_case();
     reset = 1'b1; tb_in_req = '0; tb_in_data = '0; tb_out_ack = '0; input_done = '0;
     running = 1'b0; timed_out = 1'b0; finish_requested = 1'b0; unexpected_flits = 0;
+    csv_dumped = 1'b0; delivered_packets = 0; latency_count = 0;
     #(reset_cycles * case_tick_ns);
     reset = 1'b0;
     #10.0;
     case_epoch_ns = $realtime;
     timeout_ns = timeout_cycles * case_tick_ns * timeout_scale;
+    if (stall_timeout_ns > timeout_ns) timeout_ns = stall_timeout_ns;
+    if (hard_timeout_ns > timeout_ns) timeout_ns = hard_timeout_ns;
     drain_ns = 1024.0 * case_tick_ns;
     running = 1'b1;
   end

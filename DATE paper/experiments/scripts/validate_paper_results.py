@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Refuse paper numbers that violate V3.2.0 curated gates."""
+"""Refuse paper numbers that violate V3.1.0 curated gates."""
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
@@ -31,29 +30,6 @@ def main() -> int:
     if lock.get("physical_class") == "post-synthesis":
         print("PNR_LOCK post-synthesis-only", lock.get("pilot_run_id"))
     for manifest in iter_manifests():
-        if manifest.get("paper_eligible") and (
-            str(manifest.get("design_id") or "").startswith("FPGA_")
-            or str(manifest.get("benchmark_id") or "").startswith("FPGA-")
-        ):
-            print("FAIL field-programmable gate-array result is removed in V3.2.0", manifest["run_id"])
-            errors += 1
-        if manifest.get("paper_eligible") and manifest.get("benchmark_id") == "SNN-TRACE1024":
-            if not (manifest.get("trace_hash") and manifest.get("netlist_hash") and manifest.get("sdf_hash")):
-                print("FAIL optional SNN trace lacks trace/netlist/delay-file hashes", manifest["run_id"])
-                errors += 1
-            if "Gate F" not in (manifest.get("notes") or ""):
-                print("FAIL optional SNN trace lacks Gate F authorization", manifest["run_id"])
-                errors += 1
-            gate_f = subprocess.run(
-                [sys.executable, str(SCRIPTS / "check_v31_gates.py"), "--gate", "F"],
-                cwd=SCRIPTS.parents[2],
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-            if gate_f.returncode != 0:
-                print("FAIL optional SNN trace submitted before required Gate F", manifest["run_id"])
-                errors += 1
         if (
             manifest.get("paper_eligible")
             and manifest.get("physical_class") == "post-layout"

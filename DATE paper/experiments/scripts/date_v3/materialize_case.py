@@ -3,6 +3,11 @@
 64-node async DUT keeps the classic expect-mask .case for MAXIMUM-SDF.
 256-node key cases use a compact dest-list format (no 256-bit mask scoreboard).
 H-REP split is applied here.  PROP keeps one packet per original event.
+
+Packet headers keep the canonical exponential `ready_cycle`.  The five flits
+of one packet are offered one per CASE_TICK_NS on that source; a later packet
+does not start until the previous packet's last flit has been offered, so
+wormhole order is not interleaved.
 """
 from __future__ import annotations
 
@@ -12,10 +17,26 @@ from typing import Any
 
 from .canonical_trace import PACKET_FLITS, cores_in_rect, load_jsonl, width_of
 from .hrep_policy import prop_packet, split_dest_set
+from .offered_load import CASE_TICK_NS, LOAD_UNIT
 from .route_oracle import traversal_for_packet
 
 FLIT_W = 28
 NUM_CORES_64 = 64
+# Match scripts/asic_dc/cmr/tb_cmr_router_rate_scan.sv identity payload.
+IDENTITY_MAGIC = 0b101
+PKT_TAG_BITS = 14
+
+
+def serialized_offer_start(
+    source: int,
+    ready_cycle: int,
+    packet_flits: int,
+    next_free: dict[int, int],
+) -> int:
+    """First flit cycle: scheduled header, or after the previous packet on this source."""
+    start = max(int(ready_cycle), next_free.get(int(source), 0))
+    next_free[int(source)] = start + int(packet_flits)
+    return start
 
 
 def make_flit(
@@ -27,13 +48,28 @@ def make_flit(
     y1: int,
     is_head: bool,
     is_tail: bool,
+    source: int = 0,
+    flit_index: int = 0,
+    multicast: bool = False,
 ) -> int:
-    flit = 0
-    flit |= pkt_id & 0x3
-    flit |= (x0 & 0x3F) << 2
-    flit |= (y0 & 0x3F) << 8
-    flit |= (x1 & 0x3F) << 14
-    flit |= (y1 & 0x3F) << 20
+    """Encode a packet flit with the hop-router identity payload.
+
+    Routing consumes the AABB only on the Head.  Body and Tail are diagnostic
+    payload, not addresses: [25:12] packet sequence, [11:9] flit index,
+    [8:6] magic 3'b101, [5] multicast, [1:0] source[1:0].  Head keeps AABB
+    and the same 2-bit source tag.  Type bits stay [27]=Head, [26]=Tail.
+    """
+    flit = source & 0x3
+    if is_head:
+        flit |= (x0 & 0x3F) << 2
+        flit |= (y0 & 0x3F) << 8
+        flit |= (x1 & 0x3F) << 14
+        flit |= (y1 & 0x3F) << 20
+    else:
+        flit |= (pkt_id & 0x3FFF) << 12
+        flit |= (flit_index & 0x7) << 9
+        flit |= IDENTITY_MAGIC << 6
+        flit |= (1 if multicast else 0) << 5
     flit |= (1 if is_tail else 0) << 26
     flit |= (1 if is_head else 0) << 27
     if flit >= (1 << FLIT_W):
@@ -96,6 +132,7 @@ def materialize(
     event_map: list[tuple[int, int]] = []
     packets_meta: list[dict[str, Any]] = []
     pkt_seq = 0
+    next_free: dict[int, int] = {}
     for event in trace["events"]:
         event_index = int(event["event_index"])
         for packet in injected_packets(event, nodes=nodes, hrep=hrep):
@@ -104,6 +141,7 @@ def materialize(
             dests = [d for d in dests if d != event["source"]]
             if not dests:
                 raise ValueError("%s produced no deliveries" % packet["packet_id"])
+            multicast = bool(event.get("multicast")) or len(dests) > 1
             flits = [
                 make_flit(
                     pkt_id=pkt_seq,
@@ -113,16 +151,26 @@ def materialize(
                     y1=rect[3],
                     is_head=(idx == 0),
                     is_tail=(idx == packet_flits - 1),
+                    source=int(event["source"]),
+                    flit_index=idx,
+                    multicast=multicast,
                 )
                 for idx in range(packet_flits)
             ]
             traversal = _attach_traversal(
                 packet, source=event["source"], nodes=nodes, routing=routing
             )
+            start_cycle = serialized_offer_start(
+                int(event["source"]),
+                int(event["ready_cycle"]),
+                packet_flits,
+                next_free,
+            )
+            input_cycles = [start_cycle + idx for idx in range(packet_flits)]
             for idx, flit in enumerate(flits):
                 inputs.append(
                     (
-                        event["ready_cycle"] + idx,
+                        input_cycles[idx],
                         event["source"],
                         pkt_seq,
                         flit,
@@ -161,7 +209,9 @@ def materialize(
                     "intended_destinations": list(event["destinations"]),
                     "delivered_destinations": dests,
                     "rect": rect,
-                    "ready_cycle": event["ready_cycle"],
+                    "ready_cycle": start_cycle,
+                    "scheduled_cycle": int(event["ready_cycle"]),
+                    "input_cycles": input_cycles,
                     "flits": ["%07x" % flit for flit in flits],
                     "crosses_top_mesh": packet.get("crosses_top_mesh"),
                     "hrep": hrep,
@@ -196,8 +246,11 @@ def _meta_lines(case: dict[str, Any], name: str) -> list[str]:
         "meta traffic %s" % header["traffic"],
         "meta packet_length_or_distribution %d_flits" % header["packet_flits"],
         "meta packet_flits %d" % header["packet_flits"],
+        "meta packet_tag_bits %d" % PKT_TAG_BITS,
+        "meta payload_encoding router_identity",
         "meta load_point %.2f" % header["offered_load"],
-        "meta load_unit flit_per_cycle_node",
+        "meta load_unit %s" % header.get("load_unit", LOAD_UNIT),
+        "meta case_tick_ns %.3f" % float(header.get("case_tick_ns", CASE_TICK_NS)),
         "meta nodes %d" % header["nodes"],
         "meta seed %d" % header["seed"],
         "meta original_event_count %d"
@@ -214,7 +267,7 @@ def _meta_lines(case: dict[str, Any], name: str) -> list[str]:
     ]
 
 
-def write_case(case: dict[str, Any], path: Path) -> None:
+def write_case(case: dict[str, Any], path: Path, *, sidecars: bool = True) -> None:
     header = case["header"]
     hex_width = case["hex_width"]
     name = path.stem
@@ -260,8 +313,9 @@ def write_case(case: dict[str, Any], path: Path) -> None:
             )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    write_packets_sidecar(case, path.with_suffix(".packets.json"))
-    write_model_input(case, path.with_suffix(".model.json"))
+    if sidecars:
+        write_packets_sidecar(case, path.with_suffix(".packets.json"))
+        write_model_input(case, path.with_suffix(".model.json"))
 
 
 def write_packets_sidecar(case: dict[str, Any], path: Path) -> None:
@@ -326,11 +380,12 @@ def materialize_path(
     hrep: bool = False,
     routing: str = "quadtree",
     design_id: str | None = None,
+    sidecars: bool = True,
 ) -> Path:
     trace = load_jsonl(jsonl)
     case = materialize(trace, top_lanes=top_lanes, hrep=hrep, routing=routing)
     suffix = "hrep" if hrep else (design_id or routing)
     name = "%s_%s_top%d" % (trace["header"].get("trace_id") or jsonl.stem, suffix, top_lanes)
     path = out_dir / ("%s.case" % name)
-    write_case(case, path)
+    write_case(case, path, sidecars=sidecars)
     return path
