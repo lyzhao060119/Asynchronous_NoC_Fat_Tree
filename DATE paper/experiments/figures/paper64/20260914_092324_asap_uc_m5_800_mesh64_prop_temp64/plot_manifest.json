@@ -1,0 +1,19 @@
+{
+  "source": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/figures/paper64/20260914_092324_asap_uc_m5_800_mesh64_prop_temp64/aggregated_metrics.csv",
+  "figure": "flatmesh64-vs-prop-temp64-asap-unicast",
+  "rows": 60,
+  "designs": [
+    "FM64",
+    "PROP_temp64"
+  ],
+  "x": "offered_mflit_per_port_s",
+  "panels": {
+    "left": "delivered_mflit_per_port_s vs offered (+ ideal y=x)",
+    "right": "flit_latency_mean_ns vs offered (log y)"
+  },
+  "all_tb_pass": true,
+  "outputs": [
+    "flatmesh64-vs-prop-temp64-asap-unicast.png",
+    "flatmesh64-vs-prop-temp64-asap-unicast.pdf"
+  ]
+}
