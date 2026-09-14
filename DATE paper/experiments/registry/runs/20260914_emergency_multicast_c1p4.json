@@ -1,0 +1,18 @@
+{
+  "run_id": "20260914_emergency_multicast_c1p4",
+  "status": "exploratory_post_synthesis",
+  "paper_eligible": false,
+  "physical_class": "post-synthesis_MAXIMUM-SDF_PT-PX",
+  "raw_dir": "DATE paper/experiments/raw/prop_temp64/20260914_prop_temp64_mc_emergency",
+  "network_netlist": "20260913_prop_temp64_asap_uc_m5_200",
+  "multicast_case_count": 36,
+  "router_mode_count": 8,
+  "case_run_job_hash": "case_run_job_hash.csv",
+  "router_run_job_hash": "router_run_job_hash.csv",
+  "reason_not_eligible": [
+    "Link traversals are a packet model estimate, not observed inter-router handshakes",
+    "No zero-backlog F16/F32 fanout point in the current half-open window",
+    "Low-load finite-window semantics require follow-up"
+  ],
+  "failed_run": "20260914_cmr_prop_temp_c1p4_rpsdel050 (actual RCU DEL150; replaced by _r1)"
+}

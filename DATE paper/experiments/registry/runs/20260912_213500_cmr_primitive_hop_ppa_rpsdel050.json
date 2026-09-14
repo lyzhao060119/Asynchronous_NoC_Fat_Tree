@@ -1,0 +1,73 @@
+{
+  "schema": "date-experiment-run-v1",
+  "run_id": "20260912_213500_cmr_primitive_hop_ppa_rpsdel050",
+  "status": "pass",
+  "design_id": "ASYNC_ROUTER_PPA_MATRIX",
+  "benchmark_id": "R-U5",
+  "seed": null,
+  "adapter": "hop_ppa",
+  "git": {
+    "sha": "385e40e68387136ab902660256750570d55cb9b1",
+    "dirty": true,
+    "describe": "385e40e-dirty"
+  },
+  "config_hash": "f3fb403bed14ad5c12076136b43d083bdac807739c6e3eaf378636e07da92dfb",
+  "case_hash": "54531c36d740e0ab899a0b934479c3fa2dedad444d14301e8819a2827b7a3c30",
+  "trace_hash": null,
+  "netlist_hash": null,
+  "sdf_hash": null,
+  "spef_hash": null,
+  "model_version": "rpsdel050",
+  "calibration_hash": null,
+  "tool_versions": {},
+  "pvt": {
+    "library": "tcbn28hpcplusbwp12t30p140",
+    "corner": "ssg0p81v125c",
+    "wireload": "zero"
+  },
+  "command": [
+    "python scripts/asic_dc/cmr/run_remote_cmr_router_hop_ppa.py --run-id 20260912_213500_cmr_primitive_hop_ppa_rpsdel050 --mode isolated"
+  ],
+  "env": {
+    "sdf_corner": "MAXIMUM",
+    "power_tool": "PT-PX"
+  },
+  "lsf_jobs": [
+    { "job_id": "12221101", "label": "async_thin_1x1_gls", "queue": null },
+    { "job_id": "12221201", "label": "async_thin_1x1_ptpx", "queue": null },
+    { "job_id": "12221301", "label": "async_fat_1x2_gls", "queue": null },
+    { "job_id": "12221401", "label": "async_fat_1x2_ptpx", "queue": null },
+    { "job_id": "12221501", "label": "async_prop_2x2_gls", "queue": null },
+    { "job_id": "12221601", "label": "async_prop_2x2_ptpx", "queue": null },
+    { "job_id": "12221701", "label": "async_pfat_2x4_gls", "queue": null },
+    { "job_id": "12221801", "label": "async_pfat_2x4_ptpx", "queue": null },
+    { "job_id": "12222001", "label": "async_pfat_4x8_gls", "queue": null },
+    { "job_id": "12222501", "label": "async_pfat_4x8_ptpx", "queue": null }
+  ],
+  "frozen_structure_ok": true,
+  "paper_eligible": false,
+  "physical_class": "post-synthesis",
+  "archive_only_reason": "Partial primitive matrix: valid MAXIMUM-SDF and PT-PX rows for five router geometries, but FlatMesh and TopMesh replacement PPA rows are absent. Do not promote to a complete paper Table I/calibration set.",
+  "remote_root": "/home/ghy19/Asynchronous_Router_CMR",
+  "artifacts": {
+    "raw_dir": "DATE paper/experiments/raw/hop_ppa/20260912_213500_cmr_primitive_hop_ppa_rpsdel050",
+    "metrics_csv": "DATE paper/experiments/raw/hop_ppa/20260912_213500_cmr_primitive_hop_ppa_rpsdel050/metrics.csv",
+    "metrics_sha256": "adc7c959bb0c0b6137776e3a63baef356e26cb11c9868c758cec0a3c003ab203",
+    "summary_json": "DATE paper/experiments/raw/hop_ppa/20260912_213500_cmr_primitive_hop_ppa_rpsdel050/summary.json",
+    "summary_sha256": "6443ed34bcc3bbf3835b2419b89f8f0c1be4eddcd316b557cff5e988e4669e6a",
+    "launcher_sha256": "f3fb403bed14ad5c12076136b43d083bdac807739c6e3eaf378636e07da92dfb",
+    "kinds": [
+      "async_thin_1x1",
+      "async_fat_1x2",
+      "async_prop_2x2",
+      "async_pfat_2x4",
+      "async_pfat_4x8"
+    ]
+  },
+  "cases": [
+    { "name": "R-U5 isolated single-hop five-flit", "status": "pass", "hash": "54531c36d740e0ab899a0b934479c3fa2dedad444d14301e8819a2827b7a3c30" }
+  ],
+  "created_utc": "2026-09-12T14:48:46+00:00",
+  "updated_utc": "2026-09-12T14:48:46+00:00",
+  "notes": "Five standalone Router geometries passed MAXIMUM-SDF (annotation errors=0) and PT-PX. Latency is input Req toggle to output Req toggle; energy is per isolated H/B/T window and full five-flit packet window. Raw evidence mirror contains 83 files."
+}

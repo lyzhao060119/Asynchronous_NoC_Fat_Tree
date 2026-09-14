@@ -1,0 +1,542 @@
+[
+  {
+    "design": "FM64",
+    "load": 5,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m5_FM64_top0.csv",
+    "csv_sha256": "f267dfbfb6ebb574ad54eed4e14315ad9615c96c52954c206b9a81e0c32544ae",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 10,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m10_FM64_top0.csv",
+    "csv_sha256": "b8da3b571f935fd69013c202b10a62533e894e654698e2fa5fb8838bf4c8e3c3",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 20,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m20_FM64_top0.csv",
+    "csv_sha256": "a6cd60e0bdffecc5c96c9ccf87138503c64e924d7b7cae4fd7a73f9d5da49c52",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 40,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m40_FM64_top0.csv",
+    "csv_sha256": "76981d5cb926298064e40fa057652d6bd131aa0b717150e55d8b4b76299ca8c8",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 60,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m60_FM64_top0.csv",
+    "csv_sha256": "3d8201eaa1734a54164782a0300e8fcd4d66d4a5cecbae84db564b39f27a2c2a",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 80,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m80_FM64_top0.csv",
+    "csv_sha256": "69c5cad6bdcc8f96a94d0136df140c6312b5b4d83b1e685cd105d966741218ef",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 100,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m100_FM64_top0.csv",
+    "csv_sha256": "82c953d6f6495a3cb3e897f74230c345438c35563bef8f90b3f0085bfe539e60",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 120,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m120_FM64_top0.csv",
+    "csv_sha256": "5e2adf487fc016b9c6ea9c1a6579219094fff1124f2498e68b3c2f279aa701c0",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 140,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m140_FM64_top0.csv",
+    "csv_sha256": "2b14239b11568445d1f6d8201a4cb503cada0a2085a443e800e4eade4e5dc329",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 160,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m160_FM64_top0.csv",
+    "csv_sha256": "4cc67cadd29cf3075a1b515026299294b7b30caa535504d28f6d73969d2d7234",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 180,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m180_FM64_top0.csv",
+    "csv_sha256": "91c4788cb4906b4c8b49abee319913b5446b0b62078bac334de8c036aecb808c",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 200,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m200_FM64_top0.csv",
+    "csv_sha256": "c1c7bf11dd57747b78edb28bd64fc4bb7cb595baa5f3b42e584625dedc24fcb6",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 220,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m220_FM64_top0.csv",
+    "csv_sha256": "8475b4eae9ecd22903e3ea99b0e52dfbd4df58b8a4c52b140bbf6357bf3e0214",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 240,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m240_FM64_top0.csv",
+    "csv_sha256": "d0c4ae90b33c4fa359b02e0879c159ac50d760302a5ae9db1c6933cffd745a32",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 260,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m260_FM64_top0.csv",
+    "csv_sha256": "dba2a750da021cf422d466cc4841437909aa252006668ac5e4218b19209b4dd8",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 280,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m280_FM64_top0.csv",
+    "csv_sha256": "3f62979263961baefa45b91de5d49c147b047b6e627198988d5f97319ffab831",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 300,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m300_FM64_top0.csv",
+    "csv_sha256": "ad2b833282202ea16dd2a47aaf8780374db0eec9b66456984df641bd817cf831",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 320,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m320_FM64_top0.csv",
+    "csv_sha256": "ccad647f66982f5e7db6ea64565b01f5b4cb5a48d64df023503434e31ad98f18",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 340,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m340_FM64_top0.csv",
+    "csv_sha256": "b25aca13575c1d2d6aa5954bc78c9fc721b5acaa6cb01d6d3225270d1175516c",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 360,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m360_FM64_top0.csv",
+    "csv_sha256": "96192459bcb3ff4e9837f5eb7db1dd65f8b7e61f45ff140b0de4997056a9d385",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 380,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m380_FM64_top0.csv",
+    "csv_sha256": "bc12de280fce6ae761b169f65af4a75e5b6a3bcc65ab64e34dfea63e2c44eda3",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 400,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m400_FM64_top0.csv",
+    "csv_sha256": "8b89ac425cc7cdab2175cad7b7a8fe835e6102e2936d79aa411c531991a3ab61",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 420,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m420_FM64_top0.csv",
+    "csv_sha256": "562e12861884857f69243fdf261bd9014aed150adb51d1fae7dbe8af467e1f1e",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 440,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m440_FM64_top0.csv",
+    "csv_sha256": "068e05992468f6c3389291672e872b169b02ae179c65ca1f62a2311254f268af",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 460,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m460_FM64_top0.csv",
+    "csv_sha256": "18d4009f8be89b193b203d867202b513ca69bfc2bc5f7b4321e14e56c57818a5",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 480,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m480_FM64_top0.csv",
+    "csv_sha256": "41018b3e18b1ed7a26bed56396b0e3cae157ce2092c07eacc6b75404c6ac1950",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 500,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m500_FM64_top0.csv",
+    "csv_sha256": "a341bf5eeea28dceb25f9a693103ad9eecd2b5d571b37d1d9be8bb7bda8ea3ff",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 600,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m600_FM64_top0.csv",
+    "csv_sha256": "1f5ecebdfe6e3ae61b5dac850a0ba5d7bc459e9aa00e7df60b1ffd32c8354f23",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 700,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m700_FM64_top0.csv",
+    "csv_sha256": "b875473e602bafe124bdff0b4b99dd5b2168d9979a73095e7aa4818114218414",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "FM64",
+    "load": 800,
+    "remote_run_id": "20260914_000444_cmr_fm64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260914_000444_cmr_fm64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m800_FM64_top0.csv",
+    "csv_sha256": "e4d93ffd22af7258d47a6d69957bc985ef9c6c6179e29f85b1cd6530b3e48d27",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 5,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m5_PROP_temp64_top16.csv",
+    "csv_sha256": "a6daa0d42261bb58ee2e68c2b37f765de5ee1630f82886649f4ae78dec1931f3",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 10,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m10_PROP_temp64_top16.csv",
+    "csv_sha256": "aa4cceed6f32c049d6c99b039a387af7f65a1380ec066753828131d559c4c131",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 20,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m20_PROP_temp64_top16.csv",
+    "csv_sha256": "bed2e930c93a4654ec759780626f5c9bcf7832f9336d7dcd53214f5e5c1bb72c",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 40,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m40_PROP_temp64_top16.csv",
+    "csv_sha256": "c2b2c41525bff3fbfc44302228d28e57ab1fcb1317512bc916dc4e3b98c05be9",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 60,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m60_PROP_temp64_top16.csv",
+    "csv_sha256": "883ebb011db42dff369d934a4a645a5614743b1fa3b67f41278fc0824483637a",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 80,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m80_PROP_temp64_top16.csv",
+    "csv_sha256": "d1b3dbea7cbd58993ee4145e99399c7e3524040b928777c52a24e0787692cd7c",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 100,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m100_PROP_temp64_top16.csv",
+    "csv_sha256": "e5a99f7b7b681220d6ae06b7707cabfbc936c080d96e2dcd67bffa1bab0ebf23",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 120,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m120_PROP_temp64_top16.csv",
+    "csv_sha256": "c120e7d0d51bcbdd41f0ed86762128c3bfa871f0e568b1c07cf6f22f4963cb3c",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 140,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m140_PROP_temp64_top16.csv",
+    "csv_sha256": "0bff509fe360378fd1baddab8c13beaaafb650a53da270e991b4bbbedb143e0b",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 160,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m160_PROP_temp64_top16.csv",
+    "csv_sha256": "af0ea112a87a7e5ca299c9dfd1336fdc31dc8beec0a2f898d6e99867a63a8d00",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 180,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m180_PROP_temp64_top16.csv",
+    "csv_sha256": "e1e6f0382f6078c5405d3cb38e86749606f976371e4d87b8e20477d6bb80fcaa",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 200,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m200_PROP_temp64_top16.csv",
+    "csv_sha256": "dbc74737eb7b0daf37aa9c0d073a9bf8825a39d03adf144ffa42a2658279168f",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 220,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m220_PROP_temp64_top16.csv",
+    "csv_sha256": "6c179f68ef06256ea27ab42f9db8e600ef571bb65f0e29be1d4fea5dd1cfae13",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 240,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m240_PROP_temp64_top16.csv",
+    "csv_sha256": "fcab5605cf769468173528be08a1efb52a5f4d0a8ea3a6967da5e983009f02b5",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 260,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m260_PROP_temp64_top16.csv",
+    "csv_sha256": "badb577bbbe664140e171b9852b69e9a7221942b730a26669a970adf285cda0a",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 280,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m280_PROP_temp64_top16.csv",
+    "csv_sha256": "84d739971f813f5c3cce2b1d4f093c015818bc126900f099d2dddd744b796bc5",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 300,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m300_PROP_temp64_top16.csv",
+    "csv_sha256": "43034446dd150a83b3077366ea9b3aefbee0f255ccb55d75b0555fb50ffc1dfc",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 320,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m320_PROP_temp64_top16.csv",
+    "csv_sha256": "28fcf8787cbcb48b866fa448c45f25361790929dd99fe7bafc623f2c80901872",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 340,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m340_PROP_temp64_top16.csv",
+    "csv_sha256": "7a92e7222b66233668abe90bd28c7280d69f6b1fd1d71617642a344bfa6a7413",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 360,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m360_PROP_temp64_top16.csv",
+    "csv_sha256": "8db3868a7fb7bc74c3cfa0eeef9f38a9670c29bd410842510c16efaa16d37823",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 380,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m380_PROP_temp64_top16.csv",
+    "csv_sha256": "a33c552d16f6785a0e62e8d36b3da499f52eb386a53174efd3d9556643c9e7cd",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 400,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m400_PROP_temp64_top16.csv",
+    "csv_sha256": "0bd57df480e6ed76eba3e464a582cff7d161a5a5b7af8d18adb479daadb0a4c9",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 420,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m420_PROP_temp64_top16.csv",
+    "csv_sha256": "8bda029ae4d295783c88532274cb43df49b0eb93a675b32e07e28c985ee773cb",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 440,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m440_PROP_temp64_top16.csv",
+    "csv_sha256": "9b0b3ad2d42ac704d609b0279582a2893088719b8dbe66e8b4d99d1dccdd101a",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 460,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m460_PROP_temp64_top16.csv",
+    "csv_sha256": "37e5bd107d99ec1101294fa977f878a7b14f2b293ba99d45c51f82ff82137e61",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 480,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m480_PROP_temp64_top16.csv",
+    "csv_sha256": "689c91bb9e68ec13baa567d097533357112958594ceb6e8008198274754b2900",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 500,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m500_PROP_temp64_top16.csv",
+    "csv_sha256": "3f8f189c1adbf0c294486a5d1e7d0130db633326798e1a81fd89dfa347a12048",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 600,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m600_PROP_temp64_top16.csv",
+    "csv_sha256": "2ccbb61b5c35d36f2c516993ef6bdaa54aa351460727e06d32dfa1e050a112cd",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 700,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m700_PROP_temp64_top16.csv",
+    "csv_sha256": "817b15a232606db331da8c3427d2b9c7b69788aab4860da8b9b02cd66b4a0f5e",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  },
+  {
+    "design": "PROP_temp64",
+    "load": 800,
+    "remote_run_id": "20260913_prop_temp64_asap_uc_m5_500",
+    "remote_csv": "/home/ghy19/Asynchronous_Router_CMR/results/20260913_prop_temp64_asap_uc_m5_500/csv/sdf_TOPO-UR_n64_s202701_m800_PROP_temp64_top16.csv",
+    "csv_sha256": "ace53e2c98d2e8e8f1e608b619f0c8d615879f6244682225b768f44922654d6f",
+    "csv_pass": true,
+    "gls_log_reaudited": false
+  }
+]

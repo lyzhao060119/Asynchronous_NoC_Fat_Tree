@@ -1,0 +1,1272 @@
+{
+  "run_id": "20260914_cmr_c1p4_async_sync_hop_ppa",
+  "generated_at_utc": "2026-09-14T01:54:04.045389+00:00",
+  "git_sha": "385e40e68387136ab902660256750570d55cb9b1",
+  "source_hashes": {
+    "scripts/asic_dc/cmr/tb_cmr_router_hop_ppa.sv": "72744ebad670fd638ca7104a4f7459d376c64b4c49c0979e61897945eea72a87",
+    "scripts/asic_dc/cmr/tb_sync_cmr_router_hop_ppa.sv": "aee6985b18004b7099257b0a4fd2856e6b18bbf0900432e8f190617bb25c529e",
+    "scripts/asic_dc/cmr/run_gls_cmr_router_hop_ppa.sh": "f3c4653b40569cdcaec66749059d13b4834968026e830dfd72cb478600d3b042",
+    "scripts/asic_dc/cmr/tb_cmr_pfat48_path_probe.sv": "7b78faf179637fe016173c7fe329de5c56dfc0c8933f34d8e209c65ff43d4554",
+    "scripts/asic_dc/cmr/run_gls_cmr_sync_router_hop_ppa.sh": "1c18fcce5e85aa247211560280872e49a560a5562dcff102b68b7b11956141ae",
+    "scripts/asic_dc/power/run_ptpx_cmr_router_hop_ppa.tcl": "803a236b12a9ca049d34d390b0a8daaa1fe226a424447de13223fe75935e49aa",
+    "scripts/asic_dc/cmr/hop_binds/async_ports_c1_p1.vi": "75725ad264664d04d00365a6214acc492bcbdc6c8a0c9ea473529d3e18caa843",
+    "scripts/asic_dc/cmr/hop_binds/async_ports_c1_p2.vi": "34eabf8283e823c976cd3b3de084e23747959749947d166613177fdc9d9cb432",
+    "scripts/asic_dc/cmr/hop_binds/async_ports_c1_p4.vi": "787149c2ea5cf0d8177d85b85eda952bddad59e5ebb9ca5cd729b336507331ca",
+    "scripts/asic_dc/cmr/hop_binds/async_ports_c2_p2.vi": "0cd052704dcb811a6d0e65fd600d2faf4306e97d02eaf405e2027ce906fdd4ff",
+    "scripts/asic_dc/cmr/hop_binds/async_ports_c2_p4.vi": "f1467ce99af66458c08bf51c6163a076d75965564e98f1f3a4c664bba51fc47f",
+    "scripts/asic_dc/cmr/hop_binds/async_ports_c4_p8.vi": "9861fea4eafc66469f927d53910795ac77830d19e1fc9da8f59092a1066e15cb",
+    "scripts/asic_dc/cmr/hop_binds/sync_ports_c1_p1.vi": "bd722a1c17fa0e5c201bafa8e680bb7f6dc3ef18a1cdc0d11b035386195eaf78",
+    "scripts/asic_dc/cmr/hop_binds/sync_ports_c1_p2.vi": "c5bc44e7dc09e2d633f3ebebce9bc4e83546934f09029254b79dbe5c2023549a",
+    "scripts/asic_dc/cmr/hop_binds/sync_ports_c1_p4.vi": "4068471e53eec8d8bba94babf49edb358528292d2b3732becd6b66a8c6d55b2b",
+    "scripts/asic_dc/cmr/hop_binds/sync_ports_c2_p2.vi": "4dc303e7eb1ac20d7a1d2e306dcbd8e0f1e2851fcf3432b6e5ac15d0c34b6fc5",
+    "scripts/asic_dc/cmr/hop_binds/sync_ports_c2_p4.vi": "ab941efbf64b9962da9b6bfb012486d463797fbb8de798d2a6f486a40cfdd7e3",
+    "scripts/asic_dc/cmr/hop_binds/sync_ports_c4_p8.vi": "48b81e92b8a7d1748711098dac0151a34b316518580e778f77bae21b90d4a138"
+  },
+  "artifacts": [
+    {
+      "kind": "async_fat_1x4",
+      "netlist_run_id": "20260914_cmr_prop_temp_c1p4_rpsdel050_r1",
+      "remote_output": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_prop_temp_c1p4_rpsdel050_r1",
+      "remote_reports": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20260914_cmr_prop_temp_c1p4_rpsdel050_r1",
+      "structure": {
+        "IPM_COUNT": "8",
+        "OPM_COUNT": "8",
+        "MUTEX4_COUNT": "12",
+        "MUTEX2_COUNT": "52",
+        "RESET_LATCH_COUNT": "1880",
+        "SR_LATCH_COUNT": "0",
+        "PATH_LATCH_CLEAR_COUNT": "32",
+        "PATH_LATCH_DUAL_COUNT": "0",
+        "SET_RESET_LATCH_COUNT": "144",
+        "V2_CLOSE_EVENT_COUNT": "16",
+        "HANDSHAKE_COMPLETE_COUNT": "0",
+        "LEGAL_REQ_EDGES": "44",
+        "UTURN_EDGES": "0",
+        "RCU_DEL050_COUNT": "8",
+        "RCU_DEL075_COUNT": "0",
+        "RCU_DEL100_COUNT": "0",
+        "RCU_DEL150_COUNT": "0",
+        "ADAPTER_COUNT": "4",
+        "ACKLATCH_E_COUNT": "4",
+        "LANE01_ACKLATCH_BUF_COUNT": "0",
+        "LANE01_BUF_STAGES": "0",
+        "OPM_ACKIN_DELAY_COUNT": "8",
+        "OPM_ACKIN_DELAY_UNIT_PS": "50",
+        "OPM_ACKIN_DELAY_STEPS": "1",
+        "OPM_ACKIN_USE_BUF": "0",
+        "OPM_ACKIN_DEL_COUNT": "8",
+        "OPM_ACKOUT_CLOSE_DELAY_COUNT": "0",
+        "RCU_MATCHED_BUF_COUNT": "0",
+        "RCU_MATCHED_BUF_STAGES": "0",
+        "RCU_MATCHED_DELAY_UNIT_PS": "50",
+        "RCU_MATCHED_DELAY_STEPS": "1",
+        "OTHERPATH_DEL050_COUNT": "32"
+      },
+      "post_hashes": "f92f29ba6db2757b568328f06b307a8d6db4b3e9dac937c11f175c87f2cdc999  /home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_prop_temp_c1p4_rpsdel050_r1/CMRRouter.ddc\n3f1e48e8f986b0aa165a34b44204f222080c1bf0d6bec4c0013723ddac46c64f  /home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_prop_temp_c1p4_rpsdel050_r1/CMRRouter_post.v\nfbc006267ca0fb9e32bc69d460aae1e2c48cab12562cec230c2691b45d07b4c9  /home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_prop_temp_c1p4_rpsdel050_r1/CMRRouter.sdf\nModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'INVS211'\nModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'IC618'\nModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'QUANTUS23.1'\n",
+      "total_cell_area_um2": 12601.679905,
+      "modes": {
+        "isolated": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [
+            {
+              "packet": "0",
+              "flit": "0",
+              "input_req_ns": "210.050",
+              "output_req_ns": "211.151",
+              "hop_latency_ns": "1.101",
+              "out_port": "7",
+              "data_hex": "8820821"
+            },
+            {
+              "packet": "0",
+              "flit": "1",
+              "input_req_ns": "211.501",
+              "output_req_ns": "212.197",
+              "hop_latency_ns": "0.696",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "2",
+              "input_req_ns": "212.547",
+              "output_req_ns": "213.318",
+              "hop_latency_ns": "0.771",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "3",
+              "input_req_ns": "213.668",
+              "output_req_ns": "214.366",
+              "hop_latency_ns": "0.698",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "4",
+              "input_req_ns": "214.716",
+              "output_req_ns": "215.484",
+              "hop_latency_ns": "0.768",
+              "out_port": "7",
+              "data_hex": "4820821"
+            }
+          ],
+          "power_window_ns": {
+            "start": 210.05,
+            "end": 215.485,
+            "duration": 5.435000000000002
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.001773,
+            "dynamic_power_w": 0.0009689000000000001,
+            "leakage_power_w": 0.0008041,
+            "window_ns": 5.435000000000002,
+            "total_energy_j": 9.636255000000005e-12,
+            "energy_per_delivered_flit_j": 1.927251000000001e-12,
+            "per_flit": {
+              "head": {
+                "total_power_w": 0.001735,
+                "dynamic_power_w": 0.0009321,
+                "leakage_power_w": 0.0008029,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 1.91197e-12
+              },
+              "body": {
+                "total_power_w": 0.001907,
+                "dynamic_power_w": 0.0011024,
+                "leakage_power_w": 0.0008046,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.101514e-12
+              },
+              "tail": {
+                "total_power_w": 0.00183,
+                "dynamic_power_w": 0.0010249,
+                "leakage_power_w": 0.0008051,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.01666e-12
+              }
+            }
+          }
+        },
+        "stream": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [
+            {
+              "packet": "0",
+              "flit": "0",
+              "input_req_ns": "210.050",
+              "output_req_ns": "211.151",
+              "hop_latency_ns": "1.101",
+              "out_port": "7",
+              "data_hex": "8820821"
+            },
+            {
+              "packet": "0",
+              "flit": "1",
+              "input_req_ns": "210.631",
+              "output_req_ns": "212.197",
+              "hop_latency_ns": "1.566",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "2",
+              "input_req_ns": "211.277",
+              "output_req_ns": "213.318",
+              "hop_latency_ns": "2.041",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "3",
+              "input_req_ns": "211.927",
+              "output_req_ns": "214.366",
+              "hop_latency_ns": "2.439",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "4",
+              "input_req_ns": "212.572",
+              "output_req_ns": "215.484",
+              "hop_latency_ns": "2.912",
+              "out_port": "7",
+              "data_hex": "4820821"
+            },
+            {
+              "packet": "1",
+              "flit": "0",
+              "input_req_ns": "216.776",
+              "output_req_ns": "217.844",
+              "hop_latency_ns": "1.068",
+              "out_port": "7",
+              "data_hex": "8820822"
+            },
+            {
+              "packet": "1",
+              "flit": "1",
+              "input_req_ns": "217.352",
+              "output_req_ns": "218.952",
+              "hop_latency_ns": "1.600",
+              "out_port": "7",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "2",
+              "input_req_ns": "217.990",
+              "output_req_ns": "220.010",
+              "hop_latency_ns": "2.020",
+              "out_port": "7",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "3",
+              "input_req_ns": "218.644",
+              "output_req_ns": "221.134",
+              "hop_latency_ns": "2.490",
+              "out_port": "7",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "4",
+              "input_req_ns": "219.296",
+              "output_req_ns": "222.181",
+              "hop_latency_ns": "2.885",
+              "out_port": "7",
+              "data_hex": "4820822"
+            },
+            {
+              "packet": "2",
+              "flit": "0",
+              "input_req_ns": "223.480",
+              "output_req_ns": "224.581",
+              "hop_latency_ns": "1.101",
+              "out_port": "7",
+              "data_hex": "8820823"
+            },
+            {
+              "packet": "2",
+              "flit": "1",
+              "input_req_ns": "224.061",
+              "output_req_ns": "225.627",
+              "hop_latency_ns": "1.566",
+              "out_port": "7",
+              "data_hex": "0820823"
+            },
+            {
+              "packet": "2",
+              "flit": "2",
+              "input_req_ns": "224.707",
+              "output_req_ns": "226.748",
+              "hop_latency_ns": "2.041",
+              "out_port": "7",
+              "data_hex": "0820823"
+            },
+            {
+              "packet": "2",
+              "flit": "3",
+              "input_req_ns": "225.357",
+              "output_req_ns": "227.796",
+              "hop_latency_ns": "2.439",
+              "out_port": "7",
+              "data_hex": "0820823"
+            },
+            {
+              "packet": "2",
+              "flit": "4",
+              "input_req_ns": "226.002",
+              "output_req_ns": "228.914",
+              "hop_latency_ns": "2.912",
+              "out_port": "7",
+              "data_hex": "4820823"
+            },
+            {
+              "packet": "3",
+              "flit": "0",
+              "input_req_ns": "230.206",
+              "output_req_ns": "231.274",
+              "hop_latency_ns": "1.068",
+              "out_port": "7",
+              "data_hex": "8820820"
+            },
+            {
+              "packet": "3",
+              "flit": "1",
+              "input_req_ns": "230.782",
+              "output_req_ns": "232.382",
+              "hop_latency_ns": "1.600",
+              "out_port": "7",
+              "data_hex": "0820820"
+            },
+            {
+              "packet": "3",
+              "flit": "2",
+              "input_req_ns": "231.420",
+              "output_req_ns": "233.440",
+              "hop_latency_ns": "2.020",
+              "out_port": "7",
+              "data_hex": "0820820"
+            },
+            {
+              "packet": "3",
+              "flit": "3",
+              "input_req_ns": "232.074",
+              "output_req_ns": "234.564",
+              "hop_latency_ns": "2.490",
+              "out_port": "7",
+              "data_hex": "0820820"
+            },
+            {
+              "packet": "3",
+              "flit": "4",
+              "input_req_ns": "232.726",
+              "output_req_ns": "235.611",
+              "hop_latency_ns": "2.885",
+              "out_port": "7",
+              "data_hex": "4820820"
+            }
+          ],
+          "power_window_ns": {
+            "start": 210.05,
+            "end": 235.612,
+            "duration": 25.561999999999983
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.001702,
+            "dynamic_power_w": 0.0008975999999999999,
+            "leakage_power_w": 0.0008044,
+            "window_ns": 25.561999999999983,
+            "total_energy_j": 4.350652399999997e-11,
+            "energy_per_delivered_flit_j": 2.1753261999999984e-12,
+            "per_flit": {
+              "head": {
+                "total_power_w": 0.002197,
+                "dynamic_power_w": 0.0013935000000000002,
+                "leakage_power_w": 0.0008035,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.421094e-12
+              },
+              "body": {
+                "total_power_w": 0.002378,
+                "dynamic_power_w": 0.0015733,
+                "leakage_power_w": 0.0008047,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.6205559999999996e-12
+              },
+              "tail": {
+                "total_power_w": 0.002266,
+                "dynamic_power_w": 0.0014609999999999996,
+                "leakage_power_w": 0.000805,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.4971319999999994e-12
+              }
+            }
+          }
+        },
+        "idle": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [],
+          "power_window_ns": {
+            "start": 210.0,
+            "end": 280.0,
+            "duration": 70.0
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.000799,
+            "dynamic_power_w": 0.0,
+            "leakage_power_w": 0.000799,
+            "window_ns": 70.0,
+            "total_energy_j": 5.593000000000001e-11,
+            "energy_per_delivered_flit_j": 5.593000000000001e-11,
+            "per_flit": {}
+          }
+        },
+        "contention": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [
+            {
+              "packet": "0",
+              "flit": "0",
+              "input_req_ns": "210.050",
+              "output_req_ns": "211.151",
+              "hop_latency_ns": "1.101",
+              "out_port": "7",
+              "data_hex": "8820821"
+            },
+            {
+              "packet": "0",
+              "flit": "1",
+              "input_req_ns": "211.501",
+              "output_req_ns": "212.197",
+              "hop_latency_ns": "0.696",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "2",
+              "input_req_ns": "212.547",
+              "output_req_ns": "213.318",
+              "hop_latency_ns": "0.771",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "3",
+              "input_req_ns": "213.668",
+              "output_req_ns": "214.366",
+              "hop_latency_ns": "0.698",
+              "out_port": "7",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "4",
+              "input_req_ns": "214.716",
+              "output_req_ns": "215.484",
+              "hop_latency_ns": "0.768",
+              "out_port": "7",
+              "data_hex": "4820821"
+            },
+            {
+              "packet": "1",
+              "flit": "0",
+              "input_req_ns": "215.834",
+              "output_req_ns": "216.943",
+              "hop_latency_ns": "1.109",
+              "out_port": "7",
+              "data_hex": "8820822"
+            },
+            {
+              "packet": "1",
+              "flit": "1",
+              "input_req_ns": "217.293",
+              "output_req_ns": "218.016",
+              "hop_latency_ns": "0.723",
+              "out_port": "7",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "2",
+              "input_req_ns": "218.366",
+              "output_req_ns": "219.136",
+              "hop_latency_ns": "0.770",
+              "out_port": "7",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "3",
+              "input_req_ns": "219.486",
+              "output_req_ns": "220.211",
+              "hop_latency_ns": "0.725",
+              "out_port": "7",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "4",
+              "input_req_ns": "220.561",
+              "output_req_ns": "221.328",
+              "hop_latency_ns": "0.767",
+              "out_port": "7",
+              "data_hex": "4820822"
+            }
+          ],
+          "power_window_ns": {
+            "start": 210.05,
+            "end": 221.329,
+            "duration": 11.278999999999996
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.001797,
+            "dynamic_power_w": 0.0009914,
+            "leakage_power_w": 0.0008056,
+            "window_ns": 11.278999999999996,
+            "total_energy_j": 2.0268362999999994e-11,
+            "energy_per_delivered_flit_j": 2.0268362999999994e-12,
+            "per_flit": {
+              "head": {
+                "total_power_w": 0.001735,
+                "dynamic_power_w": 0.0009321,
+                "leakage_power_w": 0.0008029,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 1.91197e-12
+              },
+              "body": {
+                "total_power_w": 0.002199,
+                "dynamic_power_w": 0.0013947,
+                "leakage_power_w": 0.0008043,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.4232979999999996e-12
+              },
+              "tail": {
+                "total_power_w": 0.002015,
+                "dynamic_power_w": 0.0012098999999999999,
+                "leakage_power_w": 0.0008051,
+                "window_ns": 1.1019999999999999,
+                "total_energy_j": 2.2205299999999996e-12
+              }
+            }
+          }
+        }
+      },
+      "events": [
+        {
+          "packet": "0",
+          "flit": "0",
+          "input_req_ns": "210.050",
+          "output_req_ns": "211.151",
+          "hop_latency_ns": "1.101",
+          "out_port": "7",
+          "data_hex": "8820821"
+        },
+        {
+          "packet": "0",
+          "flit": "1",
+          "input_req_ns": "211.501",
+          "output_req_ns": "212.197",
+          "hop_latency_ns": "0.696",
+          "out_port": "7",
+          "data_hex": "0820821"
+        },
+        {
+          "packet": "0",
+          "flit": "2",
+          "input_req_ns": "212.547",
+          "output_req_ns": "213.318",
+          "hop_latency_ns": "0.771",
+          "out_port": "7",
+          "data_hex": "0820821"
+        },
+        {
+          "packet": "0",
+          "flit": "3",
+          "input_req_ns": "213.668",
+          "output_req_ns": "214.366",
+          "hop_latency_ns": "0.698",
+          "out_port": "7",
+          "data_hex": "0820821"
+        },
+        {
+          "packet": "0",
+          "flit": "4",
+          "input_req_ns": "214.716",
+          "output_req_ns": "215.484",
+          "hop_latency_ns": "0.768",
+          "out_port": "7",
+          "data_hex": "4820821"
+        }
+      ],
+      "power": {
+        "total_power_w": 0.001773,
+        "dynamic_power_w": 0.0009689000000000001,
+        "leakage_power_w": 0.0008041,
+        "window_ns": 5.435000000000002,
+        "total_energy_j": 9.636255000000005e-12,
+        "energy_per_delivered_flit_j": 1.927251000000001e-12,
+        "per_flit": {
+          "head": {
+            "total_power_w": 0.001735,
+            "dynamic_power_w": 0.0009321,
+            "leakage_power_w": 0.0008029,
+            "window_ns": 1.1019999999999999,
+            "total_energy_j": 1.91197e-12
+          },
+          "body": {
+            "total_power_w": 0.001907,
+            "dynamic_power_w": 0.0011024,
+            "leakage_power_w": 0.0008046,
+            "window_ns": 1.1019999999999999,
+            "total_energy_j": 2.101514e-12
+          },
+          "tail": {
+            "total_power_w": 0.00183,
+            "dynamic_power_w": 0.0010249,
+            "leakage_power_w": 0.0008051,
+            "window_ns": 1.1019999999999999,
+            "total_energy_j": 2.01666e-12
+          }
+        }
+      },
+      "power_window_ns": {
+        "start": 210.05,
+        "end": 215.485,
+        "duration": 5.435000000000002
+      },
+      "active_power": {
+        "total_power_w": 0.001702,
+        "dynamic_power_w": 0.0008975999999999999,
+        "leakage_power_w": 0.0008044,
+        "window_ns": 25.561999999999983,
+        "total_energy_j": 4.350652399999997e-11,
+        "energy_per_delivered_flit_j": 2.1753261999999984e-12,
+        "per_flit": {
+          "head": {
+            "total_power_w": 0.002197,
+            "dynamic_power_w": 0.0013935000000000002,
+            "leakage_power_w": 0.0008035,
+            "window_ns": 1.1019999999999999,
+            "total_energy_j": 2.421094e-12
+          },
+          "body": {
+            "total_power_w": 0.002378,
+            "dynamic_power_w": 0.0015733,
+            "leakage_power_w": 0.0008047,
+            "window_ns": 1.1019999999999999,
+            "total_energy_j": 2.6205559999999996e-12
+          },
+          "tail": {
+            "total_power_w": 0.002266,
+            "dynamic_power_w": 0.0014609999999999996,
+            "leakage_power_w": 0.000805,
+            "window_ns": 1.1019999999999999,
+            "total_energy_j": 2.4971319999999994e-12
+          }
+        }
+      },
+      "idle_power": {
+        "total_power_w": 0.000799,
+        "dynamic_power_w": 0.0,
+        "leakage_power_w": 0.000799,
+        "window_ns": 70.0,
+        "total_energy_j": 5.593000000000001e-11,
+        "energy_per_delivered_flit_j": 5.593000000000001e-11,
+        "per_flit": {}
+      }
+    },
+    {
+      "kind": "sync_fat_1x4",
+      "netlist_run_id": "20260914_cmr_sync_prop_temp_c1p4_1p0ns",
+      "remote_output": "/home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_sync_prop_temp_c1p4_1p0ns",
+      "remote_reports": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20260914_cmr_sync_prop_temp_c1p4_1p0ns",
+      "structure": {
+        "IPM_COUNT": "8",
+        "OPM_COUNT": "8",
+        "ADAPTER_COUNT": "0",
+        "SELECTOR_COUNT": "4",
+        "MUTEX_COUNT": "0",
+        "DELAY_CELL_COUNT": "0",
+        "WNS": "0.0934718",
+        "WHS": "0.0372301",
+        "RCU_MATCHED_BUF_COUNT": "0",
+        "RCU_MATCHED_BUF_STAGES": "0",
+        "RCU_MATCHED_DELAY_UNIT_PS": "50",
+        "RCU_MATCHED_DELAY_STEPS": "1",
+        "OPM_ACKIN_DELAY_UNIT_PS": "50",
+        "OPM_ACKIN_DELAY_STEPS": "1",
+        "OPM_ACKIN_USE_BUF": "0"
+      },
+      "post_hashes": "cdb8c0b939b714e6b899ba32b672e24991fe990fa75bb4d9fbf1a81a60a138e4  /home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_sync_prop_temp_c1p4_1p0ns/SyncCmrRouter.ddc\n9048a560d14fd38d42c4276226cd20429774dfc18f724abbe580c9c0f611f350  /home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_sync_prop_temp_c1p4_1p0ns/SyncCmrRouter_post.v\n59d77462f8742b16af783fbbdff6628f1c9ad9f6db6e8749834f9d494b67eb4f  /home/ghy19/Asynchronous_Router_CMR/outputs/20260914_cmr_sync_prop_temp_c1p4_1p0ns/SyncCmrRouter.sdf\nModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'INVS211'\nModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'IC618'\nModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'QUANTUS23.1'\n",
+      "total_cell_area_um2": 11374.103891,
+      "modes": {
+        "isolated": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [
+            {
+              "packet": "0",
+              "flit": "0",
+              "input_req_ns": "13.500",
+              "output_req_ns": "14.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820821"
+            },
+            {
+              "packet": "0",
+              "flit": "1",
+              "input_req_ns": "16.500",
+              "output_req_ns": "17.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "2",
+              "input_req_ns": "19.500",
+              "output_req_ns": "20.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "3",
+              "input_req_ns": "22.500",
+              "output_req_ns": "23.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "4",
+              "input_req_ns": "25.500",
+              "output_req_ns": "26.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820821"
+            }
+          ],
+          "power_window_ns": {
+            "start": 13.5,
+            "end": 26.501,
+            "duration": 13.001000000000001
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.007252,
+            "dynamic_power_w": 0.0066123,
+            "leakage_power_w": 0.0006397,
+            "window_ns": 13.001000000000001,
+            "total_energy_j": 9.428325200000001e-11,
+            "energy_per_delivered_flit_j": 1.8856650400000002e-11,
+            "per_flit": {
+              "head": {
+                "total_power_w": 0.009766,
+                "dynamic_power_w": 0.0091266,
+                "leakage_power_w": 0.0006394,
+                "window_ns": 1.001,
+                "total_energy_j": 9.775766e-12
+              },
+              "body": {
+                "total_power_w": 0.007418,
+                "dynamic_power_w": 0.0067783,
+                "leakage_power_w": 0.0006397,
+                "window_ns": 1.001,
+                "total_energy_j": 7.425418e-12
+              },
+              "tail": {
+                "total_power_w": 0.009714,
+                "dynamic_power_w": 0.009073000000000001,
+                "leakage_power_w": 0.000641,
+                "window_ns": 1.001,
+                "total_energy_j": 9.723714e-12
+              }
+            }
+          }
+        },
+        "stream": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [
+            {
+              "packet": "0",
+              "flit": "0",
+              "input_req_ns": "13.500",
+              "output_req_ns": "14.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820821"
+            },
+            {
+              "packet": "0",
+              "flit": "1",
+              "input_req_ns": "15.500",
+              "output_req_ns": "16.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "2",
+              "input_req_ns": "17.500",
+              "output_req_ns": "18.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "3",
+              "input_req_ns": "19.500",
+              "output_req_ns": "20.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "4",
+              "input_req_ns": "21.500",
+              "output_req_ns": "22.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820821"
+            },
+            {
+              "packet": "1",
+              "flit": "0",
+              "input_req_ns": "24.500",
+              "output_req_ns": "25.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820822"
+            },
+            {
+              "packet": "1",
+              "flit": "1",
+              "input_req_ns": "26.500",
+              "output_req_ns": "27.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "2",
+              "input_req_ns": "28.500",
+              "output_req_ns": "29.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "3",
+              "input_req_ns": "30.500",
+              "output_req_ns": "31.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "4",
+              "input_req_ns": "32.500",
+              "output_req_ns": "33.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820822"
+            },
+            {
+              "packet": "2",
+              "flit": "0",
+              "input_req_ns": "35.500",
+              "output_req_ns": "36.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820823"
+            },
+            {
+              "packet": "2",
+              "flit": "1",
+              "input_req_ns": "37.500",
+              "output_req_ns": "38.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820823"
+            },
+            {
+              "packet": "2",
+              "flit": "2",
+              "input_req_ns": "39.500",
+              "output_req_ns": "40.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820823"
+            },
+            {
+              "packet": "2",
+              "flit": "3",
+              "input_req_ns": "41.500",
+              "output_req_ns": "42.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820823"
+            },
+            {
+              "packet": "2",
+              "flit": "4",
+              "input_req_ns": "43.500",
+              "output_req_ns": "44.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820823"
+            },
+            {
+              "packet": "3",
+              "flit": "0",
+              "input_req_ns": "46.500",
+              "output_req_ns": "47.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820820"
+            },
+            {
+              "packet": "3",
+              "flit": "1",
+              "input_req_ns": "48.500",
+              "output_req_ns": "49.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820820"
+            },
+            {
+              "packet": "3",
+              "flit": "2",
+              "input_req_ns": "50.500",
+              "output_req_ns": "51.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820820"
+            },
+            {
+              "packet": "3",
+              "flit": "3",
+              "input_req_ns": "52.500",
+              "output_req_ns": "53.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820820"
+            },
+            {
+              "packet": "3",
+              "flit": "4",
+              "input_req_ns": "54.500",
+              "output_req_ns": "55.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820820"
+            }
+          ],
+          "power_window_ns": {
+            "start": 13.5,
+            "end": 55.501,
+            "duration": 42.001
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.007167,
+            "dynamic_power_w": 0.006526499999999999,
+            "leakage_power_w": 0.0006405,
+            "window_ns": 42.001,
+            "total_energy_j": 3.0102116699999997e-10,
+            "energy_per_delivered_flit_j": 1.5051058349999998e-11,
+            "per_flit": {
+              "head": {
+                "total_power_w": 0.009766,
+                "dynamic_power_w": 0.0091266,
+                "leakage_power_w": 0.0006394,
+                "window_ns": 1.001,
+                "total_energy_j": 9.775766e-12
+              },
+              "body": {
+                "total_power_w": 0.009705,
+                "dynamic_power_w": 0.0090654,
+                "leakage_power_w": 0.0006396,
+                "window_ns": 1.001,
+                "total_energy_j": 9.714705e-12
+              },
+              "tail": {
+                "total_power_w": 0.009703,
+                "dynamic_power_w": 0.0090625,
+                "leakage_power_w": 0.0006405,
+                "window_ns": 1.001,
+                "total_energy_j": 9.712703e-12
+              }
+            }
+          }
+        },
+        "idle": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [],
+          "power_window_ns": {
+            "start": 8.0,
+            "end": 65.5,
+            "duration": 57.5
+          },
+          "power_job_id": "resumed",
+          "power": {
+            "total_power_w": 0.006944,
+            "dynamic_power_w": 0.0063079,
+            "leakage_power_w": 0.0006361,
+            "window_ns": 57.5,
+            "total_energy_j": 3.9928000000000004e-10,
+            "energy_per_delivered_flit_j": 3.9928000000000004e-10,
+            "per_flit": {}
+          }
+        },
+        "contention": {
+          "gls_job_id": "resumed",
+          "run_log_pass": true,
+          "events": [
+            {
+              "packet": "0",
+              "flit": "0",
+              "input_req_ns": "13.500",
+              "output_req_ns": "14.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820821"
+            },
+            {
+              "packet": "0",
+              "flit": "1",
+              "input_req_ns": "16.500",
+              "output_req_ns": "17.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "2",
+              "input_req_ns": "19.500",
+              "output_req_ns": "20.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "3",
+              "input_req_ns": "22.500",
+              "output_req_ns": "23.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820821"
+            },
+            {
+              "packet": "0",
+              "flit": "4",
+              "input_req_ns": "25.500",
+              "output_req_ns": "26.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820821"
+            },
+            {
+              "packet": "1",
+              "flit": "0",
+              "input_req_ns": "28.500",
+              "output_req_ns": "29.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "8820822"
+            },
+            {
+              "packet": "1",
+              "flit": "1",
+              "input_req_ns": "31.500",
+              "output_req_ns": "32.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "2",
+              "input_req_ns": "34.500",
+              "output_req_ns": "35.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "3",
+              "input_req_ns": "37.500",
+              "output_req_ns": "38.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "0820822"
+            },
+            {
+              "packet": "1",
+              "flit": "4",
+              "input_req_ns": "40.500",
+              "output_req_ns": "41.500",
+              "hop_latency_ns": "1.000",
+              "out_port": "4",
+              "data_hex": "4820822"
+            }
+          ],
+          "power_window_ns": {
+            "start": 13.5,
+            "end": 41.501,
+            "duration": 28.000999999999998
+          },
+          "power_job_id": "12282301",
+          "power": {
+            "total_power_w": 0.007145,
+            "dynamic_power_w": 0.0065045,
+            "leakage_power_w": 0.0006405,
+            "window_ns": 28.000999999999998,
+            "total_energy_j": 2.0006714500000001e-10,
+            "energy_per_delivered_flit_j": 2.00067145e-11,
+            "per_flit": {
+              "head": {
+                "total_power_w": 0.009766,
+                "dynamic_power_w": 0.0091266,
+                "leakage_power_w": 0.0006394,
+                "window_ns": 1.001,
+                "total_energy_j": 9.775766e-12
+              },
+              "body": {
+                "total_power_w": 0.009708,
+                "dynamic_power_w": 0.0090686,
+                "leakage_power_w": 0.0006394,
+                "window_ns": 1.001,
+                "total_energy_j": 9.717708e-12
+              },
+              "tail": {
+                "total_power_w": 0.009706,
+                "dynamic_power_w": 0.0090657,
+                "leakage_power_w": 0.0006403,
+                "window_ns": 1.001,
+                "total_energy_j": 9.715706e-12
+              }
+            }
+          }
+        }
+      },
+      "events": [
+        {
+          "packet": "0",
+          "flit": "0",
+          "input_req_ns": "13.500",
+          "output_req_ns": "14.500",
+          "hop_latency_ns": "1.000",
+          "out_port": "4",
+          "data_hex": "8820821"
+        },
+        {
+          "packet": "0",
+          "flit": "1",
+          "input_req_ns": "16.500",
+          "output_req_ns": "17.500",
+          "hop_latency_ns": "1.000",
+          "out_port": "4",
+          "data_hex": "0820821"
+        },
+        {
+          "packet": "0",
+          "flit": "2",
+          "input_req_ns": "19.500",
+          "output_req_ns": "20.500",
+          "hop_latency_ns": "1.000",
+          "out_port": "4",
+          "data_hex": "0820821"
+        },
+        {
+          "packet": "0",
+          "flit": "3",
+          "input_req_ns": "22.500",
+          "output_req_ns": "23.500",
+          "hop_latency_ns": "1.000",
+          "out_port": "4",
+          "data_hex": "0820821"
+        },
+        {
+          "packet": "0",
+          "flit": "4",
+          "input_req_ns": "25.500",
+          "output_req_ns": "26.500",
+          "hop_latency_ns": "1.000",
+          "out_port": "4",
+          "data_hex": "4820821"
+        }
+      ],
+      "power": {
+        "total_power_w": 0.007252,
+        "dynamic_power_w": 0.0066123,
+        "leakage_power_w": 0.0006397,
+        "window_ns": 13.001000000000001,
+        "total_energy_j": 9.428325200000001e-11,
+        "energy_per_delivered_flit_j": 1.8856650400000002e-11,
+        "per_flit": {
+          "head": {
+            "total_power_w": 0.009766,
+            "dynamic_power_w": 0.0091266,
+            "leakage_power_w": 0.0006394,
+            "window_ns": 1.001,
+            "total_energy_j": 9.775766e-12
+          },
+          "body": {
+            "total_power_w": 0.007418,
+            "dynamic_power_w": 0.0067783,
+            "leakage_power_w": 0.0006397,
+            "window_ns": 1.001,
+            "total_energy_j": 7.425418e-12
+          },
+          "tail": {
+            "total_power_w": 0.009714,
+            "dynamic_power_w": 0.009073000000000001,
+            "leakage_power_w": 0.000641,
+            "window_ns": 1.001,
+            "total_energy_j": 9.723714e-12
+          }
+        }
+      },
+      "power_window_ns": {
+        "start": 13.5,
+        "end": 26.501,
+        "duration": 13.001000000000001
+      },
+      "active_power": {
+        "total_power_w": 0.007167,
+        "dynamic_power_w": 0.006526499999999999,
+        "leakage_power_w": 0.0006405,
+        "window_ns": 42.001,
+        "total_energy_j": 3.0102116699999997e-10,
+        "energy_per_delivered_flit_j": 1.5051058349999998e-11,
+        "per_flit": {
+          "head": {
+            "total_power_w": 0.009766,
+            "dynamic_power_w": 0.0091266,
+            "leakage_power_w": 0.0006394,
+            "window_ns": 1.001,
+            "total_energy_j": 9.775766e-12
+          },
+          "body": {
+            "total_power_w": 0.009705,
+            "dynamic_power_w": 0.0090654,
+            "leakage_power_w": 0.0006396,
+            "window_ns": 1.001,
+            "total_energy_j": 9.714705e-12
+          },
+          "tail": {
+            "total_power_w": 0.009703,
+            "dynamic_power_w": 0.0090625,
+            "leakage_power_w": 0.0006405,
+            "window_ns": 1.001,
+            "total_energy_j": 9.712703e-12
+          }
+        }
+      },
+      "idle_power": {
+        "total_power_w": 0.006944,
+        "dynamic_power_w": 0.0063079,
+        "leakage_power_w": 0.0006361,
+        "window_ns": 57.5,
+        "total_energy_j": 3.9928000000000004e-10,
+        "energy_per_delivered_flit_j": 3.9928000000000004e-10,
+        "per_flit": {}
+      }
+    }
+  ]
+}

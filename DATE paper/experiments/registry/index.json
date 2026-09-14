@@ -1,6 +1,6 @@
 {
   "schema": "date-v3-registry-v1",
-  "updated_utc": "2026-09-05T14:07:36+00:00",
+  "updated_utc": "2026-09-12T15:32:20+00:00",
   "notes": "Empty index; populated by run_experiment.py plan.",
   "runs": [
     {
@@ -411,6 +411,17 @@
       "notes": "256-node asynchronous flat mesh MAXIMUM-SDF smoke at RCU 1xDEL250 / Ackin 1xDEL050. DEL150 netlist 20260903_182634_cmr_descal_fm256 KEY-256 passed but TOPO-UR/MC-UR stalled (missing port 189). DEL250 stitch DEL250=1280/1280; six calibration cases TB_RESULT PASS, annotate Done, timing_violation_count=0. Not the locked paper mesh recipe (FM64 remains 1xDEL150). paper_eligible=false. Calibration/template seed 900001, not the 11k formal matrix."
     },
     {
+      "run_id": "20260905_103344_cmr_descal_fm64_mat020",
+      "design_id": "FM64",
+      "benchmark_id": null,
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": null,
+      "manifest": null,
+      "notes": "Current paper FM64 netlist: AABB RoutingLogic_mesh / Mat-0.20 / RCU 1xDEL150. TOPO-UR coarse 18/18 MAXIMUM-SDF PASS (20260906_101804_cmr_descal_fm64_mat020_gls, tviol=0). paper_eligible=false until curated; no fine 25 MFlit yet."
+    },
+    {
       "run_id": "20260905_203649_cmr_descal_prop1024_gls",
       "design_id": "PROP1024",
       "benchmark_id": null,
@@ -420,6 +431,105 @@
       "config_hash": "793697d37e6e447c258c3299383ade1edf856b6ef6627aadefb04a4b3ea4e9d5",
       "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260905_203649_cmr_descal_prop1024_gls.json",
       "notes": "PROP1024 mixed-delay netlist 20260905_003827_cmr_descal_prop1024 was hashed, but required MAXIMUM-SDF cases are not all clean. Keep paper_eligible=false."
+    },
+    {
+      "run_id": "20260912_205700_cmr_fat_l1_hop_rpsdel050",
+      "design_id": "ASYNC_FAT_1X2",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "badc51e7f73fac4797f376b0340f67627f24f0a65edc6d7db261ae22d1b0c709",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_fat_l1_hop_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_flatmesh_c1p1_rpsdel050",
+      "design_id": "ASYNC_FLATMESH_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "5dfbc38560f754c382ecdb3e27d0ecaa2af1e0ba5111e7a75bbbd7a41c82b410",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_flatmesh_c1p1_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_pfat_l2_c2p4_rpsdel050",
+      "design_id": "ASYNC_PFAT_2X4",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "d74a8a3798eac4858f9728e01473c8df1e1f50f8d7da679c3270417f0c7cf728",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_pfat_l2_c2p4_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_pfat_l3_c4p8_rpsdel050",
+      "design_id": "ASYNC_PFAT_4X8",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "db438a8dceee1f85104c85313e734ffc4a229c13b8977f6b4f3bc5bf1fb4d71e",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_pfat_l3_c4p8_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_primitive_hop_ppa_rpsdel050",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "db43b4bf0744f3ad837d0bce141db58ce4320590b146866058e742e8595b2734",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_primitive_hop_ppa_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 R-U5 MAXIMUM-SDF + PT-PX for all Router primitives. Area is DC cell area. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_prop_2x2_hop_rpsdel050",
+      "design_id": "ASYNC_PROP_2X2",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "4c8ea79ebde55daa52fd41614ee1bb505530ea59265b3eec7f845132debbad68",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_prop_2x2_hop_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_thin_l1_hop_rpsdel050",
+      "design_id": "ASYNC_THIN_1X1",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "3310d14b71e579eadf6b66372ca458344d68343a9a54062df92589b127704516",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_thin_l1_hop_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_205700_cmr_topmesh_c2p2_rpsdel050",
+      "design_id": "ASYNC_TOPMESH_2X2",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": true,
+      "physical_class": "post-synthesis",
+      "config_hash": "31f7981b1c99711fc52de99e2ec192f143c03778af2f7783b30e6cd5f3fa0029",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_205700_cmr_topmesh_c2p2_rpsdel050.json",
+      "notes": "DATE V3 Phase 2 post-synthesis primitive DC + R-U5 hop PPA. No P&R."
+    },
+    {
+      "run_id": "20260912_213500_cmr_primitive_hop_ppa_rpsdel050",
+      "design_id": "ASYNC_ROUTER_PPA_MATRIX",
+      "benchmark_id": "R-U5",
+      "status": "pass",
+      "paper_eligible": false,
+      "physical_class": "post-synthesis",
+      "config_hash": "f3fb403bed14ad5c12076136b43d083bdac807739c6e3eaf378636e07da92dfb",
+      "manifest": "D:/NoC/asynchronous_fat_tree_multicast/DATE paper/experiments/registry/runs/20260912_213500_cmr_primitive_hop_ppa_rpsdel050.json",
+      "notes": "Current rpsdel050 Router PPA: five valid MAXIMUM-SDF + PT-PX rows. Partial matrix; FlatMesh/TopMesh replacements remain absent, so it is not eligible for a complete curated Table I/calibration set."
     },
     {
       "run_id": "cmr_mesh64_current",
@@ -433,15 +543,15 @@
       "notes": "Superseded placeholder. Paper 64-node flat mesh netlist is 20260905_103344_cmr_descal_fm64_mat020. Not a netlist owner."
     },
     {
-      "run_id": "20260905_103344_cmr_descal_fm64_mat020",
-      "design_id": "FM64",
-      "benchmark_id": null,
-      "status": "pass",
+      "run_id": "20260914_emergency_multicast_c1p4",
+      "design_id": "PROP_temp64",
+      "benchmark_id": "MC-REGION-F16",
+      "status": "exploratory_post_synthesis",
       "paper_eligible": false,
-      "physical_class": "post-synthesis",
-      "config_hash": null,
-      "manifest": null,
-      "notes": "Current paper FM64 netlist: AABB RoutingLogic_mesh / Mat-0.20 / RCU 1xDEL150. TOPO-UR coarse 18/18 MAXIMUM-SDF PASS (20260906_101804_cmr_descal_fm64_mat020_gls, tviol=0). paper_eligible=false until curated; no fine 25 MFlit yet."
+      "physical_class": "post-synthesis_MAXIMUM-SDF_PT-PX",
+      "config_hash": "4fa5c8218a1045c26684bf49376aa60b6508bdb61954348b427650143fc2bd29",
+      "manifest": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\registry\\runs\\20260914_emergency_multicast_c1p4.json",
+      "notes": "Link traversals are a packet model estimate, not observed inter-router handshakes; No zero-backlog F16/F32 fanout point in the current half-open window; Low-load finite-window semantics require follow-up"
     }
   ]
 }
