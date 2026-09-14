@@ -1,0 +1,30 @@
+{
+  "batch": "20260914_cmr_multi_lane_agg_r1",
+  "packets": 1000,
+  "jobs": [
+    {
+      "name": "async_c1p1",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_async_c1p1_p1000",
+      "job_id": "12287601",
+      "status": "submitted"
+    },
+    {
+      "name": "async_c1p2",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000",
+      "job_id": "12287701",
+      "status": "submitted"
+    },
+    {
+      "name": "async_c1p4",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_async_c1p4_p1000",
+      "job_id": "12287801",
+      "status": "submitted"
+    },
+    {
+      "name": "sync_c1p4",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_sync_c1p4_p1000",
+      "job_id": "12287901",
+      "status": "submitted"
+    }
+  ]
+}

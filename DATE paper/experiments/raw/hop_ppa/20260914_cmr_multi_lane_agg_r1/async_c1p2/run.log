@@ -1,0 +1,11 @@
+Command: /tmp/cmr_hop_ppa_ghy19/20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000/./simv +RX_CAPTURE_NS=0.09 +TX_SETUP_NS=0.05 +ACK_TO_NEXT_REQ_GUARD_NS=0 +HOP_KIND=async_fat_1x2 +HOP_MODE=multi_lane_agg +MESH=0 +NUM_PACKETS=1000 +EVENT_CSV=/home/ghy19/Asynchronous_Router_CMR/logs/hop_ppa/20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000/gls/hop_events.csv +VCD=/home/ghy19/Asynchronous_Router_CMR/logs/hop_ppa/20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000/gls/hop_ppa.vcd +NO_FULL_VCD -l /home/ghy19/Asynchronous_Router_CMR/logs/hop_ppa/20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000/gls/run.log +no_notifier
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version V-2023.12_Full64; Runtime version V-2023.12_Full64;  Sep 14 13:11 2026
+Doing SDF annotation ...... Done
+AGG_INFO sources=4 packets_per_source=1000 total_flits=20000 parent_lanes=2 tx_setup_ns=0.050 rx_ack_ns=0.090 kind=async_fat_1x2
+PPA_INFO SDF_MAX /home/ghy19/Asynchronous_Router_CMR/outputs/20260912_205700_cmr_fat_l1_hop_rpsdel050/CMRRouter.sdf mode=multi_lane_agg mesh=0
+AGG_RESULT PASS sources=4 packets_per_source=1000 sent=20000 received=20000 parent_lanes=2 first_req_ps=211072 last_req_ps=10879652 span_ns=10668.580 throughput_mflit_s=1874.663732 throughput_gflit_s=1.874664
+PPA_RESULT PASS geometry=async_fat_1x2 mode=multi_lane_agg
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 10885682 ps

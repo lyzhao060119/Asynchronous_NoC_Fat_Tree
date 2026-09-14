@@ -1,0 +1,34 @@
+{
+  "run_id": "20260914_abstract_freeze_m1_m2_m3",
+  "status": "abstract_freeze",
+  "paper_eligible": true,
+  "physical_class": "post-synthesis_MAXIMUM-SDF",
+  "freeze_json": "DATE paper/experiments/curated/abstract_freeze_20260914_m1_m2_m3.json",
+  "m1": {
+    "figure_dir": "DATE paper/experiments/figures/paper64/20260914_092324_asap_uc_m5_800_mesh64_prop_temp64",
+    "prop_peak_mflit_s_per_port": 379.2,
+    "mesh_peak_mflit_s_per_port": 239.0,
+    "improvement_pct": 58.7,
+    "area_overhead_pct": 10.8
+  },
+  "m2": {
+    "raw_dir": "DATE paper/experiments/raw/prop_temp64/20260914_prop_temp64_mc_emergency",
+    "gls_run_id": "20260914_prop_temp64_mc_f16_main",
+    "fanout": 16,
+    "load": 5,
+    "completed": "400/400",
+    "backlog": 0,
+    "native_latency_ns": 9.24,
+    "repeated_latency_ns": 148.602,
+    "reduction_pct": 93.8
+  },
+  "m3": {
+    "raw_dir": "DATE paper/experiments/raw/hop_ppa/20260914_cmr_multi_lane_agg_r1",
+    "batch": "20260914_cmr_multi_lane_agg_r1",
+    "c1p1_gflit_s": 1.197,
+    "c1p2_gflit_s": 1.875,
+    "c1p4_gflit_s": 3.001,
+    "four_lane_scaling_efficiency_pct": 62.7,
+    "sync_c1p4": "omitted_fail"
+  }
+}

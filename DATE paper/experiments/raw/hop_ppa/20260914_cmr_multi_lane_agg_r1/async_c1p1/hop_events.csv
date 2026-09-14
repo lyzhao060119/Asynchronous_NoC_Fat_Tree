@@ -1,0 +1,2 @@
+sources,packets_per_source,sent_flits,received_flits,parent_lanes,first_output_req_ps,last_output_req_ps,span_ns,throughput_mflit_s,throughput_gflit_s,failures
+4,1000,20000,20000,1,210749,16912447,16701.698,1197.483034,1.197483,0

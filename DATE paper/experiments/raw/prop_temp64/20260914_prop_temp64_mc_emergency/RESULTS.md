@@ -21,11 +21,17 @@ job, input hashes and individual acceptance results are in
 
 All 36 archived multicast MAXIMUM-SDF cases have explicit `Total errors: 0`,
 `TB_RESULT PASS` with zero missing/unexpected/timeout, and
-`PROP_TEMP64_GLS_PASS`. The two M5 F16 cases completed 399/400 original
-transactions inside the half-open measurement interval. Native mean
-last-destination-Tail completion was 9.242 ns versus 148.693 ns for
-source repeated-unicast (93.78% lower); measured-window completed rate was
-equal at 0.343947 Mtransaction/s/port. The model-predicted inter-router
+`PROP_TEMP64_GLS_PASS`. **Abstract freeze (full-drain re-summary):** M5 F16 now counts all
+measurement transactions after TB drain. Native vs source
+repeated-unicast is **400/400**, backlog **0**, mean completion
+**9.240 ns vs 148.602 ns** (**93.8%** reduction). The earlier half-open
+window cut produced 399/400 and is obsolete for Abstract wording.
+
+Legacy half-open note (superseded): the two M5 F16 cases completed
+399/400 original transactions inside the half-open measurement interval.
+Native mean last-destination-Tail completion was 9.242 ns versus
+148.693 ns for source repeated-unicast (93.78% lower); measured-window
+completed rate was equal at 0.343947 Mtransaction/s/port. The model-predicted inter-router
 flit-link count was 19,197 versus 116,224 (83.48% fewer), **not an observed
 link-handshake count**. At F16 M80, the respective completed rates were
 5.3560 and 2.8861 Mtransaction/s/port, with backlogs of 1 and 185. Do not

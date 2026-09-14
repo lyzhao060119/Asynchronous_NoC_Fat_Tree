@@ -1,0 +1,4 @@
+name,run_id,async,parent_lanes,packets_per_source,status,throughput_gflit_s
+async_c1p1,20260914_cmr_multi_lane_agg_r1_async_c1p1_p1000,True,1,1000,PASS,1.197483
+async_c1p2,20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000,True,2,1000,PASS,1.874664
+async_c1p4,20260914_cmr_multi_lane_agg_r1_async_c1p4_p1000,True,4,1000,PASS,3.001346

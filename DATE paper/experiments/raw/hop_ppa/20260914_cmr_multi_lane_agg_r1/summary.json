@@ -1,0 +1,38 @@
+{
+  "batch": "20260914_cmr_multi_lane_agg_r1",
+  "packets_per_source": 1000,
+  "rows": [
+    {
+      "name": "async_c1p1",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_async_c1p1_p1000",
+      "async": true,
+      "parent_lanes": 1,
+      "packets_per_source": 1000,
+      "status": "PASS",
+      "throughput_gflit_s": 1.197483
+    },
+    {
+      "name": "async_c1p2",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_async_c1p2_p1000",
+      "async": true,
+      "parent_lanes": 2,
+      "packets_per_source": 1000,
+      "status": "PASS",
+      "throughput_gflit_s": 1.874664
+    },
+    {
+      "name": "async_c1p4",
+      "run_id": "20260914_cmr_multi_lane_agg_r1_async_c1p4_p1000",
+      "async": true,
+      "parent_lanes": 4,
+      "packets_per_source": 1000,
+      "status": "PASS",
+      "throughput_gflit_s": 3.001346
+    }
+  ],
+  "c1p1_gflit_s": 1.197483,
+  "c1p2_gflit_s": 1.874664,
+  "c1p4_gflit_s": 3.001346,
+  "sync_c1p4_gflit_s": null,
+  "four_lane_scaling_efficiency_pct": 62.65946990479196
+}

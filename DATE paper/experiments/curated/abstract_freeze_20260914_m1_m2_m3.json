@@ -1,0 +1,60 @@
+{
+  "freeze_id": "20260914_abstract_m1_m2_m3",
+  "purpose": "DATE Abstract claim freeze for M1 topology, M2 native multicast, M3 multi-lane aggregate",
+  "m1": {
+    "status": "frozen",
+    "prop_peak_throughput_mflit_s_per_port": 379.2,
+    "mesh_peak_throughput_mflit_s_per_port": 239.0,
+    "peak_delivered_throughput_improvement_pct": 58.7,
+    "prop_cell_area": 520533,
+    "mesh_cell_area": 469899,
+    "area_overhead_pct": 10.8,
+    "figure_dir": "DATE paper/experiments/figures/paper64/20260914_092324_asap_uc_m5_800_mesh64_prop_temp64",
+    "netlists": {
+      "mesh64": "20260913_104506_cmr_fm64_rpsdel150",
+      "prop_temp64": "20260913_prop_temp64_asap_uc_m5_200"
+    }
+  },
+  "m2": {
+    "status": "frozen_full_drain",
+    "fanout": 16,
+    "load": 5,
+    "measurement_transactions": 400,
+    "completed": 400,
+    "backlog": 0,
+    "native_mean_completion_latency_ns": 9.24,
+    "repeated_mean_completion_latency_ns": 148.602,
+    "latency_reduction_pct": 93.8,
+    "trace_sha256": "0e608d47443eea5143193cb974979f495e3abcfdfff4ccee88b3bb7102761b7e",
+    "gls_run_id": "20260914_prop_temp64_mc_f16_main",
+    "netlist": "20260913_prop_temp64_asap_uc_m5_200",
+    "note": "Re-summarized existing MAXIMUM-SDF GLS with full-drain completion (no half-open window cut)."
+  },
+  "m3": {
+    "status": "frozen_async",
+    "batch": "20260914_cmr_multi_lane_agg_r1",
+    "sources": 4,
+    "packets_per_source": 1000,
+    "flits_per_packet": 5,
+    "async_c1p1_aggregate_gflit_s": 1.197,
+    "async_c1p2_aggregate_gflit_s": 1.875,
+    "async_c1p4_aggregate_gflit_s": 3.001,
+    "four_lane_scaling_efficiency_pct": 62.7,
+    "netlists": {
+      "async_c1p1": "20260912_205700_cmr_thin_l1_hop_rpsdel050",
+      "async_c1p2": "20260912_205700_cmr_fat_l1_hop_rpsdel050",
+      "async_c1p4": "20260914_cmr_prop_temp_c1p4_rpsdel050_r1"
+    },
+    "sync_c1p4": {
+      "attempted": true,
+      "netlist": "20260914_cmr_sync_prop_temp_c1p4_1p0ns",
+      "status": "FAIL",
+      "note": "Near end-of-run data/order mismatch; omitted from Abstract."
+    }
+  },
+  "abstract_sentences": [
+    "The 64-node network achieves 379.2 Mflit/s/port peak delivered throughput, 58.7% higher than an identically evaluated flat-mesh baseline, with 10.8% cell-area overhead.",
+    "For fanout-16 communication, native multicast reduces mean completion latency by 93.8% over source repeated unicast.",
+    "A representative c1p4 router achieves 3.00 Gflit/s aggregate throughput with 62.7% four-lane scaling efficiency."
+  ]
+}
