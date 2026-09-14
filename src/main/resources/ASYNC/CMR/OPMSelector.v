@@ -50,6 +50,17 @@ module OPMSelector #(
         for (port = 0; port < PORTS; port = port + 1) begin : selector
             wire BlockSet;
             wire SetQual = RouteSel[port] & ~BlockSet;
+            wire TailPassedPathRelease;
+
+            // Keep the packet path live through the Adapter's Ack-return
+            // interval.  BlockLatch below still sees the raw TailPassed
+            // immediately, so a stale RouteSel cannot reopen the path.
+            // Only the PathLatch clear is delayed; request-side route setup
+            // remains untouched.
+            DelayElement #(.DelayValue(1), .DelayUnitPs(75)) TailReleaseDelay (
+                .I(TailPassed[port]),
+                .Z(TailPassedPathRelease)
+            );
 
             SRLatch BlockLatch (
                 .reset(reset),
@@ -60,7 +71,7 @@ module OPMSelector #(
             SRLatch PathLatch (
                 .reset(reset),
                 .S(SetQual),
-                .R(TailPassed[port]),
+                .R(TailPassedPathRelease),
                 .Q(PathEnabled[port])
             );
         end

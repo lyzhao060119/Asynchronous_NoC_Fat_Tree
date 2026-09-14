@@ -108,7 +108,7 @@ class CMRRouter(
         ipm.io.Ackin(branch) := OutputPortModules(output).io.Ackout(source)
         ipm.io.TailPassed(branch) := OutputPortModules(output).io.TailPassed(source)
       } else {
-        val selector = Module(new LaneSelectorSRLatch(laneCount))
+        val selector = Module(new LaneSelector(laneCount))
         selector.io.reset := reset.asBool
         selector.io.PPE := ipm.io.PathEnabled(branch)
         val held = VecInit(selector.io.LaneSelect.asBools)
@@ -210,6 +210,7 @@ object CMRPrimitiveMatrixEmitMain extends App {
     (2, 1, 1, false, 8),
     (3, 1, 1, false, 8),
     (1, 1, 2, false, 8),
+    (1, 1, 4, false, 8),
     (2, 2, 2, false, 8),
     (3, 2, 2, false, 8),
     (2, 2, 4, false, 8),

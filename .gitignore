@@ -136,3 +136,5 @@ __pycache__/
 *.oas
 *.ndm/
 project/
+scripts/asic_dc/cmr/generated_cases
+scripts/asic_dc/cmr/generated_cases/20260912_paper64_m100_900_202701

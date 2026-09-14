@@ -1,0 +1,33 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "HOTSPOT10",
+  "title": "64-node Hotspot10 unicast traffic",
+  "traffic": "hotspot10",
+  "packet_flits": 5,
+  "multicast": false,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": null,
+  "spread_S": null,
+  "multicast_fraction": 0.0,
+  "destination_set_samples": null,
+  "warmup_original_events": 1000,
+  "measurement_original_events": 10000,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": false,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [5, 10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 600, 700, 800],
+    "saturation_rule": "near-lossless iff measurement delivery ratio >= 0.99 and measurement backlog <= 5 flits"
+  },
+  "metrics": ["offered_throughput", "delivered_throughput", "measurement_delivery_ratio", "measurement_backlog", "mean_latency", "p95_latency", "p99_latency"],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": ["PROP_temp64", "FM64"],
+  "paper_figures": ["Fig. B"],
+  "notes": "Continuous-Time Replication definition: PE27/28/35/36 each has destination weight 1.10 versus 1.00 for every other PE; remove src==dst then renormalize. This is not a 10-percent aggregate-hotspot mixture.",
+  "display_name": "Hotspot10",
+  "display_description": "Uniform-like unicast with the middle four routers weighted 10 percent higher as destinations."
+}

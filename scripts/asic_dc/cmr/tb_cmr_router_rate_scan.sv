@@ -113,7 +113,9 @@ module tb_cmr_router_rate_scan;
 wire [1:0] probe_adapt0_ls = dut.adapter.LaneSelect;
 wire [1:0] probe_adapt0_opmack = dut.adapter.OPMAckOut;
 wire [1:0] probe_adapt0_opmreq = dut.adapter.OPMReqIn;
-wire probe_adapt0_rawen = dut.adapter.IPMAckInFireChosenRaw;
+// The current adapter has a single shared acknowledgement arm.  Keep the
+// probe aligned with the implementation; the former per-lane AwaitAckLane
+// state no longer exists.
 wire probe_adapt0_await = dut.adapter.AwaitAck;
 wire probe_adapt0_en = dut.adapter.IPMAckInFireChosen;
 wire probe_adapt0_ipmack = dut.adapter.IPMAckIn;
@@ -167,9 +169,17 @@ wire [1:0] probe_adapt0_ipmreq = dut.adapter.IPMReqOut;
  wire [27:0] probe_c1_ipm0_dataout1 = dut.InputPortModules_0.io_Dataout_1_flit;
  wire [27:0] probe_c1_ipm0_dataout2 = dut.InputPortModules_0.io_Dataout_2_flit;
  wire [27:0] probe_c1_ipm0_dataout3 = dut.InputPortModules_0.io_Dataout_3_flit;
+ // First M100 mismatch is source-0 emitted on parent egress port 4.  Watch
+ // the exact IPM0 branch-3 -> adapter -> OPM4/source-0 boundary, rather than
+ // inferring it from another input or another parent lane.
+ wire probe_c1_ipm0_reqout3 = dut.InputPortModules_0.io_Reqout_3;
+ wire probe_c1_ipm0_ackin3 = dut.InputPortModules_0.io_Ackin_3;
+ wire probe_c1_ipm0_path3 = dut.InputPortModules_0.io_PathEnabled_3;
  // Buffer-state cut for the M600 repeated-header localization.  These are
  // observation-only probes: they neither alter the frozen DUT nor its SDF.
  wire [4:0] probe_c1_ipm0_writeptr = {dut.InputPortModules_0.Buffer.WriteInterface.io_WritePointer_4,dut.InputPortModules_0.Buffer.WriteInterface.io_WritePointer_3,dut.InputPortModules_0.Buffer.WriteInterface.io_WritePointer_2,dut.InputPortModules_0.Buffer.WriteInterface.io_WritePointer_1,dut.InputPortModules_0.Buffer.WriteInterface.io_WritePointer_0};
+ wire probe_c1_ipm0_w_reqin = dut.InputPortModules_0.Buffer.WriteInterface.Counter.Reqin;
+ wire probe_c1_ipm0_w_ackout = dut.InputPortModules_0.Buffer.WriteInterface.Counter.Ackout;
  wire [4:0] probe_c1_ipm0_readptr3 = dut.InputPortModules_0.Buffer.ReadInterface_3.Counter_ReadPointer;
  wire probe_c1_ipm0_r3_reqx = dut.InputPortModules_0.Buffer.ReadInterface_3.Counter.ReqX;
  wire probe_c1_ipm0_r3_ackx = dut.InputPortModules_0.Buffer.ReadInterface_3.Counter.AckX;
@@ -204,6 +214,14 @@ wire [3:0] probe_c1_opm5_tailpassed = {dut.OutputPortModules_5.io_TailPassed_3,d
  wire probe_c1_opm5_reqout = dut.OutputPortModules_5.io_Reqout;
  wire probe_c1_opm5_ackin = dut.OutputPortModules_5.io_Ackin;
  wire [27:0] probe_c1_opm5_dataout = dut.OutputPortModules_5.io_Dataout_flit;
+ wire probe_c1_opm4_reqin0 = dut.OutputPortModules_4.io_Reqin_0;
+ wire probe_c1_opm4_ackout0 = dut.OutputPortModules_4.io_Ackout_0;
+ wire probe_c1_opm4_grant0 = dut.OutputPortModules_4.io_Grant_0;
+ wire probe_c1_opm4_ppe0 = dut.OutputPortModules_4.io_PktPathEnable_0;
+ wire [27:0] probe_c1_opm4_datain0 = dut.OutputPortModules_4.io_Datain_0_flit;
+ wire probe_c1_opm4_reqout = dut.OutputPortModules_4.io_Reqout;
+ wire probe_c1_opm4_ackin = dut.OutputPortModules_4.io_Ackin;
+ wire [27:0] probe_c1_opm4_dataout = dut.OutputPortModules_4.io_Dataout_flit;
  // OPM input-0 capture and output-latch chain.  These prove whether an
  // input phase, its latch, or the output latch first changes.
 wire probe_c1_opm5_l1_0_en = dut.OutputPortModules_5.L1_L4_0.en;
@@ -257,13 +275,65 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
  wire [1:0] probe_c1_sel1_ls = dut.selector_1.LaneSelect;
  wire [1:0] probe_c1_sel3_ls = dut.selector_3.LaneSelect;
  wire [4:0] probe_c1_opm3_ppe = {dut.OutputPortModules_3.io_PktPathEnable_4,dut.OutputPortModules_3.io_PktPathEnable_3,dut.OutputPortModules_3.io_PktPathEnable_2,dut.OutputPortModules_3.io_PktPathEnable_1,dut.OutputPortModules_3.io_PktPathEnable_0};
- wire [4:0] probe_c1_opm3_grant = {dut.OutputPortModules_3.io_Grant_4,dut.OutputPortModules_3.io_Grant_3,dut.OutputPortModules_3.io_Grant_2,dut.OutputPortModules_3.io_Grant_1,dut.OutputPortModules_3.io_Grant_0};
+  wire [4:0] probe_c1_opm3_grant = {dut.OutputPortModules_3.io_Grant_4,dut.OutputPortModules_3.io_Grant_3,dut.OutputPortModules_3.io_Grant_2,dut.OutputPortModules_3.io_Grant_1,dut.OutputPortModules_3.io_Grant_0};
+  wire [4:0] probe_c1_opm3_reqin = {dut.OutputPortModules_3.io_Reqin_4,dut.OutputPortModules_3.io_Reqin_3,dut.OutputPortModules_3.io_Reqin_2,dut.OutputPortModules_3.io_Reqin_1,dut.OutputPortModules_3.io_Reqin_0};
+  wire [4:0] probe_c1_opm3_ackout = {dut.OutputPortModules_3.io_Ackout_4,dut.OutputPortModules_3.io_Ackout_3,dut.OutputPortModules_3.io_Ackout_2,dut.OutputPortModules_3.io_Ackout_1,dut.OutputPortModules_3.io_Ackout_0};
+  wire [27:0] probe_c1_opm3_datain0 = dut.OutputPortModules_3.io_Datain_0_flit;
+  wire [27:0] probe_c1_opm3_datain1 = dut.OutputPortModules_3.io_Datain_1_flit;
+  wire [27:0] probe_c1_opm3_datain2 = dut.OutputPortModules_3.io_Datain_2_flit;
+  wire [27:0] probe_c1_opm3_datain3 = dut.OutputPortModules_3.io_Datain_3_flit;
+  wire [27:0] probe_c1_opm3_datain4 = dut.OutputPortModules_3.io_Datain_4_flit;
  wire [27:0] probe_c1_opm3_dataout = dut.OutputPortModules_3.io_Dataout_flit;
  wire probe_c1_opm3_reqout = dut.OutputPortModules_3.io_Reqout;
+ wire probe_c1_opm3_ackin = dut.OutputPortModules_3.io_Ackin;
+  // C1P2 has four adapters named adapter / adapter_1..3.  The restored
+  // adapter has one pending Ack state per IPM branch, not one state per lane.
+ wire [1:0] probe_adapter0_lane_select = dut.adapter.LaneSelect;
+ wire [1:0] probe_adapter0_ipm_reqout = dut.adapter.IPMReqOut;
+  wire       probe_adapter0_await = dut.adapter.AwaitAck;
+ wire [1:0] probe_adapter0_req_toggle_en = dut.adapter.OPMReqInFire;
+ wire       probe_adapter0_ack_toggle_en = dut.adapter.IPMAckInFireChosen;
+ wire       probe_adapter0_ipm_ackin = dut.adapter.IPMAckIn;
+ wire [1:0] probe_adapter0_opm_reqin = dut.adapter.OPMReqIn;
+ wire [1:0] probe_adapter0_opm_ackout = dut.adapter.OPMAckOut;
+ wire [1:0] probe_adapter0_selected_mismatch =
+   probe_adapter0_lane_select & (probe_adapter0_opm_reqin ^ probe_adapter0_opm_ackout);
+ wire probe_adapter0_source_pending = probe_adapter0_ipm_reqout[0] ^ probe_adapter0_ipm_ackin;
+ // Selector-0 cut: raw availability and arbitration state in the frozen
+ // netlist.  This netlist predates the DFF selector and contains only the
+ // LaneSelectorSRLatch combinational request equation.
+ wire [1:0] probe_c1_sel0_empty = dut.selector.LaneIsEmpty;
+ wire       probe_c1_sel0_ppe = dut.selector.PPE;
+ wire [1:0] probe_c1_sel0_mutex_req = dut.selector.mutex_input_requests;
+ wire [1:0] probe_c1_sel0_mutex_gnt = dut.selector.mutex_in.grant;
+ wire [1:0] probe_adapter1_lane_select = dut.adapter_1.LaneSelect;
+ wire [1:0] probe_adapter1_ipm_reqout = dut.adapter_1.IPMReqOut;
+  wire       probe_adapter1_await = dut.adapter_1.AwaitAck;
+ wire [1:0] probe_adapter1_req_toggle_en = dut.adapter_1.OPMReqInFire;
+ wire       probe_adapter1_ack_toggle_en = dut.adapter_1.IPMAckInFireChosen;
+ wire       probe_adapter1_ipm_ackin = dut.adapter_1.IPMAckIn;
+ wire [1:0] probe_adapter1_opm_reqin = dut.adapter_1.OPMReqIn;
+ wire [1:0] probe_adapter1_opm_ackout = dut.adapter_1.OPMAckOut;
+ wire [1:0] probe_adapter2_lane_select = dut.adapter_2.LaneSelect;
+ wire [1:0] probe_adapter2_ipm_reqout = dut.adapter_2.IPMReqOut;
+  wire       probe_adapter2_await = dut.adapter_2.AwaitAck;
+ wire [1:0] probe_adapter2_req_toggle_en = dut.adapter_2.OPMReqInFire;
+ wire       probe_adapter2_ack_toggle_en = dut.adapter_2.IPMAckInFireChosen;
+ wire       probe_adapter2_ipm_ackin = dut.adapter_2.IPMAckIn;
+ wire [1:0] probe_adapter2_opm_reqin = dut.adapter_2.OPMReqIn;
+ wire [1:0] probe_adapter2_opm_ackout = dut.adapter_2.OPMAckOut;
+ wire [1:0] probe_adapter3_lane_select = dut.adapter_3.LaneSelect;
+ wire [1:0] probe_adapter3_ipm_reqout = dut.adapter_3.IPMReqOut;
+  wire       probe_adapter3_await = dut.adapter_3.AwaitAck;
+ wire [1:0] probe_adapter3_req_toggle_en = dut.adapter_3.OPMReqInFire;
+ wire       probe_adapter3_ack_toggle_en = dut.adapter_3.IPMAckInFireChosen;
+ wire       probe_adapter3_ipm_ackin = dut.adapter_3.IPMAckIn;
+ wire [1:0] probe_adapter3_opm_reqin = dut.adapter_3.OPMReqIn;
+ wire [1:0] probe_adapter3_opm_ackout = dut.adapter_3.OPMAckOut;
 `endif
  integer rate=100, gap_ps, failures=0, sent=0, got=0, seed=202701, traffic_mc=0;
  integer src_seed[0:3];
- real lambda_pkt_ns, case_tick_ns, tx_setup_ns;
+ real lambda_flit_ns, case_tick_ns, tx_setup_ns;
  integer first_mismatch_reported=0;
  integer expect_phase[0:3], expect_pkt[0:3], egress_seed[0:N-1];
  integer mc_active_lane[0:3];
@@ -295,11 +365,28 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
    end
  endfunction
  task automatic bad(input string s); begin failures=failures+1; $display("TB_RESULT FAIL %s t=%0t",s,$time); end endtask
- // Paper header inter-arrival: Exp(lambda), lambda = MFlit/s / flits / 1e3
- // packets/ns.  Inverse-CDF with a portable ln; per-source LCG streams.
+// Packet-start Poisson injection.  The exponential gap is sampled only before
+// a Header; Body/Tail follow their completed predecessor immediately.  This
+// preserves the asynchronous exponential arrival process without inserting
+// artificial bubbles inside one wormhole packet.
  function automatic integer seed_mix(input integer base, input integer part);
-   seed_mix = (base * 1664525 + 1013904223 + part);
- endfunction
+   reg [31:0] x;
+   begin
+    // Do not use adjacent seeds with $random: its first samples are then
+    // correlated and can turn independent sources into a synchronous burst.
+    // This avalanche mix derives a reproducible but decorrelated state per
+    // source before that source's independent $random(state) stream begins.
+    x = base;
+    x = x ^ (32'h9e3779b9 * (part + 1));
+    x = x ^ (x >> 16);
+    x = x * 32'h85ebca6b;
+    x = x ^ (x >> 13);
+    x = x * 32'hc2b2ae35;
+    x = x ^ (x >> 16);
+    if (x == 0) x = 32'h1;
+    seed_mix = x;
+   end
+  endfunction
  function automatic real ln_pos(input real x);
    real y, z, z2, acc;
    integer k;
@@ -325,49 +412,44 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
    begin
     u = ($random(rng) & 32'h7fffffff);
     if (u <= 0) u = 1;
-    gap_ns = -ln_pos(real'(u) / 2147483648.0) / lambda_pkt_ns;
+    gap_ns = -ln_pos(real'(u) / 2147483648.0) / lambda_flit_ns;
     expo_gap_ps = integer'(gap_ns * 1000.0 + 0.5);
     if (expo_gap_ps < 1) expo_gap_ps = 1;
    end
  endfunction
- task automatic send(input integer port,input integer src,input integer pkt,input bit mc);
-  integer q; real due; begin
-   due=$realtime;
+ task automatic send(input integer port,input integer src,input integer pkt,input bit mc,inout integer rng);
+  integer q,g; real due; begin
+   g=expo_gap_ps(rng);
+   due=$realtime+real'(g)/1000.0;
+   if(pkt==0) $display("TB_PACKET_GAP src=%0d pkt=%0d gap_ps=%0d due_ns=%0.3f now_ns=%0.3f",src,pkt,g,due,$realtime);
+   if($realtime<due) #(due-$realtime);
    for(q=0;q<FLITS;q=q+1) begin
-    if($realtime<due) #(due-$realtime);
     if(pkt==0) $display("TB_FLIT src=%0d pkt=%0d flit=%0d t=%0t",src,pkt,q,$time);
     tb_in_data[port*W+:W]=f(q==0,q==FLITS-1,src,pkt,q,mc);
+    if (src==0 && pkt==3)
+      $display("TB_SRC0_PKT3_OFFER flit=%0d data=%h in_req=%b in_ack=%b t=%0t",q,tb_in_data[port*W+:W],tb_in_req[port],tb_in_ack[port],$time);
     #(tx_setup_ns);
     tb_in_req[port]=~tb_in_req[port];
     wait(tb_in_req[port]===tb_in_ack[port]);
-    due=due+case_tick_ns;
+    if (src==0 && pkt==3)
+      $display("TB_SRC0_PKT3_ACCEPT flit=%0d data=%h in_req=%b in_ack=%b t=%0t",q,tb_in_data[port*W+:W],tb_in_req[port],tb_in_ack[port],$time);
    end
   end
  endtask
  task automatic usrc(input integer src);
-  integer k,g,rng; real next_header; begin
+  integer k,rng; begin
    rng=src_seed[src];
-   next_header=$realtime;
    for(k=0;k<PKTS;k=k+1) begin
-    g=expo_gap_ps(rng);
-    next_header=next_header+real'(g)/1000.0;
-    if (k < 3) $display("TB_GAP src=%0d pkt=%0d gap_ps=%0d due_ns=%0.3f now_ns=%0.3f", src, k, g, next_header, $realtime);
-    if($realtime<next_header) #(next_header-$realtime);
-    send(src*C,src,k,0); sent=sent+1;
+    send(src*C,src,k,0,rng); sent=sent+1;
    end
    src_seed[src]=rng;
   end
  endtask
  task automatic msrc;
-  integer k,g,rng; real next_header; begin
+  integer k,rng; begin
    rng=src_seed[0];
-   next_header=$realtime;
    for(k=0;k<PKTS;k=k+1) begin
-    g=expo_gap_ps(rng);
-    next_header=next_header+real'(g)/1000.0;
-    if (k < 3) $display("TB_GAP src=parent pkt=%0d gap_ps=%0d due_ns=%0.3f now_ns=%0.3f", k, g, next_header, $realtime);
-    if($realtime<next_header) #(next_header-$realtime);
-    send(4*C,0,k,1); sent=sent+1;
+    send(4*C,0,k,1,rng); sent=sent+1;
    end
    src_seed[0]=rng;
   end
@@ -398,6 +480,12 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
         $display("TB_FIRST_MISMATCH port=%0d actual=%h expected=%h src=%0d pkt=%0d phase=%0d actual_h=%b actual_t=%b actual_tag_pkt=%0d actual_tag_flit=%0d actual_tag_magic=%b in_req=%b in_ack=%b out_req=%b out_ack=%b t=%0t",
           p,v,f(ph==0,ph==4,src,pk,ph,traffic_mc),src,pk,ph,v[27],v[26],v[25:12],v[11:9],v[8:6],tb_in_req,tb_in_ack,tb_out_req,tb_out_ack,$time);
 `ifdef GEOM_C1_P2
+        $display("SRC0_PORT4_SNAP ipm0[dout3=%h req3=%b ack3=%b path3=%b] a0[ls=%b await=%b reqfire=%b ackfire=%b ipmreq=%b ipmack=%b opmreq=%b opmack=%b] opm4[din0=%h req0=%b ack0=%b ppe0=%b grant0=%b dout=%h reqout=%b ackin=%b] t=%0t",
+          probe_c1_ipm0_dataout3,probe_c1_ipm0_reqout3,probe_c1_ipm0_ackin3,probe_c1_ipm0_path3,
+          probe_adapter0_lane_select,probe_adapter0_await,probe_adapter0_req_toggle_en,probe_adapter0_ack_toggle_en,
+          probe_adapter0_ipm_reqout,probe_adapter0_ipm_ackin,probe_adapter0_opm_reqin,probe_adapter0_opm_ackout,
+          probe_c1_opm4_datain0,probe_c1_opm4_reqin0,probe_c1_opm4_ackout0,probe_c1_opm4_ppe0,probe_c1_opm4_grant0,
+          probe_c1_opm4_dataout,probe_c1_opm4_reqout,probe_c1_opm4_ackin,$time);
         $display("PPE_SNAP ipm2_path=%b mat=%b rs=%b en=%b dest=%h reqrc=%b reqout=%b ackin=%b sel_ppe=%b sel_q=%b opm3_ppe=%b opm3_gnt=%b opm3_req=%b opm3_data=%h dout0=%h dout1=%h dout2=%h dout3=%h t=%0t",
           probe_c1_ipm2_path,probe_c1_ipm2_mat,probe_c1_ipm2_routesel,probe_c1_ipm2_en,probe_c1_ipm2_dest,probe_c1_ipm2_reqrc,probe_c1_ipm2_reqout,probe_c1_ipm2_ackin,probe_c1_sel2_ppe,probe_c1_sel2_q,probe_c1_opm3_ppe,probe_c1_opm3_grant,probe_c1_opm3_reqout,probe_c1_opm3_dataout,probe_c1_ipm2_dout0,probe_c1_ipm2_dout1,probe_c1_ipm2_dout2,probe_c1_ipm2_dout3,$time);
         $display("SEL_SNAP sel2_ppe=%b empty=%b ls=%b q=%b mreq=%b mgnt=%b nreq=%b ngnt=%b s=%b r=%b sel0_ls=%b sel1_ls=%b sel3_ls=%b t=%0t",
@@ -442,17 +530,111 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
         probe_c1_sel2_mutex_req, probe_c1_sel2_mutex_gnt, probe_c1_sel2_s, probe_c1_sel2_r);
   end
  end
+ // IPM2 -> OPM3 link watch.  Fires on any LaneSelect edge or Ack-Toggle
+ // event on the four C1P2 adapters and dumps both ends of the two-phase
+ // handshake, so a lost flit is traceable to the exact toggle that ate it.
+ integer link_wave_printed=0;
+ always @(probe_adapter0_lane_select or probe_adapter1_lane_select
+          or probe_adapter2_lane_select or probe_adapter3_lane_select
+          or probe_adapter0_ack_toggle_en or probe_adapter1_ack_toggle_en
+          or probe_adapter2_ack_toggle_en or probe_adapter3_ack_toggle_en
+          or probe_adapter0_ipm_ackin or probe_adapter1_ipm_ackin
+          or probe_adapter2_ipm_ackin or probe_adapter3_ipm_ackin
+          or probe_c1_ipm2_reqin or probe_c1_ipm2_ackout) begin
+  if (running && link_wave_printed < 400) begin
+    link_wave_printed = link_wave_printed + 1;
+    $display("LINK_WAVE t=%0t ipm2_reqin=%b ipm2_ackout=%b ipm2_reqout=%b ipm2_ackin=%b ipm2_dout={%h,%h,%h,%h} opm3_reqin=%b opm3_ackout=%b opm3_din={%h,%h,%h,%h,%h} opm3_reqout=%b opm3_ackin=%b a0[ls=%b rqo=%b await=%b ren=%b aen=%b ack=%b orq=%b oak=%b] a1[ls=%b rqo=%b await=%b ren=%b aen=%b ack=%b orq=%b oak=%b] a2[ls=%b rqo=%b await=%b ren=%b aen=%b ack=%b orq=%b oak=%b] a3[ls=%b rqo=%b await=%b ren=%b aen=%b ack=%b orq=%b oak=%b]",
+      $time, probe_c1_ipm2_reqin, probe_c1_ipm2_ackout, probe_c1_ipm2_reqout, probe_c1_ipm2_ackin,
+      probe_c1_ipm2_dout0, probe_c1_ipm2_dout1, probe_c1_ipm2_dout2, probe_c1_ipm2_dout3,
+      probe_c1_opm3_reqin, probe_c1_opm3_ackout, probe_c1_opm3_datain0, probe_c1_opm3_datain1, probe_c1_opm3_datain2, probe_c1_opm3_datain3, probe_c1_opm3_datain4, probe_c1_opm3_reqout, probe_c1_opm3_ackin,
+      probe_adapter0_lane_select, probe_adapter0_ipm_reqout, probe_adapter0_await,
+      probe_adapter0_req_toggle_en, probe_adapter0_ack_toggle_en, probe_adapter0_ipm_ackin,
+      probe_adapter0_opm_reqin, probe_adapter0_opm_ackout,
+      probe_adapter1_lane_select, probe_adapter1_ipm_reqout, probe_adapter1_await,
+      probe_adapter1_req_toggle_en, probe_adapter1_ack_toggle_en, probe_adapter1_ipm_ackin,
+      probe_adapter1_opm_reqin, probe_adapter1_opm_ackout,
+      probe_adapter2_lane_select, probe_adapter2_ipm_reqout, probe_adapter2_await,
+      probe_adapter2_req_toggle_en, probe_adapter2_ack_toggle_en, probe_adapter2_ipm_ackin,
+      probe_adapter2_opm_reqin, probe_adapter2_opm_ackout,
+      probe_adapter3_lane_select, probe_adapter3_ipm_reqout, probe_adapter3_await,
+       probe_adapter3_req_toggle_en, probe_adapter3_ack_toggle_en, probe_adapter3_ipm_ackin,
+       probe_adapter3_opm_reqin, probe_adapter3_opm_ackout);
+  end
+ end
+ // Bounded, direct trace of the failing source-0 parent-lane-0 chain.  The
+ // packet identity is carried in every body/tail payload, so this lets the
+ // next SDF run establish which endpoint first loses the Header phase.
+ integer src0_port4_wave_printed=0;
+ always @(probe_c1_ipm0_dataout3 or probe_c1_ipm0_reqout3 or probe_c1_ipm0_ackin3
+          or probe_c1_ipm0_path3 or probe_adapter0_lane_select or probe_adapter0_await
+          or probe_adapter0_req_toggle_en or probe_adapter0_ack_toggle_en
+          or probe_adapter0_ipm_ackin or probe_adapter0_opm_reqin
+          or probe_adapter0_opm_ackout or probe_c1_opm4_datain0
+          or probe_c1_opm4_reqin0 or probe_c1_opm4_ackout0 or probe_c1_opm4_grant0
+          or probe_c1_opm4_ppe0 or probe_c1_opm4_dataout or probe_c1_opm4_reqout
+          or probe_c1_opm4_ackin or probe_c1_ipm0_reqin or probe_c1_ipm0_ackout
+          or probe_c1_ipm0_w_reqin or probe_c1_ipm0_w_ackout or probe_c1_ipm0_writeptr
+          or probe_c1_ipm0_readptr3 or probe_c1_ipm0_r3_reqx or probe_c1_ipm0_r3_ackx
+          or probe_c1_ipm0_r3_cellreq or probe_c1_ipm0_r3_cellempty or probe_c1_ipm0_r3_cellfull) begin
+   // Module time unit is ns; %t renders ps in the log.  The frozen independent
+   // RNG run first mismatches at 371 ns; retain the preceding packet window.
+   if (running && $time >= 330 && $time <= 390 && src0_port4_wave_printed < 500) begin
+     src0_port4_wave_printed = src0_port4_wave_printed + 1;
+     $display("SRC0_PORT4_WAVE t=%0t ipm0[inr=%b ina=%b wd=%h wr=%b wa=%b wp=%b rp3=%b rx=%b ax=%b cr=%b ce=%b cf=%b d=%h r=%b a=%b p=%b] a0[ls=%b aw=%b rf=%b af=%b ir=%b ia=%b or=%b oa=%b] opm4[di=%h ri=%b ao=%b pe=%b g=%b do=%h ro=%b ai=%b]",
+       $time, probe_c1_ipm0_reqin, probe_c1_ipm0_ackout, probe_c1_ipm0_datain,
+       probe_c1_ipm0_w_reqin, probe_c1_ipm0_w_ackout, probe_c1_ipm0_writeptr,
+       probe_c1_ipm0_readptr3, probe_c1_ipm0_r3_reqx, probe_c1_ipm0_r3_ackx,
+       probe_c1_ipm0_r3_cellreq, probe_c1_ipm0_r3_cellempty, probe_c1_ipm0_r3_cellfull,
+       probe_c1_ipm0_dataout3, probe_c1_ipm0_reqout3, probe_c1_ipm0_ackin3, probe_c1_ipm0_path3,
+       probe_adapter0_lane_select, probe_adapter0_await, probe_adapter0_req_toggle_en, probe_adapter0_ack_toggle_en,
+       probe_adapter0_ipm_reqout, probe_adapter0_ipm_ackin, probe_adapter0_opm_reqin, probe_adapter0_opm_ackout,
+       probe_c1_opm4_datain0, probe_c1_opm4_reqin0, probe_c1_opm4_ackout0, probe_c1_opm4_ppe0, probe_c1_opm4_grant0,
+       probe_c1_opm4_dataout, probe_c1_opm4_reqout, probe_c1_opm4_ackin);
+   end
+ end
+ // Transaction-level adapter output trace.  Unlike the broad chain wave,
+ // this fires only when the adapter's physical Req/Ack pair changes, making
+ // it possible to find the transaction that was already outstanding before
+ // the first missing Header window.
+ integer adapter0_opm_event_printed=0;
+ always @(probe_adapter0_opm_reqin or probe_adapter0_opm_ackout) begin
+   if (running && $time <= 360 && adapter0_opm_event_printed < 240) begin
+     adapter0_opm_event_printed = adapter0_opm_event_printed + 1;
+     $display("ADAPTER0_OPM_EVENT t=%0t ls=%b ipmr=%b ipma=%b srcpend=%b fire=%b await=%b selmis=%b opmr=%b opma=%b ipmd3=%h opm4di=%h opm4ri=%b opm4ao=%b",
+       $time, probe_adapter0_lane_select, probe_adapter0_ipm_reqout,
+       probe_adapter0_ipm_ackin, probe_adapter0_source_pending,
+       probe_adapter0_req_toggle_en, probe_adapter0_await,
+       probe_adapter0_selected_mismatch, probe_adapter0_opm_reqin,
+       probe_adapter0_opm_ackout, probe_c1_ipm0_dataout3,
+       probe_c1_opm4_datain0, probe_c1_opm4_reqin0, probe_c1_opm4_ackout0);
+   end
+ end
+ // Capture the exact selector state around packet-2 Header.  The frozen
+ // netlist has no hold DFF: request directly follows PPE & (Select | Empty).
+ integer selector0_wave_printed=0;
+ always @(probe_c1_sel0_empty or probe_c1_sel0_ppe
+          or probe_c1_sel0_mutex_req or probe_c1_sel0_mutex_gnt
+          or probe_adapter0_lane_select or probe_adapter0_opm_reqin
+          or probe_adapter0_opm_ackout) begin
+   if (running && $time >= 315 && $time <= 355 && selector0_wave_printed < 320) begin
+     selector0_wave_printed = selector0_wave_printed + 1;
+     $display("SELECTOR0_WAVE t=%0t empty=%b ppe=%b mreq=%b mgnt=%b ls=%b opmr=%b opma=%b",
+       $time, probe_c1_sel0_empty, probe_c1_sel0_ppe,
+       probe_c1_sel0_mutex_req, probe_c1_sel0_mutex_gnt,
+       probe_adapter0_lane_select, probe_adapter0_opm_reqin, probe_adapter0_opm_ackout);
+   end
+ end
 `elsif GEOM_C1_P1
  CMRRouter dut (`include "async_ports_c1_p1.vi");
 `else
  CMRRouter dut (`include "async_ports_c2_p2.vi");
  always @(probe_adapt0_ls or probe_adapt0_opmack or probe_adapt0_opmreq
-          or probe_adapt0_rawen or probe_adapt0_await or probe_adapt0_en
+          or probe_adapt0_await or probe_adapt0_en
           or probe_adapt0_ipmack or probe_adapt0_ipmreq) begin
   if (running && $time >= 740 && $time <= 820)
-    $display("ACK0_WAVE t=%0t ls=%b opmack=%b opmreq=%b raw=%b await=%b en=%b ipmack=%b ipmreq=%b",
+    $display("ACK0_WAVE t=%0t ls=%b opmack=%b opmreq=%b await=%b en=%b ipmack=%b ipmreq=%b",
       $time, probe_adapt0_ls, probe_adapt0_opmack, probe_adapt0_opmreq,
-      probe_adapt0_rawen, probe_adapt0_await, probe_adapt0_en,
+      probe_adapt0_await, probe_adapt0_en,
       probe_adapt0_ipmack, probe_adapt0_ipmreq);
  end
 `endif
@@ -460,14 +642,14 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
   integer i,limit; string mode,vcd;
   if($value$plusargs("RATE_MFLIT=%d",rate)); if($value$plusargs("TRAFFIC=%s",mode));
   traffic_mc=(mode=="F4"); if(rate<=0) $fatal(1,"bad RATE_MFLIT"); gap_ps=5000000/rate;
-  lambda_pkt_ns=rate/real'(FLITS)/1000.0;
+  lambda_flit_ns=rate/1000.0;
   case_tick_ns=1.0; tx_setup_ns=0.05;
   if($value$plusargs("CASE_TICK_NS=%f",case_tick_ns));
   if($value$plusargs("TX_SETUP_NS=%f",tx_setup_ns));
   if(case_tick_ns<=0.0) $fatal(1,"bad CASE_TICK_NS");
   for(i=0;i<4;i=i+1) src_seed[i]=seed_mix(seed,i);
-  $display("TB_INFO inject=exponential_serialized offered=%0d MFlit_per_port_s mean_gap_ps=%0d lambda_pkt_ns=%0.6f case_tick_ns=%0.3f tx_setup_ns=%0.3f seed=%0d",
-           rate,gap_ps,lambda_pkt_ns,case_tick_ns,tx_setup_ns,seed);
+  $display("TB_INFO inject=exponential_packet_start offered=%0d MFlit_per_port_s mean_head_gap_ps=%0d lambda_packet_ns=%0.6f packet_flits=%0d continuous_intra_packet=1 tx_setup_ns=%0.3f seed=%0d",
+           rate,gap_ps,lambda_flit_ns,FLITS,tx_setup_ns,seed);
   for(i=0;i<N;i=i+1) egress_seed[i]=202701+i;
   for(i=0;i<4;i=i+1) begin expect_phase[i]=0;expect_pkt[i]=0;mc_active_lane[i]=-1;end
   if($value$plusargs("VCD=%s",vcd)) begin
@@ -489,7 +671,7 @@ wire probe_c1_opm5_l1_3_q = dut.OutputPortModules_5.L1_L4_3.q;
   if(got!=(traffic_mc?4:4)*PKTS*FLITS) bad("delivered flit count");
   for(i=0;i<4;i=i+1) if(expect_pkt[i]!=PKTS||expect_phase[i]!=0) bad("per-copy/source completion");
   #20; if(tb_out_req!==tb_out_ack || $isunknown({tb_out_req,tb_in_ack})) bad("not idle or X");
-  $display("TB_RATE traffic=%s inject=exponential_serialized offered=%0d MFlit_per_port_s injected_packets=%0d delivered_flits=%0d",mode,rate,sent,got);
+  $display("TB_RATE traffic=%s inject=exponential_packet_start offered=%0d MFlit_per_port_s injected_packets=%0d delivered_flits=%0d",mode,rate,sent,got);
   if(failures==0) $display("TB_RESULT PASS RATE_SCAN"); else $display("TB_RESULT FAIL RATE_SCAN failures=%0d",failures);
   $finish;
  end

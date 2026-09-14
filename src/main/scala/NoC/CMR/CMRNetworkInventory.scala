@@ -205,20 +205,22 @@ object CMRNetworkInventory {
       clusterGrid: Int,
       meshLanes: Int = 2,
       hrep: Boolean = false,
-      designId: Option[String] = None
+      designId: Option[String] = None,
+      pfatQ64: Boolean = false
   ): CMRNetworkStructure = {
     require(Set(2, 4).contains(clusterGrid))
     val tiles = clusterGrid * clusterGrid
     val nodes = tiles * 64
-    val localLanes = 2
+    val localLanes = if (pfatQ64) 8 else 2
     val topGeom =
       if (meshLanes == 2) TopMesh22
       else if (meshLanes == 1) TopMesh12
+      else if (meshLanes == 4 && localLanes == 8) Pfat48
       else {
         return CMRNetworkStructure(
           designId = designId.getOrElse(s"PROP${nodes}_MESH$meshLanes"),
           nodes = nodes,
-          laneProfile = "1-2-2-2",
+          laneProfile = if (pfatQ64) "1-2-4-8" else "1-2-2-2",
           routing = "quadtree_topmesh",
           clusterGrid = Some(clusterGrid),
           topMeshLanes = meshLanes,
@@ -242,8 +244,8 @@ object CMRNetworkInventory {
       }
 
     val l1 = Fat12
-    val l2 = Prop22
-    val l3 = Prop22
+    val l2 = if (pfatQ64) Pfat24 else Prop22
+    val l3 = if (pfatQ64) Pfat48 else Prop22
     val treePorts = tiles * (L1Count * l1.ports + L2Count * l2.ports + L3Count * l3.ports)
     val topPorts = tiles * topGeom.ports
     val ports = treePorts + topPorts
@@ -258,7 +260,8 @@ object CMRNetworkInventory {
     val id = designId.getOrElse {
       if (hrep) "HREP1024"
       else if (meshLanes == 2 && clusterGrid == 4) "PROP1024"
-      else if (meshLanes == 2 && clusterGrid == 2) "PROP256"
+      else if (meshLanes == 4 && pfatQ64 && clusterGrid == 2) "PROP256"
+      else if (meshLanes == 2 && clusterGrid == 2) "PROP256_LEGACY22"
       else s"PROP${nodes}_MESH$meshLanes"
     }
     val shares =
@@ -268,7 +271,7 @@ object CMRNetworkInventory {
     CMRNetworkStructure(
       designId = id,
       nodes = nodes,
-      laneProfile = "1-2-2-2",
+      laneProfile = if (pfatQ64) "1-2-4-8" else "1-2-2-2",
       routing = "quadtree_topmesh",
       clusterGrid = Some(clusterGrid),
       topMeshLanes = meshLanes,
@@ -288,10 +291,10 @@ object CMRNetworkInventory {
       mutexWidths = mutex,
       primitives = Seq(
         CMRPrimitiveCount("async_fat_1x2", 1, 1, 2, useMeshRouting = false, tiles * L1Count),
-        CMRPrimitiveCount("async_prop_2x2", 2, 2, 2, useMeshRouting = false, tiles * L2Count),
-        CMRPrimitiveCount("async_prop_2x2", 3, 2, 2, useMeshRouting = false, tiles * L3Count),
+        CMRPrimitiveCount(primitiveName(l2, 2), 2, l2.child, l2.parent, useMeshRouting = false, tiles * L2Count),
+        CMRPrimitiveCount(primitiveName(l3, 3), 3, l3.child, l3.parent, useMeshRouting = false, tiles * L3Count),
         CMRPrimitiveCount(
-          if (meshLanes == 2) "async_topmesh_2x2" else "async_topmesh_1x2",
+          primitiveName(topGeom, 1),
           1,
           meshLanes,
           localLanes,
@@ -310,7 +313,7 @@ object CMRNetworkInventory {
     flatMesh(8),
     flatMesh(16),
     flatMesh(32),
-    clusteredProp(2, 2, designId = Some("PROP256")),
+    clusteredProp(2, 4, designId = Some("PROP256"), pfatQ64 = true),
     clusteredProp(4, 2, designId = Some("PROP1024")),
     clusteredProp(4, 2, hrep = true, designId = Some("HREP1024")),
     clusteredProp(4, 1, designId = Some("PROP1024_MESH1")),

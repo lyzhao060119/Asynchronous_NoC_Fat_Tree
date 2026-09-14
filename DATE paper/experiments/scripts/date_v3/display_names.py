@@ -64,7 +64,7 @@ DISPLAY_DESCRIPTIONS: dict[str, str] = {
     "FM64": "8-by-8 asynchronous flat mesh of narrow routers.",
     "SYNC_THIN64": "Clocked 64-node narrow hierarchical counterpart of the asynchronous narrow 64-node network. Signed at 1.0 ns with a one-cycle head.",
     "SYNC_PROP64": "Clocked 64-node balanced hierarchical counterpart of the asynchronous balanced 64-node network. Signed at 1.0 ns with a one-cycle head.",
-    "PROP256": "2-by-2 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 256-node network is added.",
+    "PROP256": "2-by-2 tiles of 64-node 1-2-4-8 hierarchical clusters plus a four-lane top mesh. No synchronous 256-node network is added.",
     "FM256": "16-by-16 asynchronous flat mesh. Compared with the 256-node hierarchical network at the same node count.",
     "PROP1024": "4-by-4 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 1024-node network is added.",
     "FM1024": "32-by-32 asynchronous flat mesh. Compared with the 1024-node hierarchical network at the same node count.",

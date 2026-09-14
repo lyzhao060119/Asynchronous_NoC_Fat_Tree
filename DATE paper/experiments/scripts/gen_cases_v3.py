@@ -32,9 +32,16 @@ from date_v3.saturation import coarse_loads  # noqa: E402
 BENCHMARKS = (
     "BF-STRESS64",
     "TOPO-UR",
+    "TOPO-BC",
+    "HOTSPOT10",
     "MC-UR-F4",
     "MC-UR-F8",
     "MC-XQ-F8",
+    "MC-REGION-F2",
+    "MC-REGION-F4",
+    "MC-REGION-F8",
+    "MC-REGION-F16",
+    "MC-REGION-F32",
     "XMC-F16",
     "XMC10-G",
     "MESH-INTERCLUSTER-UR",
@@ -56,6 +63,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--design", choices=sorted(NETWORK_IDS), action="append")
     parser.add_argument("--keycase-256", action="store_true")
     parser.add_argument("--hrep", action="store_true")
+    parser.add_argument("--source-repeated-unicast", action="store_true")
+    parser.add_argument("--warmup", type=int)
+    parser.add_argument("--measurement", type=int)
     parser.add_argument("--out", type=Path, default=INTERMEDIATE / "traces")
     parser.add_argument(
         "--case-out",
@@ -133,6 +143,7 @@ def emit_materialize(
     designs: list[str],
     *,
     hrep: bool,
+    source_repeated_unicast: bool,
     nodes: int,
     case_out: Path | None = None,
     sidecars: bool = True,
@@ -147,6 +158,7 @@ def emit_materialize(
             out_dir,
             top_lanes=opts["top_lanes"],
             hrep=hrep or opts["hrep"],
+            source_repeated_unicast=source_repeated_unicast,
             routing=opts["routing"],
             design_id=design,
             sidecars=sidecars,
@@ -177,6 +189,7 @@ def main() -> int:
                 path,
                 selected_designs(args, header["nodes"], None),
                 hrep=args.hrep,
+                source_repeated_unicast=args.source_repeated_unicast,
                 nodes=header["nodes"],
                 case_out=args.case_out,
                 sidecars=not args.no_sidecars,
@@ -194,6 +207,8 @@ def main() -> int:
                             seed=seed,
                             nodes=nodes,
                             load_point=load,
+                            warmup=args.warmup,
+                            measurement=args.measurement,
                             spread=spread,
                             smoke=smoke,
                         )
@@ -207,6 +222,7 @@ def main() -> int:
                             path,
                             selected_designs(args, header["nodes"], bench),
                             hrep=args.hrep,
+                            source_repeated_unicast=args.source_repeated_unicast,
                             nodes=header["nodes"],
                             case_out=args.case_out,
                             sidecars=not args.no_sidecars,

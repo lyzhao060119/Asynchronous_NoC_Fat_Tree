@@ -516,10 +516,29 @@ class Case:
             if count > TB_RX_DEPTH:
                 raise ValueError(f"{self.name}: RX port {port} count {count} exceeds TB_RX_DEPTH={TB_RX_DEPTH}")
 
+    def validate_continuous_packets(self) -> None:
+        """Packets start stochastically, but their flits are consecutive.
+
+        Coordinates belong exclusively to a Header.  Body/Tail retain only
+        their diagnostic payload, which keeps the case wire format compatible
+        with the asynchronous flit-level scoreboard.
+        """
+        by_packet: dict[int, list[InputEvent]] = {}
+        for event in self.inputs:
+            by_packet.setdefault(event.pkt_seq, []).append(event)
+        for pkt_seq, events in by_packet.items():
+            events.sort(key=lambda event: event.cycle)
+            for index, event in enumerate(events):
+                if event.cycle != events[0].cycle + index:
+                    raise ValueError(f"{self.name}: pkt {pkt_seq} has non-continuous flit cycles")
+                if index and (event.flit & (1 << 27)):
+                    raise ValueError(f"{self.name}: pkt {pkt_seq} body/tail is marked as Header")
+
 
 def write_case(case: Case, out_dir: Path, emit_json: bool, flat: bool = False) -> None:
     case.sort_inputs()
     case.validate_capacity()
+    case.validate_continuous_packets()
     group_dir = out_dir if flat else out_dir / case.group
     group_dir.mkdir(parents=True, exist_ok=True)
     path = group_dir / f"{case.name}.case"
@@ -606,7 +625,10 @@ def choose_multicast_rect(rng: random.Random, source_node: int) -> tuple[int, in
 def generate_event_schedule(target_count: int, packet_length: int, load_point: float, seed: int) -> list[tuple[int, int, int]]:
     if packet_length < 1:
         raise ValueError("packet_length must be positive")
-    packet_start_prob = load_point / packet_length
+    # `load_point` is the offered Bernoulli probability to start a packet.
+    # Do not divide by packet length: each accepted start emits one contiguous
+    # packet, while the measured flit rate is reported by the testbench.
+    packet_start_prob = load_point
     if not (0.0 <= packet_start_prob <= 1.0):
         raise ValueError(f"bad packet-start probability {packet_start_prob} for load {load_point} length {packet_length}")
     rng = random.Random(seed)

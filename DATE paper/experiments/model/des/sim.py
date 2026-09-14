@@ -520,7 +520,9 @@ class Simulator:
                     phase=self.packets[pkt_seq].phase,
                     destinations=dests,
                 )
-                due = (ready + idx) * self.case_tick_ns
+                # Match RTL ASAP offer: all flits of a packet become due at the
+                # header schedule instant; NIC/credit wait paces service.
+                due = ready * self.case_tick_ns
                 self.src_q[source].append((due, pkt_seq, flit))
         for source, queue in list(self.src_q.items()):
             # One NIC per PE: keep a packet's flits contiguous.  Do not

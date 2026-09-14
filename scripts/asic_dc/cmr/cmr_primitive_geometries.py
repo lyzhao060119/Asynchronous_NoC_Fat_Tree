@@ -59,8 +59,10 @@ def vcs_define(child: int, parent: int) -> str:
     return "+define+GEOM_C%d_P%d" % (child, parent)
 
 
-# V3 P0 / P0+ isolated Router ASIC targets.  Frozen 20260830 hop netlists are
-# reused for Thin / Fat L1 / PROP 2x2; new run IDs are used for everything else.
+# Async hop netlists were re-DC'd on 2026-09-12 after ReadPhaseSelector
+# OtherPath 1xDEL050.  The 20260830/20260831 hop IDs remain frozen and
+# unused.  Sync hop IDs stay the Phase 2.5 1-cycle lock.
+HOP_PPA_STAMP = "20260912_205700"
 PRIMITIVES: tuple[dict[str, Any], ...] = (
     {
         "kind": "async_thin_1x1",
@@ -72,8 +74,8 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "parent": 1,
         "mesh": False,
         "mutex_widths": frozenset({4}),
-        "reuse_dc_id": "20260830_cmr_thin_l1_hop_del050_ackin050",
-        "dc_id": "20260830_cmr_thin_l1_hop_del050_ackin050",
+        "reuse_dc_id": None,
+        "dc_id": HOP_PPA_STAMP + "_cmr_thin_l1_hop_rpsdel050",
         "netlist_envs": ("CMR_THIN_L1_1TO1_NETLIST_RUN_ID", "CMR_THIN_NETLIST_RUN_ID"),
         "rx_default": "0.09",
         "dut": "CMRRouter",
@@ -90,7 +92,7 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "mesh": True,
         "mutex_widths": frozenset({4}),
         "reuse_dc_id": None,
-        "dc_id": "20260831_cmr_flatmesh_c1p1_del050_ackin050",
+        "dc_id": HOP_PPA_STAMP + "_cmr_flatmesh_c1p1_rpsdel050",
         "netlist_envs": ("CMR_FLATMESH_NETLIST_RUN_ID",),
         "rx_default": "0.09",
         "dut": "CMRRouter",
@@ -106,12 +108,29 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "parent": 2,
         "mesh": False,
         "mutex_widths": frozenset({2, 4, 5}),
-        "reuse_dc_id": "20260830_cmr_fat_l1_hop_del050_ackin050",
-        "dc_id": "20260830_cmr_fat_l1_hop_del050_ackin050",
+        "reuse_dc_id": None,
+        "dc_id": HOP_PPA_STAMP + "_cmr_fat_l1_hop_rpsdel050",
         "netlist_envs": ("CMR_FAT_L1_1TO2_NETLIST_RUN_ID", "CMR_FAT_NETLIST_RUN_ID"),
         "rx_default": "0.1",
         "dut": "CMRRouter",
         "paper_role": "Table I PROP L1",
+    },
+    {
+        "kind": "async_fat_1x4",
+        "aliases": ("prop_temp_c1p4",),
+        "design_id": "ASYNC_FAT_1X4",
+        "async": True,
+        "level": 1,
+        "child": 1,
+        "parent": 4,
+        "mesh": False,
+        "mutex_widths": frozenset({4, 7}),
+        "reuse_dc_id": None,
+        "dc_id": "20260914_cmr_prop_temp_c1p4_rpsdel050",
+        "netlist_envs": ("CMR_PROP_TEMP_C1P4_NETLIST_RUN_ID",),
+        "rx_default": "0.1",
+        "dut": "CMRRouter",
+        "paper_role": "Emergency Router summary: PROP_temp c1p4",
     },
     {
         "kind": "async_prop_2x2",
@@ -123,8 +142,8 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "parent": 2,
         "mesh": False,
         "mutex_widths": frozenset({2, 8}),
-        "reuse_dc_id": "20260830_cmr_fat_l2_hop_del050_ackin050",
-        "dc_id": "20260830_cmr_fat_l2_hop_del050_ackin050",
+        "reuse_dc_id": None,
+        "dc_id": HOP_PPA_STAMP + "_cmr_prop_2x2_hop_rpsdel050",
         "netlist_envs": ("CMR_FAT_L2_2TO2_NETLIST_RUN_ID", "CMR_PROP_2X2_NETLIST_RUN_ID"),
         "rx_default": "0.1",
         "dut": "CMRRouter",
@@ -141,7 +160,7 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "mesh": True,
         "mutex_widths": frozenset({2, 8}),
         "reuse_dc_id": None,
-        "dc_id": "20260831_cmr_topmesh_c2p2_del050_ackin050",
+        "dc_id": HOP_PPA_STAMP + "_cmr_topmesh_c2p2_rpsdel050",
         "netlist_envs": ("CMR_TOPMESH_NETLIST_RUN_ID",),
         "rx_default": "0.1",
         "dut": "CMRRouter",
@@ -158,7 +177,7 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "mesh": False,
         "mutex_widths": frozenset({2, 4, 8, 10}),
         "reuse_dc_id": None,
-        "dc_id": "20260831_cmr_pfat_l2_c2p4_del050_ackin050",
+        "dc_id": HOP_PPA_STAMP + "_cmr_pfat_l2_c2p4_rpsdel050",
         "netlist_envs": ("CMR_PFAT_2X4_NETLIST_RUN_ID",),
         "rx_default": "0.1",
         "dut": "CMRRouter",
@@ -175,7 +194,7 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "mesh": False,
         "mutex_widths": frozenset({4, 8, 16, 20}),
         "reuse_dc_id": None,
-        "dc_id": "20260831_cmr_pfat_l3_c4p8_del050_ackin050",
+        "dc_id": HOP_PPA_STAMP + "_cmr_pfat_l3_c4p8_rpsdel050",
         "netlist_envs": ("CMR_PFAT_4X8_NETLIST_RUN_ID",),
         "rx_default": "0.1",
         "dut": "CMRRouter",
@@ -214,6 +233,74 @@ PRIMITIVES: tuple[dict[str, Any], ...] = (
         "rx_default": "0.0",
         "dut": "SyncCmrRouter",
         "paper_role": "Table I Sync 2x2 counterpart",
+    },
+    {
+        "kind": "sync_fat_1x2",
+        "aliases": (),
+        "design_id": "SYNC_FAT_1X2",
+        "async": False,
+        "level": 1,
+        "child": 1,
+        "parent": 2,
+        "mesh": False,
+        "mutex_widths": frozenset(),
+        "reuse_dc_id": None,
+        "dc_id": "20260912_cmr_sync_fat_1x2_1p0ns",
+        "netlist_envs": ("CMR_SYNC_FAT_1X2_NETLIST_RUN_ID",),
+        "rx_default": "0.0",
+        "dut": "SyncCmrRouter",
+        "paper_role": "Sync PFAT L1",
+    },
+    {
+        "kind": "sync_fat_1x4",
+        "aliases": ("sync_prop_temp_c1p4",),
+        "design_id": "SYNC_FAT_1X4",
+        "async": False,
+        "level": 1,
+        "child": 1,
+        "parent": 4,
+        "mesh": False,
+        "mutex_widths": frozenset(),
+        "reuse_dc_id": None,
+        "dc_id": "20260914_cmr_sync_prop_temp_c1p4_1p0ns",
+        "netlist_envs": ("CMR_SYNC_PROP_TEMP_C1P4_NETLIST_RUN_ID",),
+        "rx_default": "0.0",
+        "dut": "SyncCmrRouter",
+        "paper_role": "Emergency Router summary: synchronous c1p4",
+    },
+    {
+        "kind": "sync_pfat_2x4",
+        "aliases": (),
+        "design_id": "SYNC_PFAT_2X4",
+        "async": False,
+        "level": 2,
+        "child": 2,
+        "parent": 4,
+        "mesh": False,
+        "mutex_widths": frozenset(),
+        "reuse_dc_id": None,
+        "dc_id": "20260912_cmr_sync_pfat_2x4_1p0ns",
+        "netlist_envs": ("CMR_SYNC_PFAT_2X4_NETLIST_RUN_ID",),
+        "rx_default": "0.0",
+        "dut": "SyncCmrRouter",
+        "paper_role": "Sync PFAT L2",
+    },
+    {
+        "kind": "sync_pfat_4x8",
+        "aliases": (),
+        "design_id": "SYNC_PFAT_4X8",
+        "async": False,
+        "level": 3,
+        "child": 4,
+        "parent": 8,
+        "mesh": False,
+        "mutex_widths": frozenset(),
+        "reuse_dc_id": None,
+        "dc_id": "20260912_cmr_sync_pfat_4x8_1p0ns",
+        "netlist_envs": ("CMR_SYNC_PFAT_4X8_NETLIST_RUN_ID",),
+        "rx_default": "0.0",
+        "dut": "SyncCmrRouter",
+        "paper_role": "Sync PFAT L3",
     },
 )
 
@@ -260,8 +347,8 @@ for _row in PRIMITIVES:
     for _alias in _row.get("aliases") or ():
         KIND_INDEX[_alias] = _row
 
-HOP_PPA_RUN_ID = "20260901_cmr_primitive_hop_ppa_ru5"
-DEFAULT_HOP_KINDS = tuple(row["kind"] for row in PRIMITIVES)
+HOP_PPA_RUN_ID = HOP_PPA_STAMP + "_cmr_primitive_hop_ppa_rpsdel050"
+DEFAULT_HOP_KINDS = tuple(row["kind"] for row in PRIMITIVES if row["async"])
 
 
 def enrich(row: dict[str, Any]) -> dict[str, Any]:

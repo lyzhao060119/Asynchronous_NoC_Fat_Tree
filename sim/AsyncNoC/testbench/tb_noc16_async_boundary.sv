@@ -22,6 +22,7 @@ module noc16_async_boundary_core #(
   localparam integer MAX_RX_PER_PORT = 32768;
   localparam integer MAX_PKT_SEQ = 262144;
   localparam integer STR_CHARS = 256;
+  localparam [2:0] IDENTITY_MAGIC = 3'b101;
 
   reg reset;
   reg [NUM_PORTS-1:0] tb_in_req;
@@ -79,6 +80,10 @@ module noc16_async_boundary_core #(
   integer delivered_packets, latency_count;
   integer latency_ps [0:MAX_EXPECT_FLITS-1];
   event rx_activity;
+  reg case_has_identity;
+  reg pending_head_valid [0:NUM_PORTS-1];
+  reg [FLIT_W-1:0] pending_head_flit [0:NUM_PORTS-1];
+  integer pending_head_slot [0:NUM_PORTS-1];
 
   function integer now_ps;
     real t;
@@ -105,6 +110,108 @@ module noc16_async_boundary_core #(
       total_expected = total;
     end
   endfunction
+
+  function automatic integer identity_pkt_seq;
+    input [FLIT_W-1:0] flit;
+    begin
+      if (flit[27] || (flit[8:6] !== IDENTITY_MAGIC))
+        identity_pkt_seq = -1;
+      else
+        identity_pkt_seq = flit[25:12];
+    end
+  endfunction
+
+  task automatic score_rx_slot;
+    input integer port;
+    input integer slot;
+    input integer exp_idx;
+    begin
+      rx_expected_index[port][slot] = exp_idx;
+      rx_match[port][slot] = (exp_idx >= 0);
+      if (exp_idx >= 0) expected_cursor[port] = expected_cursor[port] + 1;
+      else unexpected_flits = unexpected_flits + 1;
+    end
+  endtask
+
+  task automatic match_first_unseen;
+    input integer port;
+    input integer slot;
+    input [FLIT_W-1:0] captured;
+    integer scan, exp_idx;
+    begin
+      exp_idx = -1;
+      for (scan = 0; scan < expected_count; scan = scan + 1)
+        if ((exp_idx < 0) && !expected_seen[scan] && expected_mask[scan][port] &&
+            (captured === expected_flit[scan])) begin
+          exp_idx = scan;
+          expected_seen[scan] = 1'b1;
+        end
+      score_rx_slot(port, slot, exp_idx);
+    end
+  endtask
+
+  task automatic orphan_pending_head;
+    input integer port;
+    begin
+      if (pending_head_valid[port]) begin
+        score_rx_slot(port, pending_head_slot[port], -1);
+        pending_head_valid[port] = 1'b0;
+      end
+    end
+  endtask
+
+  task automatic resolve_pending_head_fallback;
+    input integer port;
+    integer slot;
+    begin
+      if (pending_head_valid[port]) begin
+        slot = pending_head_slot[port];
+        pending_head_valid[port] = 1'b0;
+        match_first_unseen(port, slot, pending_head_flit[port]);
+      end
+    end
+  endtask
+
+  task automatic bind_pending_head;
+    input integer port;
+    input integer pkt;
+    integer scan, exp_idx, slot;
+    reg [FLIT_W-1:0] head_flit;
+    begin
+      if (pending_head_valid[port]) begin
+        slot = pending_head_slot[port];
+        head_flit = pending_head_flit[port];
+        pending_head_valid[port] = 1'b0;
+        exp_idx = -1;
+        for (scan = 0; scan < expected_count; scan = scan + 1)
+          if ((exp_idx < 0) && !expected_seen[scan] && expected_mask[scan][port] &&
+              (expected_pkt_seq[scan] == pkt) && expected_flit[scan][27])
+            exp_idx = scan;
+        if ((exp_idx >= 0) && (head_flit === expected_flit[exp_idx])) begin
+          expected_seen[exp_idx] = 1'b1;
+          score_rx_slot(port, slot, exp_idx);
+        end else
+          score_rx_slot(port, slot, -1);
+      end
+    end
+  endtask
+
+  task automatic release_pending_head;
+    input integer port;
+    begin
+      if (pending_head_valid[port]) begin
+        if (case_has_identity) orphan_pending_head(port);
+        else resolve_pending_head_fallback(port);
+      end
+    end
+  endtask
+
+  task automatic flush_pending_heads;
+    integer p;
+    begin
+      for (p = 0; p < NUM_PORTS; p = p + 1) release_pending_head(p);
+    end
+  endtask
 
   generate
     if (STRUCTURAL_ENDPOINTS != 0) begin : g_structural_endpoints
@@ -154,9 +261,13 @@ module noc16_async_boundary_core #(
       input_count = 0; expected_count = 0;
       reset_cycles = 10; timeout_cycles = 5000000;
       case_name = ""; case_group = "";
+      case_has_identity = 1'b0;
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
         expected_port_count[p] = 0; expected_cursor[p] = 0; rx_count[p] = 0;
         last_egress_ps[p] = -1; active_input[p] = -1;
+        pending_head_valid[p] = 1'b0;
+        pending_head_flit[p] = {FLIT_W{1'b0}};
+        pending_head_slot[p] = -1;
       end
       for (idx = 0; idx < MAX_PKT_SEQ; idx = idx + 1) packet_head_ack_ps[idx] = -1;
       fd = $fopen(case_file, "r");
@@ -189,6 +300,7 @@ module noc16_async_boundary_core #(
               expected_mask[expected_count] = mask_word[NUM_PORTS-1:0];
               expected_pkt_seq[expected_count] = pkt; expected_is_tail[expected_count] = cyc[0];
               expected_flit[expected_count] = flit; expected_seen[expected_count] = 1'b0;
+              if (!flit[27] && (flit[8:6] === IDENTITY_MAGIC)) case_has_identity = 1'b1;
               for (p = 0; p < NUM_PORTS; p = p + 1) if (mask_word[p]) begin
                 if (expected_port_count[p] >= MAX_RX_PER_PORT) begin $display("TB_FATAL expected queue overflow p=%0d", p); $finish; end
                 expected_port_index[p][expected_port_count[p]] = expected_count;
@@ -255,8 +367,7 @@ module noc16_async_boundary_core #(
   endtask
 
   task automatic receive_port(input integer port);
-    integer slot, exp_idx, scan;
-    reg found;
+    integer slot, pkt;
     reg [FLIT_W-1:0] captured;
     begin
       forever begin
@@ -271,19 +382,26 @@ module noc16_async_boundary_core #(
         rx_time_ps[port][slot] = now_ps();
         rx_egress_ps[port][slot] = last_egress_ps[port];
         rx_flit[port][slot] = captured;
-        // Traffic from distinct input ports is concurrent, so a case file
-        // cannot prescribe one global arrival order at a shared output.  Keep
-        // the established checker contract: consume one still-unseen expected
-        // flit for this output and preserve every delivery in the event log.
-        exp_idx = -1; found = 1'b0;
-        for (scan = 0; scan < expected_count; scan = scan + 1)
-          if (!found && !expected_seen[scan] && expected_mask[scan][port] && (captured === expected_flit[scan])) begin
-            exp_idx = scan; found = 1'b1; expected_seen[scan] = 1'b1;
+        rx_expected_index[port][slot] = -1;
+        rx_match[port][slot] = 1'b0;
+        // Concurrent sources share an output, so arrival order is not the case
+        // order.  Body/tail carry a unique pkt_seq.  Head is AABB-only and is
+        // held until the next identity flit on this port names the packet.
+        if (captured[27]) begin
+          release_pending_head(port);
+          pending_head_valid[port] = 1'b1;
+          pending_head_flit[port] = captured;
+          pending_head_slot[port] = slot;
+        end else begin
+          pkt = identity_pkt_seq(captured);
+          if (pkt >= 0) begin
+            match_first_unseen(port, slot, captured);
+            bind_pending_head(port, pkt);
+          end else begin
+            release_pending_head(port);
+            match_first_unseen(port, slot, captured);
           end
-        rx_expected_index[port][slot] = exp_idx;
-        rx_match[port][slot] = found;
-        if (rx_match[port][slot]) expected_cursor[port] = expected_cursor[port] + 1;
-        else unexpected_flits = unexpected_flits + 1;
+        end
         rx_count[port] = slot + 1;
         // Ack is deliberately delayed from observed capture; never follows a
         // clock edge and never collapses a NoC output pulse in the same slot.
@@ -299,6 +417,7 @@ module noc16_async_boundary_core #(
     real avg_lat_ns, elapsed_ns, throughput;
     reg pass_ok;
     begin
+      flush_pending_heads();
       injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();
       delivered_packets = 0; latency_count = 0; lat_sum = 0; max_lat = 0;
       for (i = 0; i < input_count; i = i + 1) if (input_accepted[i]) begin

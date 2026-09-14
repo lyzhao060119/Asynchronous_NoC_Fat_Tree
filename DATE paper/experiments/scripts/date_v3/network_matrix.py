@@ -130,9 +130,9 @@ EMIT: dict[str, dict[str, Any]] = {
     },
     "PROP256": {
         "main": "NoC.CMR.CMRClusteredNoCMain",
-        "sbt_args": "2 2",
+        "sbt_args": "2 4 1248",
         "env": {},
-        "gen_dir": "generated_cmr/clustered_noc_g2_m2",
+        "gen_dir": "generated_cmr/clustered_noc_g2_m4",
         "dut_file": "NoC_256nodes.v",
         "top": "NoC_256nodes",
         "hier_kind": "prop256",

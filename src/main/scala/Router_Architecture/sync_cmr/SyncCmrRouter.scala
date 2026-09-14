@@ -143,7 +143,7 @@ object SyncCmrRouterMain extends App {
 }
 
 object SyncCmrPrimitiveMatrixEmitMain extends App {
-  private val jobs = Seq((1, 1, 1), (2, 2, 2))
+  private val jobs = Seq((1, 1, 1), (2, 2, 2), (1, 1, 2), (1, 1, 4), (2, 2, 4), (3, 4, 8))
   for ((level, child, parent) <- jobs) {
     require(CMRParameters.SupportedLaneGeometries.contains((child, parent)))
     val dir =

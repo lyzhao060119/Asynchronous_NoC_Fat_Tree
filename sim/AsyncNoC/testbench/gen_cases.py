@@ -545,7 +545,10 @@ def choose_multicast_rect(rng: random.Random, source_node: int) -> tuple[int, in
 def generate_event_schedule(target_count: int, packet_length: int, load_point: float, seed: int) -> list[tuple[int, int, int]]:
     if packet_length < 1:
         raise ValueError("packet_length must be positive")
-    packet_start_prob = load_point / packet_length
+    # Load is a packet-start probability.  A packet itself is emitted as a
+    # contiguous sequence, so dividing by its length would silently change
+    # the offered traffic definition.
+    packet_start_prob = load_point
     if not (0.0 <= packet_start_prob <= 1.0):
         raise ValueError(f"bad packet-start probability {packet_start_prob} for load {load_point} length {packet_length}")
 

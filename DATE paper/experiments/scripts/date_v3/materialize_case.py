@@ -4,10 +4,11 @@
 256-node key cases use a compact dest-list format (no 256-bit mask scoreboard).
 H-REP split is applied here.  PROP keeps one packet per original event.
 
-Packet headers keep the canonical exponential `ready_cycle`.  The five flits
-of one packet are offered one per CASE_TICK_NS on that source; a later packet
-does not start until the previous packet's last flit has been offered, so
-wormhole order is not interleaved.
+Packet headers keep the canonical exponential `ready_cycle`.  All flits of one
+packet share that offer cycle (ASAP intra-packet); the TB service path and DUT
+backpressure pace wire injection.  A later packet on the same source may be
+scheduled on the next tick; wormhole order is preserved by stable input sort
+and sequential service_port.
 """
 from __future__ import annotations
 
@@ -32,10 +33,21 @@ def serialized_offer_start(
     ready_cycle: int,
     packet_flits: int,
     next_free: dict[int, int],
+    *,
+    offer_span_cycles: int = 1,
 ) -> int:
-    """First flit cycle: scheduled header, or after the previous packet on this source."""
+    """Offer-cycle for every flit of this packet (intra-packet ASAP).
+
+    ``packet_flits`` is accepted for call-site compatibility; schedule occupancy
+    is ``offer_span_cycles`` (default 1).  Body/tail share the same cycle as the
+    header — do not insert artificial CASE_TICK gaps inside a wormhole packet.
+    """
+    del packet_flits  # occupancy is offer_span_cycles, not flit count
+    span = int(offer_span_cycles)
+    if span < 1:
+        raise ValueError("offer_span_cycles must be >= 1")
     start = max(int(ready_cycle), next_free.get(int(source), 0))
-    next_free[int(source)] = start + int(packet_flits)
+    next_free[int(source)] = start + span
     return start
 
 
@@ -77,8 +89,35 @@ def make_flit(
     return flit
 
 
-def injected_packets(event: dict[str, Any], *, nodes: int, hrep: bool) -> list[dict[str, Any]]:
+def injected_packets(
+    event: dict[str, Any],
+    *,
+    nodes: int,
+    hrep: bool,
+    source_repeated_unicast: bool = False,
+) -> list[dict[str, Any]]:
     width = width_of(nodes)
+    if source_repeated_unicast:
+        packets = []
+        for idx, dest in enumerate(sorted(set(event["destinations"]))):
+            if dest == event["source"]:
+                continue
+            x, y = dest % width, dest // width
+            packets.append(
+                {
+                    "original_event_id": event["original_event_id"],
+                    "packet_id": "%s#ru%d" % (event["original_event_id"], idx),
+                    "source": event["source"],
+                    "destinations": [dest],
+                    "rect": [x, y, x, y],
+                    "target_cluster": [x // 8, y // 8],
+                    "crosses_top_mesh": False,
+                    "source_repeated_unicast": True,
+                }
+            )
+        if not packets:
+            raise ValueError("source repeated-unicast event has no destinations")
+        return packets
     if hrep:
         grid = width // 8
         return split_dest_set(
@@ -115,8 +154,11 @@ def materialize(
     *,
     top_lanes: int,
     hrep: bool = False,
+    source_repeated_unicast: bool = False,
     routing: str = "quadtree",
 ) -> dict[str, Any]:
+    if hrep and source_repeated_unicast:
+        raise ValueError("hrep and source_repeated_unicast are mutually exclusive")
     header = trace["header"]
     nodes = int(header["nodes"])
     packet_flits = int(header["packet_flits"])
@@ -135,13 +177,20 @@ def materialize(
     next_free: dict[int, int] = {}
     for event in trace["events"]:
         event_index = int(event["event_index"])
-        for packet in injected_packets(event, nodes=nodes, hrep=hrep):
+        for packet in injected_packets(
+            event,
+            nodes=nodes,
+            hrep=hrep,
+            source_repeated_unicast=source_repeated_unicast,
+        ):
             rect = list(packet["rect"])
             dests = cores_in_rect(rect, width)
             dests = [d for d in dests if d != event["source"]]
             if not dests:
                 raise ValueError("%s produced no deliveries" % packet["packet_id"])
-            multicast = bool(event.get("multicast")) or len(dests) > 1
+            multicast = (not source_repeated_unicast) and (
+                bool(event.get("multicast")) or len(dests) > 1
+            )
             flits = [
                 make_flit(
                     pkt_id=pkt_seq,
@@ -166,7 +215,8 @@ def materialize(
                 packet_flits,
                 next_free,
             )
-            input_cycles = [start_cycle + idx for idx in range(packet_flits)]
+            # Same offer cycle for Head..Tail; service_port + DUT ack pace injection.
+            input_cycles = [start_cycle] * packet_flits
             for idx, flit in enumerate(flits):
                 inputs.append(
                     (
@@ -215,6 +265,7 @@ def materialize(
                     "flits": ["%07x" % flit for flit in flits],
                     "crosses_top_mesh": packet.get("crosses_top_mesh"),
                     "hrep": hrep,
+                    "source_repeated_unicast": source_repeated_unicast,
                     "traversal": traversal,
                 }
             )
@@ -224,6 +275,7 @@ def materialize(
         "header": header,
         "top_lanes": top_lanes,
         "hrep": hrep,
+        "source_repeated_unicast": source_repeated_unicast,
         "routing": routing,
         "case_format": case_format,
         "hex_width": hex_width,
@@ -251,6 +303,8 @@ def _meta_lines(case: dict[str, Any], name: str) -> list[str]:
         "meta load_point %.2f" % header["offered_load"],
         "meta load_unit %s" % header.get("load_unit", LOAD_UNIT),
         "meta case_tick_ns %.3f" % float(header.get("case_tick_ns", CASE_TICK_NS)),
+        "meta injection_model v3_exp_header_asap_body",
+        "meta intra_packet_offer same_cycle_asap",
         "meta nodes %d" % header["nodes"],
         "meta seed %d" % header["seed"],
         "meta original_event_count %d"
@@ -260,6 +314,8 @@ def _meta_lines(case: dict[str, Any], name: str) -> list[str]:
         "meta trace_id %s" % header.get("trace_id", name),
         "meta top_lanes %d" % case["top_lanes"],
         "meta hrep %d" % (1 if case["hrep"] else 0),
+        "meta source_repeated_unicast %d"
+        % (1 if case["source_repeated_unicast"] else 0),
         "meta format %s" % case["case_format"],
         "meta latency_metric tmax",
         "meta latency_metric_name last_destination_tail_minus_source_header_injection",
@@ -326,6 +382,7 @@ def write_packets_sidecar(case: dict[str, Any], path: Path) -> None:
                 "trace_id": header.get("trace_id"),
                 "trace_hash": header.get("trace_hash"),
                 "hrep": case["hrep"],
+                "source_repeated_unicast": case["source_repeated_unicast"],
                 "top_lanes": case["top_lanes"],
                 "case_format": case["case_format"],
                 "packets": case["packets"],
@@ -347,6 +404,7 @@ def write_model_input(case: dict[str, Any], path: Path) -> None:
                 "trace_hash": header.get("trace_hash"),
                 "header": header,
                 "hrep": case["hrep"],
+                "source_repeated_unicast": case["source_repeated_unicast"],
                 "routing": case.get("routing"),
                 "packets": [
                     {
@@ -359,6 +417,7 @@ def write_model_input(case: dict[str, Any], path: Path) -> None:
                         "delivered_destinations": row["delivered_destinations"],
                         "rect": row["rect"],
                         "ready_cycle": row["ready_cycle"],
+                        "scheduled_cycle": row["scheduled_cycle"],
                         "flits": row["flits"],
                         "traversal": row.get("traversal"),
                     }
@@ -378,13 +437,24 @@ def materialize_path(
     *,
     top_lanes: int,
     hrep: bool = False,
+    source_repeated_unicast: bool = False,
     routing: str = "quadtree",
     design_id: str | None = None,
     sidecars: bool = True,
 ) -> Path:
     trace = load_jsonl(jsonl)
-    case = materialize(trace, top_lanes=top_lanes, hrep=hrep, routing=routing)
-    suffix = "hrep" if hrep else (design_id or routing)
+    case = materialize(
+        trace,
+        top_lanes=top_lanes,
+        hrep=hrep,
+        source_repeated_unicast=source_repeated_unicast,
+        routing=routing,
+    )
+    suffix = (
+        "source_repeated_unicast"
+        if source_repeated_unicast
+        else ("hrep" if hrep else (design_id or routing))
+    )
     name = "%s_%s_top%d" % (trace["header"].get("trace_id") or jsonl.stem, suffix, top_lanes)
     path = out_dir / ("%s.case" % name)
     write_case(case, path, sidecars=sidecars)

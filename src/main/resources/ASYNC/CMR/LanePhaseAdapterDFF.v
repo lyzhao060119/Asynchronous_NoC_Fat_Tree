@@ -23,6 +23,7 @@ module LanePhaseAdapterDFF #(
     // A request becomes eligible for IPM acknowledgement only after its
     // selected OPM lane has actually entered the Req != Ack phase.  This
     // leaves LaneSelect/Mux settling outside the Ack Toggle event path.
+    //
     wire selected_mismatch;
     wire source_pending;
     assign selected_mismatch = |(LaneSelect & (OPMReqIn ^ OPMAckOut));

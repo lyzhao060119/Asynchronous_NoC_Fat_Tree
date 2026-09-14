@@ -97,6 +97,14 @@ def password():
     raise SystemExit("Set C1_PASS or add docs password entry")
 
 
+SSH_ERRORS = (
+    OSError,
+    EOFError,
+    paramiko.SSHException,
+    paramiko.ssh_exception.SSHException,
+)
+
+
 def sha256_bytes(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -105,9 +113,51 @@ def sha256_file(path):
     return sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n"))
 
 
+def ssh_connect():
+    """Plain SSH to the login node.  No compression: it raises drop rates."""
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(
+        os.environ.get("C1_HOST", "192.168.2.8"),
+        username=os.environ.get("C1_USER", "ghy19"),
+        password=password(),
+        timeout=40,
+        banner_timeout=90,
+        allow_agent=False,
+        look_for_keys=False,
+        compress=False,
+    )
+    transport = client.get_transport()
+    if transport is not None:
+        transport.set_keepalive(20)
+    return client
+
+
+def ssh_reconnect(client):
+    if client is not None:
+        try:
+            client.close()
+        except Exception:
+            pass
+    return ssh_connect()
+
+
 def remote_run(client, command):
     _, stdout, stderr = client.exec_command(command)
     return (stdout.read() + stderr.read()).decode(errors="replace")
+
+
+def remote_run_retry(client, command, attempts=8):
+    last = None
+    for attempt in range(attempts):
+        try:
+            return client, remote_run(client, command)
+        except SSH_ERRORS as exc:
+            last = exc
+            print("SSH_RETRY", attempt, exc, flush=True)
+            client = ssh_reconnect(client)
+            time.sleep(2 + min(attempt, 6) * 2)
+    raise RuntimeError("SSH retries exhausted: %s" % last)
 
 
 def atomic_put(client, sftp, local, remote):
@@ -116,30 +166,66 @@ def atomic_put(client, sftp, local, remote):
 
 
 def atomic_put_bytes(client, sftp, data, remote):
+    """SFTP-only atomic upload.  Never opens an exec channel for the payload.
+
+    Login-node drops were common when every file also did sha256sum/cat over
+    exec.  Verify with SFTP size only; keep the local SHA-256 in manifests.
+    """
     expected = sha256_bytes(data)
     temporary = "%s.upload.%d" % (remote, os.getpid())
-    cmd = "bash --noprofile --norc -c %s" % shlex.quote("cat > " + temporary)
-    transport = client.get_transport()
-    if transport is None or not transport.is_active():
-        raise RuntimeError("ssh transport inactive before upload %s" % remote)
-    chan = transport.open_session()
-    chan.exec_command(cmd)
-    chan.sendall(data)
-    chan.shutdown_write()
-    status = chan.recv_exit_status()
-    err = ""
-    if chan.recv_stderr_ready():
-        err = chan.recv_stderr(65536).decode(errors="replace")
-    observed = remote_run(client, "sha256sum %s" % shlex.quote(temporary)).split()
-    if observed and observed[0] == expected:
-        remote_run(
-            client,
-            "mv -f %s %s" % (shlex.quote(temporary), shlex.quote(remote)),
-        )
-        return expected
-    raise RuntimeError(
-        "ssh cat upload failed %s status=%s err=%s" % (remote, status, err)
-    )
+    try:
+        sftp.remove(temporary)
+    except IOError:
+        pass
+    with sftp.file(temporary, "wb") as handle:
+        handle.write(data)
+        handle.flush()
+    if sftp.stat(temporary).st_size != len(data):
+        raise RuntimeError("sftp upload size mismatch for %s" % remote)
+    try:
+        sftp.remove(remote)
+    except IOError:
+        pass
+    sftp.rename(temporary, remote)
+    return expected
+
+
+def atomic_put_retry(client, sftp, local, remote, attempts=8):
+    last = None
+    for attempt in range(attempts):
+        try:
+            digest = atomic_put(client, sftp, local, remote)
+            return client, sftp, digest
+        except SSH_ERRORS as exc:
+            last = exc
+            print("UPLOAD_RETRY", remote, attempt, exc, flush=True)
+            try:
+                sftp.close()
+            except Exception:
+                pass
+            time.sleep(2 + min(attempt, 6) * 2)
+            client = ssh_reconnect(client)
+            sftp = client.open_sftp()
+    raise RuntimeError("upload retries exhausted %s: %s" % (remote, last))
+
+
+def atomic_put_bytes_retry(client, sftp, data, remote, attempts=8):
+    last = None
+    for attempt in range(attempts):
+        try:
+            digest = atomic_put_bytes(client, sftp, data, remote)
+            return client, sftp, digest
+        except SSH_ERRORS as exc:
+            last = exc
+            print("UPLOAD_RETRY", remote, attempt, exc, flush=True)
+            try:
+                sftp.close()
+            except Exception:
+                pass
+            time.sleep(2 + min(attempt, 6) * 2)
+            client = ssh_reconnect(client)
+            sftp = client.open_sftp()
+    raise RuntimeError("upload retries exhausted %s: %s" % (remote, last))
 
 
 def job_id(submit_text):
@@ -152,18 +238,24 @@ def job_id(submit_text):
 def wait_job(client, jid, label, polls=None):
     limit = JOB_POLLS if polls is None else polls
     for poll_index in range(limit):
-        response = remote_run(
-            client,
-            "state=$(bjobs -noheader -o stat %s 2>/dev/null | tr -d '[:space:]'); "
-            "printf '__CMR_JOB_STATE__%%s\\n' \"$state\"" % shlex.quote(jid),
-        )
+        try:
+            response = remote_run(
+                client,
+                "state=$(bjobs -noheader -o stat %s 2>/dev/null | tr -d '[:space:]'); "
+                "printf '__CMR_JOB_STATE__%%s\\n' \"$state\"" % shlex.quote(jid),
+            )
+        except SSH_ERRORS as exc:
+            print("JOB_WAIT_RETRY", label, jid, poll_index, exc, flush=True)
+            client = ssh_reconnect(client)
+            time.sleep(5)
+            continue
         marker = re.search(r"__CMR_JOB_STATE__([A-Z]*)", response)
         if not marker:
             raise RuntimeError("could not parse LSF state for %s: %s" % (jid, response))
         state = marker.group(1)
         if not state or state == "DONE":
             print("JOB_DONE", label, jid, state or "PURGED", flush=True)
-            return
+            return client
         if state in ("EXIT", "ZOMBI", "UNKWN"):
             raise RuntimeError("LSF job %s %s ended in state %s" % (label, jid, state))
         print("JOB_WAIT", label, jid, state, "poll", poll_index, flush=True)
@@ -214,16 +306,10 @@ def local_preflight():
             sim_env = base_env.copy()
             sim_env["ASYNC_PRIMITIVES"] = "sim"
             subprocess.run(
-                [
-                    sbt,
-                    "runMain",
-                    "Router_Architecture.CMR.CMRRouterMain",
-                    str(ROUTER_LEVEL),
-                    str(CHILD_LANES),
-                    str(PARENT_LANES),
-                    "1" if USE_MESH else "0",
-                    str(MESH_GRID),
-                ],
+                [sbt, "runMain Router_Architecture.CMR.CMRRouterMain %s %s %s %s %s" % (
+                    ROUTER_LEVEL, CHILD_LANES, PARENT_LANES,
+                    "1" if USE_MESH else "0", MESH_GRID,
+                )],
                 cwd=REPO,
                 env=sim_env,
                 check=True,
@@ -251,16 +337,10 @@ def local_preflight():
         asic_env = base_env.copy()
         asic_env["ASYNC_PRIMITIVES"] = "asic"
         subprocess.run(
-            [
-                sbt,
-                "runMain",
-                "Router_Architecture.CMR.CMRRouterMain",
-                str(ROUTER_LEVEL),
-                str(CHILD_LANES),
-                str(PARENT_LANES),
-                "1" if USE_MESH else "0",
-                str(MESH_GRID),
-            ],
+            [sbt, "runMain Router_Architecture.CMR.CMRRouterMain %s %s %s %s %s" % (
+                ROUTER_LEVEL, CHILD_LANES, PARENT_LANES,
+                "1" if USE_MESH else "0", MESH_GRID,
+            )],
             cwd=REPO,
             env=asic_env,
             check=True,
@@ -374,6 +454,8 @@ def main():
         files[REPO / "sim" / "CMR" / "testbench" / MULTILANE_TB_FILE] = "sim/tb/" + MULTILANE_TB_FILE
     for name in (
         "Toggle.v",
+        "LanePhaseAdapterDFF.v",
+        "LaneSelector.v",
         "HeadPredictor.v",
         "PhaseSelector.v",
         "AddressRegisterUnit.v",
@@ -391,28 +473,28 @@ def main():
         "ReadAckGenerator.v",
     ):
         files[cmr_resource / name] = "rtl/" + name
+    if os.environ.get("CMR_REUSE_REMOTE_TOOLCHAIN", "0") == "1":
+        # The remote DC/Tcl/library scaffold is immutable for a focused RTL
+        # rerun.  Upload only the emitted DUT and the Adapter under test.
+        files = {
+            source: destination
+            for source, destination in files.items()
+            if source == entry or source.name == "LanePhaseAdapterDFF.v"
+        }
     missing = [str(path) for path in files if not path.is_file()]
     if missing:
         raise SystemExit("Missing CMR remote input files: " + ", ".join(missing))
 
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(
-        os.environ.get("C1_HOST", "192.168.2.8"),
-        username=os.environ.get("C1_USER", "ghy19"),
-        password=password(),
-        timeout=40,
-        banner_timeout=90,
-        allow_agent=False,
-        look_for_keys=False,
-        compress=True,
-    )
+    client = ssh_connect()
     directories = (
         "rtl rtl/runs/%s scripts/dc scripts/sta sim/tb sim/tb/hop_binds sim/cases "
         "sim/work outputs reports/dc reports/sta logs/dc logs/gls results/%s work"
         % (RUN_ID, RUN_ID)
     )
-    remote_run(client, "mkdir -p " + " ".join(ROOT + "/" + d for d in directories.split()))
+    client, _ = remote_run_retry(
+        client,
+        "mkdir -p " + " ".join(ROOT + "/" + d for d in directories.split()),
+    )
 
     # Preserve provenance exactly as requested: copy reference stimulus from
     # the remote Ultra tree, then make a CMR-owned boundary-only adaptation.
@@ -425,10 +507,13 @@ def main():
         "{cmr}/sim/tb/tb_ultra_router_boundary_smoke.reference.sv > "
         "{cmr}/sim/tb/tb_cmr_router_boundary_smoke.sv"
     ).format(ultra=shlex.quote(ULTRA_ROOT), cmr=shlex.quote(ROOT))
-    copy_output = remote_run(client, copy_command)
+    client, copy_output = remote_run_retry(client, copy_command)
     if copy_output.strip():
         print(copy_output, flush=True)
 
+    # The Ultra case copy saturates the login-node SSH channel; start a fresh
+    # session before the multi-file SFTP upload.
+    client = ssh_reconnect(client)
     sftp = client.open_sftp()
     manifest = {
         "run_id": RUN_ID,
@@ -449,11 +534,12 @@ def main():
     }
     for source, destination in files.items():
         print("UPLOAD", destination, flush=True)
-        manifest["files"][destination] = atomic_put(
+        client, sftp, digest = atomic_put_retry(
             client, sftp, source, ROOT + "/" + destination
         )
+        manifest["files"][destination] = digest
     if entry is not None:
-        remote_run(
+        client, _ = remote_run_retry(
             client,
             "cp -f %s %s"
             % (
@@ -461,7 +547,7 @@ def main():
                 shlex.quote(ROOT + "/rtl/CMRRouter.v"),
             ),
         )
-    copied_hashes = remote_run(
+    client, copied_hashes = remote_run_retry(
         client,
         "sha256sum %s/sim/tb/tb_ultra_router_boundary_smoke.reference.sv "
         "%s/sim/tb/tb_cmr_router_boundary_smoke.sv %s/sim/cases/*.case"
@@ -470,16 +556,18 @@ def main():
     manifest["remote_copied_sha256"] = [
         line for line in copied_hashes.splitlines() if re.match(r"^[0-9a-f]{64}  ", line)
     ]
-    atomic_put_bytes(
+    client, sftp, _ = atomic_put_bytes_retry(
         client,
         sftp,
         (json.dumps(manifest, indent=2) + "\n").encode(),
         ROOT + "/results/" + RUN_ID + "/manifest.json",
     )
     sftp.close()
-    remote_run(client, "chmod +x %s/scripts/run_gls_cmr_router.sh" % ROOT)
+    client, _ = remote_run_retry(
+        client, "chmod +x %s/scripts/run_gls_cmr_router.sh" % ROOT
+    )
     if SEED_RUN_ID:
-        probe = remote_run(
+        client, probe = remote_run_retry(
             client,
             "test -s %s && echo OK"
             % shlex.quote(ROOT + "/outputs/" + SEED_RUN_ID + "/CMRRouter.ddc"),
@@ -518,23 +606,28 @@ def main():
            ROOT, ROOT)
     )
     sftp = client.open_sftp()
-    atomic_put_bytes(client, sftp, dc_body.encode(), dc_wrapper)
+    client, sftp, _ = atomic_put_bytes_retry(
+        client, sftp, dc_body.encode(), dc_wrapper
+    )
     sftp.close()
-    remote_run(client, "chmod +x %s" % dc_wrapper)
-    dc_submit = remote_run(
+    client, _ = remote_run_retry(client, "chmod +x %s" % dc_wrapper)
+    bsub_extra = os.environ.get("CMR_DES_BSUB_EXTRA", "").strip()
+    client, dc_submit = remote_run_retry(
         client,
-        "bsub -n 8 -o %s -e %s.err -J cmr_dc_%s %s"
-        % (dc_log, dc_log, RUN_ID, dc_wrapper),
+        "bsub -n 8 %s -o %s -e %s.err -J cmr_dc_%s %s"
+        % (bsub_extra, dc_log, dc_log, RUN_ID, dc_wrapper),
     )
     dc_job = job_id(dc_submit)
     print("DC_JOB", dc_job, flush=True)
-    wait_job(client, dc_job, "dc")
+    client = wait_job(client, dc_job, "dc")
     # LSF can expose DONE a few moments before the output spool is fully
     # flushed to the requested log.  Wait for an explicit flow marker rather
     # than treating that short visibility window as a DC failure.
     dc_text = ""
     for _ in range(12):
-        dc_text = remote_run(client, "cat %s %s.err 2>/dev/null" % (dc_log, dc_log))
+        client, dc_text = remote_run_retry(
+            client, "cat %s %s.err 2>/dev/null" % (dc_log, dc_log)
+        )
         if "CMR_DC_PASS" in dc_text or "CMR_DC_FAIL" in dc_text:
             break
         time.sleep(5)
@@ -595,12 +688,14 @@ def main():
            MULTILANE_TB_FILE if MULTILANE else "tb_cmr_router_boundary_smoke.sv",
            MULTILANE_TB_TOP if MULTILANE else "tb_cmr_router_boundary_smoke", ROOT)
     )
-    remote_run(client, "mkdir -p %s/logs/gls/%s" % (ROOT, RUN_ID))
+    client, _ = remote_run_retry(client, "mkdir -p %s/logs/gls/%s" % (ROOT, RUN_ID))
     sftp = client.open_sftp()
-    atomic_put_bytes(client, sftp, sdf_body.encode(), sdf_wrapper)
+    client, sftp, _ = atomic_put_bytes_retry(
+        client, sftp, sdf_body.encode(), sdf_wrapper
+    )
     sftp.close()
-    remote_run(client, "chmod +x %s" % sdf_wrapper)
-    sdf_submit = remote_run(
+    client, _ = remote_run_retry(client, "chmod +x %s" % sdf_wrapper)
+    client, sdf_submit = remote_run_retry(
         client,
         "bsub -n 8 -o %s/logs/gls/%s/sdf.bsub.log "
         "-e %s/logs/gls/%s/sdf.bsub.err -J cmr_sdf_%s %s"
@@ -608,12 +703,12 @@ def main():
     )
     sdf_job = job_id(sdf_submit)
     print("SDF_JOB", sdf_job, flush=True)
-    wait_job(client, sdf_job, "sdf")
+    client = wait_job(client, sdf_job, "sdf")
 
-    compile_log = remote_run(
+    client, compile_log = remote_run_retry(
         client, "cat %s/logs/gls/%s/sdf/compile.log 2>/dev/null" % (ROOT, RUN_ID)
     )
-    annotation_log = remote_run(
+    client, annotation_log = remote_run_retry(
         client, "cat %s/logs/gls/%s/sdf/sdf_annotate.log 2>/dev/null" % (ROOT, RUN_ID)
     )
     annotation_errors = re.search(r"Total errors:\s*(\d+)", annotation_log)
@@ -636,7 +731,7 @@ def main():
     }
     all_pass = True
     for case_name in CASE_LIST:
-        run_log = remote_run(
+        client, run_log = remote_run_retry(
             client,
             "cat %s/logs/gls/%s/sdf/%s/run.log "
             "%s/logs/gls/%s/sdf/%s/stdout.log 2>/dev/null"
@@ -669,7 +764,7 @@ def main():
                 print(line, flush=True)
 
     sftp = client.open_sftp()
-    atomic_put_bytes(
+    client, sftp, _ = atomic_put_bytes_retry(
         client,
         sftp,
         (json.dumps(summary, indent=2) + "\n").encode(),

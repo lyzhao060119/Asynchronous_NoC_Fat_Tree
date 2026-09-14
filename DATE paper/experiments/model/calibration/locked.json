@@ -2,19 +2,19 @@
   "schema": "date-v3-des-lock-v1",
   "model_version": "date-des-v1",
   "physical_class": "post-synthesis",
-  "calibration_file": "20260901_primitive_ru5_post_synthesis.json",
-  "calibration_run_id": "20260901_cmr_primitive_hop_ppa_ru5",
-  "calibration_hash": "4385f8b70c2e69f69589025557458cf1c205f926c8382910e2714bc86bbe62df",
+  "calibration_file": "20260912_205700_cmr_primitive_hop_ppa_rpsdel050.json",
+  "calibration_run_id": "20260912_205700_cmr_primitive_hop_ppa_rpsdel050",
+  "calibration_hash": "dd59437e58753dc54539367d6000eaa8610367f9188d3d815c4b3c9a2e978fc0",
   "calibration_seed": 900001,
   "hop_self_check": "pass",
   "network_rtl_64": "pending",
   "network_rtl_256": "pending",
   "paper_matrix_allowed": false,
-  "locked_utc": "2026-09-02T02:42:39+00:00",
+  "locked_utc": "2026-09-12T15:32:24+00:00",
   "stale_if": [
     "dc_netlist_change",
     "maximum_sdf_change",
     "locked_delay_recipe_change"
   ],
-  "notes": "Hop H/B/T is locked to post-synthesis MAXIMUM-SDF primitives.  Formal 64/256/1024 DES paper matrix requires paper_matrix_allowed.  256 rtl_keycase does not use DelayElement_sim Tmax vs post-synth 5%.  Do not write post-layout.  Do not overwrite frozen hop netlists.  Do not tune on paper seeds 202701/202702/202703. network_rtl_64=pending network_rtl_256=pending."
+  "notes": "Async hop H/B/T remeasured 2026-09-12 after ReadPhaseSelector OtherPath 1xDEL050. RCU 1xDEL050, Ackin 1xDEL050, mesh Mat also 1xDEL050. Isolated/stream/idle/contention MAXIMUM-SDF + PT-PX all pass. Do not cite 20260830/20260901 0.681/0.956/1.022/1.328 ns."
 }

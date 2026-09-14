@@ -107,6 +107,8 @@ module CMRMutexN #(parameter WIDTH = 5) (
                         .gnt2(grant[2]), .gnt3(grant[3]));
         end else if (WIDTH == 5) begin : w5
             CMRFlatArbiter5 flat(.reset(reset), .req(req), .grant(grant));
+        end else if (WIDTH == 7) begin : w7
+            CMRFlatArbiter7 flat(.reset(reset), .req(req), .grant(grant));
         end else if (WIDTH == 8) begin : w8
             CMRFlatArbiter8 flat(.reset(reset), .req(req), .grant(grant));
         end else if (WIDTH == 10) begin : w10

@@ -46,14 +46,18 @@ class CMRNetworkDutSpec extends AnyFlatSpec {
     assert(CMRNetworkInventory.flatMesh(32).maxOpmFanIn == 4)
   }
 
-  it should "count PROP256/1024 as Q64 tiles plus TopMesh2" in {
-    val p256 = CMRNetworkInventory.clusteredProp(2, 2, designId = Some("PROP256"))
+  it should "count PROP256 PFAT Q64 tiles plus TopMesh4x8" in {
+    val p256 = CMRNetworkInventory.clusteredProp(2, 4, designId = Some("PROP256"), pfatQ64 = true)
     assert(p256.routers == 88)
-    assert(p256.ipms == 624)
-    assert(p256.adapters == 1216)
+    assert(p256.ipms == 768)
+    assert(p256.adapters == 1792)
     assert(p256.interlevelFifos == 0)
-    assert(p256.maxOpmFanIn == 8)
+    assert(p256.topMeshLanes == 4)
+    assert(p256.maxOpmFanIn == 20)
+    assert(p256.primitives.exists(p => p.useMeshRouting && p.childLanes == 4 && p.parentLanes == 8 && p.count == 4))
+  }
 
+  it should "count PROP1024 as Q64 tiles plus TopMesh2" in {
     val p1024 = CMRNetworkInventory.clusteredProp(4, 2, designId = Some("PROP1024"))
     assert(p1024.routers == 352)
     assert(p1024.ipms == 2496)

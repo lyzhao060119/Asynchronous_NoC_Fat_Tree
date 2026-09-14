@@ -13,7 +13,16 @@ module ReadPhaseSelector #(
 );
     localparam [3:0] LOCAL_MASK = (4'b0001 << LOCAL_BRANCH);
     wire PathEnabledLocal = |(PathEnabled & LOCAL_MASK);
-    wire OtherPathEnabled = |(PathEnabled & ~LOCAL_MASK);
+    wire OtherPathEnabledComb = |(PathEnabled & ~LOCAL_MASK);
+    // Hold OtherPathEnabled by 1xDEL050 so a true multicast bit that lags
+    // its siblings by gate-level skew is not classified as WrongPath.
+    // PathEnabledLocal stays combinational.  A genuine wrong path still
+    // cancels: Local never rises, Other stays 1, only the cancel edge moves.
+    wire OtherPathEnabled;
+    DelayElement #(.DelayValue(1), .DelayUnitPs(50)) OtherPathDelay (
+        .I(OtherPathEnabledComb),
+        .Z(OtherPathEnabled)
+    );
     wire WrongPath = ~PathEnabledLocal & OtherPathEnabled;
     wire CancelEnable = WrongPath & (Reqout ^ Ackin);
     wire CorrectionPhase;

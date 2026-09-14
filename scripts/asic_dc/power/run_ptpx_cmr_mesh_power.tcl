@@ -36,5 +36,9 @@ update_power
 report_power > "$::env(CMR_POWER_REPORT_DIR)/power.rpt"
 report_power -hierarchy > "$::env(CMR_POWER_REPORT_DIR)/power_hierarchy.rpt"
 report_power -cell_power > "$::env(CMR_POWER_REPORT_DIR)/power_cells.rpt"
+if {![file exists "$::env(CMR_POWER_REPORT_DIR)/power.rpt"] || [file size "$::env(CMR_POWER_REPORT_DIR)/power.rpt"] == 0} {
+  puts "CMR_POWER_FAIL missing power report"
+  exit 1
+}
 puts "CMR_POWER_PASS reports=$::env(CMR_POWER_REPORT_DIR)"
 exit

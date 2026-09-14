@@ -1,0 +1,6 @@
+{
+  "source": "raw/*/sdf/*/{run.log,sdf_annotate_tail.log}",
+  "rows": 24,
+  "all_tb_pass": true,
+  "all_sdf_errors_zero": true
+}

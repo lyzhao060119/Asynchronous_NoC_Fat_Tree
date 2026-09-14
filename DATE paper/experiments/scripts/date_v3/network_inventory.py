@@ -88,18 +88,32 @@ def _q64(design_id: str, profile: str, l1: dict, l2: dict, l3: dict, notes: str 
     }
 
 
-def clustered(cluster_grid: int, mesh_lanes: int, *, design_id: str, hrep: bool = False) -> dict[str, Any]:
+def clustered(
+    cluster_grid: int,
+    mesh_lanes: int,
+    *,
+    design_id: str,
+    hrep: bool = False,
+    q64_profile: str = "1222",
+) -> dict[str, Any]:
     tiles = cluster_grid * cluster_grid
     nodes = tiles * 64
-    if mesh_lanes == 2:
+    if q64_profile == "1248" and mesh_lanes == 4:
+        # PROP256 uses four PFAT64 tiles (1-2-4-8) and a supported
+        # (4,8) top-mesh router per tile.
+        top = PFAT48
+        l1, l2, l3 = FAT12, PFAT24, PFAT48
+    elif q64_profile == "1222" and mesh_lanes == 2:
         top = TOP22
-    elif mesh_lanes == 1:
+        l1, l2, l3 = FAT12, PROP22, PROP22
+    elif q64_profile == "1222" and mesh_lanes == 1:
         top = TOP12
+        l1, l2, l3 = FAT12, PROP22, PROP22
     else:
         return {
             "design_id": design_id,
             "nodes": nodes,
-            "lane_profile": "1-2-2-2",
+            "lane_profile": "1-2-4-8" if q64_profile == "1248" else "1-2-2-2",
             "routing": "quadtree_topmesh",
             "cluster_grid": cluster_grid,
             "top_mesh_lanes": mesh_lanes,
@@ -116,11 +130,10 @@ def clustered(cluster_grid: int, mesh_lanes: int, *, design_id: str, hrep: bool 
             "top_ports": 0,
             "inter_router_links": 0,
             "channel_bits": 0,
-            "max_opm_fanin": PROP22["max_fanin"],
+            "max_opm_fanin": PFAT48["max_fanin"] if q64_profile == "1248" else PROP22["max_fanin"],
             "mutex_widths": [],
-            "notes": "Mesh%d needs TopMesh (%d,2), which is unsupported. Not elaborated." % (mesh_lanes, mesh_lanes),
+            "notes": "Mesh%d/profile%s has no supported top-mesh implementation. Not elaborated." % (mesh_lanes, q64_profile),
         }
-    l1, l2, l3 = FAT12, PROP22, PROP22
     tree_ports = tiles * (L1 * l1["ports"] + L2 * l2["ports"] + L3 * l3["ports"])
     ports = tree_ports + tiles * top["ports"]
     adp = tiles * (L1 * l1["adapters"] + L2 * l2["adapters"] + L3 * l3["adapters"]) + tiles * top["adapters"]
@@ -135,7 +148,7 @@ def clustered(cluster_grid: int, mesh_lanes: int, *, design_id: str, hrep: bool 
     return {
         "design_id": design_id,
         "nodes": nodes,
-        "lane_profile": "1-2-2-2",
+        "lane_profile": "1-2-4-8" if q64_profile == "1248" else "1-2-2-2",
         "routing": "quadtree_topmesh",
         "cluster_grid": cluster_grid,
         "top_mesh_lanes": mesh_lanes,
@@ -203,7 +216,7 @@ def all_duts() -> list[dict[str, Any]]:
         flat_mesh(8),
         flat_mesh(16),
         flat_mesh(32),
-        clustered(2, 2, design_id="PROP256"),
+        clustered(2, 4, design_id="PROP256", q64_profile="1248"),
         clustered(4, 2, design_id="PROP1024"),
         clustered(4, 2, design_id="HREP1024", hrep=True),
         clustered(4, 1, design_id="PROP1024_MESH1"),

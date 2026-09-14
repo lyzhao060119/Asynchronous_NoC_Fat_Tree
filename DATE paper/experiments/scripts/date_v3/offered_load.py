@@ -7,10 +7,10 @@ exponential with
     lambda_pkt = offered_MFlit_per_port_s / packet_flits / 1e3   (packets/ns)
 
 so 100 MFlit/Port/s at 5 flits is 0.02 packets/ns (mean 50 ns).  Body/tail
-flits of a packet are offered one per CASE_TICK_NS on the same source.
-A later packet on that source does not start until the previous Tail has
-been offered.  packet_start_probability() is the discrete Bernoulli
-counterpart (0.02 at 100 MFlit) and is not the scheduler.
+flits share the header's offer cycle (ASAP); DUT backpressure paces wire
+service.  A later packet on that source may be scheduled on the next tick.
+packet_start_probability() is the discrete Bernoulli counterpart
+(0.02 at 100 MFlit) and is not the scheduler.
 
 With CASE_TICK_NS = 1.0 the 1-flit/tick ceiling is 1000 MFlit/Port/s.
 Historical dimensionless offered_load (0.10 at a 20 ns tick) was 5

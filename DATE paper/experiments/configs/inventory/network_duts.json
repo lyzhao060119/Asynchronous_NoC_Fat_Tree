@@ -32,10 +32,10 @@
     {
       "design_id": "PROP64",
       "nodes": 64,
-      "lane_profile": "1-2-2-2",
+      "lane_profile": "1-2-4-8",
       "routing": "quadtree",
       "cluster_grid": 1,
-      "top_mesh_lanes": 2,
+      "top_mesh_lanes": 4,
       "hrep_policy": false,
       "shares_netlist_with": null,
       "elaborated": true,
@@ -189,25 +189,28 @@
       "shares_netlist_with": null,
       "elaborated": true,
       "routers": 88,
-      "ipms": 624,
-      "opms": 624,
-      "ports": 624,
-      "adapters": 1216,
+      "ipms": 768,
+      "opms": 768,
+      "ports": 768,
+      "adapters": 1792,
       "interlevel_fifos": 0,
       "core_ports": 256,
       "top_ports": 0,
       "inter_router_links": 352,
       "channel_bits": 9856,
-      "max_opm_fanin": 8,
+      "max_opm_fanin": 20,
       "mutex_widths": [
         2,
         4,
         5,
-        8
+        8,
+        10,
+        16,
+        20
       ],
       "notes": "",
       "display_name": "Asynchronous balanced hierarchical network, 256 nodes",
-      "display_description": "2-by-2 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 256-node network is added."
+      "display_description": "2-by-2 tiles of 64-node 1-2-4-8 hierarchical clusters plus a four-lane top mesh. No synchronous 256-node network is added."
     },
     {
       "design_id": "PROP1024",

@@ -30,6 +30,8 @@
         "r_u5",
         "bf_stress64",
         "topo_ur",
+        "topo_bc",
+        "hotspot10",
         "xmc_f16",
         "xmc10_g",
         "mc_ur64",

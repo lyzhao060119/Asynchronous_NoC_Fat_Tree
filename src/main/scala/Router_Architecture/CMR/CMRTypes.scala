@@ -48,7 +48,7 @@ object CMRParameters {
     Datain.flit(PacketLayout.Y1Hi, PacketLayout.X0Lo)
 
   val SupportedLaneGeometries: Set[(Int, Int)] =
-    Set((1, 1), (1, 2), (2, 2), (2, 4), (4, 8))
+    Set((1, 1), (1, 2), (1, 4), (2, 2), (2, 4), (4, 8))
 
   /** LanePhaseAdapter count for one CMRRouter: one adapter per ingress
     * port and legal output direction whose destination width is greater

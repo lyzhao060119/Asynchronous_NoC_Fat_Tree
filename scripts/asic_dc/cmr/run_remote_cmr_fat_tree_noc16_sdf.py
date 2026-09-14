@@ -124,7 +124,7 @@ def connect(attempts=8):
                 banner_timeout=90,
                 allow_agent=False,
                 look_for_keys=False,
-                compress=True,
+                compress=False,
             )
             transport = client.get_transport()
             if transport is not None:

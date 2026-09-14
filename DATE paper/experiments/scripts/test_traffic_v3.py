@@ -14,7 +14,12 @@ import json
 
 from date_v3.canonical_trace import (  # noqa: E402
     PACKET_FLITS,
+    choose_bit_complement_dest,
+    choose_hotspot10_dest,
     generate_trace,
+    hotspot10_centers,
+    hotspot10_weights,
+    load_benchmark,
     load_seeds,
     same_l2_subtree,
     width_of,
@@ -95,20 +100,18 @@ def test_serialized_flits() -> None:
     trace = generate_trace("TOPO-UR", seed=202701, nodes=64, smoke=True, load_point=SMOKE_LOAD)
     case = materialize(trace, top_lanes=0, hrep=False)
     by_pkt: dict[int, list[int]] = {}
-    by_port: dict[int, list[int]] = {}
+    starts_by_port: dict[int, list[int]] = {}
     for cycle, port, pkt_seq, _flit, _comment in case["inputs"]:
         by_pkt.setdefault(int(pkt_seq), []).append(int(cycle))
-        by_port.setdefault(int(port), []).append(int(cycle))
+    for packet in case["packets"]:
+        starts_by_port.setdefault(int(packet["source"]), []).append(int(packet["ready_cycle"]))
     assert_true(by_pkt, "materialized inputs")
     for cycles in by_pkt.values():
         ordered = sorted(cycles)
         assert_true(len(ordered) == PACKET_FLITS, "five flit offer times")
-        assert_true(
-            ordered == list(range(ordered[0], ordered[0] + PACKET_FLITS)),
-            "one flit per tick inside a packet",
-        )
-    for cycles in by_port.values():
-        assert_true(sorted(cycles) == sorted(set(cycles)), "one source flit per tick")
+        assert_true(len(set(ordered)) == 1, "intra-packet ASAP: same offer cycle")
+    for starts in starts_by_port.values():
+        assert_true(sorted(starts) == sorted(set(starts)), "distinct packet-start cycles per source")
 
 
 def test_bf_stress() -> None:
@@ -149,6 +152,40 @@ def test_topo_ur_scales() -> None:
             assert_true(len(event["destinations"]) == 1, "unicast")
 
 
+def test_e2_bc_hotspot10() -> None:
+    from random import Random
+
+    assert_true(
+        [choose_bit_complement_dest(source, 64) for source in range(64)]
+        == [source ^ 0x3F for source in range(64)],
+        "BC must be exact for all 64 sources",
+    )
+    assert_true(hotspot10_centers(64) == (27, 28, 35, 36), "Hotspot10 center PEs")
+    for source in range(64):
+        weights = hotspot10_weights(source, 64)
+        assert_true(source not in weights and len(weights) == 63, "Hotspot10 excluded self")
+        assert_true(all(weight == (11 if dest in (27, 28, 35, 36) else 10) for dest, weight in weights.items()), "Hotspot10 1.10x exact")
+    rng_a = Random(202701)
+    rng_b = Random(202701)
+    draws_a = [choose_hotspot10_dest(rng_a, source % 64, 64) for source in range(6400)]
+    draws_b = [choose_hotspot10_dest(rng_b, source % 64, 64) for source in range(6400)]
+    assert_true(draws_a == draws_b, "Hotspot10 deterministic by seed")
+    assert_true(all(dest != idx % 64 for idx, dest in enumerate(draws_a)), "Hotspot10 src!=dst")
+    expected_loads = [5, 10, 20] + list(range(40, 501, 20)) + [600, 700, 800]
+    for benchmark_id in ("TOPO-BC", "HOTSPOT10"):
+        bench = load_benchmark(benchmark_id)
+        assert_true(bench["load_sweep"]["coarse_loads"] == expected_loads, benchmark_id + " 30 loads")
+        assert_true(
+            bench["applies_to_designs"] == ["PROP_temp64", "FM64"],
+            benchmark_id + " paired DUTs",
+        )
+        trace = generate_trace(benchmark_id, seed=202701, nodes=64, smoke=True, load_point=5)
+        assert_true(
+            all(e["source"] not in e["destinations"] for e in trace["events"]),
+            benchmark_id + " src!=dst",
+        )
+
+
 def test_64_multicast_sets() -> None:
     for benchmark_id, fanout, cross_l2 in (
         ("MC-UR-F4", 4, False),
@@ -166,6 +203,43 @@ def test_64_multicast_sets() -> None:
                 remote = {d for d in range(64) if not same_l2_subtree(event["source"], d, width)}
                 assert_true(all(dest in remote for dest in dests), benchmark_id + " remote L2 only")
                 assert_true(len({(d % width // 4, d // width // 4) for d in dests}) >= 2, benchmark_id + " spans L2 subtrees")
+
+
+def test_emergency_region_fanouts_and_repeated_unicast() -> None:
+    for fanout in (2, 4, 8, 16, 32):
+        trace = generate_trace(
+            "MC-REGION-F%d" % fanout,
+            seed=202701,
+            nodes=64,
+            load_point=5,
+            warmup=2,
+            measurement=4,
+            smoke=False,
+        )
+        native = materialize(trace, top_lanes=16, hrep=False)
+        repeated = materialize(
+            trace, top_lanes=16, hrep=False, source_repeated_unicast=True
+        )
+        assert_true(len(native["packets"]) == 6, "one native packet per event")
+        assert_true(len(repeated["packets"]) == 6 * fanout, "F repeated unicasts per event")
+        native_sets = {
+            row["original_event_id"]: set(row["intended_destinations"])
+            for row in native["packets"]
+        }
+        repeated_sets = {}
+        for row in repeated["packets"]:
+            assert_true(len(row["delivered_destinations"]) == 1, "repeated packet is unicast")
+            assert_true(((int(row["flits"][1], 16) >> 5) & 1) == 0, "repeated body is unicast")
+            repeated_sets.setdefault(row["original_event_id"], set()).update(
+                row["intended_destinations"]
+            )
+        assert_true(native_sets == repeated_sets, "paired destination sets")
+        for event in trace["events"]:
+            dests = event["destinations"]
+            assert_true(len(dests) == fanout, "exact fanout")
+            assert_true(event["source"] not in dests, "source excluded")
+            x0, y0, x1, y1 = event["rect"]
+            assert_true((x1 - x0 + 1) * (y1 - y0 + 1) == fanout, "exact AABB area")
 
 
 def test_xmc_spread() -> None:
@@ -244,7 +318,8 @@ def test_materialize_64() -> None:
         cycles_by_pkt.setdefault(int(pkt_seq), []).append(int(cycle))
     for cycles in cycles_by_pkt.values():
         ordered = sorted(cycles)
-        assert_true(ordered == list(range(ordered[0], ordered[0] + PACKET_FLITS)), "serialized flits")
+        assert_true(len(set(ordered)) == 1, "ASAP: all flits share offer cycle")
+        assert_true(len(ordered) == PACKET_FLITS, "five flits")
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "bf.case"
         write_case(case, path)
@@ -677,7 +752,9 @@ def main() -> int:
         test_bf_stress,
         test_paired_thin_prop,
         test_topo_ur_scales,
+        test_e2_bc_hotspot10,
         test_64_multicast_sets,
+        test_emergency_region_fanouts_and_repeated_unicast,
         test_xmc_spread,
         test_xmc10_fraction,
         test_hrep_split,

@@ -202,3 +202,43 @@ object SyncCmrFatTreeNoC64Fat1222Main extends App {
     Array("--target-dir", "generated_sync_cmr/fat_tree_noc64_1222")
   )
 }
+
+/** Fat 1-2-4-8 clocked 64-core tree.  It is the synchronous Q64 counterpart
+  * of the PFAT tile: L1 1->2, L2 2->4, L3 4->8, with eight top lanes.
+  */
+class SyncCmrFatTreeNoC64Fat1248(
+    scale: NoCScaleConfig = NoCScaleConfig.syncFatTree64_1248
+) extends Module {
+  override def desiredName: String = "SyncNoC_64nodes"
+
+  require(scale.coresPerQuad == 64)
+  require((scale.channels.l1.childLanes, scale.channels.l1.parentLanes) == (1, 2),
+    s"Sync Fat1248 L1 must be (1,2), got (${scale.channels.l1.childLanes},${scale.channels.l1.parentLanes})")
+  require((scale.channels.l2.childLanes, scale.channels.l2.parentLanes) == (2, 4),
+    s"Sync Fat1248 L2 must be (2,4), got (${scale.channels.l2.childLanes},${scale.channels.l2.parentLanes})")
+  require((scale.channels.l3.childLanes, scale.channels.l3.parentLanes) == (4, 8),
+    s"Sync Fat1248 L3 must be (4,8), got (${scale.channels.l3.childLanes},${scale.channels.l3.parentLanes})")
+  require(scale.channels.l3.parentLanes == 8,
+    s"Sync Fat1248 NoC64 top lanes must be 8, got ${scale.channels.l3.parentLanes}")
+
+  val io = IO(new Bundle {
+    val core_inputs = Vec(64, new SyncVrPacket)
+    val core_outputs = Flipped(Vec(64, new SyncVrPacket))
+    val top_input = Vec(8, new SyncVrPacket)
+    val top_output = Flipped(Vec(8, new SyncVrPacket))
+  })
+
+  private val tree = Module(new SyncCmrFatTree(
+    coordinateX = 0,
+    coordinateY = 0,
+    scale = scale
+  ))
+  io <> tree.io
+}
+
+object SyncCmrFatTreeNoC64Fat1248Main extends App {
+  emitVerilog(
+    new SyncCmrFatTreeNoC64Fat1248(NoCScaleConfig.syncFatTree64_1248),
+    Array("--target-dir", "generated_sync_cmr/fat_tree_noc64_1248")
+  )
+}

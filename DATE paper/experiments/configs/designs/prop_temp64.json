@@ -1,0 +1,70 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "PROP_temp64",
+  "kind": "network",
+  "family": "PROP_TEMP",
+  "nodes": 64,
+  "async": true,
+  "routing": "quadtree",
+  "lane_profile": "B8_parallel_plane",
+  "top_mesh_lanes": 16,
+  "cluster_grid": 1,
+  "router_primitives": [
+    {
+      "primitive_id": "async_fat_1x4",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 4,
+      "use_mesh_routing": false,
+      "count": 16
+    },
+    {
+      "primitive_id": "async_fat_1x4",
+      "level": 2,
+      "child_lanes": 1,
+      "parent_lanes": 4,
+      "use_mesh_routing": false,
+      "count": 16
+    },
+    {
+      "primitive_id": "async_thin_1x1",
+      "level": 3,
+      "child_lanes": 1,
+      "parent_lanes": 1,
+      "use_mesh_routing": false,
+      "count": 16
+    }
+  ],
+  "expected_structure": {
+    "routers": 48,
+    "ports": 336,
+    "adapters": 128,
+    "interlevel_fifos": 0,
+    "top_ports": 16,
+    "max_opm_fanin": 7,
+    "mutex_widths": [2, 4, 5, 7]
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "bypass",
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "paired_trace_with": null,
+  "adapter": null,
+  "paper_role": "Experimental B8 parallel-plane hierarchical network, 64 nodes (PROP_temp)",
+  "paper_eligible_default": false,
+  "notes": "Not in locked paper matrix. Replaces wide L3 hypothesis after poor PFAT64 ASAP latency. See docs/cmr_parallel_plane_topology.md.",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "mesh_rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "display_name": "PROP_temp64 B8 parallel-plane (experimental)",
+  "display_description": "16x L1(1,4) + 16x L2(1,4) + 16x L3(1,1) with 16 top ports; low-arbitration prototype."
+}

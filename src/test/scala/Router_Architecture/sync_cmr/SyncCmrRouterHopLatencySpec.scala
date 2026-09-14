@@ -137,6 +137,18 @@ class SyncCmrRouterHopLatencySpec extends AnyFlatSpec with ChiselScalatestTester
     runIsolated(childLanes = 2, parentLanes = 2, level = 2, destX = 8, destY = 8)
   }
 
+  "Sync Fat (1,2)" should "forward isolated 5-flit packets in one clock per flit" in {
+    runIsolated(childLanes = 1, parentLanes = 2, level = 1, destX = 8, destY = 8)
+  }
+
+  "Sync PFAT (2,4)" should "forward isolated 5-flit packets in one clock per flit" in {
+    runIsolated(childLanes = 2, parentLanes = 4, level = 2, destX = 8, destY = 8)
+  }
+
+  "Sync PFAT (4,8)" should "forward isolated 5-flit packets in one clock per flit" in {
+    runIsolated(childLanes = 4, parentLanes = 8, level = 3, destX = 8, destY = 8)
+  }
+
   "Sync PROP (2,2)" should "drain two 1-flit packets that contend for the same child OPM" in {
     test(new SyncCmrRouter(0, 0, 2, 2, 2)) { dut =>
       dut.clock.setTimeout(400)

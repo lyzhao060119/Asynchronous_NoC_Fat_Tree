@@ -1,0 +1,55 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "MC-REGION-F32",
+  "title": "64-node exact-AABB region multicast with fanout 32",
+  "traffic": "mc_ur64",
+  "packet_flits": 5,
+  "multicast": true,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": false,
+  "fanout_F": 32,
+  "spread_S": null,
+  "multicast_fraction": 1.0,
+  "destination_set_samples": null,
+  "warmup_original_events": 64,
+  "measurement_original_events": 400,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": true,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [
+      5,
+      10,
+      20,
+      40,
+      80,
+      120,
+      180,
+      260,
+      360,
+      500
+    ],
+    "saturation_rule": "two successive completed-rate gains below 5 percent with positive growing transaction backlog"
+  },
+  "metrics": [
+    "completed_transaction_rate",
+    "useful_delivery_rate",
+    "tmax_mean",
+    "tmax_p95",
+    "tmax_p99",
+    "injected_flits",
+    "inter_router_flit_link_traversals",
+    "transaction_backlog"
+  ],
+  "tmax_definition": "last destination tail minus original transaction scheduled arrival",
+  "applies_to_designs": [
+    "PROP_temp64"
+  ],
+  "paper_figures": [
+    "Emergency multicast ablation"
+  ],
+  "notes": "Exact hardware-representable AABB, source excluded; paired native and source repeated-unicast cases."
+}

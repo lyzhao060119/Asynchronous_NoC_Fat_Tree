@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_lane_select_srlatch;
+module tb_lane_selector;
   reg reset=1'b1, active=1'b0;
   reg [1:0] empty2=2'b11;
   reg [3:0] empty4=4'b1111;
@@ -13,11 +13,11 @@ module tb_lane_select_srlatch;
   reg [3:0] held4;
   reg [7:0] held8;
 
-  LaneSelectorSRLatch #(.LANES(2)) dut2(
+  LaneSelector #(.LANES(2)) dut2(
     .reset(reset), .LaneIsEmpty(empty2), .PPE(active), .LaneSelect(select2));
-  LaneSelectorSRLatch #(.LANES(4)) dut4(
+  LaneSelector #(.LANES(4)) dut4(
     .reset(reset), .LaneIsEmpty(empty4), .PPE(active), .LaneSelect(select4));
-  LaneSelectorSRLatch #(.LANES(8)) dut8(
+  LaneSelector #(.LANES(8)) dut8(
     .reset(reset), .LaneIsEmpty(empty8), .PPE(active), .LaneSelect(select8));
 
   task check(input bit condition, input [8*48-1:0] text);
@@ -29,7 +29,7 @@ module tb_lane_select_srlatch;
 
   initial begin
     $dumpfile("lane_select_celement.vcd");
-    $dumpvars(0,tb_lane_select_srlatch);
+    $dumpvars(0,tb_lane_selector);
     #2 reset=0; #1 active=1;
     #8;
     check(select2==2'b01 || select2==2'b10,"two-lane onehot admission");
@@ -49,13 +49,29 @@ module tb_lane_select_srlatch;
 
     active=0; #8;
     check(select2===0 && select4===0 && select8===0,"packet completion releases selection");
+
+    // A short Empty indication must still provide a full request-hold
+    // interval to the mutex.  It is intentionally shorter than the local
+    // functional DelayElement interval used by this test.
+    empty2=0; active=1; #2;
+    empty2=2'b01; #0.05;
+    empty2=0; #0.40;
+    check(select2==2'b01 || select2==2'b10,
+          "short Empty pulse reaches mutex through ReqHold");
+    held2=select2;
+    #2;
+    check(select2===held2,
+          "Empty withdrawal does not replace selected lane");
+    active=0; #2;
+    check(select2===0,"short-pulse packet completion releases selection");
+
     empty2=2'b10; empty4=4'b1000; empty8=8'b01000000; active=1; #8;
     check(select2===2'b10,"two-lane re-admits current empty lane");
     check(select4===4'b1000,"four-lane re-admits current empty lane");
     check(select8===8'b01000000,"eight-lane re-admits current empty lane");
     active=0; #8;
-    if(failures==0) $display("TB_RESULT PASS SRLatch lane selector");
-    else $display("TB_RESULT FAIL SRLatch lane selector failures=%0d",failures);
+    if(failures==0) $display("TB_RESULT PASS LaneSelector");
+    else $display("TB_RESULT FAIL LaneSelector failures=%0d",failures);
     $finish;
   end
 endmodule

@@ -134,21 +134,32 @@ object NoCScaleConfig {
     }
   }
 
-  /** PROP 256/1024 cluster grid: `grid` Q64 tiles on a side, Mesh1/2 top. */
-  def propClustered(clusterGrid: Int, meshLanes: Int = 2): NoCScaleConfig = {
+  /** Clustered 256/1024 Q64 network.  The TopMesh geometry must match the
+    * selected Q64 top interface; PFAT Q64 therefore uses Mesh4/Local8.
+    */
+  def propClustered(
+      clusterGrid: Int,
+      q64Channels: NoCRouterChannelConfig = FatLane1248,
+      meshLanes: Int = 4
+  ): NoCScaleConfig = {
     require(Set(2, 4).contains(clusterGrid), s"PROP cluster grid must be 2 or 4, got $clusterGrid")
-    require(Set(1, 2).contains(meshLanes),
-      s"TopMesh lanes must be 1 or 2 (Mesh4 needs an unsupported (4,2) geometry), got $meshLanes")
-    val channels =
-      if (meshLanes == 2) FatLane1222
-      else FatLane1222.copy(topChildLanes = 1)
-    NoCScaleConfig(clusterGrid, clusterGrid, channels)
+    require(
+      Router_Architecture.CMR.CMRParameters.SupportedLaneGeometries.contains(
+        (meshLanes, q64Channels.l3.parentLanes)
+      ),
+      s"unsupported TopMesh geometry ($meshLanes,${q64Channels.l3.parentLanes})"
+    )
+    NoCScaleConfig(clusterGrid, clusterGrid, q64Channels)
   }
 
   /** Sync Fat 1-2-2-2 64-core tile.  Pinned so CMR_FAT_LANE_PROFILE cannot
     * silently switch this DUT to 1-2-4-8.
     */
   def syncFatTree64_1222: NoCScaleConfig = NoCScaleConfig(1, 1, FatLane1222)
+
+  /** Sync Fat 1-2-4-8 64-core tile.  This is explicitly pinned so a
+    * synchronous baseline cannot be changed by CMR_FAT_LANE_PROFILE. */
+  def syncFatTree64_1248: NoCScaleConfig = NoCScaleConfig(1, 1, FatLane1248)
 
   // Default full-NoC regression scale: 2x2 quadtree tiles = 256 cores.
   val Verification256: NoCScaleConfig = NoCScaleConfig(2, 2, DefaultRouterChannels)

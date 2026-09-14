@@ -51,7 +51,30 @@ ARCHIVE_SYNC_PROP_HOP_RUN_ID = "20260831_cmr_sync_prop_2x2_1p0ns"
 FROZEN_MESH64_CANDIDATE_RUN_ID = "20260831_115856_cmr_mesh64_p50"
 FROZEN_READONLY_NETLIST_RUN_IDS = frozenset({FROZEN_MESH64_CANDIDATE_RUN_ID})
 
+# Official PROP64 paper netlist: RCU 1xDEL050, Ackin 1xDEL050, OtherPath
+# 1xDEL050, bypass inter-level FIFO, lane01=0.  SKIP_DC this id; never
+# re-run DC under the same stamp.
+FROZEN_PROP64_PAPER_NETLIST_RUN_ID = "20260912_172443_cmr_prop64_rpsdel050_1222"
+
+# Paper ASAP Mesh64 network netlist (Mesh RCU 1xDEL150). SKIP_DC.
+FROZEN_MESH64_PAPER_NETLIST_RUN_ID = "20260913_104506_cmr_fm64_rpsdel150"
+
+# PROP_temp64 (B8) experimental network netlist (tree RCU 1xDEL050,
+# mesh RCU env DEL150 unused on this DUT, Ackin 1xDEL050). SKIP_DC.
+FROZEN_PROP_TEMP64_NETLIST_RUN_ID = "20260913_prop_temp64_asap_uc_m5_200"
+
 FROZEN_WRITE_RUN_IDS = FROZEN_HOP_NETLIST_RUN_IDS | {
+    "20260912_205700_cmr_thin_l1_hop_rpsdel050",
+    "20260912_205700_cmr_flatmesh_c1p1_rpsdel050",
+    "20260912_205700_cmr_fat_l1_hop_rpsdel050",
+    "20260912_205700_cmr_prop_2x2_hop_rpsdel050",
+    "20260912_205700_cmr_topmesh_c2p2_rpsdel050",
+    "20260912_205700_cmr_pfat_l2_c2p4_rpsdel050",
+    "20260912_205700_cmr_pfat_l3_c4p8_rpsdel050",
+    "20260901_cmr_sync_thin_1x1_1p0ns",
+    "20260901_cmr_sync_prop_2x2_1p0ns",
+    "20260912_205700_cmr_primitive_hop_ppa_rpsdel050",
+
     FROZEN_HOP_PPA_RUN_ID,
     FROZEN_PRIMITIVE_HOP_PPA_RUN_ID,
     ARCHIVE_PRIMITIVE_HOP_PPA_RUN_ID,
@@ -65,6 +88,9 @@ FROZEN_WRITE_RUN_IDS = FROZEN_HOP_NETLIST_RUN_IDS | {
     ARCHIVE_SYNC64_FAT1222_RUN_ID,
     ARCHIVE_SYNC_THIN_HOP_RUN_ID,
     ARCHIVE_SYNC_PROP_HOP_RUN_ID,
+    FROZEN_PROP64_PAPER_NETLIST_RUN_ID,
+    FROZEN_MESH64_PAPER_NETLIST_RUN_ID,
+    FROZEN_PROP_TEMP64_NETLIST_RUN_ID,
 }
 
 NOT_FAT_VS_THIN_DELAY = {
@@ -124,7 +150,9 @@ def refuse_overwrite(run_id: str, *, action: str = "write") -> None:
     raise SystemExit(
         "refusing to %s frozen run_id %s (RCU 1xDEL050 / buf=0 / Ackin 1xDEL050 "
         "hop lock, Thin CURRENT, NoC64 Ackin-250 predecessor, Phase 2 archive "
-        "Sync 2/3-cycle Head, or Phase 2.5 signed Sync 1-cycle Head 1.0 ns). "
+        "Sync 2/3-cycle Head, Phase 2.5 signed Sync 1-cycle Head 1.0 ns, or "
+        "official PROP64 paper netlist 20260912_172443, Mesh64 paper "
+        "20260913_104506, or PROP_temp64 20260913_prop_temp64). "
         "Set CMR_FORCE_OVERWRITE_FROZEN=1 only if you mean to replace it."
         % (action, run_id)
     )
@@ -154,9 +182,11 @@ def require_locked_delay_structure(values: dict[str, str], *, label: str) -> Non
         )
 
 
-def require_emit_locked_delays(text: str, *, label: str, ackin_unit_ps: int) -> None:
+def require_emit_locked_delays(
+    text: str, *, label: str, ackin_unit_ps: int, rcu_unit_ps: int = LOCKED_RCU_UNIT_PS
+) -> None:
     params = "#(.DelayUnitPs(%d), .DelayValue(%d))" % (
-        LOCKED_RCU_UNIT_PS,
+        rcu_unit_ps,
         LOCKED_RCU_STEPS,
     )
     matched_ok = (
@@ -168,7 +198,7 @@ def require_emit_locked_delays(text: str, *, label: str, ackin_unit_ps: int) -> 
         LOCKED_ACKIN_STEPS,
     )
     if not matched_ok:
-        raise SystemExit("%s MatchedDelay is not RCU 1x%sps" % (label, LOCKED_RCU_UNIT_PS))
+        raise SystemExit("%s MatchedDelay is not RCU 1x%sps" % (label, rcu_unit_ps))
     if ackin not in text:
         raise SystemExit("%s AckinDelay is not 1x%sps" % (label, ackin_unit_ps))
     if ackin_unit_ps != LOCKED_ACKIN_UNIT_PS:

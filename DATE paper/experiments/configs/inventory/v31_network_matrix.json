@@ -302,7 +302,7 @@
     {
       "design_id": "PROP256",
       "display_name": "Asynchronous balanced hierarchical network, 256 nodes",
-      "display_description": "2-by-2 tiles of 64-node balanced hierarchical clusters plus a two-lane top mesh. No synchronous 256-node network is added.",
+      "display_description": "2-by-2 tiles of 64-node 1-2-4-8 hierarchical clusters plus a four-lane top mesh. No synchronous 256-node network is added.",
       "nodes": 256,
       "independent_netlist": true,
       "shares_netlist_with": null,
@@ -313,9 +313,9 @@
       "unsupported_reason": null,
       "emit": {
         "main": "NoC.CMR.CMRClusteredNoCMain",
-        "sbt_args": "2 2",
+        "sbt_args": "2 4 1248",
         "env": {},
-        "gen_dir": "generated_cmr/clustered_noc_g2_m2",
+        "gen_dir": "generated_cmr/clustered_noc_g2_m4",
         "dut_file": "NoC_256nodes.v",
         "top": "NoC_256nodes",
         "hier_kind": "prop256",
@@ -333,8 +333,8 @@
       },
       "expected": {
         "routers": 88,
-        "ports": 624,
-        "adapters": 1216
+        "ports": 768,
+        "adapters": 1792
       }
     },
     {

@@ -37,13 +37,11 @@ def path_tmax_ns(
         last_body = prim.body_ns
         last_tail = prim.tail_ns
     bodies = max(0, packet_flits - 2)
-    if case_tick_ns > 1e-12:
-        # TB spaces flits by CASE_TICK_NS.  At the 1 ns DATE V3 tick the Head
-        # may still occupy the path, so Tail waits for the remaining hop tails
-        # after the last inject.
-        tmax = (packet_flits - 1) * case_tick_ns + sum(tails)
-    else:
-        tmax = sum(heads) + bodies * float(last_body) + float(last_tail)
+    # Intra-packet offers are ASAP (same schedule cycle as the header).  Do not
+    # add (packet_flits-1)*case_tick_ns artificial bubbles; wire spacing comes
+    # from hop primitives / backpressure.
+    _ = case_tick_ns
+    tmax = sum(heads) + bodies * float(last_body) + float(last_tail)
     return {
         "tmax_ns": tmax,
         "routers": routers,

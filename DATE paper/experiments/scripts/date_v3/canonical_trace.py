@@ -100,6 +100,52 @@ def choose_other(rng: Random, source: int, n: int) -> int:
     return dest if dest < source else dest + 1
 
 
+def choose_bit_complement_dest(source: int, n: int) -> int:
+    """Return the fixed bit-complement destination for a power-of-two network."""
+    if n < 2 or n & (n - 1):
+        raise ValueError("bit-complement traffic needs a power-of-two node count")
+    return source ^ (n - 1)
+
+
+def hotspot10_centers(n: int) -> tuple[int, int, int, int]:
+    """Middle four routers of an even square network, in row-major PE order."""
+    width = width_of(n)
+    if width % 2:
+        raise ValueError("hotspot10 needs an even square network")
+    lo = width // 2 - 1
+    hi = width // 2
+    return (
+        pe_index(lo, lo, width),
+        pe_index(hi, lo, width),
+        pe_index(lo, hi, width),
+        pe_index(hi, hi, width),
+    )
+
+
+def choose_hotspot10_dest(rng: Random, source: int, n: int) -> int:
+    """Sample dst with center weights 1.10 and all other weights 1.00.
+
+    The source is removed before sampling, so probabilities are renormalized
+    exactly as required by the Continuous-Time Replication benchmark.
+    Integer weights avoid floating-point/platform-dependent boundary behavior.
+    """
+    weights_by_dest = hotspot10_weights(source, n)
+    destinations = list(weights_by_dest)
+    weights = list(weights_by_dest.values())
+    ticket = rng.randrange(sum(weights))
+    for dest, weight in zip(destinations, weights):
+        if ticket < weight:
+            return dest
+        ticket -= weight
+    raise RuntimeError("hotspot10 weighted draw fell through")
+
+
+def hotspot10_weights(source: int, n: int) -> dict[int, int]:
+    """Unnormalized integer weights after excluding src (11:10 center:other)."""
+    centers = set(hotspot10_centers(n))
+    return {dest: (11 if dest in centers else 10) for dest in range(n) if dest != source}
+
+
 def choose_bf_dest(rng: Random, source: int, n: int) -> int:
     width = width_of(n)
     choices = [d for d in range(n) if d != source and not same_l2_subtree(d, source, width)]
@@ -122,7 +168,13 @@ def sample_rect_multicast_dests(
 ) -> list[int]:
     """Pick a hardware-representable AABB destination set of exactly F cores."""
     width = width_of(n)
-    shapes = {4: ((2, 2),), 8: ((4, 2), (2, 4))}.get(fanout)
+    shapes = {
+        2: ((1, 2), (2, 1)),
+        4: ((2, 2),),
+        8: ((4, 2), (2, 4)),
+        16: ((4, 4), (2, 8), (8, 2)),
+        32: ((4, 8), (8, 4)),
+    }.get(fanout)
     if not shapes:
         raise ValueError("no AABB encoding for multicast fanout %s" % fanout)
     src_key = l2_key(source, width)
@@ -214,6 +266,10 @@ def draw_pairs(
             dests = [choose_bf_dest(rng, source, nodes)]
         elif traffic == "topo_ur":
             dests = [choose_other(rng, source, nodes)]
+        elif traffic == "topo_bc":
+            dests = [choose_bit_complement_dest(source, nodes)]
+        elif traffic == "hotspot10":
+            dests = [choose_hotspot10_dest(rng, source, nodes)]
         elif traffic == "mc_ur64":
             dests = sample_rect_multicast_dests(rng, source, nodes, fanout, cross_l2=False)
             multicast = True
@@ -334,8 +390,8 @@ def generate_trace(
             nodes = 1024
         else:
             nodes = 64
-    if traffic == "bf_stress64" and nodes != 64:
-        raise ValueError("BF-STRESS64 is 64-node only")
+    if traffic in ("bf_stress64", "topo_bc", "hotspot10") and nodes != 64:
+        raise ValueError("%s is 64-node only" % benchmark_id)
     if traffic in ("mc_ur64", "mc_xq64") and nodes != 64:
         raise ValueError("%s is 64-node only" % traffic)
     if traffic == "xmc_f16" and not smoke and measurement < 32:
@@ -385,6 +441,8 @@ def generate_trace(
 def paper_nodes_for(benchmark_id: str) -> list[int]:
     """Node counts the paper path must emit for one canonical-trace family."""
     if benchmark_id == "BF-STRESS64":
+        return [64]
+    if benchmark_id in ("TOPO-BC", "HOTSPOT10"):
         return [64]
     if benchmark_id == "TOPO-UR":
         return [64, 256, 1024]

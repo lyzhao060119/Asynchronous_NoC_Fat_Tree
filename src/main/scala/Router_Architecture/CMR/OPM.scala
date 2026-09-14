@@ -30,7 +30,7 @@ class OPM(config: RouterModuleConfig, egressPort: Int) extends Module {
   ))
   require(egressPort >= 0 && egressPort < config.totalPorts)
   private val SourceCount = UltraTopology.legalInputPorts(config, egressPort).length
-  require(Set(4, 5, 8, 10, 16, 20).contains(SourceCount))
+  require(Set(4, 5, 7, 8, 10, 16, 20).contains(SourceCount))
 
   val io = IO(new Bundle {
     val Reqin = Input(Vec(SourceCount, Bool()))

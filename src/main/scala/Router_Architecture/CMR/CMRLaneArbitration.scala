@@ -9,7 +9,7 @@ class CMRMutexN(val width: Int)
     extends BlackBox(Map("WIDTH" -> width))
     with HasBlackBoxResource {
   override def desiredName: String = "CMRMutexN"
-  private val Supported = Set(1, 2, 4, 5, 8, 10, 16, 20)
+  private val Supported = Set(1, 2, 4, 5, 7, 8, 10, 16, 20)
   require(Supported.contains(width), s"unsupported CMR mutex width $width")
   val io = IO(new Bundle {
     val reset = Input(Bool())
@@ -61,19 +61,19 @@ class LaneSelectorCelement(val laneCount: Int)
   addResource(AsyncPrimitiveProfile.mutex2Resource)
 }
 
-/** Packet-lifetime lane selector.  Mutex grant feeds back into the request
-  * so the first winner is held until PathEnabled falls, without an SR latch. */
-class LaneSelectorSRLatch(val laneCount: Int)
+/** Packet-lifetime lane selector.  Raw Empty is pulse-extended before the
+  * mutex, then the mutex grant feeds back until PathEnabled falls. */
+class LaneSelector(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount)) with HasBlackBoxResource {
   require(Set(2, 4, 8).contains(laneCount))
-  override def desiredName: String = "LaneSelectorSRLatch"
+  override def desiredName: String = "LaneSelector"
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val LaneIsEmpty = Input(UInt(laneCount.W))
     val PPE = Input(Bool())
     val LaneSelect = Output(UInt(laneCount.W))
   })
-  addResource("/ASYNC/CMR/LaneSelectorSRLatch.v")
+  addResource("/ASYNC/CMR/LaneSelector.v")
   addResource("/ASYNC/CMR/CMRMutexN.v")
   addResource("/ASYNC/CMR/CMRFlattenedTAC.v")
   addResource("/ASYNC/MullerC2.v")
@@ -101,7 +101,7 @@ class LanePhaseAdapter(val laneCount: Int)
 
 /** Per-lane two-phase adapter built from the request and acknowledgement
   * Toggle Q states.  LaneSelect must be held through the physical OPM
-  * acknowledgement; LaneSelectorSRLatch provides that packet-lifetime hold.
+  * acknowledgement; LaneSelector provides that packet-lifetime hold.
   */
 class LanePhaseAdapterDFF(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount))

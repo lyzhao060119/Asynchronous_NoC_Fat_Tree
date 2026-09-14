@@ -11,8 +11,8 @@ import chisel3._
   * supplied Q64 channel profile).  H-REP uses this exact netlist; the
   * boundary split lives in `HrepBoundaryPolicy`, not in the routers.
   *
-  * Mesh1/2 only change TopMesh `(meshLanes, localLanes)` and the Q64
-  * top-lane map.  Mesh4 is rejected: `(4,2)` is not a supported geometry.
+  * TopMesh `(meshLanes, localLanes)` is selected from the Q64 top interface.
+  * The paper PROP256 point uses PFAT Q64 `(1,2,4,8)` plus Mesh4/Local8.
   */
 class CMRClusteredNoC(
     clusterGrid: Int,
@@ -34,7 +34,7 @@ class CMRClusteredNoC(
   require(bypassInterLevelFifo, "DATE V3 clustered DUT bypasses inter-level FIFOs")
   require(CMRParameters.SupportedLaneGeometries.contains((meshLanes, localLanes)),
     s"TopMesh ($meshLanes,$localLanes) is not a supported geometry. " +
-      "Mesh4 / (4,2) is not elaborated on the DATE V3 path.")
+      "selected TopMesh/Q64 interface is not elaborated.")
   require(q64.channels.l1.childLanes == 1)
 
   val io = IO(new Bundle {
@@ -88,7 +88,13 @@ class CMRClusteredNoC(
 object CMRClusteredNoCMain extends App {
   private val grid = args.headOption.map(_.toInt).getOrElse(2)
   private val meshLanes = args.drop(1).headOption.map(_.toInt).getOrElse(2)
-  private val q64 = NoCScaleConfig(1, 1, NoCScaleConfig.FatLane1222)
+  private val q64Profile = args.drop(2).headOption.getOrElse("1222")
+  private val q64Channels = q64Profile match {
+    case "1222" => NoCScaleConfig.FatLane1222
+    case "1248" => NoCScaleConfig.FatLane1248
+    case other => throw new IllegalArgumentException(s"unsupported Q64 profile $other; use 1222 or 1248")
+  }
+  private val q64 = NoCScaleConfig(1, 1, q64Channels)
   emitVerilog(
     new CMRClusteredNoC(clusterGrid = grid, q64 = q64, meshLanes = meshLanes),
     Array("--target-dir", s"generated_cmr/clustered_noc_g${grid}_m$meshLanes")
