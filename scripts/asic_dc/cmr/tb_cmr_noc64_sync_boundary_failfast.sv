@@ -1,9 +1,11 @@
 `timescale 1ns/1ps
 
 // Fail-fast shell around tb_noc64_sync_boundary.
-// Thin TOP_LANES=1; Fat 1-2-2-2 uses +define+CMR_SYNC64_TOP2.
+// Thin TOP_LANES=1; Fat 1-2-2-2 uses TOP2; PROP_temp64 B8 uses TOP16.
 module tb_cmr_noc64_sync_boundary_failfast;
-`ifdef CMR_SYNC64_TOP2
+`ifdef CMR_SYNC64_TOP16
+  localparam integer TOP_LANES = 16;
+`elsif CMR_SYNC64_TOP2
   localparam integer TOP_LANES = 2;
 `else
   localparam integer TOP_LANES = 1;

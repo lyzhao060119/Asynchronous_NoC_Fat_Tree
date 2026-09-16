@@ -1,0 +1,78 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "PROP_temp256",
+  "kind": "network",
+  "family": "PROP_TEMP",
+  "nodes": 256,
+  "async": true,
+  "routing": "quadtree_topmesh",
+  "lane_profile": "B8_parallel_plane",
+  "top_mesh_lanes": 0,
+  "cluster_grid": 2,
+  "router_primitives": [
+    {
+      "primitive_id": "async_fat_1x4",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 4,
+      "use_mesh_routing": false,
+      "count": 64
+    },
+    {
+      "primitive_id": "async_fat_1x4",
+      "level": 2,
+      "child_lanes": 1,
+      "parent_lanes": 4,
+      "use_mesh_routing": false,
+      "count": 64
+    },
+    {
+      "primitive_id": "async_thin_1x1",
+      "level": 3,
+      "child_lanes": 1,
+      "parent_lanes": 1,
+      "use_mesh_routing": false,
+      "count": 64
+    },
+    {
+      "primitive_id": "async_mesh_1x2",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 2,
+      "use_mesh_routing": true,
+      "count": 32
+    }
+  ],
+  "expected_structure": {
+    "routers": 224,
+    "ports": 1536,
+    "adapters": 640,
+    "interlevel_fifos": 0,
+    "top_ports": 0,
+    "max_opm_fanin": 7,
+    "mutex_widths": [2, 4, 5, 7]
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "bypass",
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "paired_trace_with": null,
+  "adapter": null,
+  "paper_role": "PROP_temp256 B8: 4x PROP_temp64 tiles + 8 Mesh(1,2) planes",
+  "paper_eligible_default": true,
+  "notes": "Formal 256-node Proposed. Do not confuse with historical PROP256 (NoC_256nodes / PFAT tiles).",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "mesh_rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "display_name": "PROP_temp256 B8",
+  "display_description": "Four B8 tiles joined by eight independent 2x2 Mesh(1,2) planes."
+}

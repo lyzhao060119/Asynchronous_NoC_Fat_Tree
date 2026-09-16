@@ -1,0 +1,7 @@
+load,scheme,avg_lat_ns,p95_lat_ns,delivered_throughput,pass_fail
+high,native,39.917098,114.696,44.508328,PASS
+high,repeated,40.819276,136.174,0.000843,FAIL
+low,native,10.503857,12.62,8.506185,PASS
+low,repeated,13.518998,29.375,0.581427,PASS
+medium,native,20.40251,54.584,28.983295,PASS
+medium,repeated,38.868581,117.963,1.947871,PASS

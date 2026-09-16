@@ -1,0 +1,78 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "PFAT_temp256",
+  "kind": "network",
+  "family": "PFAT",
+  "nodes": 256,
+  "async": true,
+  "routing": "quadtree_topmesh",
+  "lane_profile": "1-2-4-8",
+  "top_mesh_lanes": 0,
+  "cluster_grid": 2,
+  "router_primitives": [
+    {
+      "primitive_id": "async_fat_1x2",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 2,
+      "use_mesh_routing": false,
+      "count": 64
+    },
+    {
+      "primitive_id": "async_pfat_2x4",
+      "level": 2,
+      "child_lanes": 2,
+      "parent_lanes": 4,
+      "use_mesh_routing": false,
+      "count": 16
+    },
+    {
+      "primitive_id": "async_pfat_4x8",
+      "level": 3,
+      "child_lanes": 4,
+      "parent_lanes": 8,
+      "use_mesh_routing": false,
+      "count": 4
+    },
+    {
+      "primitive_id": "async_mesh_1x2",
+      "level": 1,
+      "child_lanes": 1,
+      "parent_lanes": 2,
+      "use_mesh_routing": true,
+      "count": 16
+    }
+  ],
+  "expected_structure": {
+    "routers": 100,
+    "ports": 768,
+    "adapters": 352,
+    "interlevel_fifos": 0,
+    "top_ports": 0,
+    "max_opm_fanin": 20,
+    "mutex_widths": [2, 4, 5, 8, 10, 16, 20]
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "no_uturn": true,
+  "interlevel_fifo": "bypass",
+  "clock_ns": null,
+  "hrep_policy": false,
+  "shares_netlist_with": null,
+  "paired_trace_with": null,
+  "adapter": null,
+  "paper_role": "PFAT_temp256: 4x PFAT64 1-2-4-8 tiles + 4 Mesh(1,2) planes",
+  "paper_eligible_default": true,
+  "notes": "Upper Mesh uses the same Mesh(1,2) cell as PROP_temp256; plane count is 4 because each PFAT64 tile has 8 top ports (vs 16 on B8).",
+  "delay_recipe": {
+    "rcu_steps": 1,
+    "rcu_unit_ps": 50,
+    "mesh_rcu_unit_ps": 150,
+    "buf_stages": 0,
+    "ackin_steps": 1,
+    "ackin_unit_ps": 50,
+    "ackin_use_buf": false
+  },
+  "display_name": "PFAT_temp256",
+  "display_description": "Four PFAT64 1-2-4-8 tiles plus four Mesh(1,2) upper planes."
+}

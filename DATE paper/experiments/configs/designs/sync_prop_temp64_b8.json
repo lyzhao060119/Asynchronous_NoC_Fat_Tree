@@ -1,0 +1,35 @@
+{
+  "schema": "date-v3-design-v1",
+  "design_id": "SYNC_PROP_temp64",
+  "kind": "network",
+  "family": "SYNC_PROP_TEMP",
+  "nodes": 64,
+  "async": false,
+  "routing": "quadtree",
+  "lane_profile": "B8_parallel_plane_sync",
+  "top_mesh_lanes": 16,
+  "cluster_grid": 1,
+  "router_primitives": [
+    {"primitive_id": "sync_fat_1x4", "level": 1, "child_lanes": 1, "parent_lanes": 4, "count": 16},
+    {"primitive_id": "sync_fat_1x4", "level": 2, "child_lanes": 1, "parent_lanes": 4, "count": 16},
+    {"primitive_id": "sync_thin_1x1", "level": 3, "child_lanes": 1, "parent_lanes": 1, "count": 16}
+  ],
+  "expected_structure": {
+    "routers": 48,
+    "ports": 336,
+    "l1_l2_full_duplex_links": 64,
+    "l2_l3_full_duplex_links": 64,
+    "top_ports": 16,
+    "async_primitives": 0
+  },
+  "flit_width_bits": 28,
+  "buffer_slots": 5,
+  "clock_reference_ns": 1.0,
+  "clock_freeze_rule": "ceil_50ps(critical_period_ns * 1.05)",
+  "paired_trace_with": "PROP_temp64",
+  "adapter": "sync_noc64_port_adapter_top16",
+  "paper_role": "Topology-matched synchronous implementation reference for PROP_temp64 B8",
+  "paper_eligible_default": false,
+  "evidence_level": "RTL emitted; publication eligibility requires structure, DC/STA, MAXIMUM-SDF and PT-PX gates",
+  "display_name": "Sync PROP_temp64 B8"
+}

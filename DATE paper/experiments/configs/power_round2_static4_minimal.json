@@ -1,0 +1,28 @@
+{
+  "schema": "date-power-round2-v1",
+  "description": "Eight accepted non-Sync network power points; Static4 M_DS_high is frozen at M420. Sync B8 is optional and excluded.",
+  "activity_gate": ["MAXIMUM-SDF Total errors: 0", "TB_RESULT PASS", "full drain", "paired trace SHA-256"],
+  "ptpx_gate": ["PT-063 absent", "read_vcd and strip path success", "nonzero activity coverage", "clean check_power.rpt", "CMR_POWER_PASS"],
+  "environment": {
+    "SYNOPSYS_LC_ROOT": "/soft/synopsys/lc/V-2023.12",
+    "pt_shell": "/soft/synopsys/prime/V-2023.12/bin/pt_shell"
+  },
+  "selectors": {"M_DS_high": 420},
+  "designs": {
+    "PROP_temp64": {"netlist_run_id": "20260913_prop_temp64_asap_uc_m5_200", "ddc": "PROP_temp64.ddc", "sdc": "PROP_temp64.sdc", "post": "PROP_temp64_post.v", "sdf": "PROP_temp64.sdf", "top": "PROP_temp64", "strip_path": "tb_cmr_noc64_async_boundary_failfast/core/g_behavioral_noc_prop_temp.noc/dut"},
+    "PROP_temp64_static4": {"netlist_run_id": "20260915_144500_prop_temp64_static4_dc", "ddc": "PROP_temp64_static4.ddc", "sdc": "PROP_temp64_static4.sdc", "post": "PROP_temp64_static4_post.v", "sdf": "PROP_temp64_static4.sdf", "top": "PROP_temp64_static4", "strip_path": "tb_cmr_noc64_async_boundary_failfast/core/g_behavioral_noc_prop_temp.noc/dut"},
+    "PFAT64": {"netlist_run_id": "20260915_080229_cmr_pfat64_rpsdel050_1248", "ddc": "NoC_64nodes.ddc", "sdc": "NoC_64nodes.sdc", "post": "NoC_64nodes_post.v", "sdf": "NoC_64nodes.sdf", "top": "NoC_64nodes", "strip_path": "tb_cmr_noc64_async_boundary_failfast/core/g_behavioral_noc.noc/dut", "caveat": "M100 performance baseline used historical 20260912 netlist, which is no longer in remote outputs; current power uses accepted 20260915 frozen netlist and must be labeled separately"},
+    "FM64": {"netlist_run_id": "20260913_104506_cmr_fm64_rpsdel150", "ddc": "CMRMeshNoC.ddc", "sdc": "CMRMeshNoC.sdc", "post": "CMRMeshNoC_post.v", "sdf": "CMRMeshNoC.sdf", "top": "CMRMeshNoC", "strip_path": "tb_cmr_noc64_async_boundary_failfast/core/g_behavioral_noc_mesh.noc/dut"},
+    "SYNC_PROP_temp64": {"netlist_run_id": "20260915_231600_sync_prop_temp64_b8_dc", "clock_period_ns": 1.05, "ddc": "SyncNoC_64nodes.ddc", "sdc": "SyncNoC_64nodes.sdc", "post": "SyncNoC_64nodes_post.v", "sdf": "SyncNoC_64nodes.sdf", "top": "SyncNoC_64nodes", "strip_path": "tb_cmr_noc64_sync_boundary_failfast/core/noc/dut"}
+  },
+  "points": [
+    {"id": "prop_m100", "suite": "ur", "design": "PROP_temp64", "load": 100, "window": "measurement", "normalization": "delivered_flit"},
+    {"id": "pfat_m100", "suite": "ur", "design": "PFAT64", "load": 100, "window": "measurement", "normalization": "delivered_flit"},
+    {"id": "flatmesh_m100", "suite": "ur", "design": "FM64", "load": 100, "window": "measurement", "normalization": "delivered_flit"},
+    {"id": "dynamic_common_high", "suite": "ur", "design": "PROP_temp64", "load": "M_DS_high", "window": "measurement", "normalization": "delivered_flit", "lane_monitor": true},
+    {"id": "static_m100", "suite": "ur", "design": "PROP_temp64_static4", "load": 100, "window": "measurement", "normalization": "delivered_flit"},
+    {"id": "static_common_high", "suite": "ur", "design": "PROP_temp64_static4", "load": "M_DS_high", "window": "measurement", "normalization": "delivered_flit", "deduplicate_if_load": 100, "lane_monitor": true},
+    {"id": "f16_native_m5", "suite": "multicast", "design": "PROP_temp64", "scheme": "native", "fanout": 16, "load": 5, "window": "first_measurement_arrival_to_last_destination_tail", "normalization": ["original_transaction", "useful_destination_delivery"]},
+    {"id": "f16_repeated_m5", "suite": "multicast", "design": "PROP_temp64", "scheme": "source_repeated_unicast", "fanout": 16, "load": 5, "window": "first_measurement_arrival_to_last_destination_tail", "normalization": ["original_transaction", "useful_destination_delivery"]}
+  ]
+}

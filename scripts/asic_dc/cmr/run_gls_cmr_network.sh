@@ -27,11 +27,26 @@ if [[ "$EXTRA_SIM_ARGS" == *notimingcheck* ]]; then
 fi
 
 TB_DEFINE="+define+CMR_NOC_${NODES}"
+ADAPTER="$ROOT/sim/tb/async_noc_scale_port_adapter.sv"
 if [[ "$KIND" == "fm" || "$KIND" == "mesh" ]]; then
   KIND=fm
   TB_DEFINE="$TB_DEFINE +define+CMR_NOC_FM"
+elif [[ "$KIND" == "prop_temp" ]]; then
+  KIND=prop_temp
+  TB_DEFINE="$TB_DEFINE +define+CMR_NOC_PROP_TEMP"
+elif [[ "$KIND" == "pfat_temp" ]]; then
+  KIND=pfat_temp
+  TB_DEFINE="$TB_DEFINE +define+CMR_NOC_PFAT_TEMP"
 else
   KIND=prop
+fi
+# Allow TOP to select paper PROP_temp256 / PFAT_temp256 adapters.
+if [[ "$TOP" == "PROP_temp256" ]]; then
+  TB_DEFINE="$TB_DEFINE +define+CMR_NOC_PROP_TEMP"
+  KIND=prop_temp
+elif [[ "$TOP" == "PFAT_temp256" ]]; then
+  TB_DEFINE="$TB_DEFINE +define+CMR_NOC_PFAT_TEMP"
+  KIND=pfat_temp
 fi
 
 SDF_SCOPE="tb_noc_async_keycase.core.noc.dut"
@@ -108,7 +123,7 @@ set +e
 ./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
   +V3_METRICS_CSV="$LOG/v3_metrics.csv" \
-  +CASE_TICK_NS=20 +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
+  +CASE_TICK_NS=1 +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
   +STALL_TIMEOUT_NS="$STALL_TIMEOUT_NS" +HARD_TIMEOUT_NS="$HARD_TIMEOUT_NS" \
   $INJECT_ARG $EXTRA_SIM_ARGS \
   -l "$LOG/run.log" 2>&1 | tee "$LOG/stdout.log"

@@ -42,6 +42,9 @@ module tb_cmr_router_hop_ppa;
   integer expect_phase [0:NUM_SOURCES-1];
   integer expect_pkt [0:NUM_SOURCES-1];
   integer sent_src [0:NUM_SOURCES-1];
+  // Four columns are always present in the CSV so c1p1/c1p2/c1p4 summaries
+  // remain machine-comparable; lanes outside PARENT_LANES stay zero.
+  integer received_lane [0:3];
   integer csv_fd;
   string event_csv;
   string hop_kind;
@@ -148,6 +151,8 @@ module tb_cmr_router_hop_ppa;
                     if (first_req_ps < 0) first_req_ps = req_ps;
                     if (req_ps > last_req_ps) last_req_ps = req_ps;
                     received = received + 1;
+                    received_lane[port - PARENT_BASE] =
+                      received_lane[port - PARENT_BASE] + 1;
                     if (ph == FLITS_PER_PACKET - 1) begin
                       expect_phase[src] = 0;
                       expect_pkt[src] = pk + 1;
@@ -195,6 +200,10 @@ module tb_cmr_router_hop_ppa;
   initial begin : stimulus
     integer i;
     integer parent_idle;
+    integer lane_max;
+    real lane_share;
+    real lane_mean;
+    real lane_imbalance;
     if (!$value$plusargs("EVENT_CSV=%s", event_csv)) event_csv = "hop_events.csv";
     if (!$value$plusargs("TX_SETUP_NS=%f", setup_ns)) setup_ns = 0.05;
     if (!$value$plusargs("RX_CAPTURE_NS=%f", capture_ns)) capture_ns = 0.09;
@@ -212,6 +221,8 @@ module tb_cmr_router_hop_ppa;
       expect_pkt[i] = 0;
       sent_src[i] = 0;
     end
+    for (i = 0; i < 4; i = i + 1)
+      received_lane[i] = 0;
     if (!$test$plusargs("NO_FULL_VCD")) begin
       $dumpfile("hop_ppa.vcd");
       $dumpvars(0, tb_cmr_router_hop_ppa);
@@ -243,15 +254,34 @@ module tb_cmr_router_hop_ppa;
       span_ns = (last_req_ps - first_req_ps) / 1000.0;
       throughput_mflit_s = 1000.0 * total_flits / span_ns;
       throughput_gflit_s = throughput_mflit_s / 1000.0;
-      $fdisplay(csv_fd, "sources,packets_per_source,sent_flits,received_flits,parent_lanes,first_output_req_ps,last_output_req_ps,span_ns,throughput_mflit_s,throughput_gflit_s,failures");
-      $fdisplay(csv_fd, "%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0.3f,%0.6f,%0.6f,%0d",
+      lane_max = 0;
+      lane_mean = 1.0 / PARENT_LANES;
+      for (i = 0; i < PARENT_LANES; i = i + 1)
+        if (received_lane[i] > lane_max) lane_max = received_lane[i];
+      lane_imbalance = (1.0 * lane_max / total_flits) / lane_mean;
+      $fdisplay(csv_fd, "sources,packets_per_source,sent_flits,received_flits,parent_lanes,first_output_req_ps,last_output_req_ps,span_ns,throughput_mflit_s,throughput_gflit_s,failures,lane0_flits,lane1_flits,lane2_flits,lane3_flits,lane0_share,lane1_share,lane2_share,lane3_share,lane_imbalance_max_over_mean");
+      $fdisplay(csv_fd, "%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0.3f,%0.6f,%0.6f,%0d,%0d,%0d,%0d,%0d,%0.9f,%0.9f,%0.9f,%0.9f,%0.9f",
                 NUM_SOURCES, packets_per_source, sent, received, PARENT_LANES,
                 first_req_ps, last_req_ps, span_ns,
-                throughput_mflit_s, throughput_gflit_s, failures);
+                throughput_mflit_s, throughput_gflit_s, failures,
+                received_lane[0], received_lane[1],
+                received_lane[2], received_lane[3],
+                1.0 * received_lane[0] / total_flits,
+                1.0 * received_lane[1] / total_flits,
+                1.0 * received_lane[2] / total_flits,
+                1.0 * received_lane[3] / total_flits,
+                lane_imbalance);
       $display("AGG_RESULT PASS sources=%0d packets_per_source=%0d sent=%0d received=%0d parent_lanes=%0d first_req_ps=%0d last_req_ps=%0d span_ns=%0.3f throughput_mflit_s=%0.6f throughput_gflit_s=%0.6f",
                NUM_SOURCES, packets_per_source, sent, received, PARENT_LANES,
                first_req_ps, last_req_ps, span_ns,
                throughput_mflit_s, throughput_gflit_s);
+      for (i = 0; i < PARENT_LANES; i = i + 1) begin
+        lane_share = 1.0 * received_lane[i] / total_flits;
+        $display("AGG_LANE lane=%0d delivered_flits=%0d utilization_share=%0.9f",
+                 i, received_lane[i], lane_share);
+      end
+      $display("AGG_LANE_SUMMARY definition=delivered_flit_share min_mean_reference=%0.9f max_flits=%0d imbalance_max_over_mean=%0.9f",
+               lane_mean, lane_max, lane_imbalance);
       $display("PPA_RESULT PASS geometry=%s mode=multi_lane_agg", hop_kind);
     end else begin
       $display("PPA_RESULT FAIL geometry=%s mode=multi_lane_agg sent=%0d received=%0d parent_idle=%0d failures=%0d",

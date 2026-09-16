@@ -5,7 +5,7 @@ Same-level nodes keep compile-time coordinates.  Each unique CMRRouter*
 module is one DC job; the stitch job only instantiates those DDC files and
 writes NoC_64nodes_post.v / CMRMeshNoC_post.v plus hierarchical MAXIMUM SDF.
 
-CMR_HIER_KIND=thin|1248|1222|mesh|prop256|prop_temp256|mesh256|prop1024|mesh1024.
+CMR_HIER_KIND=thin|1248|1222|mesh|prop256|prop_temp256|prop_temp256_m16|mesh256|prop1024|mesh1024.
 CMR_DESCAL_SUBMIT_ONLY=1 returns after bsub.
 If stitch/SDF scope fails, the matrix launcher falls back to one full-network
 DC per missing design (still parallel across designs).
@@ -104,6 +104,46 @@ def _job(kind: str, run_id: str) -> str:
     return "cmr_%s_%s" % (kind, run_id)
 
 
+def _parse_stat_sizes(text: str) -> dict[str, int]:
+    """Parse `stat -c '%s %n'` lines, ignoring login-shell module noise."""
+    sizes: dict[str, int] = {}
+    for line in text.splitlines():
+        parts = line.strip().split(None, 1)
+        if len(parts) != 2 or not parts[0].isdigit():
+            continue
+        sizes[parts[1]] = int(parts[0])
+    return sizes
+
+
+def _child_artifacts_ok(client, cid: str, ref: str):
+    """Return (client, ok) if child log PASSed and ddc/post.v/sdf are non-empty."""
+    dc_log = ROOT + "/logs/dc/" + cid + ".log"
+    out_dir = ROOT + "/outputs/" + cid
+    client, pass_probe = remote_run_retry(
+        client,
+        "grep -E '^CMR_HIER_CHILD_DC_PASS ' %s >/dev/null 2>&1 "
+        "&& echo HAS_PASS || echo NO_PASS" % shlex.quote(dc_log),
+    )
+    if "HAS_PASS" not in pass_probe:
+        return client, False
+    client, sizes_text = remote_run_retry(
+        client,
+        "stat -c '%%s %%n' %s %s %s 2>/dev/null || true"
+        % (
+            shlex.quote(out_dir + "/" + ref + ".ddc"),
+            shlex.quote(out_dir + "/" + ref + "_post.v"),
+            shlex.quote(out_dir + "/" + ref + ".sdf"),
+        ),
+    )
+    sizes = _parse_stat_sizes(sizes_text)
+    needed = [
+        out_dir + "/" + ref + ".ddc",
+        out_dir + "/" + ref + "_post.v",
+        out_dir + "/" + ref + ".sdf",
+    ]
+    return client, all(path in sizes and sizes[path] > 0 for path in needed)
+
+
 def _prepare() -> dict:
     if KIND == "mesh":
         from run_remote_cmr_mesh64_sdf import generate_rtl, shared_input_files
@@ -139,6 +179,28 @@ def _prepare() -> dict:
         remote_dut = "rtl/network_prop_temp256/PROP_temp256.v"
         expected = {"routers": 224, "ports": 1536, "adapters": 640}
         files = shared_input_files()
+    elif KIND == "prop_temp256_m16":
+        # M16 variant: L3(1,4) + 16 Mesh(1,4) planes. Independent of frozen B8.
+        from run_remote_cmr_noc64_sdf import shared_input_files
+
+        generated = REPO / "generated_cmr" / "prop_temp256_m16"
+        dut_name = "PROP_temp256_m16.v"
+        top = "PROP_temp256_m16"
+        remote_dut = "rtl/network_prop_temp256_m16/PROP_temp256_m16.v"
+        expected = {"routers": 256, "ports": 2048, "adapters": 1024}
+        files = shared_input_files()
+    elif KIND == "pfat_temp256":
+        from run_remote_cmr_noc64_sdf import shared_input_files
+
+        generated = REPO / "generated_cmr" / "pfat_temp256"
+        dut_name = "PFAT_temp256.v"
+        top = "PFAT_temp256"
+        remote_dut = "rtl/network_pfat_temp256/PFAT_temp256.v"
+        # 4*21 tile + 4*4 mesh = 100 routers.
+        # Hier stitch measured IPM/OPM = 768 on the first authorized run
+        # (20260915_122347); do not use the placeholder 800.
+        expected = {"routers": 100, "ports": 768, "adapters": 0}
+        files = shared_input_files()
     elif KIND in ("prop256", "mesh256", "prop1024", "mesh1024"):
         from v31_emit import asic_input_files, generate_network_rtl
 
@@ -165,8 +227,9 @@ def _prepare() -> dict:
         files = asic_input_files(design_id)
     else:
         raise SystemExit(
-            "CMR_HIER_KIND must be thin, 1248, 1222, mesh, prop256, prop_temp256, mesh256, "
-            "prop1024, or mesh1024; got %r" % KIND
+            "CMR_HIER_KIND must be thin, 1248, 1222, mesh, prop256, prop_temp256, "
+            "prop_temp256_m16, pfat_temp256, mesh256, prop1024, or mesh1024; got %r"
+            % KIND
         )
     verilog = (generated / dut_name).read_text(encoding="utf-8")
     jobs = unique_router_jobs(verilog)
@@ -178,7 +241,15 @@ def _prepare() -> dict:
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_noc64.sh"] = "scripts/run_gls_cmr_noc64.sh"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_mesh64.sh"] = "scripts/run_gls_cmr_mesh64.sh"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_network.sh"] = "scripts/run_gls_cmr_network.sh"
-    nodes = {"prop256": 256, "prop_temp256": 256, "mesh256": 256, "prop1024": 1024, "mesh1024": 1024}.get(KIND, 64)
+    nodes = {
+        "prop256": 256,
+        "prop_temp256": 256,
+        "prop_temp256_m16": 256,
+        "pfat_temp256": 256,
+        "mesh256": 256,
+        "prop1024": 1024,
+        "mesh1024": 1024,
+    }.get(KIND, 64)
     return {
         "generated": generated,
         "dut_name": dut_name,
@@ -188,8 +259,29 @@ def _prepare() -> dict:
         "jobs": jobs,
         "files": files,
         "nodes": nodes,
-        "large": KIND in ("prop256", "prop_temp256", "mesh256", "prop1024", "mesh1024"),
-        "net_kind": "fm" if KIND.startswith("mesh") else "prop",
+        "large": KIND
+        in (
+            "prop256",
+            "prop_temp256",
+            "prop_temp256_m16",
+            "pfat_temp256",
+            "mesh256",
+            "prop1024",
+            "mesh1024",
+        ),
+        "net_kind": (
+            "fm"
+            if KIND.startswith("mesh")
+            else (
+                "pfat_temp"
+                if KIND == "pfat_temp256"
+                else (
+                    "prop_temp"
+                    if KIND in ("prop_temp256", "prop_temp256_m16")
+                    else "prop"
+                )
+            )
+        ),
     }
 
 
@@ -216,6 +308,21 @@ def main() -> None:
     for source, destination in prep["files"].items():
         print("UPLOAD", destination, flush=True)
         if source.stat().st_size > 1024 * 1024:
+            # Resume-friendly: skip multi-minute upload when remote already matches.
+            digest = hashlib.sha256(
+                source.read_bytes().replace(b"\r\n", b"\n")
+            ).hexdigest()
+            client, remote_hash = remote_run_retry(
+                client,
+                "test -s %s && sha256sum %s || echo MISSING"
+                % (
+                    shlex.quote(ROOT + "/" + destination),
+                    shlex.quote(ROOT + "/" + destination),
+                ),
+            )
+            if digest in remote_hash:
+                print("UPLOAD_SKIP_MATCH", destination, digest, flush=True)
+                continue
             sftp.close()
             client = upload_large_verified(client, source, destination)
             sftp = client.open_sftp()
@@ -234,6 +341,7 @@ def main() -> None:
     child_jids = []
     child_pairs = []
     batch_size = len(prep["jobs"]) if CHILD_BATCH_SIZE <= 0 else CHILD_BATCH_SIZE
+    force_child = os.environ.get("CMR_HIER_FORCE_CHILD", "0") == "1"
     for batch_start in range(0, len(prep["jobs"]), batch_size):
       batch_jobs = prep["jobs"][batch_start : batch_start + batch_size]
       batch_submissions = []
@@ -241,6 +349,32 @@ def main() -> None:
         index = batch_start + batch_offset
         cid = child_run_id(PARENT_RUN_ID, index, job["ref"])
         refuse_overwrite(cid, action="hier-child")
+        if not force_child:
+          client, already = _child_artifacts_ok(client, cid, job["ref"])
+          if already:
+            child_pairs.append("%s:%s" % (cid, job["ref"]))
+            print("HIER_CHILD_SKIP_EXISTING", job["ref"], cid, flush=True)
+            continue
+          # Avoid duplicate bsub while a previous resume left the child RUN/PEND.
+          jname = _job("hier_child", cid)
+          client, running = remote_run_retry(
+              client,
+              "bjobs -J %s -noheader 2>/dev/null | awk '{print $1\" \"$3}' | head -n 1"
+              % shlex.quote(jname),
+          )
+          run_line = ""
+          for line in running.splitlines():
+            parts = line.strip().split()
+            if len(parts) >= 2 and parts[0].isdigit() and parts[1] in ("RUN", "PEND", "PSUSP"):
+              run_line = line.strip()
+              break
+          if run_line:
+            jid = run_line.split()[0]
+            child_jids.append(jid)
+            child_pairs.append("%s:%s" % (cid, job["ref"]))
+            batch_submissions.append((jid, cid, job["ref"]))
+            print("HIER_CHILD_ATTACH_RUNNING", job["ref"], jid, cid, flush=True)
+            continue
         wrapper = ROOT + "/logs/dc/" + cid + ".sh"
         body = (
             "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
@@ -282,26 +416,37 @@ def main() -> None:
         jid = job_id(submit)
         child_jids.append(jid)
         child_pairs.append("%s:%s" % (cid, job["ref"]))
-        batch_submissions.append((jid, cid))
+        batch_submissions.append((jid, cid, job["ref"]))
         print("HIER_CHILD_JOB", job["ref"], jid, cid, flush=True)
 
       # In submit-only mode callers deliberately want the historical
       # fire-and-forget submission.  Normal DC runs gate each wave on the
       # explicit child marker and non-empty DDC/SDF/netlist artifacts.
       if not SUBMIT_ONLY:
-        for offset, (jid, cid) in enumerate(batch_submissions):
-          ref = batch_jobs[offset]["ref"]
+        for jid, cid, ref in batch_submissions:
           client = wait_job(client, jid, "hier_child", polls=DC_POLLS)
           dc_log = ROOT + "/logs/dc/" + cid + ".log"
-          client, child_log = remote_run_retry(
-              client, "cat %s %s.err 2>/dev/null" % (dc_log, dc_log)
-          )
+          child_log = ""
+          # LSF can report DONE slightly before the PASS line is flushed.
+          for attempt in range(8):
+            client, child_log = remote_run_retry(
+                client, "cat %s %s.err 2>/dev/null" % (dc_log, dc_log)
+            )
+            if "CMR_HIER_CHILD_DC_PASS " in child_log:
+              break
+            client, already = _child_artifacts_ok(client, cid, ref)
+            if already:
+              child_log = "CMR_HIER_CHILD_DC_PASS artifacts_ok_retry"
+              break
+            import time as _time
+
+            _time.sleep(5 + attempt)
           if "CMR_HIER_CHILD_DC_PASS " not in child_log:
             print(child_log[-16000:], flush=True)
             raise RuntimeError("hierarchical child failed for %s" % cid)
           # _05 left DONE jobs with 0-byte DDC/SDF/netlist.  Do not advance.
           out_dir = ROOT + "/outputs/" + cid
-          client, sizes = remote_run_retry(
+          client, sizes_text = remote_run_retry(
               client,
               "stat -c '%%s %%n' %s %s %s 2>/dev/null || true"
               % (
@@ -310,24 +455,42 @@ def main() -> None:
                   shlex.quote(out_dir + "/" + ref + ".sdf"),
               ),
           )
-          bad = []
-          for line in sizes.splitlines():
-            parts = line.strip().split(None, 1)
-            if len(parts) != 2:
-              continue
-            if int(parts[0]) <= 0:
-              bad.append(parts[1])
-          if bad or (ref + ".ddc") not in sizes:
-            print(sizes, flush=True)
+          sizes = _parse_stat_sizes(sizes_text)
+          needed = [
+              out_dir + "/" + ref + ".ddc",
+              out_dir + "/" + ref + "_post.v",
+              out_dir + "/" + ref + ".sdf",
+          ]
+          bad = [path for path in needed if sizes.get(path, 0) <= 0]
+          if bad:
+            # One more short wait for NFS flush of write_file outputs.
+            import time as _time
+
+            _time.sleep(8)
+            client, sizes_text = remote_run_retry(
+                client,
+                "stat -c '%%s %%n' %s %s %s 2>/dev/null || true"
+                % (
+                    shlex.quote(out_dir + "/" + ref + ".ddc"),
+                    shlex.quote(out_dir + "/" + ref + "_post.v"),
+                    shlex.quote(out_dir + "/" + ref + ".sdf"),
+                ),
+            )
+            sizes = _parse_stat_sizes(sizes_text)
+            bad = [path for path in needed if sizes.get(path, 0) <= 0]
+          if bad:
+            print(sizes_text, flush=True)
             raise RuntimeError(
               "hierarchical child produced empty artifacts for %s: %s" % (cid, bad)
             )
         print(
-            "HIER_CHILD_BATCH_PASS start=%d count=%d" % (batch_start, len(batch_jobs)),
+            "HIER_CHILD_BATCH_PASS start=%d count=%d submitted=%d"
+            % (batch_start, len(batch_jobs), len(batch_submissions)),
             flush=True,
         )
 
     # ended() not done(): child EXIT used to leave stitch PEND forever.
+    # Resume may skip already-PASS children, so dep can be empty.
     dep = " && ".join("ended(%s)" % jid for jid in child_jids)
     child_ids = [pair.split(":", 1)[0] for pair in child_pairs]
     wait_children = (
@@ -375,22 +538,29 @@ def main() -> None:
     atomic_put_bytes(client, sftp, stitch_body.encode(), stitch_wrap)
     sftp.close()
     client, _ = remote_run_retry(client, "chmod +x %s" % stitch_wrap)
+    # Do not use bsub -w ended(jid): long hier runs leave stale LSF ids that
+    # later fail with "No matching job found".  The stitch wrapper already waits
+    # on CMR_HIER_CHILD_DC_PASS markers for every child.
     stitch_log = ROOT + "/logs/dc/" + PARENT_RUN_ID + ".log"
     stitch_name = _job("hier_stitch", PARENT_RUN_ID)
-    client, stitch_submit = remote_run_retry(
-        client,
-        "bsub %s -w %s -o %s -e %s.err -J %s %s"
-        % (
-            STITCH_BSUB,
-            shlex.quote(dep),
-            stitch_log,
-            stitch_log,
-            shlex.quote(stitch_name),
-            stitch_wrap,
-        ),
+    stitch_cmd = "bsub %s -o %s -e %s.err -J %s %s" % (
+        STITCH_BSUB,
+        stitch_log,
+        stitch_log,
+        shlex.quote(stitch_name),
+        stitch_wrap,
     )
+    client, stitch_submit = remote_run_retry(client, stitch_cmd)
     stitch_jid = job_id(stitch_submit)
-    print("HIER_STITCH_JOB", stitch_jid, "children", len(child_jids), flush=True)
+    print(
+        "HIER_STITCH_JOB",
+        stitch_jid,
+        "children_submitted",
+        len(child_jids),
+        "children_total",
+        len(child_pairs),
+        flush=True,
+    )
 
     gls_jobs = []
     case_raw = (

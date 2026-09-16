@@ -1,0 +1,4 @@
+design,peak_load_setpoint,peak_delivered_mflit_per_port_s,near_lossless_load_setpoint,near_lossless_delivered_mflit_per_port_s,near_lossless_criterion
+PROP_temp64,600,379.195994,420,302.194149,delivery_ratio>=0.99 and backlog<=5 (PFAT measurement; PROP/FM end-of-run backlog proxy)
+PFAT64,180,137.782777,160,127.019817,delivery_ratio>=0.99 and backlog<=5 (PFAT measurement; PROP/FM end-of-run backlog proxy)
+FM64,360,239.00542,280,199.227716,delivery_ratio>=0.99 and backlog<=5 (PFAT measurement; PROP/FM end-of-run backlog proxy)

@@ -79,13 +79,29 @@ set +e
   -l "$LOG/run.log" 2>&1 | tee "$LOG/stdout.log"
 rc=${PIPESTATUS[0]}
 set -e
-# VCS anchors relative $sdf_annotate logs to the compiled simv directory.
-# Per-design jobs run serially; move each annotation log before the next case.
-test -s "$COMPILE/sdf_annotate.log" || { echo "E2_CASE_FAIL SDF log absent"; exit 4; }
-mv "$COMPILE/sdf_annotate.log" "$LOG/sdf_annotate.log"
-grep -Eq 'Total errors:[[:space:]]*0' "$LOG/sdf_annotate.log" || { echo "E2_CASE_FAIL SDF"; exit 4; }
-! grep -Eiq 'Total errors:[[:space:]]*[1-9]|Timing violation|TB_RESULT FAIL|TB_X_FAIL|TB_PROTOCOL_X|TB_UNEXPECTED_FAIL|TB_STALL_FAIL|TB_HARD_TIMEOUT|TB_FATAL|Fatal:' "$LOG/sdf_annotate.log" "$LOG/run.log" "$LOG/stdout.log"
+# VCS generates a single MAXIMUM-SDF report per compiled DUT.  Its hash and
+# path are recorded in every case; each simv run must additionally report that
+# this case executed annotation. Never pretend this shared report is unique.
+SHARED_SDF_LOG="$COMPILE/sdf_annotate.log"
+test -s "$SHARED_SDF_LOG" || { echo "E2_CASE_FAIL shared SDF log absent"; exit 4; }
+grep -Eq 'Total errors:[[:space:]]*0' "$SHARED_SDF_LOG" || { echo "E2_CASE_FAIL SDF"; exit 4; }
+grep -Eq 'Doing SDF annotation .* Done' "$LOG/run.log" || { echo "E2_CASE_FAIL case annotation missing"; exit 4; }
+sha256sum "$SHARED_SDF_LOG" > "$LOG/sdf_reference.sha256"
+! grep -Eiq 'Total errors:[[:space:]]*[1-9]|Timing violation|TB_RESULT FAIL|TB_X_FAIL|TB_PROTOCOL_X|TB_UNEXPECTED_FAIL|TB_STALL_FAIL|TB_HARD_TIMEOUT|TB_FATAL|Fatal:' "$SHARED_SDF_LOG" "$LOG/run.log" "$LOG/stdout.log"
 grep -Eq 'TB_RESULT PASS injected=55000 delivered=55000 missing=0 unexpected=0 timeout=0' "$LOG/run.log" || { echo "E2_CASE_FAIL counts"; exit 5; }
 test -s "$CSV"
+if ! awk -F, '
+  NR == 1 { for (i = 1; i <= NF; i++) col[$i] = i; next }
+  NR == 2 {
+    split("injected_flits delivered_flits missing_expected_flits unexpected_flits timeout_hit warmup_original_events measurement_original_events pass_fail", names, " ")
+    split("55000 55000 0 0 0 1000 10000 PASS", values, " ")
+    for (i = 1; i <= 8; i++) if (!(names[i] in col) || $(col[names[i]]) != values[i]) exit 1
+    next
+  }
+  END { if (NR != 2) exit 1 }
+' "$CSV"; then
+  echo "E2_CASE_FAIL CSV counts/pass marker" >&2
+  exit 6
+fi
 echo "E2_CASE_PASS design=$DESIGN case=$CASE_NAME rc=$rc" | tee -a stage.log
 exit "$rc"

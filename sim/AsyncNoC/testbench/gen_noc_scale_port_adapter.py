@@ -15,6 +15,8 @@ FLIT_W = 28
 
 SPECS = (
     (256, "prop", "NoC_256nodes"),
+    (256, "prop_temp", "PROP_temp256"),
+    (256, "pfat_temp", "PFAT_temp256"),
     (256, "fm", "CMRMeshNoC"),
     (1024, "prop", "NoC_1024nodes"),
     (1024, "fm", "CMRMeshNoC"),

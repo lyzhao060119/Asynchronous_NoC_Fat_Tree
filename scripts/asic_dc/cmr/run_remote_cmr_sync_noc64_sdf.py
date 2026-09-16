@@ -4,6 +4,7 @@
 Profiles (CMR_SYNC64_PROFILE):
   thin     (1,1) three-level tree, 1 top lane, 105 ports (default)
   fat1222  L1 1->2, L2/L3 2->2, 2 top lanes, 146 ports, 264 SyncLaneSelector
+  propb8   topology-matched PROP_temp64: 48 routers, 336 ports, 16 top lanes
 
 No Mutex, no DelayElement, no LanePhaseAdapter.  Functional/no-SDF GLS is
 not implemented: emit -> clock DC -> MAXIMUM SDF.
@@ -48,17 +49,31 @@ SIGNED_FAT1222_RUN_ID = FROZEN_SYNC64_FAT1222_RUN_ID
 
 _raw_profile = os.environ.get("CMR_SYNC64_PROFILE", "thin").strip().lower()
 _raw_profile = _raw_profile.replace("-", "").replace("_", "")
-if _raw_profile in ("fat1222", "1222", "fat"):
+if _raw_profile in ("propb8", "b8", "proptemp"):
+    PROFILE = "propb8"
+elif _raw_profile in ("fat1222", "1222", "fat"):
     PROFILE = "fat1222"
 elif _raw_profile in ("thin", "111"):
     PROFILE = "thin"
 else:
     raise SystemExit(
-        "CMR_SYNC64_PROFILE must be thin or fat1222, got %s"
+        "CMR_SYNC64_PROFILE must be thin, fat1222, or propb8, got %s"
         % os.environ.get("CMR_SYNC64_PROFILE", "")
     )
 
-if PROFILE == "fat1222":
+if PROFILE == "propb8":
+    RUN_SUFFIX = "_cmr_sync_prop_temp64_b8_p1000"
+    DEFAULT_CASES = ("noc64_00_to_77_3flit",)
+    EXPECTED_PORTS = 336
+    EXPECTED_TOP = 16
+    EXPECTED_SELECTORS = -1
+    CASE_TOP_LANES = "16"
+    RTL_REMOTE_DIR = "rtl/sync_prop_temp64_b8"
+    GEN_DIR = REPO / "generated_sync_cmr" / "prop_temp64_b8"
+    EMIT_MAIN = "NoC.CMR.SyncPROPtemp64Main"
+    EMIT_LABEL = "PROP_temp64 B8 topology-matched sync"
+    GEOMETRY = "prop_temp64_b8_l1_1to4_l2_1to4_16_parallel_l3"
+elif PROFILE == "fat1222":
     RUN_SUFFIX = "_cmr_sync_noc64_fat1222_p50"
     DEFAULT_CASES = ("TAB-NET-UR-3f-r0p50", "VCTM-MC5-NM-3f-r0p50")
     EXPECTED_PORTS = 146
@@ -100,16 +115,18 @@ CASES = tuple(
     name for name in os.environ.get("CMR_SYNC64_CASES", ",".join(DEFAULT_CASES)).split(",")
     if name
 )
+REMOTE_CASE_FILE = os.environ.get("CMR_SYNC64_REMOTE_CASE_FILE", "").strip()
 SKIP_GLS = os.environ.get("CMR_SYNC64_SKIP_GLS", "0") == "1"
 INJECT_MAX_RATE = os.environ.get("CMR_SYNC64_INJECT_MAX_RATE", "0") == "1"
 SIM_ARGS = os.environ.get("CMR_SYNC64_SIM_ARGS", "")
 CLOCK_PERIOD_NS = os.environ.get("CMR_SYNC64_CLOCK_PERIOD_NS", "1.0")
+CASE_TICK_NS = os.environ.get("CMR_SYNC64_CASE_TICK_NS", "auto")
 SDF_RX_CAPTURE_NS = os.environ.get("CMR_SYNC64_RX_CAPTURE_NS", "0")
 DC_POLLS = int(os.environ.get("CMR_SYNC64_DC_POLLS", "1440"))
 GLS_POLLS = int(os.environ.get("CMR_SYNC64_GLS_POLLS", "720"))
 DC_BSUB = os.environ.get("CMR_SYNC64_DC_BSUB", "-n 16")
 GLS_BSUB = os.environ.get("CMR_SYNC64_GLS_BSUB", "-n 8")
-EXPECTED_ROUTERS = 21
+EXPECTED_ROUTERS = 48 if PROFILE == "propb8" else 21
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
 
@@ -187,7 +204,8 @@ def _check_generated(generated: Path) -> Path:
     if not rtl.is_file():
         raise SystemExit("missing generated SyncNoC64: " + str(rtl))
     text = rtl.read_text(encoding="utf-8")
-    router_count = len(re.findall(r"^\s+SyncCmrRouter(?:_\d+)?\s+routers?L", text, re.M))
+    router_pattern = r"^\s+SyncCmrRouter(?:_\d+)?\s+syncPropL" if PROFILE == "propb8" else r"^\s+SyncCmrRouter(?:_\d+)?\s+routers?L"
+    router_count = len(re.findall(router_pattern, text, re.M))
     ipm_count = len(re.findall(r"^\s+SyncCmrIPM(?:_\d+)?\s+InputPortModules_\d+", text, re.M))
     opm_count = len(re.findall(r"^\s+SyncOPM(?:_\d+)?\s+OutputPortModules_\d+", text, re.M))
     mutex_count = len(re.findall(r"\bMutex\d+\b", text))
@@ -204,9 +222,9 @@ def _check_generated(generated: Path) -> Path:
         raise SystemExit("generated DUT still has async HS_Req ports")
     if router_count != EXPECTED_ROUTERS:
         raise SystemExit("SyncNoC64 router count %d != %d" % (router_count, EXPECTED_ROUTERS))
-    if ipm_count != EXPECTED_PORTS:
+    if PROFILE != "propb8" and ipm_count != EXPECTED_PORTS:
         raise SystemExit("SyncNoC64 IPM count %d != %d" % (ipm_count, EXPECTED_PORTS))
-    if opm_count != EXPECTED_PORTS:
+    if PROFILE != "propb8" and opm_count != EXPECTED_PORTS:
         raise SystemExit("SyncNoC64 OPM count %d != %d" % (opm_count, EXPECTED_PORTS))
     if mutex_count or delay_count or adapter_count or fifo_count:
         raise SystemExit(
@@ -217,7 +235,7 @@ def _check_generated(generated: Path) -> Path:
         raise SystemExit("SyncNoC64 still instantiates RRArbiter")
     if top_ports != EXPECTED_TOP:
         raise SystemExit("SyncNoC64 top ports %d != %d" % (top_ports, EXPECTED_TOP))
-    if selector_count != EXPECTED_SELECTORS:
+    if EXPECTED_SELECTORS >= 0 and selector_count != EXPECTED_SELECTORS:
         raise SystemExit(
             "SyncNoC64 SyncLaneSelector count %d != %d" % (selector_count, EXPECTED_SELECTORS)
         )
@@ -351,6 +369,7 @@ def submit_gls(client, run_id, netlist_run_id, name, case_path):
         "CMR_SYNC64_NETLIST_RUN_ID=%s CMR_SYNC64_CASE_NAME=%s "
         "CMR_SYNC64_CASE_FILE=%s CMR_SYNC64_GLS_MODE=sdf "
         "CMR_SYNC64_CLOCK_PERIOD_NS=%s CMR_SYNC64_RX_CAPTURE_NS=%s "
+        "CMR_SYNC64_CASE_TICK_NS=%s "
         "CMR_SYNC64_INJECT_MAX_RATE=%s CMR_SYNC64_SIM_ARGS=%s "
         "CMR_SYNC64_TOP_LANES=%s\n"
         "exec bash %s/scripts/run_gls_cmr_sync_noc64.sh\n"
@@ -362,6 +381,7 @@ def submit_gls(client, run_id, netlist_run_id, name, case_path):
             shlex.quote(case_path),
             shlex.quote(CLOCK_PERIOD_NS),
             shlex.quote(SDF_RX_CAPTURE_NS),
+            shlex.quote(CASE_TICK_NS),
             "1" if INJECT_MAX_RATE else "0",
             shlex.quote(SIM_ARGS),
             shlex.quote(CASE_TOP_LANES),
@@ -400,7 +420,14 @@ def main():
             % os.environ["CMR_NOC16_NETLIST_RUN_ID"],
             flush=True,
         )
+    # A canonical async UR case can be consumed directly by the Sync TB.  This
+    # is the required matched-trace path for PROP_temp64 B8 and must not copy
+    # or regenerate an existing remote case.
     unknown = [name for name in CASES if name not in ALLOWED_CASES]
+    if REMOTE_CASE_FILE:
+        if len(CASES) != 1:
+            raise SystemExit("CMR_SYNC64_REMOTE_CASE_FILE requires exactly one case name")
+        unknown = []
     if unknown:
         raise SystemExit("unsupported sync NoC64 cases: " + ",".join(unknown))
     if not CASES:
@@ -438,11 +465,15 @@ def main():
         ),
         flush=True,
     )
-    case_files = generate_cases()
-    generated = generate_rtl()
+    case_files = {} if REMOTE_CASE_FILE else generate_cases()
+    # Frozen-netlist GLS does not consume the source RTL.  Avoid uploading the
+    # multi-megabyte generated design when exercising an already accepted DC
+    # result; only the TB/wrapper changes needed for the activity run transfer.
+    generated = None if skip_dc else generate_rtl()
 
     files = shared_input_files()
-    files[generated / "SyncNoC_64nodes.v"] = RTL_REMOTE_DIR + "/SyncNoC_64nodes.v"
+    if generated is not None:
+        files[generated / "SyncNoC_64nodes.v"] = RTL_REMOTE_DIR + "/SyncNoC_64nodes.v"
     dut_remote = ROOT + "/" + RTL_REMOTE_DIR + "/SyncNoC_64nodes.v"
     result_dir = RESULT_ROOT / run_id
 
@@ -481,6 +512,18 @@ def main():
         client, sftp, digest = atomic_put_retry(client, sftp, local, dest)
         case_hashes[name] = digest
         remote_cases[name] = ROOT + "/" + dest
+    if REMOTE_CASE_FILE:
+        client, remote_case_hash = remote_run_retry(
+            client, "test -s %s && sha256sum %s" % (
+                shlex.quote(REMOTE_CASE_FILE), shlex.quote(REMOTE_CASE_FILE)
+            )
+        )
+        match = re.search(r"\b([0-9a-f]{64})\b", remote_case_hash)
+        if not match:
+            raise RuntimeError("remote canonical case missing or unhashed: " + REMOTE_CASE_FILE)
+        case_hashes[CASES[0]] = match.group(1)
+        remote_cases[CASES[0]] = REMOTE_CASE_FILE
+        print("REMOTE_CASE_REUSE", CASES[0], match.group(1), REMOTE_CASE_FILE, flush=True)
     sftp.close()
     remote_run(
         client,
@@ -533,7 +576,7 @@ def main():
                     "export CMR_REMOTE_ROOT=%s CMR_SYNC64_RUN_ID=%s "
                     "CMR_SYNC64_DUT_V=%s CMR_SYNC64_CLOCK_PERIOD_NS=%s "
                     "CMR_EXPECTED_ROUTERS=%d CMR_EXPECTED_PORTS=%d "
-                    "CMR_EXPECTED_SELECTORS=%d\n"
+                    "CMR_EXPECTED_TOP=%d CMR_EXPECTED_SELECTORS=%d\n"
                     "cd %s\nexec dc_shell-t -64 -f %s/scripts/dc/run_dc_cmr_sync_fat_tree_noc64.tcl\n"
                     % (
                         ROOT,
@@ -542,6 +585,7 @@ def main():
                         shlex.quote(CLOCK_PERIOD_NS),
                         EXPECTED_ROUTERS,
                         EXPECTED_PORTS,
+                        EXPECTED_TOP,
                         EXPECTED_SELECTORS,
                         ROOT,
                         ROOT,
@@ -569,6 +613,7 @@ def main():
         "expected_ports": EXPECTED_PORTS,
         "expected_selectors": EXPECTED_SELECTORS,
         "clock_period_ns": CLOCK_PERIOD_NS,
+        "case_tick_ns": CASE_TICK_NS,
         "sdf_rx_capture_ns": SDF_RX_CAPTURE_NS,
         "inject_max_rate": INJECT_MAX_RATE,
         "case_hashes": case_hashes,

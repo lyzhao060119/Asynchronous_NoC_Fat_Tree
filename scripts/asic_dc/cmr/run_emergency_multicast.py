@@ -228,6 +228,17 @@ def summarize_case(run_id: str, fanout: int, load: int, scheme: str) -> dict[str
     result = next(csv.DictReader((local / "result.csv").open(encoding="utf-8", newline="")))
     if result.get("pass_fail") != "PASS":
         raise RuntimeError("%s result is not PASS" % name)
+    run_log = (local / "run.log").read_text(encoding="utf-8", errors="replace")
+    sdf_log = (local / "sdf_annotate.log").read_text(encoding="utf-8", errors="replace")
+    stdout_log = (local / "stdout.log").read_text(encoding="utf-8", errors="replace")
+    if "TB_RESULT PASS" not in run_log:
+        raise RuntimeError("%s missing TB_RESULT PASS" % name)
+    if "PROP_TEMP64_GLS_PASS " + name not in stdout_log:
+        raise RuntimeError("%s missing GLS PASS marker" % name)
+    if not __import__("re").search(r"Total errors:\s*0\b", sdf_log):
+        raise RuntimeError("%s missing SDF Total errors: 0" % name)
+    if any(marker in run_log for marker in ("TB_RESULT FAIL", "TB_X_FAIL", "TB_PROTOCOL_X", "TB_STALL_FAIL", "TB_HARD_TIMEOUT", "TB_FATAL", "Fatal:", "Timing violation")):
+        raise RuntimeError("%s has fatal/failure marker" % name)
     packet_obj = json.loads((CASE_DIR / (name + ".packets.json")).read_text(encoding="utf-8"))
     packets = {int(p["pkt_seq"]): p for p in packet_obj["packets"]}
     tail_by_event: dict[str, dict[int, float]] = defaultdict(dict)
@@ -290,7 +301,7 @@ def summarize_case(run_id: str, fanout: int, load: int, scheme: str) -> dict[str
         inter = [x for x in (packets[pkt].get("traversal") or {}).get("link_traversal", []) if "->PE(" not in x]
         links += len(inter)
     return {
-        "scheme": scheme, "fanout": fanout, "load": load,
+        "source_run_id": run_id, "scheme": scheme, "fanout": fanout, "load": load,
         "offered_transactions": offered, "completed_transactions": completed_rate,
         "useful_delivery_rate": useful,
         "mean_completion_latency": statistics.fmean(lats) if lats else math.nan,
@@ -299,13 +310,34 @@ def summarize_case(run_id: str, fanout: int, load: int, scheme: str) -> dict[str
         "backlog": len(event_meta) - completed, "completed_count": completed,
         "measurement_transactions": len(event_meta),
         "trace_sha256": packet_obj["trace_hash"], "case": name,
+        "sdf_pass": True, "full_drain_pass": True,
     }
 
 
 def summarize(args: argparse.Namespace) -> None:
     rows = [summarize_case(args.run_id, *pick) for pick in selected(args)]
-    RAW_ROOT.mkdir(parents=True, exist_ok=True)
-    detailed = RAW_ROOT / (args.run_id + "_detailed.csv")
+    # A paper-facing summary must be explicitly placed in a new directory so
+    # re-summarization never overwrites the historical exploratory evidence.
+    if args.output is None:
+        raise RuntimeError("summarize requires --output (new directory)")
+    out_root = args.output.resolve()
+    if out_root.exists():
+        raise RuntimeError("refusing to overwrite summary directory: %s" % out_root)
+    out_root.mkdir(parents=True)
+    by_pair: dict[tuple[int, int], list[dict[str, object]]] = defaultdict(list)
+    for row in rows:
+        by_pair[(int(row["fanout"]), int(row["load"]))].append(row)
+        if int(row["measurement_transactions"]) != 400 or int(row["completed_count"]) != 400 or int(row["backlog"]) != 0:
+            raise RuntimeError(
+                "strict full-drain reject %s: %s/%s backlog=%s" %
+                (row["case"], row["completed_count"], row["measurement_transactions"], row["backlog"])
+            )
+    for pair, pair_rows in by_pair.items():
+        if len(pair_rows) != 2 or {str(r["scheme"]) for r in pair_rows} != set(SCHEMES):
+            raise RuntimeError("missing paired schemes for fanout/load %s" % (pair,))
+        if len({str(r["trace_sha256"]) for r in pair_rows}) != 1:
+            raise RuntimeError("trace mismatch for fanout/load %s" % (pair,))
+    detailed = out_root / (args.run_id + "_detailed.csv")
     with detailed.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader(); writer.writerows(rows)
@@ -314,13 +346,13 @@ def summarize(args: argparse.Namespace) -> None:
                   "mean_completion_latency", "p95_completion_latency", "p99_completion_latency",
                   "injected_flits", "link_traversals", "backlog"]
         for scheme in SCHEMES:
-            path = RAW_ROOT / ("multicast_main_%s.csv" % scheme)
+            path = out_root / ("multicast_main_%s.csv" % scheme)
             with path.open("w", encoding="utf-8", newline="") as handle:
                 writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
                 writer.writeheader(); writer.writerows(sorted((r for r in rows if r["scheme"] == scheme), key=lambda r: int(r["load"])))
     if len({int(row["fanout"]) for row in rows}) > 1 and len({int(row["load"]) for row in rows}) == 1:
         fields = ["scheme", "fanout", "mean_completion_latency", "link_traversals", "injected_flits", "useful_delivery_rate"]
-        path = RAW_ROOT / "multicast_fanout.csv"
+        path = out_root / "multicast_fanout.csv"
         with path.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
             writer.writeheader(); writer.writerows(sorted(rows, key=lambda r: (str(r["scheme"]), int(r["fanout"]))))
@@ -342,6 +374,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--fanout", type=int, choices=FANOUTS, action="append")
     p.add_argument("--load", type=int, action="append")
     p.add_argument("--scheme", choices=SCHEMES, action="append")
+    p.add_argument("--output", type=Path,
+                   help="new summary directory; required for summarize")
     return p.parse_args()
 
 

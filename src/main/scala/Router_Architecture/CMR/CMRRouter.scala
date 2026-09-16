@@ -5,6 +5,24 @@ import Router_Architecture.common.{RouterDirGroupedHSIO, RouterModuleConfig}
 import Router_Architecture.ultra.UltraTopology
 import chisel3._
 
+private[CMR] object CMRStaticLaneMapping {
+  /**
+    * Fixed upward mapping used by the Static4 ablation.
+    *
+    * This maps a child ingress direction to one parent *output* lane.  Parent
+    * ingress ports are deliberately rejected: downstream traffic must retain
+    * normal destination routing to every child direction.
+    */
+  def parentOutputLane(config: RouterModuleConfig, ingressPort: Int): Int = {
+    require(config.childLanes == 1 && config.parentLanes == 4,
+      "Static4 mapping requires c1p4 geometry")
+    val ingressDirection = config.dirOfPhys(ingressPort)
+    require(ingressDirection >= 0 && ingressDirection < config.parentDir,
+      "Static4 mapping applies only to child ingress -> parent output")
+    ingressDirection
+  }
+}
+
 /** Continuous-Time Replication router with exact per-direction lane geometry. */
 class CMRRouter(
     xCoordinate: Int,
@@ -14,7 +32,8 @@ class CMRRouter(
     parentLanes: Int = 1,
     useMeshRouting: Boolean = false,
     meshGridSize: Int = 8,
-    meshCoordShift: Int = 0
+    meshCoordShift: Int = 0,
+    staticParentLaneMapping: Boolean = false
 ) extends Module {
   require(routerLevel >= 1 && routerLevel <= 3)
   require(CMRParameters.SupportedLaneGeometries.contains((childLanes, parentLanes)))
@@ -26,6 +45,10 @@ class CMRRouter(
     require(yCoordinate >= 0 && yCoordinate < meshGridSize)
   } else {
     require(meshCoordShift == 0, "quadtree routers do not shift mesh coordinates")
+  }
+  if (staticParentLaneMapping) {
+    require(childLanes == 1 && parentLanes == 4,
+      "Static parent-lane mapping is the DATE E1 c1p4 ablation only")
   }
 
   private val config = RouterModuleConfig(
@@ -108,10 +131,7 @@ class CMRRouter(
         ipm.io.Ackin(branch) := OutputPortModules(output).io.Ackout(source)
         ipm.io.TailPassed(branch) := OutputPortModules(output).io.TailPassed(source)
       } else {
-        val selector = Module(new LaneSelector(laneCount))
-        selector.io.reset := reset.asBool
-        selector.io.PPE := ipm.io.PathEnabled(branch)
-        val held = VecInit(selector.io.LaneSelect.asBools)
+        val laneSelect = Wire(UInt(laneCount.W))
         val laneIsEmpty = outputs.zipWithIndex.map { case (output, lane) =>
           val source = sourceIndices(lane)
           val otherGrants = OutputPortModules(output).io.Grant.zipWithIndex.collect {
@@ -119,7 +139,26 @@ class CMRRouter(
           }
           !(if (otherGrants.isEmpty) false.B else otherGrants.reduce(_ || _))
         }
-        selector.io.LaneIsEmpty := VecInit(laneIsEmpty).asUInt
+        if (staticParentLaneMapping && outputDirection == config.parentDir) {
+          // DATE E1 Static4: retain all four physical lanes and the same OPM,
+          // datapath and phase adapter, but never fall back based on availability.
+          // This is an upward output choice only.  A packet entering from any
+          // parent lane on its downward path still routes normally to all child
+          // directions; no bidirectional lane ownership is created here.
+          val fixedLane = CMRStaticLaneMapping.parentOutputLane(config, input)
+          laneSelect := Mux(
+            ipm.io.PathEnabled(branch),
+            (1 << fixedLane).U(laneCount.W),
+            0.U(laneCount.W)
+          )
+        } else {
+          val selector = Module(new LaneSelector(laneCount))
+          selector.io.reset := reset.asBool
+          selector.io.PPE := ipm.io.PathEnabled(branch)
+          selector.io.LaneIsEmpty := VecInit(laneIsEmpty).asUInt
+          laneSelect := selector.io.LaneSelect
+        }
+        val held = VecInit(laneSelect.asBools)
         for ((output, lane) <- outputs.zipWithIndex) {
           val source = sourceIndices(lane)
           OutputPortModules(output).io.PktPathEnable(source) :=
@@ -132,7 +171,7 @@ class CMRRouter(
         val laneTails = Wire(Vec(laneCount, Bool()))
 
         adapter.io.reset := reset.asBool
-        adapter.io.LaneSelect := selector.io.LaneSelect
+        adapter.io.LaneSelect := laneSelect
         for ((output, lane) <- outputs.zipWithIndex) {
           val source = sourceIndices(lane)
           laneAcks(lane) := OutputPortModules(output).io.Ackout(source)
@@ -166,7 +205,8 @@ object CMRRouterEmit {
       parentLanes: Int,
       useMeshRouting: Boolean,
       xCoordinate: Int = 0,
-      yCoordinate: Int = 0
+      yCoordinate: Int = 0,
+      staticParentLaneMapping: Boolean = false
   ): String = {
     val base =
       if (useMeshRouting)
@@ -175,8 +215,10 @@ object CMRRouterEmit {
         s"generated_cmr/router_l$routerLevel"
       else
         s"generated_cmr/router_l${routerLevel}_c${childLanes}_p${parentLanes}"
-    if (xCoordinate == 0 && yCoordinate == 0) base
-    else s"${base}_x${xCoordinate}_y${yCoordinate}"
+    val placed =
+      if (xCoordinate == 0 && yCoordinate == 0) base
+      else s"${base}_x${xCoordinate}_y${yCoordinate}"
+    if (staticParentLaneMapping) placed + "_static4" else placed
   }
 }
 
@@ -189,14 +231,20 @@ object CMRRouterMain extends App {
   private val meshGrid = args.drop(4).headOption.map(_.toInt).getOrElse(8)
   private val xCoordinate = args.drop(5).headOption.map(_.toInt).getOrElse(0)
   private val yCoordinate = args.drop(6).headOption.map(_.toInt).getOrElse(0)
+  private val staticFlag = args.drop(7).headOption.getOrElse("dynamic")
+  private val staticParentLaneMapping =
+    staticFlag == "1" || staticFlag.equalsIgnoreCase("static") ||
+      staticFlag.equalsIgnoreCase("static4")
   require(routerLevel >= 1 && routerLevel <= 3)
   require(CMRParameters.SupportedLaneGeometries.contains((childLanes, parentLanes)))
   private val targetDir = CMRRouterEmit.targetDir(
-    routerLevel, childLanes, parentLanes, useMesh, xCoordinate, yCoordinate
+    routerLevel, childLanes, parentLanes, useMesh, xCoordinate, yCoordinate,
+    staticParentLaneMapping
   )
   emitVerilog(
     new CMRRouter(
-      xCoordinate, yCoordinate, routerLevel, childLanes, parentLanes, useMesh, meshGrid
+      xCoordinate, yCoordinate, routerLevel, childLanes, parentLanes, useMesh,
+      meshGrid, 0, staticParentLaneMapping
     ),
     Array("--target-dir", targetDir)
   )

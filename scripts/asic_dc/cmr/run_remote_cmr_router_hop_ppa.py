@@ -598,6 +598,127 @@ def write_metrics(result: dict) -> None:
     )
 
 
+def flit_windows_from_events(events: list[dict]) -> str:
+    if len(events) >= 5:
+        return ",".join(
+            [
+                "%.3f:%.3f" % (float(events[0]["input_req_ns"]), float(events[0]["output_req_ns"]) + 0.001),
+                "%.3f:%.3f" % (float(events[1]["input_req_ns"]), float(events[3]["output_req_ns"]) + 0.001),
+                "%.3f:%.3f" % (float(events[4]["input_req_ns"]), float(events[4]["output_req_ns"]) + 0.001),
+            ]
+        )
+    return ",".join(
+        "%.3f:%.3f" % (float(row["input_req_ns"]), float(row["output_req_ns"]) + 0.001)
+        for row in events[:3]
+    )
+
+
+def require_clean_px(local_power: Path, tag: str) -> str:
+    """Fail closed on the PX evidence gates used by the paper table."""
+    lsf = local_power / "lsf.log"
+    check_path = local_power / "check_power.rpt"
+    power_path = local_power / "power.rpt"
+    activity_path = local_power / "activity.rpt"
+    px_log = lsf.read_text(encoding="utf-8", errors="replace") if lsf.is_file() else ""
+    if "PT-063" in px_log:
+        raise RuntimeError("%s PT-063 present in PT startup log" % tag)
+    if "PPA_POWER_PASS" not in px_log:
+        raise RuntimeError("%s missing PPA_POWER_PASS\n%s" % (tag, px_log[-4000:]))
+    for path in (check_path, power_path, activity_path):
+        if not path.is_file() or path.stat().st_size == 0:
+            raise RuntimeError("%s missing/nonzero PX report %s" % (tag, path.name))
+    check = check_path.read_text(encoding="utf-8", errors="replace")
+    if re.search(r"\b(error|violation)\b", check, re.I) and not re.search(r"0\s+error", check, re.I):
+        raise RuntimeError("%s check_power is not clean" % tag)
+    activity = activity_path.read_text(encoding="utf-8", errors="replace")
+    if re.search(r"(?:no\s+switching\s+activity|0\s+annotated)", activity, re.I):
+        raise RuntimeError("%s VCD activity coverage is zero" % tag)
+    return px_log
+
+
+def run_ptpx_only(client, sftp, artifacts: list[dict]) -> dict:
+    """Re-run only PT-PX against immutable accepted GLS VCDs.
+
+    This intentionally neither uploads a testbench nor submits GLS/DC.  A new
+    RUN_ID isolates reports from the historically diagnostic PT-063 outputs.
+    """
+    source_run = os.environ.get("CMR_HOP_PTPX_SOURCE_RUN_ID", "").strip()
+    if not source_run:
+        raise RuntimeError("CMR_HOP_PTPX_SOURCE_RUN_ID is required with CMR_HOP_PTPX_ONLY=1")
+    source_root = REPO / "scripts" / "asic_dc" / "cmr" / "results" / source_run
+    if not source_root.is_dir():
+        raise RuntimeError("missing local accepted GLS source %s" % source_root)
+    tcl = REPO / "scripts" / "asic_dc" / "power" / "run_ptpx_cmr_router_hop_ppa.tcl"
+    ssh_chunk_put(client, tcl, "%s/scripts/run_ptpx_cmr_router_hop_ppa.tcl" % ROOT)
+    result = {
+        "run_id": RUN_ID,
+        "ptpx_only": True,
+        "source_gls_run_id": source_run,
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "git_sha": subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+        "artifacts": [],
+    }
+    for artifact in artifacts:
+        kind = artifact["kind"]
+        config = kind_config(kind)
+        strip = "tb_cmr_router_hop_ppa/dut" if config["async"] else "tb_sync_cmr_router_hop_ppa/dut"
+        copied = dict(artifact)
+        copied["modes"] = {}
+        for mode in HOP_MODES:
+            tag = "%s_%s" % (kind, mode)
+            source_gls = source_root / kind / mode / "gls"
+            run_log_path = source_gls / "run.log"
+            vcd_path = source_gls / "hop_ppa.vcd"
+            events_path = source_gls / "hop_events.csv"
+            if not run_log_path.is_file() or not vcd_path.is_file() or vcd_path.stat().st_size == 0:
+                raise RuntimeError("%s missing immutable GLS log/VCD" % tag)
+            run_log = run_log_path.read_text(encoding="utf-8", errors="replace")
+            if "PPA_RESULT PASS" not in run_log or re.search(r"Timing violation|PPA_FAIL|PPA_RESULT FAIL", run_log):
+                raise RuntimeError("%s source GLS is not accepted" % tag)
+            events, start_ns, end_ns = parse_events(events_path, mode=mode, run_log=run_log)
+            windows = flit_windows_from_events(events) if events else ""
+            remote_source_vcd = "%s/logs/hop_ppa/%s_%s/gls/hop_ppa.vcd" % (ROOT, source_run, tag)
+            remote_log = "%s/logs/hop_ppa/%s_%s/power" % (ROOT, RUN_ID, tag)
+            remote_power = "%s/reports/hop_ppa/%s_%s/power" % (ROOT, RUN_ID, tag)
+            local_power = RESULT_DIR / kind / mode / "power"
+            command = (
+                "mkdir -p {log}; bsub -n 4{hosts} -oo {log}/lsf.log "
+                "env SYNOPSYS_LC_ROOT=/soft/synopsys/lc/V-2023.12 "
+                "CMR_REMOTE_ROOT={root} CMR_RUN_ID={run}_{tag} CMR_NETLIST_RUN_ID={netlist} "
+                "CMR_POWER_VCD_FILE={vcd} CMR_POWER_START_NS={start:.3f} CMR_POWER_END_NS={end:.3f} "
+                "CMR_POWER_FLIT_WINDOWS={windows} CMR_DUT_NAME={dut} CMR_TB_STRIP={strip} "
+                "/soft/synopsys/prime/V-2023.12/bin/pt_shell -f {root}/scripts/run_ptpx_cmr_router_hop_ppa.tcl"
+            ).format(
+                root=shlex.quote(ROOT), run=shlex.quote(RUN_ID), tag=shlex.quote(tag),
+                netlist=shlex.quote(artifact["netlist_run_id"]), vcd=shlex.quote(remote_source_vcd),
+                start=start_ns, end=end_ns, windows=shlex.quote(windows), dut=shlex.quote(config["dut"]),
+                strip=shlex.quote(strip), log=shlex.quote(remote_log), hosts=bsub_hosts(),
+            )
+            jid = submit(client, command, tag + "_ptpx")
+            fetch_tree(sftp, remote_power, local_power)
+            copy_remote_file(sftp, "%s/lsf.log" % remote_log, local_power / "lsf.log")
+            require_clean_px(local_power, tag)
+            power = annotate_energy(parse_power(local_power / "power.rpt"), end_ns - start_ns)
+            power["energy_per_delivered_flit_j"] = power["total_energy_j"] / len(events) if events and power["total_energy_j"] is not None else None
+            copied["modes"][mode] = {
+                "gls_job_id": "reused:%s" % source_run,
+                "power_job_id": jid,
+                "source_vcd": remote_source_vcd,
+                "power_window_ns": {"start": start_ns, "end": end_ns, "duration": end_ns - start_ns},
+                "events": events,
+                "power": power,
+                "pt063_absent": True,
+                "check_power_clean": True,
+                "activity_coverage_nonzero": True,
+            }
+            if mode == "isolated":
+                copied["events"] = events; copied["power"] = power; copied["power_window_ns"] = copied["modes"][mode]["power_window_ns"]
+            if mode == "idle": copied["idle_power"] = power
+            if mode == "stream": copied["active_power"] = power
+        result["artifacts"].append(copied)
+    return result
+
+
 def main() -> None:
     refuse_overwrite(RUN_ID, action="hop-ppa-results")
     kinds = selected_kinds()
@@ -611,6 +732,20 @@ def main() -> None:
             client.close()
         print(json.dumps({"frozen_router_candidates": candidates, "missing_kinds": missing}, indent=2))
         return
+    if os.environ.get("CMR_HOP_PTPX_ONLY", "0") == "1":
+        client = connect()
+        sftp = client.open_sftp()
+        try:
+            artifacts = [validate_artifact(client, kind, netlist_ids[kind]) for kind in kinds]
+            RESULT_DIR.mkdir(parents=True, exist_ok=True)
+            result = run_ptpx_only(client, sftp, artifacts)
+            (RESULT_DIR / "summary.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+            write_metrics(result)
+            print("HOP_PPA_PTPX_ONLY_PASS", RUN_ID, ",".join(kinds), flush=True)
+        finally:
+            sftp.close(); client.close()
+        return
+
     uploads = [
         (
             REPO / "scripts/asic_dc/cmr/tb_cmr_router_hop_ppa.sv",

@@ -32,6 +32,7 @@
         "topo_ur",
         "topo_bc",
         "hotspot10",
+        "dir_skew1_64",
         "xmc_f16",
         "xmc10_g",
         "mc_ur64",

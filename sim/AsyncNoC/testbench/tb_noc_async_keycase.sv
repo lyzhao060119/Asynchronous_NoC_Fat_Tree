@@ -61,10 +61,22 @@ module noc_async_keycase_core #(
       .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
     );
   `else
-    async_noc_port_adapter_prop_256 noc (
-      .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
-      .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
-    );
+    `ifdef CMR_NOC_PROP_TEMP
+      async_noc_port_adapter_prop_temp_256 noc (
+        .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
+        .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
+      );
+    `elsif CMR_NOC_PFAT_TEMP
+      async_noc_port_adapter_pfat_temp_256 noc (
+        .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
+        .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
+      );
+    `else
+      async_noc_port_adapter_prop_256 noc (
+        .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
+        .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
+      );
+    `endif
   `endif
 `endif
 
@@ -72,7 +84,8 @@ module noc_async_keycase_core #(
   reg running, timed_out, finish_requested, write_v3_metrics, x_failed;
   integer reset_cycles, timeout_cycles, inject_max_rate;
   integer warmup_events, measurement_events;
-  real case_tick_ns, tx_setup_ns, rx_capture_ns, ack_to_next_req_guard_ns, timeout_scale;
+  real case_tick_ns, case_meta_tick_ns, tx_setup_ns, rx_capture_ns, ack_to_next_req_guard_ns, timeout_scale;
+  reg case_tick_cli_seen, case_meta_tick_seen;
   real case_epoch_ns, timeout_ns, drain_ns, stall_timeout_ns, hard_timeout_ns;
   reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, v3_metrics_file;
   reg [STR_CHARS*8-1:0] case_name, case_group;
@@ -167,9 +180,18 @@ module noc_async_keycase_core #(
             else if (tag == "reset_cycles") n = $sscanf(line, "%s %d", tag, reset_cycles);
             else if (tag == "timeout_cycles") n = $sscanf(line, "%s %d", tag, timeout_cycles);
             else if (tag == "meta") begin
-              n = $sscanf(line, "%s %s %d", tag, word, cyc);
-              if (word == "warmup_original_events") warmup_events = cyc;
-              else if (word == "measurement_original_events") measurement_events = cyc;
+              if ($sscanf(line, "%s %s", tag, word) != 2) begin
+                $display("TB_FATAL malformed meta at line %0d", line_no); $finish;
+              end
+              if (word == "case_tick_ns") begin
+                n = $sscanf(line, "%s %s %f", tag, word, case_meta_tick_ns);
+                if (n != 3) begin $display("TB_FATAL malformed case_tick_ns at line %0d", line_no); $finish; end
+                case_meta_tick_seen = 1'b1;
+              end else begin
+                n = $sscanf(line, "%s %s %d", tag, word, cyc);
+                if (word == "warmup_original_events") warmup_events = cyc;
+                else if (word == "measurement_original_events") measurement_events = cyc;
+              end
             end else if (tag == "event_map") begin
               n = $sscanf(line, "%s %d %d", tag, pkt, cyc);
               if (n != 3 || pkt < 0 || pkt >= MAX_PACKETS) begin
@@ -644,7 +666,9 @@ module noc_async_keycase_core #(
   initial begin
     case_file = ""; csv_file = "async_noc_summary.csv"; event_csv_file = "async_noc_events.csv";
     latency_csv_file = "async_noc_latency.csv"; v3_metrics_file = "";
-    case_tick_ns = 20.0; tx_setup_ns = 0.05; rx_capture_ns = 0.05;
+    case_tick_ns = 1.0; case_meta_tick_ns = 0.0;
+    case_tick_cli_seen = 1'b0; case_meta_tick_seen = 1'b0;
+    tx_setup_ns = 0.05; rx_capture_ns = 0.05;
     ack_to_next_req_guard_ns = 0.20; timeout_scale = 1.0; inject_max_rate = 0; write_v3_metrics = 0;
     stall_timeout_ns = 0.0; hard_timeout_ns = 0.0;
     x_failed = 1'b0;
@@ -653,7 +677,7 @@ module noc_async_keycase_core #(
     if ($value$plusargs("EVENT_CSV=%s", event_csv_file)) ;
     if ($value$plusargs("LATENCY_CSV=%s", latency_csv_file)) ;
     if ($value$plusargs("V3_METRICS_CSV=%s", v3_metrics_file)) write_v3_metrics = 1;
-    if ($value$plusargs("CASE_TICK_NS=%f", case_tick_ns)) ;
+    if ($value$plusargs("CASE_TICK_NS=%f", case_tick_ns)) case_tick_cli_seen = 1'b1;
     if ($value$plusargs("TX_SETUP_NS=%f", tx_setup_ns)) ;
     if ($value$plusargs("RX_CAPTURE_NS=%f", rx_capture_ns)) ;
     if ($value$plusargs("ACK_TO_NEXT_REQ_GUARD_NS=%f", ack_to_next_req_guard_ns)) ;
@@ -664,6 +688,18 @@ module noc_async_keycase_core #(
     if (case_file == "") begin $display("TB_FATAL +CASE_FILE=<case> is required"); $finish; end
     $display("TB_INFO NUM_CORES=%0d KEYCASE async-only ACK_TO_NEXT_REQ_GUARD_NS=%0.3f INJECT_MAX_RATE=%0d CASE_TICK_NS=%0.3f RX_CAPTURE_NS=%0.3f", NUM_CORES, ack_to_next_req_guard_ns, inject_max_rate, case_tick_ns, rx_capture_ns);
     parse_case();
+    if (!case_meta_tick_seen) begin
+      $display("TB_FATAL case is missing meta case_tick_ns");
+      $finish;
+    end
+    if ((case_tick_ns - case_meta_tick_ns > 0.0005) ||
+        (case_meta_tick_ns - case_tick_ns > 0.0005)) begin
+      $display("TB_FATAL CASE_TICK_NS mismatch cli_or_default=%0.6f case_meta=%0.6f cli_seen=%0d",
+               case_tick_ns, case_meta_tick_ns, case_tick_cli_seen);
+      $finish;
+    end
+    $display("TB_INFO CASE_TICK_NS verified cli_or_default=%0.3f case_meta=%0.3f cli_seen=%0d",
+             case_tick_ns, case_meta_tick_ns, case_tick_cli_seen);
     reset = 1'b1; tb_in_req = '0; tb_in_data = '0; tb_out_ack = '0; input_done = '0;
     running = 1'b0; timed_out = 1'b0; finish_requested = 1'b0; unexpected_flits = 0;
     csv_dumped = 1'b0; delivered_packets = 0; latency_count = 0;
@@ -703,4 +739,32 @@ module tb_noc_async_keycase;
   localparam integer NUM_CORES = 256;
 `endif
   noc_async_keycase_core #(.NUM_CORES(NUM_CORES), .ROBUST_DIRECT_HANDSHAKE(1)) core();
+`ifndef CMR_NOC_1024
+`ifdef CMR_NOC_PROP_TEMP
+`define TB_L1_DUP_MON(req, ack, flit, nm) \
+  always @(req) begin \
+    if (core.running && $test$plusargs("L1_DUP_PROBE")) \
+      $display("TB_L1_DUP t=%0t link=%s req=%b ack=%b ht=%0d%0d flit=%h", \
+               $time, nm, req, ack, flit[27], flit[26], flit); \
+  end
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_0_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_0_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_0_Data_flit, "tile1_0.L1_q0_i2.parent0_in")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_1_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_1_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_1_Data_flit, "tile1_0.L1_q0_i2.parent1_in")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_2_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_2_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_2_Data_flit, "tile1_0.L1_q0_i2.parent2_in")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_3_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_3_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_inputs_parent_3_Data_flit, "tile1_0.L1_q0_i2.parent3_in")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_0_0_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_0_0_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_0_0_Data_flit, "tile1_0.L1_q0_i2.child0_out_global27")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_1_0_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_1_0_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_1_0_Data_flit, "tile1_0.L1_q0_i2.child1_out_global11")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_2_0_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_2_0_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_2_0_Data_flit, "tile1_0.L1_q0_i2.child2_out_global26")
+  `TB_L1_DUP_MON(core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_3_0_HS_Req, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_3_0_HS_Ack, core.noc.dut.propTile_1_0.propL1_q0_i2.io_outputs_child_3_0_Data_flit, "tile1_0.L1_q0_i2.child3_out_global10")
+`undef TB_L1_DUP_MON
+  initial begin : l1_duplicate_vcd
+    reg [8*256-1:0] dump_l1_vcd;
+    dump_l1_vcd = "";
+    if ($value$plusargs("DUMP_L1_DUP_VCD=%s", dump_l1_vcd)) begin
+      $dumpfile(dump_l1_vcd);
+      $dumpvars(1, core.noc.dut.propTile_1_0.propL1_q0_i2);
+      $display("TB_INFO DUMP_L1_DUP_VCD %0s", dump_l1_vcd);
+    end
+  end
+`endif
+`endif
 endmodule

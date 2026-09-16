@@ -163,6 +163,29 @@ def choose_intercluster_dest(rng: Random, source: int, n: int) -> int:
     return rng.choice(choices)
 
 
+def dir_skew1_sources(nodes: int = 64) -> tuple[int, ...]:
+    """The childDir=0 core of every 2x2 L1 subtree in the 8x8 network."""
+    if nodes != 64:
+        raise ValueError("DIR-SKEW1 is 64-node only")
+    return tuple((2 * a + 1) + 8 * (2 * b + 1) for b in range(4) for a in range(4))
+
+
+def choose_dir_skew1_dest(rng: Random, source: int, nodes: int = 64) -> int:
+    if source not in dir_skew1_sources(nodes):
+        raise ValueError("DIR-SKEW1 source is not childDir=0: %s" % source)
+    width = width_of(nodes)
+    sx, sy = pe_xy(source, width)
+    subtree_x, subtree_y = sx // 2, sy // 2
+    choices = [
+        dest for dest in range(nodes)
+        if (pe_xy(dest, width)[0] // 2, pe_xy(dest, width)[1] // 2)
+        != (subtree_x, subtree_y)
+    ]
+    if len(choices) != 60:
+        raise RuntimeError("DIR-SKEW1 expected 60 destinations, got %s" % len(choices))
+    return rng.choice(choices)
+
+
 def sample_rect_multicast_dests(
     rng: Random, source: int, n: int, fanout: int, *, cross_l2: bool
 ) -> list[int]:
@@ -260,7 +283,8 @@ def draw_pairs(
     width = width_of(nodes)
     pairs: list[dict[str, Any]] = []
     for _ in range(count):
-        source = rng.randrange(nodes)
+        source = (rng.choice(dir_skew1_sources(nodes))
+                  if traffic == "dir_skew1_64" else rng.randrange(nodes))
         multicast = False
         if traffic == "bf_stress64":
             dests = [choose_bf_dest(rng, source, nodes)]
@@ -270,6 +294,8 @@ def draw_pairs(
             dests = [choose_bit_complement_dest(source, nodes)]
         elif traffic == "hotspot10":
             dests = [choose_hotspot10_dest(rng, source, nodes)]
+        elif traffic == "dir_skew1_64":
+            dests = [choose_dir_skew1_dest(rng, source, nodes)]
         elif traffic == "mc_ur64":
             dests = sample_rect_multicast_dests(rng, source, nodes, fanout, cross_l2=False)
             multicast = True
@@ -390,7 +416,7 @@ def generate_trace(
             nodes = 1024
         else:
             nodes = 64
-    if traffic in ("bf_stress64", "topo_bc", "hotspot10") and nodes != 64:
+    if traffic in ("bf_stress64", "topo_bc", "hotspot10", "dir_skew1_64") and nodes != 64:
         raise ValueError("%s is 64-node only" % benchmark_id)
     if traffic in ("mc_ur64", "mc_xq64") and nodes != 64:
         raise ValueError("%s is 64-node only" % traffic)
@@ -415,8 +441,9 @@ def generate_trace(
         ready = [idx * (packet_flits + gap) for idx in range(len(pairs))]
     else:
         sched_rng = Random(seed_mix(seed, nodes, spread or 0, load_tag_int(load_point)))
+        schedule_load = load_point * 4.0 if traffic == "dir_skew1_64" else load_point
         ready = schedule_pairs(
-            pairs, nodes=nodes, packet_flits=packet_flits, load_point=load_point, rng=sched_rng
+            pairs, nodes=nodes, packet_flits=packet_flits, load_point=schedule_load, rng=sched_rng
         )
     events = build_events(pairs, ready, warmup=warmup, packet_flits=packet_flits)
     header = {
@@ -435,6 +462,13 @@ def generate_trace(
         "tmax_definition": bench.get("tmax_definition"),
     }
     header.update(trace_load_fields(load_point))
+    if traffic == "dir_skew1_64":
+        header.update({
+            "active_sources": 16,
+            "source_child_direction": 0,
+            "source_rate_multiplier": 4,
+            "load_normalization": "all_64_ports",
+        })
     return {"header": header, "events": events}
 
 
@@ -442,7 +476,7 @@ def paper_nodes_for(benchmark_id: str) -> list[int]:
     """Node counts the paper path must emit for one canonical-trace family."""
     if benchmark_id == "BF-STRESS64":
         return [64]
-    if benchmark_id in ("TOPO-BC", "HOTSPOT10"):
+    if benchmark_id in ("TOPO-BC", "HOTSPOT10", "DIR-SKEW1"):
         return [64]
     if benchmark_id == "TOPO-UR":
         return [64, 256, 1024]

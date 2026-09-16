@@ -29,16 +29,34 @@ set power_enable_leakage_variation_analysis true
 set power_enable_multi_rail_analysis true
 set power_analysis_mode time_based
 puts "CMR_POWER_WINDOW ns=$::env(CMR_POWER_START_NS):$::env(CMR_POWER_END_NS)"
-read_vcd -strip_path $::env(CMR_POWER_STRIP_PATH) $::env(CMR_POWER_VCD) -time [list $::env(CMR_POWER_START_NS) $::env(CMR_POWER_END_NS)]
+if {[catch {read_vcd -strip_path $::env(CMR_POWER_STRIP_PATH) $::env(CMR_POWER_VCD) -time [list $::env(CMR_POWER_START_NS) $::env(CMR_POWER_END_NS)]} err]} {
+  puts "CMR_POWER_FAIL read_vcd/strip-path: $err"
+  exit 2
+}
 check_power > "$::env(CMR_POWER_REPORT_DIR)/check_power.rpt"
 report_switching_activity -list_not_annotated > "$::env(CMR_POWER_REPORT_DIR)/unannotated_activity.rpt"
-update_power
+if {[catch {report_switching_activity > "$::env(CMR_POWER_REPORT_DIR)/activity.rpt"} err]} {
+  puts "CMR_POWER_FAIL activity report: $err"
+  exit 2
+}
+if {[catch {update_power} err]} {
+  puts "CMR_POWER_FAIL update_power: $err"
+  exit 2
+}
 report_power > "$::env(CMR_POWER_REPORT_DIR)/power.rpt"
 report_power -hierarchy > "$::env(CMR_POWER_REPORT_DIR)/power_hierarchy.rpt"
 report_power -cell_power > "$::env(CMR_POWER_REPORT_DIR)/power_cells.rpt"
-if {![file exists "$::env(CMR_POWER_REPORT_DIR)/power.rpt"] || [file size "$::env(CMR_POWER_REPORT_DIR)/power.rpt"] == 0} {
-  puts "CMR_POWER_FAIL missing power report"
-  exit 1
+foreach name {check_power.rpt activity.rpt power.rpt power_hierarchy.rpt power_cells.rpt} {
+  set path "$::env(CMR_POWER_REPORT_DIR)/$name"
+  if {![file exists $path] || [file size $path] == 0} {
+    puts "CMR_POWER_FAIL missing report $name"
+    exit 2
+  }
+}
+set check [read [open "$::env(CMR_POWER_REPORT_DIR)/check_power.rpt" r]]
+if {[regexp -nocase {(^|\s)(error|violation)(\s|:)} $check] && ![regexp -nocase {0\s+errors?} $check]} {
+  puts "CMR_POWER_FAIL check_power not clean"
+  exit 2
 }
 puts "CMR_POWER_PASS reports=$::env(CMR_POWER_REPORT_DIR)"
 exit

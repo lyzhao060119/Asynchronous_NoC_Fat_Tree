@@ -1,0 +1,13 @@
+{
+  "ur_source": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper64\\cohort64_20260916_083441\\ur_acceptance.csv",
+  "bc_source": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper64\\cohort64_20260916_083441\\bc_hotspot_acceptance.csv",
+  "static_source": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper64\\static64_cohort_20260916_083827\\acceptance.csv",
+  "f16_source": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper64\\compact64_20260915_112900\\multicast_acceptance.csv",
+  "ratios": {
+    "TOPO-UR": 1.4804642179004122,
+    "TOPO-BC": 2.199752878922808,
+    "HOTSPOT10": 1.39581881413741
+  },
+  "lane_imbalance_marker": "M420 real parent-lane CV: Dynamic 0.307, Static 0.067\nJain: 0.903 / 0.995 | unused lanes: 1 / 0",
+  "lane_power_source": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper64\\network_power_20260916_084500_paper64_network8"
+}

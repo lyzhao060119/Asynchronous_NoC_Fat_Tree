@@ -24,6 +24,12 @@ if {[info exists ::env(CMR_TB_STRIP)] && $::env(CMR_TB_STRIP) ne ""} {
   set TB_STRIP $::env(CMR_TB_STRIP)
 }
 set VCD_FILE "$ROOT/logs/hop_ppa/$RUN_ID/gls/hop_ppa.vcd"
+# PT-PX-only cleanup runs must write to a fresh report run while consuming the
+# immutable VCD from the already accepted GLS run.  The override is explicit
+# rather than copying or relaunching GLS.
+if {[info exists ::env(CMR_POWER_VCD_FILE)] && $::env(CMR_POWER_VCD_FILE) ne ""} {
+  set VCD_FILE $::env(CMR_POWER_VCD_FILE)
+}
 set LIB_DIR "/process/course_lib/t28hpc+"
 set STD_CELL_LIB "$LIB_DIR/tcbn28hpcplusbwp12t30p140ssg0p81v125c_ccs.db"
 
@@ -71,6 +77,10 @@ if {[catch {report_vcd_window $VCD_FILE $START_NS $END_NS "$REPORT_DIR/power.rpt
 check_power > "$REPORT_DIR/check_power.rpt"
 report_power -hierarchy > "$REPORT_DIR/power_hierarchy.rpt"
 report_power -cell_power > "$REPORT_DIR/power_cells.rpt"
+if {[catch {report_switching_activity > "$REPORT_DIR/activity.rpt"} activity_err]} {
+  puts "PPA_POWER_FAIL switching-activity report: $activity_err"
+  exit 2
+}
 
 if {[info exists ::env(CMR_POWER_FLIT_WINDOWS)] && $::env(CMR_POWER_FLIT_WINDOWS) ne ""} {
   set labels [list head body tail]

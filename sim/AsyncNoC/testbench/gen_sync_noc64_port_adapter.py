@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Packed valid/ready adapters for SyncNoC_64nodes.
+"""Packed valid/ready adapters for synchronous 64-node CMR networks.
 
 top1 = Thin (1,1), top2 = Fat (1,2,2,2), and top8 = Fat (1,2,4,8).
 The DUT module name stays SyncNoC_64nodes.
@@ -15,7 +15,7 @@ FLIT_W = 28
 NUM_CORES = 64
 
 
-def emit_module(top_lanes: int) -> str:
+def emit_module(top_lanes: int, dut: str = "SyncNoC_64nodes", suffix: str | None = None) -> str:
     num_ports = NUM_CORES + top_lanes
     ports: list[str] = []
     for core in range(NUM_CORES):
@@ -46,7 +46,7 @@ def emit_module(top_lanes: int) -> str:
         )
     return "\n".join(
         [
-            f"module sync_noc64_port_adapter_top{top_lanes} #(",
+            f"module sync_noc64_port_adapter_top{suffix or top_lanes} #(",
             f"  parameter integer FLIT_W = {FLIT_W},",
             f"  parameter integer NUM_PORTS = {num_ports}",
             ") (",
@@ -59,7 +59,7 @@ def emit_module(top_lanes: int) -> str:
             "  input  wire [NUM_PORTS-1:0]      out_ready,",
             "  output wire [NUM_PORTS*FLIT_W-1:0] out_data",
             ");",
-            "  SyncNoC_64nodes dut (",
+            f"  {dut} dut (",
             "    .clock(clock), .reset(reset),",
             ",\n".join(ports),
             "  );",
@@ -84,6 +84,8 @@ def main() -> None:
             emit_module(2),
             "",
             emit_module(8),
+            "",
+            emit_module(16, dut="SyncNoC_64nodes", suffix="16"),
             "",
             "`default_nettype wire",
             "",

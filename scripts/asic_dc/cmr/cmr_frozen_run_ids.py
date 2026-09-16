@@ -63,6 +63,17 @@ FROZEN_MESH64_PAPER_NETLIST_RUN_ID = "20260913_104506_cmr_fm64_rpsdel150"
 # mesh RCU env DEL150 unused on this DUT, Ackin 1xDEL050). SKIP_DC.
 FROZEN_PROP_TEMP64_NETLIST_RUN_ID = "20260913_prop_temp64_asap_uc_m5_200"
 
+# PROP_temp256 B8 paper netlist (4x PROP_temp64 tile + 8 Mesh planes;
+# hier DC 20260914_prop_temp256_b8_hier_dc_06). SKIP_DC; never overwrite.
+FROZEN_PROP_TEMP256_NETLIST_RUN_ID = "20260914_prop_temp256_b8_hier_dc_06"
+
+# PFAT_temp256 paper baseline (4x PFAT64 1248 tiles + 4 Mesh(1,2);
+# hier DC 20260915_122347, restitched with expected_ports=768). SKIP_DC.
+FROZEN_PFAT_TEMP256_NETLIST_RUN_ID = "20260915_122347_cmr_pfat_temp256_hier_dc"
+
+# FlatMesh256 paper baseline (hier DC 20260915_122347). SKIP_DC.
+FROZEN_FM256_NETLIST_RUN_ID = "20260915_122347_cmr_mesh256_hier_dc"
+
 FROZEN_WRITE_RUN_IDS = FROZEN_HOP_NETLIST_RUN_IDS | {
     "20260912_205700_cmr_thin_l1_hop_rpsdel050",
     "20260912_205700_cmr_flatmesh_c1p1_rpsdel050",
@@ -91,6 +102,9 @@ FROZEN_WRITE_RUN_IDS = FROZEN_HOP_NETLIST_RUN_IDS | {
     FROZEN_PROP64_PAPER_NETLIST_RUN_ID,
     FROZEN_MESH64_PAPER_NETLIST_RUN_ID,
     FROZEN_PROP_TEMP64_NETLIST_RUN_ID,
+    FROZEN_PROP_TEMP256_NETLIST_RUN_ID,
+    FROZEN_PFAT_TEMP256_NETLIST_RUN_ID,
+    FROZEN_FM256_NETLIST_RUN_ID,
 }
 
 NOT_FAT_VS_THIN_DELAY = {
@@ -152,7 +166,8 @@ def refuse_overwrite(run_id: str, *, action: str = "write") -> None:
         "hop lock, Thin CURRENT, NoC64 Ackin-250 predecessor, Phase 2 archive "
         "Sync 2/3-cycle Head, Phase 2.5 signed Sync 1-cycle Head 1.0 ns, or "
         "official PROP64 paper netlist 20260912_172443, Mesh64 paper "
-        "20260913_104506, or PROP_temp64 20260913_prop_temp64). "
+        "20260913_104506, PROP_temp64 20260913_prop_temp64, or "
+        "PROP_temp256 20260914_prop_temp256_b8_hier_dc_06). "
         "Set CMR_FORCE_OVERWRITE_FROZEN=1 only if you mean to replace it."
         % (action, run_id)
     )

@@ -2,9 +2,9 @@
 """PROP_temp64 experiment flow: remote DC, then ASAP TOPO-UR SDF GLS scan.
 
 Usage:
-  python run_remote_prop_temp64.py dc [--run-id ID] [--submit-only]
-  python run_remote_prop_temp64.py gls [--run-id ID] [--submit-only]
-  python run_remote_prop_temp64.py all [--run-id ID]
+  python run_remote_prop_temp64.py dc [--static4] [--run-id ID] [--submit-only]
+  python run_remote_prop_temp64.py gls [--static4] [--run-id ID] [--submit-only]
+  python run_remote_prop_temp64.py all [--static4] [--run-id ID]
 """
 from __future__ import annotations
 
@@ -47,12 +47,34 @@ FROZEN_NETLIST = FROZEN_PROP_TEMP64_NETLIST_RUN_ID
 STATE_DIR = HERE / "generated_cases" / "20260913_prop_temp64_asap_m5_500_202701"
 
 
+def dut_name() -> str:
+    return os.environ.get("PROP_TEMP64_DUT_NAME", "PROP_temp64")
+
+
+def static4() -> bool:
+    return dut_name() == "PROP_temp64_static4"
+
+
+def dc_marker() -> str:
+    return "PROP_TEMP64_STATIC4_DC_PASS" if static4() else "PROP_TEMP64_DC_PASS"
+
+
+def output_files() -> tuple[str, str, str, str]:
+    name = dut_name()
+    return (name + ".ddc", name + "_post.v", name + ".sdf", name + ".sdc")
+
+
+def state_dir() -> Path:
+    return STATE_DIR / ("static4" if static4() else "dynamic")
+
+
 def case_name(load: int) -> str:
     return "TOPO-UR_n64_s202701_m%d_PROP_temp64_top16" % load
 
 
-def case_names() -> list[str]:
-    return [case_name(load) for load in LOADS]
+def case_names(loads=None) -> list[str]:
+    selected = LOADS if loads is None else loads
+    return [case_name(load) for load in selected]
 
 
 def checked_id(value: str) -> str:
@@ -127,20 +149,22 @@ def put_text(client, text: str, dest: str):
         path.unlink(missing_ok=True)
 
 
-def require_cases() -> list[str]:
-    names = case_names()
+def require_cases(loads=None) -> list[str]:
+    names = case_names(loads)
     missing = [n for n in names if not (CASE_DIR / (n + ".case")).is_file()]
     if missing:
         raise SystemExit("missing cases (run gen_prop_temp64_cases.py): " + ",".join(missing[:6]))
     return names
 
 
-def dc(client, run_id: str, submit_only: bool):
-    dut = REPO / "generated_cmr" / "prop_temp64" / "PROP_temp64.v"
+def dc(client, run_id: str, submit_only: bool, reuse_rtl_run_id: str | None = None):
+    name = dut_name()
+    source_dir = "prop_temp64_static4" if static4() else "prop_temp64"
+    dut = REPO / "generated_cmr" / source_dir / (name + ".v")
     if not dut.is_file():
         raise FileNotFoundError(dut)
     require_emit_locked_delays(
-        dut.read_text(encoding="utf-8"), label="PROP_temp64", ackin_unit_ps=50
+        dut.read_text(encoding="utf-8"), label=name, ackin_unit_ps=50
     )
     client, exists = remote(
         client, "test -e %s/outputs/%s && echo EXISTS || echo NEW" % (ROOT, run_id)
@@ -153,12 +177,14 @@ def dc(client, run_id: str, submit_only: bool):
         "mkdir -p %s %s/scripts/prop_temp64_%s %s/logs/dc %s/outputs %s/reports/dc %s/work"
         % (rtl, ROOT, run_id, ROOT, ROOT, ROOT, ROOT),
     )
-    files = {
-        source: rtl + "/" + Path(dest).name
-        for source, dest in shared_input_files().items()
-        if dest.startswith("rtl/")
-    }
-    files[dut] = rtl + "/PROP_temp64.v"
+    files = {}
+    if reuse_rtl_run_id is None:
+        files = {
+            source: rtl + "/" + Path(dest).name
+            for source, dest in shared_input_files().items()
+            if dest.startswith("rtl/")
+        }
+        files[dut] = rtl + "/" + name + ".v"
     files[HERE / "run_dc_prop_temp64.tcl"] = (
         "%s/scripts/prop_temp64_%s/run_dc_prop_temp64.tcl" % (ROOT, run_id)
     )
@@ -169,13 +195,13 @@ def dc(client, run_id: str, submit_only: bool):
     body = (
         "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
         "module load syn 2>/dev/null || true\n"
-        "export CMR_REMOTE_ROOT=%s PROP_TEMP64_RUN_ID=%s CMR_BYPASS_INTERLEVEL_FIFO=1 "
+        "export CMR_REMOTE_ROOT=%s PROP_TEMP64_RUN_ID=%s PROP_TEMP64_DUT_NAME=%s CMR_EXPECTED_SELECTORS=%s PROP_TEMP64_RTL_DIR=%s CMR_BYPASS_INTERLEVEL_FIFO=1 "
         "CMR_LANE01_BUF_STAGES=0 "
         "CMR_RCU_MATCHED_DELAY_STEPS=1 CMR_RCU_MATCHED_DELAY_UNIT_PS=50 "
         "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS=150 "
         "CMR_OPM_ACKIN_DELAY_UNIT_PS=50\n"
         "exec dc_shell-t -64 -f %s/scripts/prop_temp64_%s/run_dc_prop_temp64.tcl\n"
-        % (ROOT, run_id, ROOT, run_id)
+        % (ROOT, run_id, name, "0" if static4() else "128", rtl if reuse_rtl_run_id is None else "%s/rtl/prop_temp64_%s" % (ROOT, reuse_rtl_run_id), ROOT, run_id)
     )
     client = put_text(client, body, wrapper)
     client, _ = remote(client, "chmod +x " + shlex.quote(wrapper))
@@ -197,7 +223,7 @@ def dc(client, run_id: str, submit_only: bool):
         "injection": "v3_exp_header_asap_body",
         "loads": list(LOADS),
     }
-    state_path = STATE_DIR / "launch_state.json"
+    state_path = state_dir() / "launch_state.json"
     state_path.parent.mkdir(parents=True, exist_ok=True)
     state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
     if submit_only:
@@ -209,10 +235,11 @@ def dc(client, run_id: str, submit_only: bool):
 
 
 def validate_netlist(client, netlist_run_id: str):
+    expected = output_files()
     client, files = remote(
         client,
-        "for f in PROP_temp64.ddc PROP_temp64_post.v PROP_temp64.sdf PROP_temp64.sdc; do "
-        "test -s %s/outputs/%s/$f || echo MISSING:$f; done" % (ROOT, netlist_run_id),
+        "for f in %s; do test -s %s/outputs/%s/$f || echo MISSING:$f; done"
+        % (" ".join(expected), ROOT, netlist_run_id),
     )
     if "MISSING:" in files:
         raise RuntimeError("PROP_temp64 frozen netlist incomplete: " + files)
@@ -221,38 +248,47 @@ def validate_netlist(client, netlist_run_id: str):
 
 
 def validate_dc(client, run_id: str):
+    expected = output_files()
+    marker = dc_marker()
     log = "%s/logs/dc/%s.log" % (ROOT, run_id)
-    client, output = remote(client, "cat %s %s.err 2>/dev/null | tail -n 200" % (log, log))
+    retry_log = "%s/logs/dc/%s.retry.log" % (ROOT, run_id)
+    client, output = remote(
+        client,
+        "cat %s %s.err %s %s.err 2>/dev/null | tail -n 240"
+        % (log, log, retry_log, retry_log),
+    )
     print(output, flush=True)
     client, files = remote(
         client,
-        "for f in PROP_temp64.ddc PROP_temp64_post.v PROP_temp64.sdf PROP_temp64.sdc; do "
-        "test -s %s/outputs/%s/$f || echo MISSING:$f; done" % (ROOT, run_id),
+        "for f in %s; do test -s %s/outputs/%s/$f || echo MISSING:$f; done"
+        % (" ".join(expected), ROOT, run_id),
     )
     # TCL source contains puts "PROP_TEMP64_DC_FAIL ..."; only real marker lines count.
     real_fail = any(
         line.strip().startswith("PROP_TEMP64_DC_FAIL") for line in output.splitlines()
     )
     real_pass = any(
-        line.strip().startswith("PROP_TEMP64_DC_PASS") for line in output.splitlines()
+        line.strip().startswith(marker) for line in output.splitlines()
     )
     if not real_pass or real_fail or "MISSING:" in files:
         raise RuntimeError("PROP_temp64 DC did not pass: " + files)
-    print("PROP_TEMP64_DC_VALIDATED", run_id, flush=True)
+    print(marker + "_VALIDATED", run_id, flush=True)
     return client
 
 
 def wait_dc_pass(client, run_id: str, polls: int = 960):
     log = "%s/logs/dc/%s.log" % (ROOT, run_id)
+    marker = dc_marker()
+    post = output_files()[1]
     for i in range(polls):
         # Ignore TCL source echoes like: puts "PROP_TEMP64_DC_FAIL ..."
         client, out = remote(
             client,
-            "grep -E 'PROP_TEMP64_DC_PASS|PROP_TEMP64_DC_FAIL' %s 2>/dev/null | "
+            "grep -E 'PROP_TEMP64(_STATIC4)?_DC_PASS|PROP_TEMP64(_STATIC4)?_DC_FAIL' %s 2>/dev/null | "
             "grep -v 'puts \\\"PROP_TEMP64' | tail -n 5; "
-            "test -s %s/outputs/%s/PROP_temp64_post.v && echo HAS_POST || echo NO_POST; "
+            "test -s %s/outputs/%s/%s && echo HAS_POST || echo NO_POST; "
             "bjobs -u ghy19 2>/dev/null | grep -F prop_temp64_dc_%s | head -n 2 || true"
-            % (log, ROOT, run_id, run_id),
+            % (log, ROOT, run_id, post, run_id),
         )
         print("DC_POLL", i, out.replace("\n", " | "), flush=True)
         # Only treat a real marker line (not a puts "..." template) as FAIL.
@@ -261,14 +297,15 @@ def wait_dc_pass(client, run_id: str, polls: int = 960):
             for line in out.splitlines()
         ):
             raise RuntimeError("PROP_temp64 DC failed")
-        if "PROP_TEMP64_DC_PASS" in out and "HAS_POST" in out:
+        if marker in out and "HAS_POST" in out:
             return validate_dc(client, run_id)
         time.sleep(60)
     raise RuntimeError("PROP_temp64 DC poll timeout")
 
 
-def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = None):
-    names = require_cases()
+def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = None, loads=None):
+    selected_loads = list(LOADS if loads is None else loads)
+    names = require_cases(selected_loads)
     netlist_id = (
         netlist_run_id
         or os.environ.get("PROP_TEMP64_NETLIST_RUN_ID", "").strip()
@@ -311,12 +348,12 @@ def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = Non
         wrapper = "%s/logs/gls/%s/%s_%s.sh" % (ROOT, run_id, mode, name)
         body = (
             "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
-            "export CMR_REMOTE_ROOT=%s PROP_TEMP64_RUN_ID=%s "
+            "export CMR_REMOTE_ROOT=%s PROP_TEMP64_RUN_ID=%s PROP_TEMP64_DUT_NAME=%s "
             "PROP_TEMP64_NETLIST_RUN_ID=%s PROP_TEMP64_MODE=%s "
             "PROP_TEMP64_CASE_NAME=%s PROP_TEMP64_CASE_FILE=%s/cases/%s.case "
             "PROP_TEMP64_RX_CAPTURE_NS=0.1\n"
             "exec bash %s\n"
-            % (ROOT, run_id, netlist_id, mode, name, sim, name, shell)
+            % (ROOT, run_id, dut_name(), netlist_id, mode, name, sim, name, shell)
         )
         client = put_text(client, body, wrapper)
         client, _ = remote(client, "chmod +x " + shlex.quote(wrapper))
@@ -335,17 +372,18 @@ def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = Non
         jid = job_id(submitted)
         jobs.append({"case": name, "mode": mode, "job": jid, "netlist": netlist_id})
         print("PROP_TEMP64_GLS_SUBMITTED", mode, name, jid, flush=True)
-    state_path = STATE_DIR / "launch_state.json"
+    state_path = state_dir() / "launch_state.json"
     state = {}
     if state_path.is_file():
         state = json.loads(state_path.read_text(encoding="utf-8"))
     state.update(
         {
             "run_id": run_id,
+            "design": dut_name(),
             "netlist_run_id": netlist_id,
             "stage": "gls_submitted",
             "gls_jobs": jobs,
-            "loads": list(LOADS),
+            "loads": selected_loads,
         }
     )
     state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -393,22 +431,41 @@ def main() -> int:
         action="store_true",
         default=os.environ.get("CMR_DESCAL_SUBMIT_ONLY", "0") == "1",
     )
+    parser.add_argument(
+        "--static4", action="store_true",
+        help="use PROP_temp64_static4 and require zero dynamic LaneSelector cells",
+    )
+    parser.add_argument(
+        "--reuse-rtl-run-id", default=None,
+        help="DC only: reuse verified remote rtl/prop_temp64_<run-id> without upload",
+    )
+    parser.add_argument(
+        "--loads", default=None,
+        help="comma-separated GLS loads; default is the complete canonical grid",
+    )
     args = parser.parse_args()
+    if args.static4:
+        os.environ["PROP_TEMP64_DUT_NAME"] = "PROP_temp64_static4"
+    selected_loads = None
+    if args.loads:
+        selected_loads = [int(value.strip()) for value in args.loads.split(",") if value.strip()]
+        if not selected_loads or any(value not in LOADS for value in selected_loads):
+            raise SystemExit("--loads must be a nonempty subset of the canonical load grid")
     run_id = checked_id(args.run_id)
     require_cases()
     client = connect_failover()
     try:
         if args.stage == "dc":
-            dc(client, run_id, submit_only=args.submit_only)
+            dc(client, run_id, submit_only=args.submit_only, reuse_rtl_run_id=args.reuse_rtl_run_id)
         elif args.stage == "waitdc":
             wait_dc_pass(client, run_id)
         elif args.stage == "gls":
             netlist = args.netlist_run_id or FROZEN_NETLIST
-            gls(client, run_id, submit_only=args.submit_only, netlist_run_id=netlist)
+            gls(client, run_id, submit_only=args.submit_only, netlist_run_id=netlist, loads=selected_loads)
         else:
             # all: submit DC, wait, then submit GLS (parallel, submit-only by default for long scan)
-            dc(client, run_id, submit_only=False)
-            gls(client, run_id, submit_only=True)
+            dc(client, run_id, submit_only=False, reuse_rtl_run_id=args.reuse_rtl_run_id)
+            gls(client, run_id, submit_only=True, loads=selected_loads)
             print("PROP_TEMP64_ALL_DC_DONE_GLS_SUBMITTED", run_id, flush=True)
     finally:
         client.close()

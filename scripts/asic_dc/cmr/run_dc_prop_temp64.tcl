@@ -3,8 +3,15 @@
 # Default DUT omits inter-level FIFOs (bypass).
 set PROJECT_DIR $::env(CMR_REMOTE_ROOT)
 set RUN_ID $::env(PROP_TEMP64_RUN_ID)
+set DUT_NAME PROP_temp64
+if {[info exists ::env(PROP_TEMP64_DUT_NAME)] && $::env(PROP_TEMP64_DUT_NAME) ne ""} {
+  set DUT_NAME $::env(PROP_TEMP64_DUT_NAME)
+}
 set RTL_DIR "$PROJECT_DIR/rtl/prop_temp64_$RUN_ID"
-set DUT_V "$RTL_DIR/PROP_temp64.v"
+if {[info exists ::env(PROP_TEMP64_RTL_DIR)] && $::env(PROP_TEMP64_RTL_DIR) ne ""} {
+  set RTL_DIR $::env(PROP_TEMP64_RTL_DIR)
+}
+set DUT_V "$RTL_DIR/$DUT_NAME.v"
 if {[info exists ::env(PROP_TEMP64_DUT_V)] && $::env(PROP_TEMP64_DUT_V) ne ""} {
   set DUT_V $::env(PROP_TEMP64_DUT_V)
 }
@@ -35,6 +42,10 @@ if {[info exists ::env(CMR_LANE01_BUF_STAGES)] && $::env(CMR_LANE01_BUF_STAGES) 
   set lane01_stages $::env(CMR_LANE01_BUF_STAGES)
 }
 set expected_adapters [expr {[info exists ::env(CMR_EXPECTED_ADAPTERS)] ? $::env(CMR_EXPECTED_ADAPTERS) : 128}]
+set expected_selectors $expected_adapters
+if {[info exists ::env(CMR_EXPECTED_SELECTORS)] && $::env(CMR_EXPECTED_SELECTORS) ne ""} {
+  set expected_selectors $::env(CMR_EXPECTED_SELECTORS)
+}
 set rcu_unit_ps 50
 if {[info exists ::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)] && $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS) ne ""} {
   set rcu_unit_ps $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)
@@ -182,7 +193,7 @@ proc cmr_ft_dump_pin_sample {label coll limit} {
   }
 }
 
-proc cmr_ft_require_adapter_elaboration {expected_adapters} {
+proc cmr_ft_require_adapter_elaboration {expected_adapters expected_selectors} {
   # Fail before compile_ultra if DFF/Selector Verilog was not analyzed.
   # Black-box LanePhaseAdapterDFF cells still match ref_name, but they have
   # no await_latch children.
@@ -194,7 +205,7 @@ proc cmr_ft_require_adapter_elaboration {expected_adapters} {
   set n_sel [sizeof_collection $sel]
   set n_await_cells [sizeof_collection $await_cells]
   set n_await_pins [sizeof_collection $await_pins]
-  puts "PROP_TEMP64_ADAPTER_ELAB DFF=$n_dff SELECTOR=$n_sel AWAIT_LATCH=$n_await_cells AWAIT_E=$n_await_pins expected=$expected_adapters"
+  puts "PROP_TEMP64_ADAPTER_ELAB DFF=$n_dff SELECTOR=$n_sel AWAIT_LATCH=$n_await_cells AWAIT_E=$n_await_pins expected_dff=$expected_adapters expected_selector=$expected_selectors"
   foreach req {LanePhaseAdapterDFF LaneAdapterAwaitLatch LaneSelector LaneRequestDFF Mux1H} {
     set n 0
     if {[catch {sizeof_collection [get_designs -quiet -filter "name =~ ${req}*"]} n]} {
@@ -207,9 +218,9 @@ proc cmr_ft_require_adapter_elaboration {expected_adapters} {
     puts "PROP_TEMP64_DC_FAIL adapter_elab_count actual=$n_dff expected=$expected_adapters"
     exit 2
   }
-  if {$n_sel != $expected_adapters} {
+  if {$n_sel != $expected_selectors} {
     cmr_ft_dump_pin_sample selectors $sel 8
-    puts "PROP_TEMP64_DC_FAIL selector_elab_count actual=$n_sel expected=$expected_adapters"
+    puts "PROP_TEMP64_DC_FAIL selector_elab_count actual=$n_sel expected=$expected_selectors"
     exit 2
   }
   if {$n_await_pins != $expected_adapters} {
@@ -400,11 +411,11 @@ proc cmr_ft_insert_cfifo_rd01 {} {
   puts "CMR_CFIFO_RD01_ECO buffers=[sizeof_collection $cells] stages=$stages fifos=$circular pins=$expected_targets lib=$lib_name"
 }
 
-elaborate PROP_temp64 -work WORK
-current_design PROP_temp64
+elaborate $DUT_NAME -work WORK
+current_design $DUT_NAME
 uniquify
 link
-cmr_ft_require_adapter_elaboration $expected_adapters
+cmr_ft_require_adapter_elaboration $expected_adapters $expected_selectors
 check_design > "$REPORT_DIR/check_design_pre.rpt"
 
 set sr_pre [get_cells -hierarchical -quiet -filter {ref_name =~ LHCSNDQD*}]
@@ -624,10 +635,14 @@ async_report_primitive_counts "$REPORT_DIR/async_primitives.csv"
 report_qor > "$REPORT_DIR/qor.rpt"
 report_timing -delay_type max -max_paths 100 > "$REPORT_DIR/timing_max.rpt"
 report_timing -delay_type min -max_paths 100 > "$REPORT_DIR/timing_min.rpt"
-write -hierarchy -format ddc -output "$OUTPUT_DIR/PROP_temp64.ddc"
-write -hierarchy -format verilog -output "$OUTPUT_DIR/PROP_temp64_post.v"
-write_sdf "$OUTPUT_DIR/PROP_temp64.sdf"
-write_sdc "$OUTPUT_DIR/PROP_temp64.sdc"
-exec sha256sum "$OUTPUT_DIR/PROP_temp64.ddc" "$OUTPUT_DIR/PROP_temp64_post.v" "$OUTPUT_DIR/PROP_temp64.sdf" > "$REPORT_DIR/post_hashes.sha256"
-puts "PROP_TEMP64_DC_PASS output=$OUTPUT_DIR"
+write -hierarchy -format ddc -output "$OUTPUT_DIR/$DUT_NAME.ddc"
+write -hierarchy -format verilog -output "$OUTPUT_DIR/${DUT_NAME}_post.v"
+write_sdf "$OUTPUT_DIR/$DUT_NAME.sdf"
+write_sdc "$OUTPUT_DIR/$DUT_NAME.sdc"
+exec sha256sum "$OUTPUT_DIR/$DUT_NAME.ddc" "$OUTPUT_DIR/${DUT_NAME}_post.v" "$OUTPUT_DIR/$DUT_NAME.sdf" "$OUTPUT_DIR/$DUT_NAME.sdc" > "$REPORT_DIR/post_hashes.sha256"
+if {$DUT_NAME eq "PROP_temp64_static4"} {
+  puts "PROP_TEMP64_STATIC4_DC_PASS output=$OUTPUT_DIR"
+} else {
+  puts "PROP_TEMP64_DC_PASS output=$OUTPUT_DIR"
+}
 quit

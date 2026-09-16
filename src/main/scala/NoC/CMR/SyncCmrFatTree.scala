@@ -242,3 +242,80 @@ object SyncCmrFatTreeNoC64Fat1248Main extends App {
     Array("--target-dir", "generated_sync_cmr/fat_tree_noc64_1248")
   )
 }
+
+/** Topology-matched synchronous implementation of PROP_temp64 B8.
+  *
+  * This mirrors PROPtempTile rather than the 21-router shared-tree variants:
+  * sixteen independent L1, L2 and L3 routers preserve the four parallel
+  * planes at each hierarchy boundary.
+  */
+class SyncPROPtemp64 extends Module {
+  // Keep the established clocked-flow top name; the frozen run ID and design
+  // manifest distinguish this 48-router B8 implementation from old 21-router
+  // Sync variants.
+  override def desiredName: String = "SyncNoC_64nodes"
+  val io = IO(new Bundle {
+    val core_inputs = Vec(64, new SyncVrPacket)
+    val core_outputs = Flipped(Vec(64, new SyncVrPacket))
+    val top_input = Vec(16, new SyncVrPacket)
+    val top_output = Flipped(Vec(16, new SyncVrPacket))
+  })
+
+  private def xy(n: Int): (Int, Int) = (n / 2, n % 2)
+  private def topIndex(j: Int, k: Int): Int = 4 * j + k
+
+  private val l1 = Seq.tabulate(4, 4) { (q, i) =>
+    val (qx, qy) = xy(q)
+    val (ix, iy) = xy(i)
+    val r = Module(new SyncCmrRouter(2 * qx + ix, 2 * qy + iy,
+      routerLevel = 1, childLanes = 1, parentLanes = 4))
+    r.suggestName(s"syncPropL1_q${q}_i${i}")
+    r
+  }
+  private val l2 = Seq.tabulate(4, 4) { (q, k) =>
+    val (qx, qy) = xy(q)
+    val r = Module(new SyncCmrRouter(qx, qy, routerLevel = 2,
+      childLanes = 1, parentLanes = 4))
+    r.suggestName(s"syncPropL2_q${q}_k${k}")
+    r
+  }
+  private val l3 = Seq.tabulate(4, 4) { (j, k) =>
+    val r = Module(new SyncCmrRouter(0, 0, routerLevel = 3,
+      childLanes = 1, parentLanes = 1))
+    r.suggestName(s"syncPropL3_j${j}_k${k}")
+    r
+  }
+
+  for (q <- 0 until 4; i <- 0 until 4) {
+    val (qx, qy) = xy(q)
+    val (ix, iy) = xy(i)
+    val x = 4 * qx + 2 * ix
+    val y = 4 * qy + 2 * iy
+    val cores = Seq((x + 1) + 8 * (y + 1), (x + 1) + 8 * y,
+      x + 8 * (y + 1), x + 8 * y)
+    for (d <- 0 until 4) {
+      l1(q)(i).io.inputs.child(d)(0) <> io.core_inputs(cores(d))
+      l1(q)(i).io.outputs.child(d)(0) <> io.core_outputs(cores(d))
+    }
+  }
+  for (q <- 0 until 4; i <- 0 until 4; k <- 0 until 4) {
+    val d = (~i) & 3
+    l1(q)(i).io.outputs.parent(k) <> l2(q)(k).io.inputs.child(d)(0)
+    l2(q)(k).io.outputs.child(d)(0) <> l1(q)(i).io.inputs.parent(k)
+  }
+  for (q <- 0 until 4; k <- 0 until 4; j <- 0 until 4) {
+    val d = (~q) & 3
+    l2(q)(k).io.outputs.parent(j) <> l3(j)(k).io.inputs.child(d)(0)
+    l3(j)(k).io.outputs.child(d)(0) <> l2(q)(k).io.inputs.parent(j)
+  }
+  for (j <- 0 until 4; k <- 0 until 4) {
+    val p = topIndex(j, k)
+    l3(j)(k).io.inputs.parent(0) <> io.top_input(p)
+    l3(j)(k).io.outputs.parent(0) <> io.top_output(p)
+  }
+}
+
+object SyncPROPtemp64Main extends App {
+  emitVerilog(new SyncPROPtemp64,
+    Array("--target-dir", "generated_sync_cmr/prop_temp64_b8"))
+}

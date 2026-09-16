@@ -3,6 +3,7 @@
 set -euo pipefail
 ROOT=${CMR_REMOTE_ROOT:?}
 RUN_ID=${PROP_TEMP64_RUN_ID:?}
+TOP=${PROP_TEMP64_DUT_NAME:-PROP_temp64}
 CASE_FILE=${PROP_TEMP64_CASE_FILE:?}
 CASE_NAME=${PROP_TEMP64_CASE_NAME:?}
 MODE=${PROP_TEMP64_MODE:-sdf}
@@ -11,8 +12,8 @@ LOG="$ROOT/logs/gls/$RUN_ID/$MODE/$CASE_NAME"
 WORK="$ROOT/sim/work/$RUN_ID/$MODE/$CASE_NAME"
 CSV="$ROOT/results/$RUN_ID/csv/${MODE}_$CASE_NAME.csv"
 LIB=${STD_CELL_V:-/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140.v}
-RAW="$OUT/PROP_temp64_post.v"
-SDF="$OUT/PROP_temp64.sdf"
+RAW="$OUT/${TOP}_post.v"
+SDF="$OUT/${TOP}.sdf"
 ADAPTER="$ROOT/sim/prop_temp64_$RUN_ID/async_prop_temp64_port_adapter.sv"
 TB="$ROOT/sim/prop_temp64_$RUN_ID/tb_noc64_async_boundary.sv"
 FAILFAST="$ROOT/sim/prop_temp64_$RUN_ID/tb_cmr_noc64_async_boundary_failfast.sv"
@@ -27,7 +28,7 @@ export VCS_HOME=${VCS_HOME:-/soft/synopsys/vcs/V-2023.12}
 export PATH="$VCS_HOME/bin:$PATH"
 sha256sum "$CASE_FILE" "$RAW" "$ADAPTER" "$TB" "$FAILFAST" > "$LOG/input_hashes.log"
 if [[ "$MODE" == func ]]; then
-  NETLIST="$WORK/PROP_temp64_func.v"
+  NETLIST="$WORK/${TOP}_func.v"
   python3 "$PATCH" "$RAW" "$NETLIST" --mode cmr_func > "$LOG/netlist_patch.log"
   grep -q 'q0 = ~(req0 & q1)' "$NETLIST"
   grep -q 'assign #(1.0)' "$NETLIST"
@@ -42,13 +43,15 @@ else
 module sdf_boot;
   initial begin
     \$sdf_annotate("$SDF", tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_prop_temp.noc.dut, , "sdf_annotate.log", "MAXIMUM", ,);
-    \$display("TB_INFO PROP_temp64 MAXIMUM SDF annotation");
+    \$display("TB_INFO %s MAXIMUM SDF annotation", "$TOP");
   end
 endmodule
 EOF
 fi
 printf '%s\n' "$LIB" "$NETLIST" "$ADAPTER" "$TB" "$FAILFAST" ${BOOT:+"$BOOT"} > filelist.f
-vcs -full64 -sverilog -timescale=1ns/1ps $TIMING +define+PROP_TEMP64_TOP16 \
+STATIC_DEFINE=""
+if [[ "$TOP" == "PROP_temp64_static4" ]]; then STATIC_DEFINE="+define+PROP_TEMP64_STATIC4"; fi
+vcs -full64 -sverilog -timescale=1ns/1ps $TIMING +define+PROP_TEMP64_TOP16 $STATIC_DEFINE \
   -f filelist.f -top tb_cmr_noc64_async_boundary_failfast ${BOOT:+-top sdf_boot} \
   -o simv -l "$LOG/compile.log"
 set +e

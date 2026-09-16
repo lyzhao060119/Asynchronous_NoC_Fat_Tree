@@ -1,0 +1,31 @@
+{
+  "schema": "date-v3-benchmark-v1",
+  "benchmark_id": "DIR-SKEW1",
+  "title": "64-node direction-skew traffic with only childDir=0 sources active",
+  "traffic": "dir_skew1_64",
+  "packet_flits": 5,
+  "multicast": false,
+  "src_neq_dst": true,
+  "dst_not_same_l2_subtree": true,
+  "fanout_F": null,
+  "spread_S": null,
+  "multicast_fraction": 0.0,
+  "destination_set_samples": null,
+  "warmup_original_events": 1000,
+  "measurement_original_events": 10000,
+  "seed_set_id": "v3_main_seeds",
+  "paired_trace": true,
+  "load_sweep": {
+    "enabled": true,
+    "coarse_then_fine": false,
+    "load_unit": "MFlit_per_port_s",
+    "case_tick_ns": 1.0,
+    "coarse_loads": [5, 60, 100, 120, 140, 160, 180, 200],
+    "saturation_rule": "fixed scan; do not extend to seek a positive divergence"
+  },
+  "metrics": ["delivered_throughput", "flit_latency", "source_backlog", "lane_utilization_l1", "lane_utilization_l2"],
+  "tmax_definition": "last destination tail minus source header injection",
+  "applies_to_designs": ["PROP_temp64", "PROP_temp64_static4"],
+  "paper_figures": ["Fig. 64-B(a) inset"],
+  "notes": "Exactly 16 childDir=0 sources. Destinations are outside the source 2x2 L1 subtree. M is normalized over all 64 ports, so active-source header rate is 4x."
+}

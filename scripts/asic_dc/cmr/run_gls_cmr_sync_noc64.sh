@@ -1,6 +1,6 @@
 #!/bin/bash
 # CMR sync NoC64 GLS: MAXIMUM SDF only.  No functional/no-SDF path.
-# Thin default TOP_LANES=1.  Fat 1-2-2-2: CMR_SYNC64_TOP_LANES=2.
+# Thin default TOP_LANES=1.  Fat 1-2-2-2 uses 2; PROP_temp64 B8 uses 16.
 set -euo pipefail
 
 ROOT=${CMR_REMOTE_ROOT:?}
@@ -9,6 +9,7 @@ CASE_NAME=${CMR_SYNC64_CASE_NAME:?}
 CASE_FILE=${CMR_SYNC64_CASE_FILE:?}
 NETLIST_RUN_ID=${CMR_SYNC64_NETLIST_RUN_ID:-$RUN_ID}
 CLOCK_PERIOD_NS=${CMR_SYNC64_CLOCK_PERIOD_NS:-1.0}
+CASE_TICK_NS=${CMR_SYNC64_CASE_TICK_NS:-auto}
 EXTRA_SIM_ARGS=${CMR_SYNC64_SIM_ARGS:-}
 INJECT_MAX_RATE=${CMR_SYNC64_INJECT_MAX_RATE:-0}
 STALL_TIMEOUT_NS=${CMR_SYNC64_STALL_TIMEOUT_NS:-50000}
@@ -17,10 +18,12 @@ RX_CAPTURE_NS=${CMR_SYNC64_RX_CAPTURE_NS:-0}
 TOP_LANES=${CMR_SYNC64_TOP_LANES:-1}
 SDF_SCOPE="tb_cmr_noc64_sync_boundary_failfast.core.noc.dut"
 TB_DEFINE=""
-if [[ "$TOP_LANES" == "2" ]]; then
+if [[ "$TOP_LANES" == "16" ]]; then
+  TB_DEFINE="+define+CMR_SYNC64_TOP16"
+elif [[ "$TOP_LANES" == "2" ]]; then
   TB_DEFINE="+define+CMR_SYNC64_TOP2"
 elif [[ "$TOP_LANES" != "1" ]]; then
-  echo "CMR_SYNC64_GLS_FAIL TOP_LANES must be 1 or 2, got $TOP_LANES" >&2
+  echo "CMR_SYNC64_GLS_FAIL TOP_LANES must be 1, 2, or 16, got $TOP_LANES" >&2
   exit 2
 fi
 
@@ -47,6 +50,20 @@ test -s "$ROOT/sim/tb/sync_noc64_port_adapter.sv"
 test -s "$ROOT/sim/tb/tb_noc64_sync_boundary.sv"
 test -s "$ROOT/sim/tb/tb_cmr_noc64_sync_boundary_failfast.sv"
 
+CASE_META_TICK_NS=$(awk '$1 == "meta" && $2 == "case_tick_ns" { print $3; exit }' "$CASE_FILE")
+if [[ -z "$CASE_META_TICK_NS" ]]; then
+  echo "CMR_SYNC64_GLS_FAIL missing case_tick_ns metadata in $CASE_FILE" >&2
+  exit 2
+fi
+if [[ "$CASE_TICK_NS" == "auto" ]]; then
+  CASE_TICK_NS=$CASE_META_TICK_NS
+fi
+if ! awk -v requested="$CASE_TICK_NS" -v metadata="$CASE_META_TICK_NS" \
+  'BEGIN { delta=requested-metadata; if (delta < 0) delta=-delta; exit !(delta < 0.000001) }'; then
+  echo "CMR_SYNC64_GLS_FAIL CASE_TICK_NS=$CASE_TICK_NS metadata=$CASE_META_TICK_NS" >&2
+  exit 2
+fi
+
 module load vcs 2>/dev/null || module load vcs/vcs2023.12 2>/dev/null || true
 export VCS_HOME=${VCS_HOME:-/soft/synopsys/vcs/V-2023.12}
 export PATH="$VCS_HOME/bin:$PATH"
@@ -55,7 +72,7 @@ sha256sum "$CASE_FILE" "$NETLIST" "$SDF" "$LIB" \
   "$ROOT/sim/tb/sync_noc64_port_adapter.sv" \
   "$ROOT/sim/tb/tb_noc64_sync_boundary.sv" \
   "$ROOT/sim/tb/tb_cmr_noc64_sync_boundary_failfast.sv" | tee "$LOG/input_hashes.log"
-echo "CMR_SYNC64_GLS mode=sdf clock=${CLOCK_PERIOD_NS}ns top_lanes=$TOP_LANES rx_capture=$RX_CAPTURE_NS scope=$SDF_SCOPE" | tee -a "$LOG/input_hashes.log"
+echo "CMR_SYNC64_GLS mode=sdf clock=${CLOCK_PERIOD_NS}ns case_tick=${CASE_TICK_NS}ns top_lanes=$TOP_LANES rx_capture=$RX_CAPTURE_NS scope=$SDF_SCOPE" | tee -a "$LOG/input_hashes.log"
 
 cat > "$WORK/sdf_boot.sv" <<EOF
 module sdf_boot;
@@ -92,8 +109,9 @@ set +e
 # shellcheck disable=SC2086
 ./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
+  +FLIT_LATENCY_CSV="$LOG/flit_latency.csv" \
   +V3_METRICS_CSV="$LOG/v3_metrics.csv" \
-  +CLOCK_PERIOD_NS="$CLOCK_PERIOD_NS" +CASE_TICK_NS=20 \
+  +CLOCK_PERIOD_NS="$CLOCK_PERIOD_NS" +CASE_TICK_NS="$CASE_TICK_NS" \
   +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
   +STALL_TIMEOUT_NS="$STALL_TIMEOUT_NS" +HARD_TIMEOUT_NS="$HARD_TIMEOUT_NS" \
   $INJECT_ARG $EXTRA_SIM_ARGS \

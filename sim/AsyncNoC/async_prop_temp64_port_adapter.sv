@@ -13,7 +13,11 @@ module async_prop_temp64_port_adapter_top16 #(
   output wire [NUM_PORTS*FLIT_W-1:0] out_data
 );
   wire unused_clock = 1'b0;
+`ifdef PROP_TEMP64_STATIC4
+  PROP_temp64_static4 dut (
+`else
   PROP_temp64 dut (
+`endif
     .clock(unused_clock), .reset(reset),
     .io_core_inputs_0_HS_Req(in_req[0]), .io_core_inputs_0_HS_Ack(in_ack[0]), .io_core_inputs_0_Data_flit(in_data[0*FLIT_W +: FLIT_W]),
     .io_core_inputs_1_HS_Req(in_req[1]), .io_core_inputs_1_HS_Ack(in_ack[1]), .io_core_inputs_1_Data_flit(in_data[1*FLIT_W +: FLIT_W]),

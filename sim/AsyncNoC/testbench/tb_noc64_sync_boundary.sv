@@ -26,8 +26,8 @@ module noc64_sync_boundary_core #(
       $display("TB_FATAL NUM_CORES must be 64, got %0d", NUM_CORES);
       $finish;
     end
-    if ((TOP_LANES != 1) && (TOP_LANES != 2) && (TOP_LANES != 8)) begin
-      $display("TB_FATAL TOP_LANES must be 1 (Thin), 2 (Fat 1-2-2-2), or 8 (Fat 1-2-4-8), got %0d", TOP_LANES);
+    if ((TOP_LANES != 1) && (TOP_LANES != 2) && (TOP_LANES != 8) && (TOP_LANES != 16)) begin
+      $display("TB_FATAL TOP_LANES must be 1, 2, 8, or 16 (PROP_temp B8), got %0d", TOP_LANES);
       $finish;
     end
   end
@@ -53,7 +53,18 @@ module noc64_sync_boundary_core #(
   assign tb_out_data = noc_out_data;
   assign noc_out_ready = tb_out_ready;
 
-`ifdef CMR_SYNC64_TOP8
+`ifdef CMR_SYNC64_TOP16
+  sync_noc64_port_adapter_top16 noc (
+    .clock(clock),
+    .reset(reset),
+    .in_valid(noc_in_valid),
+    .in_ready(noc_in_ready),
+    .in_data(noc_in_data),
+    .out_valid(noc_out_valid),
+    .out_ready(noc_out_ready),
+    .out_data(noc_out_data)
+  );
+`elsif CMR_SYNC64_TOP8
   sync_noc64_port_adapter_top8 noc (
     .clock(clock),
     .reset(reset),
@@ -94,7 +105,7 @@ module noc64_sync_boundary_core #(
   integer reset_cycles, timeout_cycles;
   real clock_period_ns, case_tick_ns, rx_capture_ns, timeout_scale;
   real case_epoch_ns, timeout_ns, drain_ns;
-  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, v3_metrics_file;
+  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, flit_latency_csv_file, v3_metrics_file;
   reg [STR_CHARS*8-1:0] case_name, case_group;
   reg [2047:0] dump_vcd;
 
@@ -122,6 +133,7 @@ module noc64_sync_boundary_core #(
   reg [MASK_W-1:0] expected_mask [0:MAX_EXPECT_FLITS-1];
   reg [FLIT_W-1:0] expected_flit [0:MAX_EXPECT_FLITS-1];
   reg expected_seen [0:MAX_EXPECT_FLITS-1];
+  integer expected_input_index [0:MAX_EXPECT_FLITS-1];
 
   integer rx_count [0:NUM_PORTS-1];
   longint rx_time_ps [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
@@ -137,7 +149,10 @@ module noc64_sync_boundary_core #(
   integer delivered_packets, latency_count;
   longint latency_ps [0:MAX_EXPECT_FLITS-1];
   integer warmup_events, measurement_events;
+  integer measurement_start_cycle, measurement_end_cycle;
+  longint measurement_start_ps, measurement_end_ps;
   reg write_v3_metrics;
+  reg dump_measurement_only;
   event rx_activity, source_arrival;
   reg case_has_identity;
   reg pending_head_valid [0:NUM_PORTS-1];
@@ -356,6 +371,32 @@ module noc64_sync_boundary_core #(
       if (total_expected() != expected_count) begin
         $display("TB_FATAL expected masks must be one-hot: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
       end
+      measurement_start_cycle = -1; measurement_end_cycle = -1;
+      for (idx = 0; idx < input_count; idx = idx + 1)
+        if (input_flit[idx][27] &&
+            (packet_event_id[input_pkt_seq[idx]] < 0 ||
+             packet_event_id[input_pkt_seq[idx]] >= warmup_events)) begin
+          if (measurement_start_cycle < 0 || input_cycle[idx] < measurement_start_cycle)
+            measurement_start_cycle = input_cycle[idx];
+          if (measurement_end_cycle < input_cycle[idx] + 1)
+            measurement_end_cycle = input_cycle[idx] + 1;
+        end
+      if (measurement_start_cycle < 0 || measurement_end_cycle <= measurement_start_cycle) begin
+        $display("TB_FATAL missing measurement packet window"); $finish;
+      end
+      for (idx = 0; idx < expected_count; idx = idx + 1) begin
+        expected_input_index[idx] = -1;
+        for (n = 0; n < input_count; n = n + 1)
+          if ((expected_input_index[idx] < 0) &&
+              (input_pkt_seq[n] == expected_pkt_seq[idx]) &&
+              (input_flit[n] === expected_flit[idx]))
+            expected_input_index[idx] = n;
+        if (expected_input_index[idx] < 0) begin
+          $display("TB_FATAL expected/source join failed pkt=%0d flit=%h",
+                   expected_pkt_seq[idx], expected_flit[idx]);
+          $finish;
+        end
+      end
     end
   endtask
 
@@ -461,7 +502,7 @@ module noc64_sync_boundary_core #(
   endtask
 
   task automatic write_results;
-    integer p, s, i, j, fd_summary, fd_events, fd_latency, fd_v3;
+    integer p, s, i, j, tx_index, fd_summary, fd_events, fd_latency, fd_flit, fd_v3;
     integer rank95, rank99, packet, injected_packets;
     longint tmp, max_lat, p95_lat, p99_lat, lat;
     real lat_sum, avg_lat_ns, elapsed_ns, throughput;
@@ -521,6 +562,19 @@ module noc64_sync_boundary_core #(
         $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0, (rx_egress_ps[p][s]-packet_head_req_ps[packet])/1000.0);
       end
       $fclose(fd_latency);
+      fd_flit = $fopen(flit_latency_csv_file, "w");
+      $fwrite(fd_flit, "port,pkt_seq,flit,offer_ps,egress_ps,lat_ns\n");
+      for (p = 0; p < NUM_PORTS; p = p + 1)
+        for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s]) begin
+          i = rx_expected_index[p][s];
+          tx_index = expected_input_index[i];
+          if (tx_index >= 0 && input_offer_ps[tx_index] >= 0)
+            $fwrite(fd_flit, "%0d,%0d,%h,%0d,%0d,%f\n", p,
+                    expected_pkt_seq[i], rx_flit[p][s], input_offer_ps[tx_index],
+                    rx_egress_ps[p][s],
+                    (rx_egress_ps[p][s]-input_offer_ps[tx_index])/1000.0);
+        end
+      $fclose(fd_flit);
       if (write_v3_metrics) begin
         fd_v3 = $fopen(v3_metrics_file, "w");
         $fwrite(fd_v3, "drainable,timeout,missing_flits,unexpected_flits,injected_flits,delivered_flits,inflight_end,warmup_original_events,measurement_original_events,errors,backlog_growth,pass_fail\n");
@@ -571,7 +625,7 @@ module noc64_sync_boundary_core #(
   end
 
   initial begin
-    case_file = ""; csv_file = "sync_noc64_summary.csv"; event_csv_file = "sync_noc64_events.csv"; latency_csv_file = "sync_noc64_latency.csv";
+    case_file = ""; csv_file = "sync_noc64_summary.csv"; event_csv_file = "sync_noc64_events.csv"; latency_csv_file = "sync_noc64_latency.csv"; flit_latency_csv_file = "sync_noc64_flit_latency.csv";
     v3_metrics_file = ""; write_v3_metrics = 1'b0;
     case_tick_ns = 20.0; rx_capture_ns = 0.0;
     timeout_scale = 1.0;
@@ -579,12 +633,18 @@ module noc64_sync_boundary_core #(
     if ($value$plusargs("RESULT_CSV=%s", csv_file)) ;
     if ($value$plusargs("EVENT_CSV=%s", event_csv_file)) ;
     if ($value$plusargs("LATENCY_CSV=%s", latency_csv_file)) ;
+    if ($value$plusargs("FLIT_LATENCY_CSV=%s", flit_latency_csv_file)) ;
     if ($value$plusargs("V3_METRICS_CSV=%s", v3_metrics_file)) write_v3_metrics = 1'b1;
     if ($value$plusargs("CLOCK_PERIOD_NS=%f", clock_period_ns)) ;
     if ($value$plusargs("CASE_TICK_NS=%f", case_tick_ns)) ;
     if ($value$plusargs("RX_CAPTURE_NS=%f", rx_capture_ns)) ;
     if ($value$plusargs("TIMEOUT_SCALE=%f", timeout_scale)) ;
-    if ($value$plusargs("DUMP_VCD=%s", dump_vcd)) begin $dumpfile(dump_vcd); $dumpvars(0, noc64_sync_boundary_core); end
+    dump_measurement_only = $test$plusargs("DUMP_MEASUREMENT_ONLY");
+    if ($value$plusargs("DUMP_VCD=%s", dump_vcd)) begin
+      $dumpfile(dump_vcd);
+      $dumpvars(0, noc64_sync_boundary_core);
+      if (dump_measurement_only) $dumpoff;
+    end
     if (case_file == "") begin $display("TB_FATAL +CASE_FILE=<case> is required"); $finish; end
     if (clock_period_ns <= 0.0) begin $display("TB_FATAL CLOCK_PERIOD_NS must be positive"); $finish; end
     $display("TB_INFO NUM_CORES=%0d TOP_LANES=%0d NUM_PORTS=%0d CLOCK_PERIOD_NS=%0.3f CASE_TICK_NS=%0.3f RX_CAPTURE_NS=%0.3f INJECTION_MODEL=open_loop_case_queue", NUM_CORES, TOP_LANES, NUM_PORTS, clock_period_ns, case_tick_ns, rx_capture_ns);
@@ -596,6 +656,20 @@ module noc64_sync_boundary_core #(
     tb_out_ready = {NUM_PORTS{1'b1}};
     repeat (16) @(posedge clock);
     case_epoch_ns = $realtime;
+    measurement_start_ps = longint'((case_epoch_ns + measurement_start_cycle * case_tick_ns) * 1000.0 + 0.5);
+    measurement_end_ps = longint'((case_epoch_ns + measurement_end_cycle * case_tick_ns) * 1000.0 + 0.5);
+    $display("TB_METRICS_V2 window_ps=%0d:%0d warmup_events=%0d measurement_events=%0d",
+             measurement_start_ps, measurement_end_ps, warmup_events, measurement_events);
+    if (dump_measurement_only && (dump_vcd != "")) begin
+      fork
+        begin : dump_measurement_window_only
+          #(measurement_start_cycle * case_tick_ns);
+          $dumpon;
+          #((measurement_end_cycle - measurement_start_cycle) * case_tick_ns);
+          $dumpoff;
+        end
+      join_none
+    end
     timeout_ns = timeout_cycles * case_tick_ns * timeout_scale;
     drain_ns = 1024.0 * case_tick_ns;
     running = 1'b1;
