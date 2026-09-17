@@ -25,11 +25,30 @@ def check_prop_temp256_m16(path: Path) -> None:
     assert count(r"^  CMRRouter\w* topMesh_\d_\d \(", text) in (4, 64)
     for idx in range(256):
         assert "io_core_inputs_%d_HS_Req" % idx in text
+    # This candidate changes only the tree RCU matched delay.  Mesh RCU stays
+    # at DEL150 and OPM Ackin stays DEL050.
+    rcu100 = count(
+        r"DelayElement #\(\.DelayUnitPs\(100\), \.DelayValue\(1\)\) BundlingSignal_MatchedDelay",
+        text,
+    )
+    rcu150 = count(
+        r"DelayElement #\(\.DelayUnitPs\(150\), \.DelayValue\(1\)\) BundlingSignal_MatchedDelay",
+        text,
+    )
+    rcu050 = count(
+        r"DelayElement #\(\.DelayUnitPs\(50\), \.DelayValue\(1\)\) BundlingSignal_MatchedDelay",
+        text,
+    )
+    assert rcu100 > 0 and rcu150 > 0 and rcu050 == 0, (rcu100, rcu150, rcu050)
     print(
         "PROP_TEMP256_M16_STRUCTURE_PASS",
         path.name,
         "routers",
         256,
+        "tree_rcu_del100",
+        rcu100,
+        "mesh_rcu_del150",
+        rcu150,
         "size",
         path.stat().st_size,
     )

@@ -258,9 +258,10 @@ class PROPtemp256M16 extends Module {
 }
 
 object PROPtemp256M16Main extends App {
-  require(CMRParameters.TreeRcuMatchedDelayUnitPs == 50 &&
+  require(CMRParameters.RcuMatchedDelaySteps == 1 &&
+    CMRParameters.TreeRcuMatchedDelayUnitPs == 100 &&
     CMRParameters.MeshRcuMatchedDelayUnitPs == 150,
-    "PROP_temp256_m16 emission requires Tree RCU DEL050 and Mesh RCU DEL150")
+    "PROP_temp256_m16 emission requires Tree RCU DEL100 and Mesh RCU DEL150")
   emitVerilog(new PROPtemp256M16,
     Array("--target-dir", "generated_cmr/prop_temp256_m16"))
 }

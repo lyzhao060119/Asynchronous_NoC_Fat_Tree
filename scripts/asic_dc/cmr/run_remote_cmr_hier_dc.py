@@ -53,6 +53,11 @@ DC_POLLS = int(os.environ.get("CMR_HIER_DC_POLLS", "1440"))
 # response.  Keep each wave small and verify its child markers before
 # releasing the next one.  Zero retains the historical all-at-once behavior.
 CHILD_BATCH_SIZE = int(os.environ.get("CMR_HIER_CHILD_BATCH_SIZE", "8"))
+SKIP_UPLOAD = os.environ.get("CMR_HIER_SKIP_UPLOAD", "0") == "1"
+RCU_STEPS = int(os.environ.get("CMR_RCU_MATCHED_DELAY_STEPS", "1"))
+RCU_UNIT_PS = int(os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50"))
+MESH_RCU_UNIT_PS = int(os.environ.get("CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS", "150"))
+ACKIN_UNIT_PS = int(os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50"))
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
 
@@ -304,31 +309,34 @@ def main() -> None:
             ROOT, ROOT, ROOT, ROOT, ROOT,
         ),
     )
-    sftp = client.open_sftp()
-    for source, destination in prep["files"].items():
-        print("UPLOAD", destination, flush=True)
-        if source.stat().st_size > 1024 * 1024:
-            # Resume-friendly: skip multi-minute upload when remote already matches.
-            digest = hashlib.sha256(
-                source.read_bytes().replace(b"\r\n", b"\n")
-            ).hexdigest()
-            client, remote_hash = remote_run_retry(
-                client,
-                "test -s %s && sha256sum %s || echo MISSING"
-                % (
-                    shlex.quote(ROOT + "/" + destination),
-                    shlex.quote(ROOT + "/" + destination),
-                ),
-            )
-            if digest in remote_hash:
-                print("UPLOAD_SKIP_MATCH", destination, digest, flush=True)
-                continue
-            sftp.close()
-            client = upload_large_verified(client, source, destination)
-            sftp = client.open_sftp()
-        else:
-            client, sftp, _digest = atomic_put_retry(client, sftp, source, destination)
-    sftp.close()
+    if SKIP_UPLOAD:
+        print("HIER_UPLOAD_SKIPPED explicit CMR_HIER_SKIP_UPLOAD=1", flush=True)
+    else:
+        sftp = client.open_sftp()
+        for source, destination in prep["files"].items():
+            print("UPLOAD", destination, flush=True)
+            if source.stat().st_size > 1024 * 1024:
+                # Resume-friendly: skip multi-minute upload when remote already matches.
+                digest = hashlib.sha256(
+                    source.read_bytes().replace(b"\r\n", b"\n")
+                ).hexdigest()
+                client, remote_hash = remote_run_retry(
+                    client,
+                    "test -s %s && sha256sum %s || echo MISSING"
+                    % (
+                        shlex.quote(ROOT + "/" + destination),
+                        shlex.quote(ROOT + "/" + destination),
+                    ),
+                )
+                if digest in remote_hash:
+                    print("UPLOAD_SKIP_MATCH", destination, digest, flush=True)
+                    continue
+                sftp.close()
+                client = upload_large_verified(client, source, destination)
+                sftp = client.open_sftp()
+            else:
+                client, sftp, _digest = atomic_put_retry(client, sftp, source, destination)
+        sftp.close()
     remote_run_retry(
         client,
         "sed -i 's/\\r$//' %s/scripts/dc/run_dc_cmr_hier_child.tcl "
@@ -381,8 +389,8 @@ def main() -> None:
             "module load syn 2>/dev/null || true\n"
             "export CMR_REMOTE_ROOT=%s CMR_HIER_CHILD_RUN_ID=%s CMR_HIER_REF=%s "
             "CMR_HIER_DUT_V=%s CMR_EXPECTED_PORTS=%d CMR_EXPECTED_ADAPTERS=%d "
-            "CMR_RCU_MATCHED_DELAY_STEPS=1 CMR_RCU_MATCHED_DELAY_UNIT_PS=50 "
-            "CMR_OPM_ACKIN_DELAY_UNIT_PS=50\n"
+            "CMR_RCU_MATCHED_DELAY_STEPS=%d CMR_RCU_MATCHED_DELAY_UNIT_PS=%d "
+            "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS=%d CMR_OPM_ACKIN_DELAY_UNIT_PS=%d\n"
             "cd %s\nexec dc_shell-t -64 -f %s/scripts/dc/run_dc_cmr_hier_child.tcl\n"
             % (
                 ROOT,
@@ -391,6 +399,10 @@ def main() -> None:
                 shlex.quote(ROOT + "/" + prep["remote_dut"]),
                 job["expected_ports"],
                 job["expected_adapters"],
+                RCU_STEPS,
+                RCU_UNIT_PS,
+                MESH_RCU_UNIT_PS,
+                ACKIN_UNIT_PS,
                 ROOT,
                 ROOT,
             )

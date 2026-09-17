@@ -1,0 +1,26 @@
+{
+  "loads": [
+    40,
+    60,
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    240,
+    280,
+    320,
+    400
+  ],
+  "latency_definition": "native packet-level result.csv metrics",
+  "cohort": "10000 measurement packets",
+  "prop_archive": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper256\\prop_temp256_m16_unique_20260917_193541",
+  "flatmesh_archive": "D:\\NoC\\asynchronous_fat_tree_multicast\\DATE paper\\experiments\\raw\\paper256\\m16_vs_fm256_flit_compare_20260917",
+  "pass_counts": {
+    "PROP-M16": 1,
+    "FlatMesh256": 13
+  },
+  "warning": "PROP diagnostic FAIL points contain duplicate/unexpected flits and are not paper-eligible. Old FlatMesh payload identity is not unique per flit, so flit-level latency is not cross-plotted."
+}
