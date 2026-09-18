@@ -1,0 +1,11 @@
+paper_label,result_id,total_power_w,energy_pj_per_delivered_flit,energy_pj_per_useful_delivery,physical_class,source_file,source_design,source_case,source_run_id
+PROP,dynamic_common_high,0.1554,8.034983498349836,,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PROP_temp64,,20260913_prop_temp64_asap_uc_m5_200
+PROP,f16_native_m5,0.0359,,101.71788203125001,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PROP_temp64,,20260913_prop_temp64_asap_uc_m5_200
+PROP,f16_repeated_m5,0.0467,,133.06350668750002,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PROP_temp64,,20260913_prop_temp64_asap_uc_m5_200
+Mesh,flatmesh_m100,0.0735,15.166036603660368,,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,FM64,,20260913_104506_cmr_fm64_rpsdel150
+FAT,pfat_m100,0.0519,10.70907890789079,,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PFAT64,,20260915_080229_cmr_pfat64_rpsdel050_1248
+PROP,prop_m100,0.0647,13.35023902390239,,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PROP_temp64,,20260913_prop_temp64_asap_uc_m5_200
+Static,static_common_high,0.1521,7.864356435643566,,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PROP_temp64_static4,,20260915_144500_prop_temp64_static4_dc
+Static,static_m100,0.0641,13.226434643464348,,post-synthesis time-based PT-PX estimate,64/05_ppa_power/network_power_async_accepted.csv,PROP_temp64_static4,,20260915_144500_prop_temp64_static4_dc
+Sync,sync_common_high,0.3216,16.62838283828383,,post-synthesis time-based PT-PX estimate; pre-CTS clock activity,64/07_sync_b8/power_accepted.csv,SYNC_PROP_temp64_B8,,
+Sync,sync_m100,0.2843,58.66264226422643,,post-synthesis time-based PT-PX estimate; pre-CTS clock activity,64/07_sync_b8/power_accepted.csv,SYNC_PROP_temp64_B8,,

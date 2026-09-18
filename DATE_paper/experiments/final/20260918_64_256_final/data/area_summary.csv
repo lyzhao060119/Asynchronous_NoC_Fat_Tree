@@ -1,0 +1,6 @@
+paper_label,source_design,area_um2,netlist_run_id,evidence_scope,caveat,source_file
+Mesh,FlatMesh64,469899.020724,20260913_104506_cmr_fm64_rpsdel150,post-synthesis MAXIMUM-SDF + time-based PT-PX estimate,,64/05_ppa_power/table64_i_network.csv
+PROP,Full PROP,520533.044158,20260913_prop_temp64_asap_uc_m5_200,post-synthesis MAXIMUM-SDF + time-based PT-PX estimate,,64/05_ppa_power/table64_i_network.csv
+FAT,PFAT64,300934.86952,20260915_080229_cmr_pfat64_rpsdel050_1248,post-synthesis MAXIMUM-SDF + time-based PT-PX estimate,performance/power netlist differs; do not claim same physical implementation,64/05_ppa_power/table64_i_network.csv
+Static,Static4,506078.828487,20260915_144500_prop_temp64_static4_dc,post-synthesis MAXIMUM-SDF + time-based PT-PX estimate,,64/05_ppa_power/table64_i_network.csv
+Sync,Sync B8,466318.60369,20260915_231600_sync_prop_temp64_b8_dc,post-synthesis MAXIMUM-SDF + time-based PT-PX estimate; pre-CTS clock activity,,64/05_ppa_power/table64_i_network.csv

@@ -1,0 +1,2 @@
+group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail
+LOCALITY256-M120,LOCALITY256-M120_n256_s202701_m120_FM256_top0,11000,11000,55000,55000,0,0,0,0,3906,14.078627,16.863027,87.049000,36.024000,52.549000,PASS

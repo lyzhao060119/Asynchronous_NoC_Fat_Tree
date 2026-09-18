@@ -1,0 +1,28 @@
+{
+  "status": "FINAL_RESULTS_PASS",
+  "figures": {
+    "figures/fig01_unicast64.pdf": "124834625b41cf7c0399508450f3a7840b5c3e5f42d8da2f6abfdb2af847bafd",
+    "figures/fig01_unicast64.png": "4af75e6a45409b9d6c87a1f39f031010ec2a45a601206ba76c8d74fb9503a794",
+    "figures/fig02_unicast256.pdf": "5cffdaeea774dac5f6a6cfd86c57997f08881eac6f259c5e73405fcb104901ba",
+    "figures/fig02_unicast256.png": "6a385578f720aaa88d6e16115949e93a69bef446df3926248c48f7593df88a80",
+    "figures/fig03_multicast.pdf": "fa3ddbb94dad4f457b6fed55f9fd5c39d099331da867871e9612020f5f871fd6",
+    "figures/fig03_multicast.png": "307d6ea7aa3f4a1788937dc0263e4cfa240a2b7e23898303781d80581a896b75",
+    "figures/fig04_implementation64.pdf": "8fb77533a6419965d5e271257c334aaf707adb2773cf168bbd292d9fde2e736c",
+    "figures/fig04_implementation64.png": "df390812b3d5141466c0d52728d94749d36040fec540a06d312ea557c9c041d7"
+  },
+  "style": {
+    "palette": {
+      "Mesh": "#0072B2",
+      "PROP": "#D55E00",
+      "FAT": "#009E73",
+      "Native": "#D55E00",
+      "Repeated": "#7A7A7A",
+      "Dynamic": "#D55E00",
+      "Static": "#CC79A7",
+      "Async": "#D55E00",
+      "Sync": "#56B4E9"
+    },
+    "latency": "mean only",
+    "png_dpi": 300
+  }
+}
