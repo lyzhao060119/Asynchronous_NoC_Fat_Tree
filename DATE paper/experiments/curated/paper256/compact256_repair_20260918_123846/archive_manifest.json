@@ -1,0 +1,752 @@
+{
+  "run_id": "compact256_repair_20260918_123846",
+  "job_id": "12471101",
+  "commit": "46593607642aa5733bdf5af0166f7b8bf368b5ac",
+  "dirty_worktree": true,
+  "case_count": 14,
+  "vcs_compiles": 1,
+  "dc_jobs": 0,
+  "ptpx_jobs": 0,
+  "files": [
+    {
+      "path": "acceptance_e2_f16_2tile.csv",
+      "bytes": 1604,
+      "sha256": "74f6be19e85e78462aaf8c16d9bd3b511c24d4850f0b491231a5fec05ac688cb"
+    },
+    {
+      "path": "acceptance_e3_m120.csv",
+      "bytes": 2187,
+      "sha256": "9da5ac245883b91cbf7be642dc3399eb460cf52c3466c79628e33593cf8f36c9"
+    },
+    {
+      "path": "execution_manifest.json",
+      "bytes": 7257,
+      "sha256": "e29c2e0d0b6070e9d6a9b07bf7267efe6b98f3a272647a2896398015e0e724b8"
+    },
+    {
+      "path": "jobs.json",
+      "bytes": 2240,
+      "sha256": "7147b1867ff3a7adf5f511de801c35fead534039e8ced63fcb262e024a85a210"
+    },
+    {
+      "path": "pull_manifest.json",
+      "bytes": 46918,
+      "sha256": "ff9023a9e39a24e11d6e04edc073db779fd046ec6fad202bbf85e4ce4b914d6e"
+    },
+    {
+      "path": "repair_manifest.json",
+      "bytes": 369748,
+      "sha256": "a2c2d43df7992024060341da0d1343de08e4684112654c6e817655408f6381d9"
+    },
+    {
+      "path": "RESULTS.md",
+      "bytes": 943,
+      "sha256": "7a01ad752122a08081ff2ba850373b2df31570f9133af55924ce2e50d47a4062"
+    },
+    {
+      "path": "run_repair.sh",
+      "bytes": 6081,
+      "sha256": "608a258f39e5faa1a6c07988037caf40da14e2cc9f22173d16b2f2b9dce3da5c"
+    },
+    {
+      "path": "sdf_acceptance.json",
+      "bytes": 939,
+      "sha256": "bb7596f76700750c2b270eadc685686051c1c7cedd597ede057ce5dfa4728583"
+    },
+    {
+      "path": "summary_e2_f16_2tile.csv",
+      "bytes": 2019,
+      "sha256": "e968f59744b0a0fa8333bb68dd785e81632c7b30f20c71045e4a40b4a02f068a"
+    },
+    {
+      "path": "summary_e3_m120.csv",
+      "bytes": 2691,
+      "sha256": "2399886fee12e6a4a61de69facd4f82bc49acfce2e467633e960b4b8e90b4dea"
+    },
+    {
+      "path": "figures\\fig256-2_f16_2tile.pdf",
+      "bytes": 17141,
+      "sha256": "916ac348d7cc9672f742d59baf5eb013f6ac35c2045794c0602ad95aa9192568"
+    },
+    {
+      "path": "figures\\fig256-2_f16_2tile.png",
+      "bytes": 120262,
+      "sha256": "302d94daaacc1f1fd61ff02679963ecc49d35c313eb3a2a6a9c3261ec675f2ec"
+    },
+    {
+      "path": "figures\\fig256-3_locality_m120.pdf",
+      "bytes": 22206,
+      "sha256": "43cfda469712a52c44983af6a72f0c5ed2ffd7ae81ff91d4ff7dd4b815ab90de"
+    },
+    {
+      "path": "figures\\fig256-3_locality_m120.png",
+      "bytes": 245896,
+      "sha256": "88ac435b6a8d8cbb7e0bad9542d088c73b9c6fd56fdd33a61c9f033acfb0c1f8"
+    },
+    {
+      "path": "raw\\logs\\compile_m16.log",
+      "bytes": 1688697,
+      "sha256": "3bc2ca35b549fa36683168984930c65e75404935f0d1e196534160a1bce493f0"
+    },
+    {
+      "path": "raw\\logs\\repair.job.log",
+      "bytes": 1690767,
+      "sha256": "e532edde7db4b34e1064e11c98718ecfc5f0f0ee96e7e8b444f78e91a91f78a5"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0.csv",
+      "bytes": 423,
+      "sha256": "88b57c92f00614344d6ac8dfa52207d70ce2cf9bb9d699cd855a9bdc6da5bbd9"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0.csv",
+      "bytes": 435,
+      "sha256": "9f02e3a8ea1a75f41bc48536876a127cb9250aecc61f7e2a8441b61f3570a622"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0.csv",
+      "bytes": 421,
+      "sha256": "d930fdd03ffb54ceefd56bdc915deeef91dbd11f0386cb5875fb7697a67336df"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0.csv",
+      "bytes": 434,
+      "sha256": "13dccb8dbe7fdd1830727419cb0daae5f5853db985d896c6cc3dd30ece95528a"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0.csv",
+      "bytes": 421,
+      "sha256": "a948bd797d5c0c4e3b5a95e19f466ca57050c949d1e027255db1d5b322f4938c"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0.csv",
+      "bytes": 433,
+      "sha256": "38d62deb4a75cf615d13dd9f9f28b0b8bda67ecf0d3ab82fac5f8fd15056ab9b"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0.csv",
+      "bytes": 421,
+      "sha256": "a1e1c10d452b495e671166c6e8c115f7263e5b0dd72d61a64759dccc0161ff78"
+    },
+    {
+      "path": "raw\\results\\sdf_LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0.csv",
+      "bytes": 432,
+      "sha256": "4f840fd14563592d6644f1c6bf777aa1652f8e51f41bd448c37a8af351d3e311"
+    },
+    {
+      "path": "raw\\results\\sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0.csv",
+      "bytes": 428,
+      "sha256": "c639290444733320e3502603bb62f94d9c3a35d1fef909aa873d3da1449dbbbf"
+    },
+    {
+      "path": "raw\\results\\sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0.csv",
+      "bytes": 449,
+      "sha256": "a8bb5281ce66660f278ea764f65a6e1fab22fe3dac907c44d2fcf76be3d7e46c"
+    },
+    {
+      "path": "raw\\results\\sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0.csv",
+      "bytes": 430,
+      "sha256": "c69c776e3f3629e7668e04257b76291f33095396a720d9d67ac4a6bbcc77b904"
+    },
+    {
+      "path": "raw\\results\\sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0.csv",
+      "bytes": 451,
+      "sha256": "7de687aa8ed5fff7653b29d3b5037005b70434d1141ec855407dfc6ea1ab55fb"
+    },
+    {
+      "path": "raw\\results\\sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0.csv",
+      "bytes": 426,
+      "sha256": "106a710c0c0b487972ad96d7c71a68ec4ef448c0da0c41d9d096cbd2f2b445f5"
+    },
+    {
+      "path": "raw\\results\\sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0.csv",
+      "bytes": 448,
+      "sha256": "f7a43c84379827ab244620b97470323f1810704195bb61c286bd9f3bac3219f3"
+    },
+    {
+      "path": "raw\\shared_sdf\\FlatMesh256_sdf_annotate.log",
+      "bytes": 166122289,
+      "sha256": "7a1ac944c2452c58c05353e5e63b22063de832fb27f7e2a823ab2cee87469ea2"
+    },
+    {
+      "path": "raw\\shared_sdf\\M16_sdf_annotate.log",
+      "bytes": 302065199,
+      "sha256": "c9b4502a2b6cf5a7ac41a3ca3b5eac055b458af1f6ba42f51c66bb86dd057217"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0\\events.csv",
+      "bytes": 5238158,
+      "sha256": "0bdf3b33f7153ee459977333808e92b157ab8b95e9e02cc44bc1dd2dd827f4c4"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0\\flit_latency.csv",
+      "bytes": 2270147,
+      "sha256": "86ebcb89c4446096ecfcb441c16356c545c60fb66a8766c902e79ba9fad7aad5"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0\\latency.csv",
+      "bytes": 781601,
+      "sha256": "45c058bbd2957b378c2271eb076d87258c3220ba7be33278564670210afabb0c"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0\\run.log",
+      "bytes": 2347,
+      "sha256": "a9373e6748e77396303bc9e606dedbf61a051d13c157c63893b3cd12215743a6"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0\\stdout.log",
+      "bytes": 822,
+      "sha256": "f0ae12e3e9772de94928849fe86b1343829b0cbb0f7e1b3c403f770d86b3fa4f"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 5238909,
+      "sha256": "ddc166646114475bbed78e007103b3faec7b8db0a82ace67c89c1d59b75dd681"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 2274192,
+      "sha256": "ef3a3050bbbc733adcfba1fb895371db3cf66ed9260b0226775fbc381fcc6e6b"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 782977,
+      "sha256": "bf2a32e0ab2e6a67f2584abea2d31eb1c617da10ad6f58039cfd665846525457"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2705,
+      "sha256": "40dc8eab3b94538883460484a562d4436c50bff6d16c13c1cf01750c0d806d09"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "24e069cb2abc4daaea666358e0b3b3cf3f000e84b60761f9a99ae449fd32bc61"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\upper_mesh_accepted.csv",
+      "bytes": 3822,
+      "sha256": "d128df00c1e52ac7ed62971fe6a56c98d63200e919f38b782eeecdba7f46a79b"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0\\events.csv",
+      "bytes": 5235832,
+      "sha256": "3a4c2abe26bb1a1609f5a8a1295391d6647d3afaba4561b4f257e21e640fcc81"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0\\flit_latency.csv",
+      "bytes": 2259376,
+      "sha256": "08398b304ef13f9d2fbf971c540b56f2c30cc7aa51c33de80acdc8332dc590a6"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0\\latency.csv",
+      "bytes": 778085,
+      "sha256": "5e6170d1b129de7c06d4397320b61af085aab6414bea8504a5114a442e8c54c0"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0\\run.log",
+      "bytes": 2235,
+      "sha256": "d5cf15c885e852bdbfc181b33f7f6631d2fa321aa1f948aee1658c78ef4e80ee"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0\\stdout.log",
+      "bytes": 822,
+      "sha256": "2ac2085a9612f580ca7ce5b4cc1e7d66783f40063b95decb3ceb55d5e87bde38"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 5236765,
+      "sha256": "fc1bedead207dc31a7e9314c631a3c3635b5751eac4794f6ffd709378475545c"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 2262319,
+      "sha256": "5666bda6657ad520c94c3e83c5b6a6a11f02aaedbe7c3f9f683c3f77a4436089"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 778436,
+      "sha256": "7c73a00151a740428dfe5adcd9ebb9ce831c63f52937eebdbe7b884fc7a519a6"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2577,
+      "sha256": "e6a5e6fc157a6dcd47a006d5dcbf11c3d243922ef6556623f0fb45dc6471a782"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "88665495d9b15db4e23c37563dede9e5f38180a2563a888b937b3d9d09f33511"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\upper_mesh_accepted.csv",
+      "bytes": 3757,
+      "sha256": "3688ce342d5461d8f60dda5ee1260a5caff60c7af91ccfd14212f3eec71b27c9"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0\\events.csv",
+      "bytes": 5239117,
+      "sha256": "e81b0b88d537912c2984e2fb639695d3824ab9153140e60cefa09444a3a12c44"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0\\flit_latency.csv",
+      "bytes": 2252615,
+      "sha256": "a946f26b389a9c994beed7564d52e89531043ccb6a80602563f0b97815949d13"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0\\latency.csv",
+      "bytes": 775747,
+      "sha256": "2f4573f548cf894f372dc277f0273791df0a14616594f37ce74a54d186383fc2"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0\\run.log",
+      "bytes": 2242,
+      "sha256": "74ed79d018f0b1fdb2275b2d78de5cabbdc46ca9b28673d13ce26490f525ab4d"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0\\stdout.log",
+      "bytes": 822,
+      "sha256": "3194a8b1d795dd92f5507163892907ba493e89ab78cb2d98ba48aea2f17a5106"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 5239481,
+      "sha256": "c854008b2f51e9cbffcc0689cce10a6db4930cb6adb806caea43faf6be9b9d3a"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 2254685,
+      "sha256": "dc021021b454a799b44c01d3c45f71405e566ba0acb0ef4b2cc94bdbd9b93c45"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 775407,
+      "sha256": "28dd0d6299a8208cbee010b091d6d1667b7ac5e54f19bbeb6f18d010cf4c374e"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2585,
+      "sha256": "ba4ee5686ea16164352d852eac71fee12f342e8677ef2350d3a41b4f30b54622"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "948833527b4ffc2e4aefe4909effd345585d6d0b4c60c3782e0d979c8557b780"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\upper_mesh_accepted.csv",
+      "bytes": 3694,
+      "sha256": "e60c1650f98d3eaa6ca96f9688ad3ff08c9a6383f295ec06914c663a6659977e"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0\\events.csv",
+      "bytes": 5231735,
+      "sha256": "ed7f8fe1b2384d8fa314700aeb1356facc9623fd5bf8ddee85b875c41ba70530"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0\\flit_latency.csv",
+      "bytes": 2243996,
+      "sha256": "262e4562e078290f5a12000456c420c12c07538f9524297d5c4d992119536c50"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0\\latency.csv",
+      "bytes": 772306,
+      "sha256": "384bb4bcd54af23eff1a7ca325c5a1a02b9e1490b88d2baf49df8b7aec1f784d"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0\\run.log",
+      "bytes": 2235,
+      "sha256": "07dd9944bd7569e71a685cd1ab2e96f21d30248f51452da4d5a1dbab73317317"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0\\stdout.log",
+      "bytes": 822,
+      "sha256": "5b4a4a3d6daad2571e8eb318f9855d3484e5790dc49d869c5e573706be8eeafa"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 5232261,
+      "sha256": "4dfc162c74b95471f601e9a3e2cbaf0606ec0fb825cb122d833b0d697aa61110"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 2247460,
+      "sha256": "8269662fb725dad971b83acb42b0227a08174e3d84534ad6028bb4bacbf6cd05"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 772269,
+      "sha256": "82fd4b8273a46f3cb933f4d8ad96e43bf72ddeac4ff21524f54ea2b2094a4bdf"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2577,
+      "sha256": "ad3d0b75833f9ae34b8ae6218155f0a945f40d5f51df82c6ace308996b4f398d"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "bb1b550a42fa260afc2a3e727893a5d02245519311563fd5ae6870586f2ea4e8"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\upper_mesh_accepted.csv",
+      "bytes": 3656,
+      "sha256": "cd5605d53cab003d6a0df78131416bc44b33b88df39a0665cdc1ded2c33bcf06"
+    },
+    {
+      "path": "raw\\logs\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 218,
+      "sha256": "07dad897e7eb6d9d0c1e70a7c43c98adf1ddbb2337bbf09a278368cfacab94de"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 1484311,
+      "sha256": "1dde51a49cbc92254e6b2abd1ee414473338968d925d901eb210649f10d664c6"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 1250088,
+      "sha256": "d560fe292f37508ef0662f1a0cadcce2f696f51273a4a8fd6ce4c06703ba5727"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 426356,
+      "sha256": "216d48d78bbeb500534e924b4f63404aa72affcb171188907fce1d6913d4c8c7"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2386,
+      "sha256": "a81345c28049322af139d533f5f66b7cab0eaac858f7e3656227e5e0e889a15f"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 875,
+      "sha256": "21458570652a85ea327b886edc54df546773e506817111261be9ef868a2c940d"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 212,
+      "sha256": "11c54f7ed933392a0d27ec8534e6f574afbd82211f699bb9d59a2d861984d2cd"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 2995058,
+      "sha256": "f76bfbab7fe30b3a62704a8459523a3c5ba16abcdea4f173ed10207f551c2f98"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 1324576,
+      "sha256": "6a9eecb44e5de5e35e2d005287eec5ed64019c098451edc8efd08ec9f61e13a2"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 448557,
+      "sha256": "7009b6611b8af72cd08e6283e6affce7d0fe6b0780b7991585d146b25b7d1bb9"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2401,
+      "sha256": "3e99e4ee4e554a4563e4e814f66ff3c35ff9652fce24d93a38ee247f63a5e295"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "3fc0513956ef407aca6e0d77f4d86a38aca9ea69720358857fd271f3a292b37e"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 214,
+      "sha256": "c3b544f1c4f7a8db353b6d5d7a8cefb39b8f30e8fa594f548d21b7b1d2c3500b"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 1474188,
+      "sha256": "1821fe580635f97291e4739bf131c14acac30b6318584d468b731612525d4919"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 1249976,
+      "sha256": "26336fbc8ea849c07c304de57aa21e37d88ec235110c40acac2cf120e726a6c7"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 426016,
+      "sha256": "89bc9deedacb860446b03c48d8cd6ae0b39afb75bb550762a1462e1b4aef2557"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2386,
+      "sha256": "d1d8ed678b0616185c63c2ccfbece7708a2e1cff3ef685ace0ef5a04ed74ff52"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 875,
+      "sha256": "e0b4a8a19013b72e2560990b95664836fe45a9a88a74cb1f65ac4b818b18d7d9"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 212,
+      "sha256": "11c54f7ed933392a0d27ec8534e6f574afbd82211f699bb9d59a2d861984d2cd"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 2978130,
+      "sha256": "b93016408f09d3c251bb6677c53212faea7fd82cf01e32c9280b33933e66f538"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 1320308,
+      "sha256": "a03accf235169a93fb3ccfb3c3816bc6e4a32e2912fb51520a728732b575b3ab"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 447795,
+      "sha256": "d9b8d0e9fef907677f81975c060f0790f66551f5063149b6d4f54753321f9925"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2401,
+      "sha256": "926eb4c300e64223b06c31442f2f0cdab1ccf15d41560aa80a787319325d307d"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "888b759eec1d5b43d3d0f1d5cda5e1e40c1db62ce8ddad9d467b26bd942c07e5"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 214,
+      "sha256": "c3b544f1c4f7a8db353b6d5d7a8cefb39b8f30e8fa594f548d21b7b1d2c3500b"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 1527155,
+      "sha256": "be8342b1e2e375baf9176cf1b2b512cfda984e4c022a33b5bad3c4f1078cd9db"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 1280942,
+      "sha256": "9734cdc601b7134dc058d6cde029677560f18919e393d4af58ca4db78ee98d31"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 439801,
+      "sha256": "5989595ab90cc33b64aedcb0f4a822f2c138e253d6c85726c88e11cf4d1a2919"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2380,
+      "sha256": "95f7e2373aaef0f0651a3d3e56134c6c2cbf436d7ef9c29b4ce06bf821860760"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 876,
+      "sha256": "52ffa8f220e4fe4595555b6c2f3d289089080b7acf0762363b1869efe88aaa1e"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 212,
+      "sha256": "11c54f7ed933392a0d27ec8534e6f574afbd82211f699bb9d59a2d861984d2cd"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0\\events.csv",
+      "bytes": 3074137,
+      "sha256": "a3d6db2b4cd9ccbb8bd3850896f86036b99de490c4bb0b839a0928889b01b7f3"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0\\flit_latency.csv",
+      "bytes": 1347073,
+      "sha256": "dfe8a5406106961692faf3d148b90e0549c59ac96ac1f6e79e3a78aa6cfc3925"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0\\latency.csv",
+      "bytes": 457402,
+      "sha256": "f5d473fc270abea0022f5a5285ef23d6f17a3887f1a86baced7db5065505d4d8"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0\\run.log",
+      "bytes": 2395,
+      "sha256": "f922b242c7b329559208ef3a350de48e8f103986b0c73859f8a79c0fcd42e2ab"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0\\stdout.log",
+      "bytes": 877,
+      "sha256": "02853aece1d662e61cd57fb3021e2250e480930d1bcd5103297de0ccb9f0e2bf"
+    },
+    {
+      "path": "raw\\logs\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0\\v3_metrics.csv",
+      "bytes": 214,
+      "sha256": "c3b544f1c4f7a8db353b6d5d7a8cefb39b8f30e8fa594f548d21b7b1d2c3500b"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0.case",
+      "bytes": 6507120,
+      "sha256": "fe71e90aa813aa510eb860cb81a496eef114b5756fad13fe3c5c466c0dc6d816"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0.case",
+      "bytes": 6507142,
+      "sha256": "f127e6136b7e7edcb5443983218575c50c6061de9d6d78dc2a57ed7d2464a3f0"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0.case",
+      "bytes": 6506946,
+      "sha256": "ae86dcf927b8f73f9b8cd5d439fa2e040bb7cc427c609a548bf71d8821db381b"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0.case",
+      "bytes": 6506968,
+      "sha256": "8521d3d9ac8e9f43cc1e5e58aa915a6b1746b047d573730e1b37f13b9a6cb2f6"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0.case",
+      "bytes": 6507172,
+      "sha256": "e602a3128dc3e343714e2dbf6c047d9fe8f747ddbb20ddb571be3db75c6bf3d8"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0.case",
+      "bytes": 6507194,
+      "sha256": "f6fba3484dbb3c1ef5af665c45f6168b0fc9a85e076c85e73041bc44dfd44923"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0.case",
+      "bytes": 6507468,
+      "sha256": "d0bd735789091f8c4237d70a74d824d9e9590ac36cab5983a8f98d18074f94f0"
+    },
+    {
+      "path": "inputs\\cases\\LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0.case",
+      "bytes": 6507490,
+      "sha256": "200acd097c03ce8396f9fce4eb8d372f4d92e433f27a973fc0d66935fce656c7"
+    },
+    {
+      "path": "inputs\\cases\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0.case",
+      "bytes": 1962358,
+      "sha256": "9a75bf493f85104d2edf63375209b618531c498b0a5640eb444fd27d0995c1f4"
+    },
+    {
+      "path": "inputs\\cases\\MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0.case",
+      "bytes": 3792473,
+      "sha256": "e28743ec3be3fc3a2ae759827d29a77e3bf76ad5b3eb2bbb423c70d69f577f68"
+    },
+    {
+      "path": "inputs\\cases\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0.case",
+      "bytes": 1961985,
+      "sha256": "cebd98f988a5a9a6adeff1afd839d364b444b01763350bd5b33629c5899b2422"
+    },
+    {
+      "path": "inputs\\cases\\MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0.case",
+      "bytes": 3791275,
+      "sha256": "abe1d07374e572df337010fbc1926a1df9741fe093eced5ee7c204cbbfd43d4e"
+    },
+    {
+      "path": "inputs\\cases\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0.case",
+      "bytes": 1962518,
+      "sha256": "a62d115c58c71fb5fc11af283b9108d06bd6dd2881de3b60af47c2bcd551ae5f"
+    },
+    {
+      "path": "inputs\\cases\\MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0.case",
+      "bytes": 3791583,
+      "sha256": "e244024de756dc57f07f98ce94b6d091c88d6858c9578b47c4951f4fcb4a3851"
+    },
+    {
+      "path": "inputs\\traces\\LOCALITY256_n256_s202701_m120_p0p24705882352941178.jsonl",
+      "bytes": 2624504,
+      "sha256": "74a2020934b4e0d76b12739ef9237ae6dba3442d47c7789a6ce3c26df10cc180"
+    },
+    {
+      "path": "inputs\\traces\\LOCALITY256_n256_s202701_m120_p0p5.jsonl",
+      "bytes": 2624616,
+      "sha256": "d604499ae75df8c5b35c5a8126abd29f620299c180615e90c9a996f31dd99182"
+    },
+    {
+      "path": "inputs\\traces\\LOCALITY256_n256_s202701_m120_p0p75.jsonl",
+      "bytes": 2625036,
+      "sha256": "41be18225510bc0e71714770c76a79591a9b78c17f6765af39c8d1c9a5421b16"
+    },
+    {
+      "path": "inputs\\traces\\LOCALITY256_n256_s202701_m120_p0p9.jsonl",
+      "bytes": 2624716,
+      "sha256": "4498c1d38bd2d0cf05aba909660ef26e5b3ba0a61a62edcab60533178e474f7d"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m20_destinations.json",
+      "bytes": 143193,
+      "sha256": "fb55a0ce22f9a991e19f077ab866acd139edd522453e1a4abe1e8a3d08b6410b"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m20_native.jsonl",
+      "bytes": 137366,
+      "sha256": "0d29a4e0477942454c9ca2bce0c143df16bf86fe24a1038b8180933120db31f3"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m20_repeated.jsonl",
+      "bytes": 1746055,
+      "sha256": "36dfb22a279ef827d4e79d35cc731d40cecee866efd2e5e4a1e95ae9c06a5964"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m40_destinations.json",
+      "bytes": 143117,
+      "sha256": "d912954d373a0f5fe90b458fdc0844a90f3648325d768aa5c72f1013b9775d3a"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m40_native.jsonl",
+      "bytes": 137191,
+      "sha256": "c029f5590b66bc53f01d1210234e1b26cb8b849877f56c384b860eafaafb4791"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m40_repeated.jsonl",
+      "bytes": 1744090,
+      "sha256": "9386722adec225f4f26ec0b70f0fb25a5c3fb22103a9387c8d2279f5d4e1d69d"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m5_destinations.json",
+      "bytes": 143203,
+      "sha256": "59dde8da26db3ccb96d80f59fd03a92d196a8d41e844e2064886934c412eaf32"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m5_native.jsonl",
+      "bytes": 137652,
+      "sha256": "a1254ac25bdbe7b6c346e18adfb3cc8f2fa8b1f36a9d4e0e4682600cd78d646a"
+    },
+    {
+      "path": "inputs\\traces\\MC-F16-2TILE_n256_s202701_m5_repeated.jsonl",
+      "bytes": 1750155,
+      "sha256": "d0cbb821180c78f681159f1cbf5e74bb11eac24b58cc1d4c6af0f2056b3475dc"
+    }
+  ]
+}

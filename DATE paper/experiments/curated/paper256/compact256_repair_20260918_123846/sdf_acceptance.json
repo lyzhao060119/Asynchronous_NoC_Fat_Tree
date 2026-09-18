@@ -1,0 +1,16 @@
+[
+  {
+    "remote": "/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0/sdf_annotate.log",
+    "sha256": "c9b4502a2b6cf5a7ac41a3ca3b5eac055b458af1f6ba42f51c66bb86dd057217",
+    "local": "shared_sdf/M16_sdf_annotate.log",
+    "case_count": 10,
+    "local_sha256": "c9b4502a2b6cf5a7ac41a3ca3b5eac055b458af1f6ba42f51c66bb86dd057217"
+  },
+  {
+    "remote": "/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0/sdf_annotate.log",
+    "sha256": "7a1ac944c2452c58c05353e5e63b22063de832fb27f7e2a823ab2cee87469ea2",
+    "local": "shared_sdf/FlatMesh256_sdf_annotate.log",
+    "case_count": 4,
+    "local_sha256": "7a1ac944c2452c58c05353e5e63b22063de832fb27f7e2a823ab2cee87469ea2"
+  }
+]

@@ -1,0 +1,2 @@
+group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail
+MC-F16-2TILE-256-REPEATED,MC-F16-2TILE-256-REPEATED_n256_s202701_m40_PROP_temp256_m16_top0,6400,6400,32000,32000,0,0,0,0,2693,11.880069,69.209597,1011.048000,239.875000,434.146000,PASS

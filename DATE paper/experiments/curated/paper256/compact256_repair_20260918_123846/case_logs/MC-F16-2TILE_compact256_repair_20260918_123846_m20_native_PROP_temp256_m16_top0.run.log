@@ -1,0 +1,14 @@
+Command: /home/ghy19/Asynchronous_Router_CMR/sim/work/compact256_repair_20260918_123846_repair/sdf/PROP_temp256_m16/./simv -no_save +CASE_FILE=/home/ghy19/Asynchronous_Router_CMR/sim/cases_network/MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0.case +RESULT_CSV=/home/ghy19/Asynchronous_Router_CMR/results/compact256_repair_20260918_123846_repair/csv/sdf_MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0.csv +EVENT_CSV=/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0/events.csv +LATENCY_CSV=/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0/latency.csv +FLIT_LATENCY_CSV=/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0/flit_latency.csv +V3_METRICS_CSV=/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0/v3_metrics.csv +CASE_TICK_NS=1 +RX_CAPTURE_NS=0.1 +STALL_TIMEOUT_NS=1200000 +HARD_TIMEOUT_NS=6000000 -l /home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0/run.log
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version V-2023.12_Full64; Runtime version V-2023.12_Full64;  Sep 18 12:58 2026
+Doing SDF annotation ...... Done
+TB_INFO NUM_CORES=256 KEYCASE async-only ACK_TO_NEXT_REQ_GUARD_NS=0.200 INJECT_MAX_RATE=0 CASE_TICK_NS=1.000 RX_CAPTURE_NS=0.100
+TB_INFO CASE_TICK_NS verified cli_or_default=1.000 case_meta=1.000 cli_seen=1
+TB_RESULT PASS injected=2000 delivered=32000 missing=0 unexpected=0 timeout=0 drainable=1
+$finish called from file "/home/ghy19/Asynchronous_Router_CMR/scripts/experiments/compact256_repair_20260918_123846_repair/tb_noc_async_keycase.sv", line 507.
+$finish at simulation time              3248576
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 3248576 ps
+CPU Time:     13.230 seconds;       Data structure size: 897.0Mb
+Fri Sep 18 12:59:02 2026

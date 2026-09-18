@@ -1,0 +1,2 @@
+drainable,timeout,missing_flits,unexpected_flits,injected_flits,delivered_flits,inflight_end,warmup_original_events,measurement_original_events,errors,backlog_growth,pass_fail
+1,0,0,0,32000,32000,0,0,6400,0,0,PASS

@@ -1,0 +1,63 @@
+{
+  "run_id": "compact256_repair_20260918_123846_repair",
+  "job_id": "12471101",
+  "log": "/home/ghy19/Asynchronous_Router_CMR/logs/gls/compact256_repair_20260918_123846_repair/repair.job.log",
+  "cases": [
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "FM256",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p24705882352941178_FM256_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "FM256",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p5_FM256_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "FM256",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p75_FM256_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "FM256",
+      "stem": "LOCALITY256_compact256_repair_20260918_123846_m120_p0p9_FM256_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "MC-F16-2TILE_compact256_repair_20260918_123846_m20_native_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "MC-F16-2TILE_compact256_repair_20260918_123846_m40_native_PROP_temp256_m16_top0"
+    },
+    {
+      "design": "PROP_temp256_m16",
+      "stem": "MC-F16-2TILE_compact256_repair_20260918_123846_m40_repeated_PROP_temp256_m16_top0"
+    }
+  ]
+}
