@@ -1,11 +1,10 @@
 {
-  "input_bundle": "DATE paper/experiments/curated/validated_64_256_csv_20260918",
+  "input_bundle": "DATE_paper/experiments/curated/validated_64_256_csv_20260918",
   "input_counts": {
     "64/01_ur/throughput_all_accepted.csv": 90,
     "64/01_ur/pre_saturation_latency_accepted.csv": 44,
     "64/02_benchmarks/bc_hotspot_all_accepted.csv": 120,
     "64/02_benchmarks/bc_hotspot_latency_eligible.csv": 62,
-    "64/03_static4/static4_paper_points.csv": 3,
     "64/04_multicast/clean_fanout_400tx.csv": 8,
     "64/06_router/router_lane_scaling.csv": 3,
     "64/07_sync_b8/ur_all_full_drain.csv": 30,
@@ -17,6 +16,10 @@
   },
   "archived_256_csv_count": 59,
   "archived_256_bytes": 65775464,
+  "shared_64_scan_counts": {
+    "delivered_throughput": 240,
+    "mean_flit_latency": 125
+  },
   "output_sha256": {
     "data/256/01_global_ur/common_near_lossless_latency.csv": "2f3d5b55110637e0c8e076969685ab2c46e113629895be23d20290a7e43a1ce2",
     "data/256/01_global_ur/throughput_all_full_drain.csv": "4484de6995c20ed508b51bb4491c2a912e639e416774fc46d7cf3da7091502e0",
@@ -77,16 +80,20 @@
     "data/256/03_f16_cross_tier/raw/latency/MC-F16-2TILE_compact256_repair_20260918_123846_m20_repeated_PROP_temp256_m16_top0.latency.csv": "7009b6611b8af72cd08e6283e6affce7d0fe6b0780b7991585d146b25b7d1bb9",
     "data/256/03_f16_cross_tier/raw/latency/MC-F16-2TILE_compact256_repair_20260918_123846_m5_native_PROP_temp256_m16_top0.latency.csv": "5989595ab90cc33b64aedcb0f4a822f2c138e253d6c85726c88e11cf4d1a2919",
     "data/256/03_f16_cross_tier/raw/latency/MC-F16-2TILE_compact256_repair_20260918_123846_m5_repeated_PROP_temp256_m16_top0.latency.csv": "f5d473fc270abea0022f5a5285ef23d6f17a3887f1a86baced7db5065505d4d8",
-    "data/area_summary.csv": "c945c86c583a87b66b9bb7705c1e990f66b0c463e17a09e839a4d5022130d859",
-    "data/fig01_unicast64.csv": "55044fc292ad57bd877704d468f13504670c95d8f5f757b67287e59eb19c2bbd",
+    "data/area_summary.csv": "5a04d26c0947ba1f9b0d54ad22afb2c89e4dcbaf3f877571ce9e5f0325cbd4a4",
+    "data/fig01_64_throughput.csv": "0c8b7732996c3b2a16405605b7dbc32de8306c98257735b641bb8b1be8110820",
+    "data/fig01_unicast64.csv": "3e137648ec0a618cb03f24bae4f878d63efb652cf51f1a4a7bd82045e49a8a72",
+    "data/fig02_64_latency.csv": "809b89c583d06b7c1196448ffae15e7b55715f5cfe20ca5c6ca6a9383dbc8087",
     "data/fig02_unicast256.csv": "6471af7c1d31de872b4595e69c822fafdd835d4c41ae4f7aafe684581b83d08b",
     "data/fig03_multicast.csv": "a706452fd1eb972df1312bf1bfedc2201ccb4f09049a01b028f6ef3e8c3b4715",
-    "data/fig04_implementation64.csv": "122234c1d76a898ad05ec055d6ce95a64c526b7e2883a15429e491109e7ebcb7",
-    "data/final_results_long.csv": "a716f916dcbc91460f8025531c231d6b13bd11bc6ab9c2860ce267f574f75d36",
-    "data/power64_all_accepted.csv": "5be2f5265dffe5dab2eb6f7327fc94320d74bb2c2dca087a792995ea80a8ddfa",
-    "excluded_results.csv": "f6556a15af0c276b8786117664513ef880f1599726fc21aba90eab4bfd47630c",
-    "README.md": "56d4a11be8aef6215089783075ad8a854111154fd55d11dcb57c1a06e03a8041",
-    "source_manifest.csv": "ec9897ffc5633441e1a3764b2f7e6d387510ca7a4d910f077564a26c83f59894"
+    "data/fig04_implementation64.csv": "c85ff5291ab31bc62ea75416a05aa165cfc28255d46a1495f6ef968ea0f51eac",
+    "data/final_results_long.csv": "50cc6bb9fe4f0ce6d11d85263613f588ee21a0dcb2cfb372992937301f0ac1c7",
+    "data/mesh64_ur_latency_eligibility_audit.csv": "320bc48e8b28c8c1c6368b7418e46d15710e7a71a12a6de3c657455039bd1f6b",
+    "data/node_ppa.csv": "563f28cf4858fd9d056bbd8aa0086dd8e83c5de4e0b54d68b3db63b50a372bdd",
+    "data/power64_all_accepted.csv": "63077b130fba0affc090ebf21f5e026e07b9ffd3eda4073cf6fc39da5871b17a",
+    "excluded_results.csv": "2911a869980fd0242f8b2a5a509b187431ae7342e632f961c6ec036477a326ae",
+    "README.md": "f12f09ef7275b7a51d54fa62c702af5cafe16eddff90e6d98622e761229930a4",
+    "source_manifest.csv": "a979017f64ac3e7f99e9b8d09e9c7c0d9989208a60568fcfcea08c9b02de94fe"
   },
   "status": "FINAL_RESULTS_DATA_PASS"
 }

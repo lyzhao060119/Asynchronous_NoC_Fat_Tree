@@ -1,27 +1,30 @@
 {
   "status": "FINAL_RESULTS_PASS",
   "figures": {
-    "figures/fig01_unicast64.pdf": "124834625b41cf7c0399508450f3a7840b5c3e5f42d8da2f6abfdb2af847bafd",
-    "figures/fig01_unicast64.png": "4af75e6a45409b9d6c87a1f39f031010ec2a45a601206ba76c8d74fb9503a794",
-    "figures/fig02_unicast256.pdf": "5cffdaeea774dac5f6a6cfd86c57997f08881eac6f259c5e73405fcb104901ba",
-    "figures/fig02_unicast256.png": "6a385578f720aaa88d6e16115949e93a69bef446df3926248c48f7593df88a80",
-    "figures/fig03_multicast.pdf": "fa3ddbb94dad4f457b6fed55f9fd5c39d099331da867871e9612020f5f871fd6",
-    "figures/fig03_multicast.png": "307d6ea7aa3f4a1788937dc0263e4cfa240a2b7e23898303781d80581a896b75",
-    "figures/fig04_implementation64.pdf": "8fb77533a6419965d5e271257c334aaf707adb2773cf168bbd292d9fde2e736c",
-    "figures/fig04_implementation64.png": "df390812b3d5141466c0d52728d94749d36040fec540a06d312ea557c9c041d7"
+    "figures/fig01_64_throughput.pdf": "341d9e1ea5bc8e758a962aba129f54a7b581f75e2b0bc7cdadd62f9654c2a5d1",
+    "figures/fig01_64_throughput.png": "1b02883ad3d75be26945127456c0cdd254885ae7380eff37b5e19e904f2d7ea6",
+    "figures/fig02_64_latency.pdf": "16da0abd741e91b9d4957bcb2b8fe75fbe5fb80b777f84c77870955cc10f044f",
+    "figures/fig02_64_latency.png": "2097251cfd56f1ca7e78bc1ece02442a04c16c512f023f55398fcae50d823155",
+    "figures/fig03_256_global_locality.pdf": "ddeeb3b2c527d0c5b83b7e743ce029ddc10f7dea744fd1768bdc0575bbb4b1fb",
+    "figures/fig03_256_global_locality.png": "7549b54b77704fa39bfd8201bc445dfdc72b550b542a4fbaccda783fbfa99830",
+    "figures/fig04_multicast.pdf": "4b8122b10b7fed1f86bf65d96f1c8d21cddf8abcc890c0942d928052e40007d3",
+    "figures/fig04_multicast.png": "8a6d8e5611dccb6ed137b5fcd5250edcb4e14830178cdd3117ce63e652a974be",
+    "figures/fig05_network_power64.pdf": "36c6e392ae40622e70c94ad3096690f63b59b0dbabf6d8d85e8364ecf606edd5",
+    "figures/fig05_network_power64.png": "7a7de51b67b220783cffed053a64802add15ceb970c32a022671585d1170ba7f"
   },
   "style": {
-    "palette": {
+    "topology_palette": {
       "Mesh": "#0072B2",
       "PROP": "#D55E00",
-      "FAT": "#009E73",
-      "Native": "#D55E00",
-      "Repeated": "#7A7A7A",
-      "Dynamic": "#D55E00",
-      "Static": "#CC79A7",
-      "Async": "#D55E00",
-      "Sync": "#56B4E9"
+      "FAT": "#009E73"
     },
+    "mode_markers": {
+      "UR (Async)": "o",
+      "UR (Sync)": "X",
+      "BC": "s",
+      "Hotspot10": "^"
+    },
+    "64_node_shared_axes": true,
     "latency": "mean only",
     "png_dpi": 300
   }
