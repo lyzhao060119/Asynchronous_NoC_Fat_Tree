@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Frozen-manifest remote DC and strict-SDF flow for CMRRouter geometries."""
 
+import base64
 import hashlib
 import json
 import os
 import re
+import shutil
 import shlex
 import stat
 import subprocess
@@ -16,10 +18,14 @@ from pathlib import Path
 import paramiko
 
 from cmr_frozen_run_ids import refuse_overwrite
-from cmr_primitive_geometries import max_opm_fanin
 
 
 REPO = Path(__file__).resolve().parents[3]
+CMR = REPO / "scripts" / "asic_dc" / "cmr"
+SOURCE_ROOT = Path(os.environ.get("CMR_SOURCE_ROOT", str(REPO))).resolve()
+GENERATED_ROOT = Path(
+    os.environ.get("CMR_GENERATED_ROOT", str(SOURCE_ROOT / "generated_cmr"))
+).resolve()
 ROOT = os.environ.get("CMR_REMOTE_ROOT", "/home/ghy19/Asynchronous_Router_CMR")
 ULTRA_ROOT = os.environ.get("ULTRA_REMOTE_ROOT", "/home/ghy19/Asynchronous_Router_ultra")
 RUN_ID = os.environ.get("CMR_RUN_ID", datetime.now().strftime("%Y%m%d_%H%M%S") + "_cmr_router_sdf")
@@ -58,12 +64,27 @@ CASE_LIST = [name for name in CASES.split(",") if name]
 SEED_RUN_ID = os.environ.get("CMR_DC_SEED_RUN_ID", "").strip()
 BUF_STAGES = os.environ.get("CMR_RCU_MATCHED_BUF_STAGES", "0").strip() or "0"
 LANE01_STAGES = os.environ.get("CMR_LANE01_BUF_STAGES", "0").strip() or "0"
-UNIT_PS = os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50")
+UNIT_PS = os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "100")
 STEPS = os.environ.get("CMR_RCU_MATCHED_DELAY_STEPS", "1")
-OPM_ACKIN_STEPS = os.environ.get("CMR_OPM_ACKIN_DELAY_STEPS", "1")
+OPM_ACKIN_STEPS = os.environ.get("CMR_OPM_ACKIN_DELAY_STEPS", "0")
 OPM_ACKIN_UNIT_PS = os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50")
 OPM_ACKIN_USE_BUF = os.environ.get("CMR_OPM_ACKIN_USE_BUF", "0").strip() or "0"
+OPM_REQOUT_STEPS = os.environ.get("CMR_OPM_REQOUT_DELAY_STEPS", "1").strip() or "1"
+OPM_REQOUT_UNIT_PS = os.environ.get("CMR_OPM_REQOUT_DELAY_UNIT_PS", "50").strip() or "50"
+OPM_REQOUT_BUFFERS = os.environ.get("CMR_OPM_REQOUT_BUFFER_STAGES", "1")
+WRITE_CELLFULL_STEPS = os.environ.get("CMR_WRITE_CELLFULL_DELAY_STEPS", "0").strip() or "0"
+WRITE_CELLFULL_UNIT_PS = os.environ.get("CMR_WRITE_CELLFULL_DELAY_UNIT_PS", "50").strip() or "50"
+LIBRARY_CORNER = os.environ.get("CMR_LIBRARY_CORNER", "tt0p8v25c")
+OPM_RTM_OPT = os.environ.get("CMR_OPM_RTM_OPT", "0").strip() or "0"
+OPM_RTM_MAX = os.environ.get("CMR_OPM_RTM_MAX", "0.10").strip() or "0.10"
+OPM_REQOUT_REFERENCE = os.environ.get(
+    "CMR_OPM_REQOUT_REFERENCE_RUN",
+    "20260927_140000_cmr_routerl1_opm_req_del100_rawfb_r3",
+).strip()
+LOCAL_SMOKE_NOTE = os.environ.get("CMR_LOCAL_SMOKE_NOTE", "").strip()
 DC_ONLY = os.environ.get("CMR_DC_ONLY", "0") == "1"
+SKIP_RESULT_FETCH = os.environ.get("CMR_SKIP_RESULT_FETCH", "0") == "1"
+LEGACY_LATCH_RTL = os.environ.get("CMR_LEGACY_LATCH_RTL", "0").strip() == "1"
 LOCAL_RESULT = REPO / "scripts" / "asic_dc" / "cmr" / "results" / RUN_ID
 
 
@@ -78,9 +99,12 @@ def expected_adapters(child_lanes, parent_lanes):
 
 EXPECTED_ADAPTERS = expected_adapters(CHILD_LANES, PARENT_LANES)
 EXPECTED_PORTS = 4 * CHILD_LANES + PARENT_LANES
-EXPECTED_ACKOUT_CLOSE_DELAY = (
-    EXPECTED_PORTS if max_opm_fanin(CHILD_LANES, PARENT_LANES) >= 16 else 0
-)
+# The current Click OPM closes Ackout directly from the sampled ReqSelection.
+# The former high-fanin AckoutCloseDelay branch was removed; output protection
+# is now only Reqout DEL+buffer and per-source TailCaptureDelay.  Keep this
+# structural gate at zero for every geometry so c4p8 is not rejected by a
+# retired large-Mutex heuristic.
+EXPECTED_ACKOUT_CLOSE_DELAY = 0
 
 
 def password():
@@ -190,11 +214,42 @@ def atomic_put_bytes(client, sftp, data, remote):
     return expected
 
 
+def ssh_chunk_put(client, data, remote, chunk_size=2048):
+    """Upload atomically through short SSH exec writes.
+
+    The C1 login-node SFTP service has occasionally acknowledged a completed
+    write while leaving the renamed remote file at zero bytes.  Chunked
+    base64 writes avoid that failure mode and verify the final SHA-256 before
+    promotion.
+    """
+    expected = sha256_bytes(data)
+    existing = remote_run(client, "sha256sum %s 2>/dev/null" % shlex.quote(remote))
+    if expected in existing:
+        return expected
+    temporary = "%s.upload.%d" % (remote, os.getpid())
+    remote_run(client, ": > %s" % shlex.quote(temporary))
+    encoded = base64.b64encode(data).decode("ascii")
+    for offset in range(0, len(encoded), chunk_size):
+        chunk = encoded[offset:offset + chunk_size]
+        remote_run(client, "printf '%%s' %s >> %s" % (shlex.quote(chunk), shlex.quote(temporary)))
+    observed = remote_run(
+        client,
+        "base64 -d %s > %s.decoded && sha256sum %s.decoded && mv -f %s.decoded %s && rm -f %s"
+        % tuple(shlex.quote(x) for x in (temporary, temporary, temporary, temporary, remote, temporary)),
+    )
+    if expected not in observed:
+        raise RuntimeError("SSH upload hash mismatch for %s" % remote)
+    return expected
+
+
 def atomic_put_retry(client, sftp, local, remote, attempts=8):
     last = None
     for attempt in range(attempts):
         try:
-            digest = atomic_put(client, sftp, local, remote)
+            if os.environ.get("CMR_SSH_CHUNK_UPLOAD", "0") == "1":
+                digest = ssh_chunk_put(client, local.read_bytes().replace(b"\r\n", b"\n"), remote)
+            else:
+                digest = atomic_put(client, sftp, local, remote)
             return client, sftp, digest
         except SSH_ERRORS as exc:
             last = exc
@@ -213,7 +268,10 @@ def atomic_put_bytes_retry(client, sftp, data, remote, attempts=8):
     last = None
     for attempt in range(attempts):
         try:
-            digest = atomic_put_bytes(client, sftp, data, remote)
+            if os.environ.get("CMR_SSH_CHUNK_UPLOAD", "0") == "1":
+                digest = ssh_chunk_put(client, data, remote)
+            else:
+                digest = atomic_put_bytes(client, sftp, data, remote)
             return client, sftp, digest
         except SSH_ERRORS as exc:
             last = exc
@@ -279,11 +337,18 @@ def first_failure(text):
     # Protocol failures are the actionable test outcome.  Bare $setup/$hold
     # lines also occur in timing-check declarations, so only classify an
     # actual simulator "Timing violation" diagnostic as a runtime violation.
-    for markers in (("TB_RESULT FAIL", "TB_X_FAIL"), ("Timing violation",)):
+    for markers in (
+        ("TB_RESULT FAIL", "TB_X_FAIL"),
+        ("Timing violation",),
+    ):
         match = next((line for line in lines if any(m in line for m in markers)), None)
         if match:
             return match
-    return None
+    return next(
+        (line for line in lines
+         if re.match(r"^\s*(?:CMR_OPM_RTM_FAIL|CMR_DC_FAIL\b)", line)),
+        None,
+    )
 
 
 def first_timing_violation(text):
@@ -301,16 +366,39 @@ def local_preflight():
         target = "router_l%d_c%d_p%d" % (ROUTER_LEVEL, CHILD_LANES, PARENT_LANES)
     skip_emit = os.environ.get("CMR_SKIP_EMIT", "0") == "1"
     if not skip_emit:
-        subprocess.run([sbt, "compile"], cwd=REPO, env=base_env, check=True)
+        subprocess.run([sbt, "compile"], cwd=SOURCE_ROOT, env=base_env, check=True)
         if os.environ.get("CMR_SKIP_LOCAL_SMOKE", "0") != "1":
             sim_env = base_env.copy()
             sim_env["ASYNC_PRIMITIVES"] = "sim"
+            if (
+                not USE_MESH
+                and ROUTER_LEVEL == 1
+                and (CHILD_LANES, PARENT_LANES) == (1, 1)
+            ):
+                # run_smoke.tcl consumes several separately emitted modules;
+                # preserve their prior outputs, then regenerate them from the
+                # same source revision as the Router before running the suite.
+                pre_emit_root = LOCAL_RESULT / "preflight" / "generated_pre_emit"
+                for target_dir in (
+                    "opm",
+                    "rcu_l1",
+                    "write_interface",
+                    "read_interface_0",
+                    "buffer",
+                    "router_l1",
+                ):
+                    source_dir = GENERATED_ROOT / target_dir
+                    backup_dir = pre_emit_root / target_dir
+                    if source_dir.is_dir() and not backup_dir.exists():
+                        backup_dir.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copytree(source_dir, backup_dir)
+
             subprocess.run(
                 [sbt, "runMain Router_Architecture.CMR.CMRRouterMain %s %s %s %s %s" % (
                     ROUTER_LEVEL, CHILD_LANES, PARENT_LANES,
                     "1" if USE_MESH else "0", MESH_GRID,
                 )],
-                cwd=REPO,
+                cwd=SOURCE_ROOT,
                 env=sim_env,
                 check=True,
             )
@@ -322,6 +410,19 @@ def local_preflight():
                 vivado = os.environ.get(
                     "VIVADO_CMD", "vivado.bat" if os.name == "nt" else "vivado"
                 )
+                for smoke_emit in (
+                    "Router_Architecture.CMR.OPMMain",
+                    "Router_Architecture.CMR.RCUMain 1",
+                    "Router_Architecture.CMR.WriteInterfaceControlMain",
+                    "Router_Architecture.CMR.ReadInterfaceControlMain 0",
+                    "Router_Architecture.CMR.CMRBufferMain",
+                ):
+                    subprocess.run(
+                        [sbt, "runMain " + smoke_emit],
+                        cwd=SOURCE_ROOT,
+                        env=sim_env,
+                        check=True,
+                    )
                 subprocess.run(
                     [vivado, "-mode", "batch", "-source", "run_smoke.tcl"],
                     cwd=REPO / "sim" / "CMR",
@@ -341,12 +442,12 @@ def local_preflight():
                 ROUTER_LEVEL, CHILD_LANES, PARENT_LANES,
                 "1" if USE_MESH else "0", MESH_GRID,
             )],
-            cwd=REPO,
+            cwd=SOURCE_ROOT,
             env=asic_env,
             check=True,
         )
 
-    entry = REPO / "generated_cmr" / target / "CMRRouter.v"
+    entry = GENERATED_ROOT / target / "CMRRouter.v"
     text = entry.read_text(encoding="utf-8", errors="replace")
     direct_edges = re.findall(
         r"assign OutputPortModules_(\d+)_io_Reqin_\d+ = InputPortModules_(\d+)_io_Reqout_\d+;",
@@ -362,7 +463,7 @@ def local_preflight():
             sys.executable,
             str(REPO / "scripts" / "asic_dc" / "cmr" / "check_cmr_router_geometry.py"),
             "--root",
-            str(REPO / "generated_cmr"),
+            str(GENERATED_ROOT),
             target,
         ],
         cwd=REPO,
@@ -372,7 +473,42 @@ def local_preflight():
 
 
 def main():
+    if LIBRARY_CORNER not in {"tt0p8v25c", "ssg0p81v125c"}:
+        raise SystemExit("unsupported CMR_LIBRARY_CORNER")
     refuse_overwrite(RUN_ID, action="dc")
+    reference_record = None
+    if OPM_RTM_OPT == "1":
+        if int(OPM_REQOUT_STEPS) != 0:
+            raise SystemExit("CMR_OPM_RTM_OPT=1 requires CMR_OPM_REQOUT_DELAY_STEPS=0")
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+", OPM_REQOUT_REFERENCE):
+            raise SystemExit("unsafe CMR_OPM_REQOUT_REFERENCE_RUN")
+        ref_dir = CMR / "results" / OPM_REQOUT_REFERENCE
+        ref_summary_path = ref_dir / "summary.json"
+        ref_ddc = ref_dir / "outputs" / "CMRRouter.ddc"
+        ref_hashes = ref_dir / "reports_dc" / "post_hashes.sha256"
+        if not ref_summary_path.is_file() or not ref_ddc.is_file() or not ref_hashes.is_file():
+            raise SystemExit("frozen DEL100 reference is incomplete: " + OPM_REQOUT_REFERENCE)
+        ref_summary = json.loads(ref_summary_path.read_text(encoding="utf-8"))
+        ref_cases = ref_summary.get("sdf", {}).get("cases", {})
+        expected_ref_cases = {
+            "unicast3", "mc_single3", "mc_disjoint_parallel3", "uc_overlap_release3",
+            "mc_overlap_tailjoin3", "b_alone_head", "a_then_b_head_parallel",
+        }
+        if (not ref_summary.get("dc", {}).get("pass")
+                or set(ref_cases) != expected_ref_cases
+                or ref_summary.get("sdf", {}).get("annotation_error_count") != 0
+                or any(not c.get("tb_pass") or not c.get("annotation_done")
+                       or c.get("x_failure") or c.get("timing_violation")
+                       for c in ref_cases.values())):
+            raise SystemExit("frozen DEL100 reference did not pass the required DC/SDF gates")
+        # DDC is binary: do not apply the text-file CRLF normalization used
+        # by the uploader helper when verifying its frozen artifact hash.
+        ref_ddc_sha = hashlib.sha256(ref_ddc.read_bytes()).hexdigest()
+        hash_lines = ref_hashes.read_text(encoding="utf-8").splitlines()
+        hash_line = next((line for line in hash_lines if line.endswith("/CMRRouter.ddc")), None)
+        if hash_line is None or hash_line.split()[0] != ref_ddc_sha:
+            raise SystemExit("frozen DEL100 reference DDC hash does not match its DC manifest")
+        reference_record = {"run_id": OPM_REQOUT_REFERENCE, "ddc_sha256": ref_ddc_sha}
     if not DC_ONLY and (
         not CASE_LIST
         or len(CASE_LIST) != len(set(CASE_LIST))
@@ -416,24 +552,27 @@ def main():
         entry = None
     else:
         entry = local_preflight()
-    cmr_resource = REPO / "src" / "main" / "resources" / "ASYNC" / "CMR"
+    source_resource = SOURCE_ROOT / "src" / "main" / "resources" / "ASYNC"
+    cmr_resource = source_resource / "CMR"
     files = {
-        REPO / "src/main/resources/ASYNC/DelayElement_ASIC.v": "rtl/DelayElement_ASIC.v",
-        REPO / "src/main/resources/ASYNC/DontTouchBuf_ASIC.v": "rtl/DontTouchBuf_ASIC.v",
-        REPO / "src/main/resources/ASYNC/Mutex2_ASIC.v": "rtl/Mutex2_ASIC.v",
+        source_resource / "DelayElement_ASIC.v": "rtl/DelayElement_ASIC.v",
+        source_resource / "DontTouchBuf_ASIC.v": "rtl/DontTouchBuf_ASIC.v",
+        source_resource / "Mutex2_ASIC.v": "rtl/Mutex2_ASIC.v",
         REPO / "scripts/asic_dc/cmr/tb_cmr_router_hop_ppa.sv": "sim/tb/tb_cmr_router_hop_ppa.sv",
-        REPO / "src/main/resources/ASYNC/Mutex4.v": "rtl/Mutex4.v",
-        REPO / "src/main/resources/ASYNC/MullerC2.v": "rtl/MullerC2.v",
+        source_resource / "Mutex4.v": "rtl/Mutex4.v",
+        source_resource / "MullerC2.v": "rtl/MullerC2.v",
         cmr_resource / "CMRMutexN.v": "rtl/CMRMutexN.v",
         cmr_resource / "CMRFlattenedTAC.v": "rtl/CMRFlattenedTAC.v",
-        cmr_resource / "LanePhaseAdapter.v": "rtl/LanePhaseAdapter.v",
-        REPO / "src/main/resources/ASYNC/DLatchBank.v": "rtl/DLatchBank.v",
-        REPO / "src/main/resources/ASYNC/V2CloseEvent.v": "rtl/V2CloseEvent.v",
+        source_resource / "DLatchBank.v": "rtl/DLatchBank.v",
+        source_resource / "V2CloseEvent.v": "rtl/V2CloseEvent.v",
         REPO / "scripts/asic_dc/tech_t28ss.tcl": "rtl/tech_t28ss.tcl",
         REPO / "scripts/asic_dc/async_primitives.tcl": "rtl/async_primitives.tcl",
         REPO / "scripts/asic_dc/assert_no_gtech.tcl": "rtl/assert_no_gtech.tcl",
         REPO / "scripts/asic_dc/cmr/async_cmr_router.sdc": "rtl/async_cmr_router.sdc",
+        REPO / "scripts/asic_dc/cmr/opm_reqout_minmax_overlay.tcl": "rtl/opm_reqout_minmax_overlay.tcl",
         REPO / "scripts/asic_dc/cmr/run_dc_cmr_router.tcl": "scripts/dc/run_dc_cmr_router.tcl",
+        REPO / "scripts/asic_dc/cmr/apply_cmr_ipm_timing_recipe.tcl":
+            "scripts/dc/apply_cmr_ipm_timing_recipe.tcl",
         REPO / "scripts/asic_dc/cmr/run_gls_cmr_router.sh": "scripts/run_gls_cmr_router.sh",
         REPO / "scripts/asic_dc/cmr/run_gls_cmr_router_hop_ppa.sh":
             "scripts/run_gls_cmr_router_hop_ppa.sh",
@@ -479,7 +618,9 @@ def main():
         files = {
             source: destination
             for source, destination in files.items()
-            if source == entry or source.name == "LanePhaseAdapterDFF.v"
+            if source == entry or source.name in (
+                "LanePhaseAdapterDFF.v", "opm_reqout_minmax_overlay.tcl"
+            )
         }
     missing = [str(path) for path in files if not path.is_file()]
     if missing:
@@ -496,20 +637,26 @@ def main():
         "mkdir -p " + " ".join(ROOT + "/" + d for d in directories.split()),
     )
 
-    # Preserve provenance exactly as requested: copy reference stimulus from
-    # the remote Ultra tree, then make a CMR-owned boundary-only adaptation.
-    copy_command = (
-        "cp -a {ultra}/sim/cases/. {cmr}/sim/cases/ && "
-        "cp {ultra}/sim/tb/tb_ultra_router_boundary_smoke.sv "
-        "{cmr}/sim/tb/tb_ultra_router_boundary_smoke.reference.sv && "
-        "sed -e 's/tb_ultra_router_boundary_smoke/tb_cmr_router_boundary_smoke/g' "
-        "-e 's/UltraRouter dut/CMRRouter dut/g' "
-        "{cmr}/sim/tb/tb_ultra_router_boundary_smoke.reference.sv > "
-        "{cmr}/sim/tb/tb_cmr_router_boundary_smoke.sv"
-    ).format(ultra=shlex.quote(ULTRA_ROOT), cmr=shlex.quote(ROOT))
-    client, copy_output = remote_run_retry(client, copy_command)
-    if copy_output.strip():
-        print(copy_output, flush=True)
+    boundary_tb_digest = None
+    # The boundary smoke is shared protocol stimulus with only the DUT module
+    # renamed. Keep its source in this checkout so a retired remote Ultra tree
+    # cannot silently supply stale stimulus or assertions.
+    if DC_ONLY:
+        print("SKIP_ULTRA_CASE_COPY dc_only=1", flush=True)
+    else:
+        tb_source = REPO / "sim" / "AsyncRouterL1" / "testbench" / "tb_ultra_router_boundary_smoke.sv"
+        tb_text = tb_source.read_text(encoding="utf-8")
+        tb_text = tb_text.replace(
+            "tb_ultra_router_boundary_smoke", "tb_cmr_router_boundary_smoke"
+        ).replace("UltraRouter dut", "CMRRouter dut")
+        sftp = client.open_sftp()
+        client, sftp, boundary_tb_digest = atomic_put_bytes_retry(
+            client,
+            sftp,
+            tb_text.encode("utf-8"),
+            ROOT + "/sim/tb/tb_cmr_router_boundary_smoke.sv",
+        )
+        sftp.close()
 
     # The Ultra case copy saturates the login-node SSH channel; start a fresh
     # session before the multi-file SFTP upload.
@@ -530,6 +677,25 @@ def main():
         "opm_ackin_delay_steps": int(OPM_ACKIN_STEPS),
         "opm_ackin_delay_unit_ps": int(OPM_ACKIN_UNIT_PS),
         "opm_ackin_use_buf": OPM_ACKIN_USE_BUF == "1",
+        "opm_reqout_delay_steps": int(OPM_REQOUT_STEPS),
+        "opm_reqout_delay_unit_ps": int(OPM_REQOUT_UNIT_PS),
+        "opm_reqout_buffer_stages": int(OPM_REQOUT_BUFFERS),
+        "write_cellfull_delay_steps": int(WRITE_CELLFULL_STEPS),
+        "write_cellfull_delay_unit_ps": int(WRITE_CELLFULL_UNIT_PS),
+        "corner": LIBRARY_CORNER,
+        "library_name": "tcbn28hpcplusbwp12t30p140" + LIBRARY_CORNER + "_ccs",
+        "technology_setup_remote": ROOT + "/rtl/runs/" + RUN_ID + "/tech_t28ss.tcl",
+        "opm_reqout_rtm_opt": OPM_RTM_OPT == "1",
+        "opm_reqout_rtm_max": float(OPM_RTM_MAX),
+        "opm_reqout_reference": reference_record,
+        "local_vivado_smoke": {
+            "performed_this_run": os.environ.get("CMR_SKIP_LOCAL_SMOKE", "0") != "1",
+            "prior_result_note": LOCAL_SMOKE_NOTE or None,
+        },
+        "boundary_testbench_source": (
+            "sim/AsyncRouterL1/testbench/tb_ultra_router_boundary_smoke.sv"
+            if boundary_tb_digest is not None else None
+        ),
         "files": {},
     }
     for source, destination in files.items():
@@ -538,6 +704,11 @@ def main():
             client, sftp, source, ROOT + "/" + destination
         )
         manifest["files"][destination] = digest
+    if boundary_tb_digest is not None:
+        manifest["files"]["sim/tb/tb_cmr_router_boundary_smoke.sv"] = boundary_tb_digest
+    client, sftp, tech_digest = atomic_put_retry(
+        client, sftp, REPO / "scripts/asic_dc/tech_t28ss.tcl", manifest["technology_setup_remote"])
+    manifest["technology_setup_sha256"] = tech_digest
     if entry is not None:
         client, _ = remote_run_retry(
             client,
@@ -547,15 +718,6 @@ def main():
                 shlex.quote(ROOT + "/rtl/CMRRouter.v"),
             ),
         )
-    client, copied_hashes = remote_run_retry(
-        client,
-        "sha256sum %s/sim/tb/tb_ultra_router_boundary_smoke.reference.sv "
-        "%s/sim/tb/tb_cmr_router_boundary_smoke.sv %s/sim/cases/*.case"
-        % (ROOT, ROOT, ROOT),
-    )
-    manifest["remote_copied_sha256"] = [
-        line for line in copied_hashes.splitlines() if re.match(r"^[0-9a-f]{64}  ", line)
-    ]
     client, sftp, _ = atomic_put_bytes_retry(
         client,
         sftp,
@@ -587,7 +749,12 @@ def main():
         "CMR_LANE01_BUF_STAGES=%s "
         "CMR_RCU_MATCHED_DELAY_UNIT_PS=%s CMR_RCU_MATCHED_DELAY_STEPS=%s "
         "CMR_OPM_ACKIN_DELAY_STEPS=%s CMR_OPM_ACKIN_DELAY_UNIT_PS=%s "
-        "CMR_OPM_ACKIN_USE_BUF=%s CMR_DUT_V=%s CMR_DONT_TOUCH_ADAPTERS=%s\n"
+        "CMR_OPM_ACKIN_USE_BUF=%s CMR_OPM_REQOUT_DELAY_STEPS=%s "
+        "CMR_OPM_REQOUT_DELAY_UNIT_PS=%s CMR_OPM_REQOUT_BUFFER_STAGES=%s "
+        "CMR_LIBRARY_CORNER=%s CMR_TECH_TCL=%s "
+        "CMR_OPM_RTM_OPT=%s CMR_OPM_RTM_MAX=%s "
+        "CMR_DUT_V=%s CMR_DONT_TOUCH_ADAPTERS=%s CMR_LEGACY_LATCH_RTL=%s "
+        "CMR_APPLY_IPM_TIMING_RECIPE=%s\n"
         "cd %s\ndc_shell-t -64 -f %s/scripts/dc/run_dc_cmr_router.tcl\n"
         % (ROOT, shlex.quote(RUN_ID), EXPECTED_PORTS,
            EXPECTED_PHYSICAL_EDGES, EXPECTED_ADAPTERS,
@@ -601,8 +768,17 @@ def main():
            shlex.quote(OPM_ACKIN_STEPS),
            shlex.quote(OPM_ACKIN_UNIT_PS),
            shlex.quote(OPM_ACKIN_USE_BUF),
+           shlex.quote(OPM_REQOUT_STEPS),
+           shlex.quote(OPM_REQOUT_UNIT_PS),
+           shlex.quote(OPM_REQOUT_BUFFERS),
+           shlex.quote(LIBRARY_CORNER),
+           shlex.quote(manifest["technology_setup_remote"]),
+           shlex.quote(OPM_RTM_OPT),
+           shlex.quote(OPM_RTM_MAX),
            shlex.quote(ROOT + "/rtl/runs/" + RUN_ID + "/CMRRouter.v"),
            shlex.quote(os.environ.get("CMR_DONT_TOUCH_ADAPTERS", "0")),
+           "1" if LEGACY_LATCH_RTL else "0",
+           shlex.quote(os.environ.get("CMR_APPLY_IPM_TIMING_RECIPE", "0")),
            ROOT, ROOT)
     )
     sftp = client.open_sftp()
@@ -619,7 +795,13 @@ def main():
     )
     dc_job = job_id(dc_submit)
     print("DC_JOB", dc_job, flush=True)
-    client = wait_job(client, dc_job, "dc")
+    dc_job_error = None
+    try:
+        client = wait_job(client, dc_job, "dc")
+    except RuntimeError as exc:
+        # EXIT is expected for explicit experimental gates; still fetch their
+        # DDC/reports before surfacing the failure to the caller.
+        dc_job_error = str(exc)
     # LSF can expose DONE a few moments before the output spool is fully
     # flushed to the requested log.  Wait for an explicit flow marker rather
     # than treating that short visibility window as a DC failure.
@@ -632,6 +814,33 @@ def main():
             break
         time.sleep(5)
     if "CMR_DC_PASS" not in dc_text:
+        # Keep the first mapped DDC and failure reports from experimental
+        # min/max runs, even when the capability gate intentionally stops DC.
+        LOCAL_RESULT.mkdir(parents=True, exist_ok=True)
+        sftp = client.open_sftp()
+        for remote_path, local_name in (
+            (ROOT + "/outputs/" + RUN_ID, "outputs"),
+            (ROOT + "/reports/dc/" + RUN_ID, "reports_dc"),
+        ):
+            try:
+                fetch_tree(sftp, remote_path, LOCAL_RESULT / local_name)
+            except IOError:
+                pass
+        try:
+            sftp.get(dc_log, str(LOCAL_RESULT / "dc.log"))
+        except OSError:
+            pass
+        sftp.close()
+        failure_summary = {
+            "run_id": RUN_ID,
+            "dc": {"pass": False, "failure": first_failure(dc_text),
+                   "experimental_opm_reqout_minmax": OPM_RTM_OPT == "1",
+                   "job_error": dc_job_error},
+            "manifest": manifest,
+        }
+        (LOCAL_RESULT / "summary.json").write_text(
+            json.dumps(failure_summary, indent=2) + "\n", encoding="utf-8"
+        )
         print(dc_text[-12000:], flush=True)
         raise RuntimeError("CMR DC failed: " + (first_failure(dc_text) or "see remote log"))
 
@@ -658,19 +867,20 @@ def main():
             },
         }
         LOCAL_RESULT.mkdir(parents=True, exist_ok=True)
-        sftp = client.open_sftp()
-        try:
-            for remote_path, local_name in (
-                (ROOT + "/outputs/" + RUN_ID, "outputs"),
-                (ROOT + "/reports/dc/" + RUN_ID, "reports_dc"),
-                (ROOT + "/results/" + RUN_ID, "results"),
-            ):
-                try:
-                    fetch_tree(sftp, remote_path, LOCAL_RESULT / local_name)
-                except IOError:
-                    pass
-        finally:
-            sftp.close()
+        if not SKIP_RESULT_FETCH:
+            sftp = client.open_sftp()
+            try:
+                for remote_path, local_name in (
+                    (ROOT + "/outputs/" + RUN_ID, "outputs"),
+                    (ROOT + "/reports/dc/" + RUN_ID, "reports_dc"),
+                    (ROOT + "/results/" + RUN_ID, "results"),
+                ):
+                    try:
+                        fetch_tree(sftp, remote_path, LOCAL_RESULT / local_name)
+                    except IOError:
+                        pass
+            finally:
+                sftp.close()
         (LOCAL_RESULT / "summary.json").write_text(
             json.dumps(local_summary, indent=2) + "\n", encoding="utf-8"
         )

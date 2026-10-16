@@ -14,7 +14,7 @@ from hier_noc import unique_router_jobs
 from run_remote_cmr_fat_tree_noc16_sdf import CIRCULAR_RTL
 
 REPO = Path(__file__).resolve().parents[3]
-EXPERIMENT_SCRIPTS = REPO / "DATE paper" / "experiments" / "scripts"
+EXPERIMENT_SCRIPTS = REPO / "DATE_paper" / "experiments" / "scripts"
 if str(EXPERIMENT_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(EXPERIMENT_SCRIPTS))
 
@@ -41,11 +41,11 @@ def check_generated(design_id: str, generated: Path) -> Path:
         raise SystemExit("generated DUT is not named %s" % emit["top"])
     owner = netlist_owner(design_id)
     if owner in ("THIN64", "PROP64", "PFAT64", "FM64"):
-        require_emit_locked_delays(text, label=design_id, ackin_unit_ps=50,
+        require_emit_locked_delays(text, label=design_id, ackin_unit_ps=None,
                                    rcu_unit_ps=row["delay_recipe"]["rcu_unit_ps"])
         check_noc64(generated, generated.name)
     else:
-        require_emit_locked_delays(text, label=design_id, ackin_unit_ps=50,
+        require_emit_locked_delays(text, label=design_id, ackin_unit_ps=None,
                                    rcu_unit_ps=row["delay_recipe"]["rcu_unit_ps"])
     router_count = len(re.findall(r"^\s+CMRRouter(?:_\d+)?\s+\w+", text, re.M))
     ipm_count = len(re.findall(r"^\s+IPM(?:_\d+)?\s+InputPortModules_\d+", text, re.M))

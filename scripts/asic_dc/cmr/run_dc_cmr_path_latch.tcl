@@ -16,12 +16,10 @@ current_design OPMSelector
 uniquify
 link
 
-set path_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch*sr_cell && ref_name =~ LHCNDQD*}]
-set dual_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch*sr_cell && ref_name =~ LHCSNDQD*}]
+set path_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathState*path_state_reg && ref_name == DFCNQD1BWP12T30P140}]
 set path_pre_count [sizeof_collection $path_pre]
-set dual_pre_count [sizeof_collection $dual_pre]
-if {$path_pre_count != 4 || $dual_pre_count != 0} {
-  puts "CMR_PATH_LATCH_DC_FAIL pre clear=$path_pre_count dual=$dual_pre_count"
+if {$path_pre_count != 4} {
+  puts "CMR_PATH_LATCH_DC_FAIL pre dff=$path_pre_count"
   exit 2
 }
 set_dont_touch $path_pre true
@@ -32,20 +30,17 @@ compile_ultra -no_autoungroup
 source "$RTL_DIR/assert_no_gtech.tcl"
 set n_gtech [async_assert_no_gtech $REPORT_DIR]
 set n_unmapped [async_assert_no_seqgen $REPORT_DIR]
-set path_post [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch*sr_cell && ref_name =~ LHCNDQD*}]
-set dual_post [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch*sr_cell && ref_name =~ LHCSNDQD*}]
+set path_post [get_cells -hierarchical -quiet -filter {full_name =~ *PathState*path_state_reg && ref_name == DFCNQD1BWP12T30P140}]
 set path_post_count [sizeof_collection $path_post]
-set dual_post_count [sizeof_collection $dual_post]
 
 set fd [open "$REPORT_DIR/path_latch_structure.rpt" w]
-puts $fd "PATH_LATCH_CLEAR_COUNT=$path_post_count"
-puts $fd "PATH_LATCH_DUAL_COUNT=$dual_post_count"
+puts $fd "PATH_STATE_DFF_COUNT=$path_post_count"
 puts $fd "GTECH_COUNT=$n_gtech"
 puts $fd "UNMAPPED_COUNT=$n_unmapped"
 close $fd
 
-if {$n_gtech != 0 || $n_unmapped != 0 || $path_post_count != 4 || $dual_post_count != 0} {
-  puts "CMR_PATH_LATCH_DC_FAIL post clear=$path_post_count dual=$dual_post_count gtech=$n_gtech unmapped=$n_unmapped"
+if {$n_gtech != 0 || $n_unmapped != 0 || $path_post_count != 4} {
+  puts "CMR_PATH_LATCH_DC_FAIL post dff=$path_post_count gtech=$n_gtech unmapped=$n_unmapped"
   exit 2
 }
 

@@ -41,7 +41,10 @@ else
   KIND=prop
 fi
 # Allow TOP to select paper PROP_temp256 / PFAT_temp256 adapters.
-if [[ "$TOP" == "PROP_temp256" ]]; then
+if [[ "$TOP" == "PROP_temp256_m16" ]]; then
+  TB_DEFINE="$TB_DEFINE +define+CMR_NOC_PROP_TEMP_M16"
+  KIND=prop_temp
+elif [[ "$TOP" == "PROP_temp256" ]]; then
   TB_DEFINE="$TB_DEFINE +define+CMR_NOC_PROP_TEMP"
   KIND=prop_temp
 elif [[ "$TOP" == "PFAT_temp256" ]]; then
@@ -122,6 +125,7 @@ set +e
 # shellcheck disable=SC2086
 ./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
+  +FLIT_LATENCY_CSV="$LOG/flit_latency.csv" \
   +V3_METRICS_CSV="$LOG/v3_metrics.csv" \
   +CASE_TICK_NS=1 +RX_CAPTURE_NS="$RX_CAPTURE_NS" \
   +STALL_TIMEOUT_NS="$STALL_TIMEOUT_NS" +HARD_TIMEOUT_NS="$HARD_TIMEOUT_NS" \

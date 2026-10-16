@@ -63,70 +63,65 @@ class OPM(config: RouterModuleConfig, egressPort: Int) extends Module {
     L1_L4(input).io.d := io.Reqin(input).asUInt
     ReqSelection(input) := L1_L4(input).io.q(0)
   }
-
+  val Ackout = Wire(Vec(SourceCount, Bool()))
   val ReqMerged = ReqSelection.asUInt.xorR
-
+  val AckMerged = Ackout.asUInt.xorR
   val DataSelected = Mux1H(MG, io.Datain.map(_.flit))
-  private val L5 = Module(new UltraDLatchBank(1))
-  private val DataReg = Module(new UltraDLatchBank(PacketLayout.FlitWidth))
-  val Reqout = L5.io.q(0)
-  val delayedAckin = Wire(Bool())
-  if (CMRParameters.OpmAckinUseBuf) {
-    val AckinDelay = Module(new DontTouchBuf)
-    AckinDelay.io.I := io.Ackin
-    delayedAckin := AckinDelay.io.Z
-  } else if (CMRParameters.OpmAckinDelaySteps > 0) {
-    val AckinDelay = Module(new DelayElement(
-      CMRParameters.OpmAckinDelaySteps, DelayUnitPs = CMRParameters.OpmAckinDelayUnitPs
-    ))
-    AckinDelay.io.I := io.Ackin
-    delayedAckin := AckinDelay.io.Z
-  } else {
-    delayedAckin := io.Ackin
-  }
-  val RegEnable = !(Reqout ^ delayedAckin)
-  private val RegClose = Module(new V2CloseEvent)
-  // L5/DataReg must close on the same transition that produces the packet
-  // completion event.  Delaying this enable delays its falling edge too:
-  // TailPassed can then release the IPM while the transparent DataReg still
-  // follows an invalidated mux input.
-  RegClose.io.latch_enable := RegEnable
-  val outputLatchEnable = RegEnable
 
-  L5.io.reset := reset.asBool
-  L5.io.en := outputLatchEnable
-  // Data mux settling before the V2 request latch is a physical bundled-data
-  // obligation, constrained during DC/P&R rather than by an RTL delay line.
-  L5.io.d := ReqMerged.asUInt
-  DataReg.io.reset := reset.asBool
-  DataReg.io.en := outputLatchEnable
-  DataReg.io.d := DataSelected
+  val Reqout = Wire(Bool())
+  val RegEnable = Wire(Bool())
+  // Close the internal fire from the raw request phase.  The externally
+  // delayed Reqout is only the bundled-data output; feeding it back here would
+  // extend the click window by the output protection delay.
+  RegEnable := (AckMerged ^ ReqMerged) & ~(io.Ackin ^ Reqout)
 
-  // Wide OPMs share ReqMerged (xorR of 16/20 ReqSelection bits) with the
-  // V2 close edge.  MAXIMUM-SDF glitches on that cone can clock Ackout
-  // before D is stable.  Delay only the Ackout sample clock; TailPassed
-  // stays on the undelayed close so packet completion is unchanged.
-  val ackoutSampleClock = Wire(Clock())
-  if (SourceCount >= 16) {
-    val AckoutCloseDelay = Module(new DelayElement(
-      1, DelayUnitPs = CMRParameters.OpmAckinDelayUnitPs
-    ))
-    AckoutCloseDelay.io.I := RegClose.io.close_clock
-    ackoutSampleClock := AckoutCloseDelay.io.Z.asClock
-  } else {
-    ackoutSampleClock := RegClose.io.close_clock.asClock
-  }
-
-  private val Ackout = withClockAndReset(ackoutSampleClock, reset.asAsyncReset) {
+  Ackout := withClockAndReset((~RegEnable).asClock, reset.asAsyncReset) {
     val FF0_FF3 = RegInit(VecInit(Seq.fill(SourceCount)(false.B)))
     FF0_FF3 := ReqSelection
     FF0_FF3
   }
+  val DataReg = Wire(UInt(PacketLayout.FlitWidth.W))
+  DataReg := withClockAndReset(RegEnable.asClock, reset.asAsyncReset){
+    val ff = RegInit(0.U(PacketLayout.FlitWidth.W))
+    ff := DataSelected
+    ff
+  }
+  Reqout := withClockAndReset(RegEnable.asClock, reset.asAsyncReset){
+    val ff = RegInit(0.B)
+    ff := ~ff
+    ff
+  }
+  // Intentional output timing protection. Keep this after the Reqout state and
+  // outside RegEnable feedback; paired STA measures the mapped path to io.Reqout.
+  val OPMDelay = Module(new DelayElement(
+    CMRParameters.OpmReqoutDelaySteps,
+    DelayUnitPs = CMRParameters.OpmReqoutDelayUnitPs))
+  OPMDelay.io.I := Reqout
+  // Output-only fine delay; internal RegEnable feedback remains on raw Reqout.
+  private val OPMReqoutBuffers = Seq.tabulate(CMRParameters.OpmReqoutBufferStages) { stage =>
+    val buffer = Module(new DontTouchBuf)
+    buffer.suggestName(s"OPMReqoutBuffer_$stage")
+    buffer
+  }
+  private val ProtectedReqout = OPMReqoutBuffers.foldLeft(OPMDelay.io.Z) { (previous, buffer) =>
+    buffer.io.I := previous
+    buffer.io.Z
+  }
 
-  val tailFlag = DataReg.io.q(PacketLayout.IsTailIndex)
+  val tailFlag = DataReg(PacketLayout.IsTailIndex)
+  // Timing-only protection for Grant-release -> TailPassed capture recovery.
+  // Ackout retains the raw close event; only TailPassed sees this delayed copy.
   for (input <- 0 until SourceCount) {
+    // Keep one physical protection branch per state.  A shared high-fanout
+    // delay has a different mapped delay/load and cannot use the same hold
+    // window established for a single TailPassed CP sink.
+    val TailCaptureDelay = Module(new DelayElement(
+      CMRParameters.OpmTailCaptureDelaySteps,
+      DelayUnitPs = CMRParameters.OpmTailCaptureDelayUnitPs))
+    TailCaptureDelay.suggestName(s"TailCaptureDelay_$input")
+    TailCaptureDelay.io.I := ~RegEnable
     val TailDetectorReset = (reset.asBool || !Grant(input)).asAsyncReset
-    TailPassed(input) := withClockAndReset(RegClose.io.close_clock.asClock, TailDetectorReset) {
+    TailPassed(input) := withClockAndReset(TailCaptureDelay.io.Z.asClock, TailDetectorReset) {
       val FF = RegInit(false.B)
       FF := tailFlag
       FF
@@ -135,9 +130,9 @@ class OPM(config: RouterModuleConfig, egressPort: Int) extends Module {
 
   io.Ackout := Ackout
   io.Grant := Grant
-  io.Reqout := Reqout
-  io.Dataout.flit := DataReg.io.q
+  io.Dataout.flit := DataReg
   io.TailPassed := TailPassed
+  io.Reqout := ProtectedReqout
 }
 
 object OPMMain extends App {

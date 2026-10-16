@@ -53,14 +53,17 @@ module tb_read_interface_control_smoke;
       check(Reqout !== Ackin, "correct-path request was not held for Ackin");
       check(ReadPointer === (5'b00001 << selected_index), "correct-path pointer advanced early");
       check(Dataout === Datain[selected_index], "Dataout does not match selected cell");
-      check(CellEmpty === old_empty, "CellEmpty changed before correct-path Ackin");
+      check(CellEmpty === old_empty,
+            "CellEmpty advanced before downstream Ackin");
       #3;
       check(Reqout !== Ackin, "backpressure did not hold Reqout");
       check(Dataout === Datain[selected_index], "backpressure did not hold Dataout");
+      check(CellEmpty === old_empty,
+            "backpressure changed CellEmpty before downstream Ackin");
       Ackin = Reqout;
       #3;
       check(CellEmpty === (old_empty ^ (5'b00001 << selected_index)),
-            "correct-path Ackin did not toggle selected CellEmpty");
+            "downstream Ackin did not advance selected CellEmpty");
       check_known_onehot();
     end
   endtask

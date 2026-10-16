@@ -14,6 +14,7 @@ module tb_opm_smoke;
   wire Reqout;
   wire [27:0] Dataout;
   wire [3:0] TailPassed;
+  assign MG = Grant & ~TailPassed;
 
   OPM dut (
     .clock(clock), .reset(reset),
@@ -30,8 +31,6 @@ module tb_opm_smoke;
     .io_Ackout_2(Ackout[2]), .io_Ackout_3(Ackout[3]),
     .io_Grant_0(Grant[0]), .io_Grant_1(Grant[1]),
     .io_Grant_2(Grant[2]), .io_Grant_3(Grant[3]),
-    .io_MG_0(MG[0]), .io_MG_1(MG[1]),
-    .io_MG_2(MG[2]), .io_MG_3(MG[3]),
     .io_Reqout(Reqout), .io_Dataout_flit(Dataout),
     .io_TailPassed_0(TailPassed[0]), .io_TailPassed_1(TailPassed[1]),
     .io_TailPassed_2(TailPassed[2]), .io_TailPassed_3(TailPassed[3])

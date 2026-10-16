@@ -179,8 +179,7 @@ class CMRRouter(
             OutputPortModules(output).io.TailPassed(source)
           OutputPortModules(output).io.Reqin(source) := adapter.io.OPMReqIn(lane)
         }
-        adapter.io.IPMReqOut :=
-          VecInit(Seq.fill(laneCount)(ipm.io.Reqout(branch))).asUInt
+        adapter.io.IPMReqOut := ipm.io.Reqout(branch)
         adapter.io.OPMAckOut := laneAcks.asUInt
         ipm.io.Ackin(branch) := adapter.io.IPMAckIn
         ipm.io.TailPassed(branch) := laneTails.asUInt.orR

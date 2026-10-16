@@ -13,6 +13,7 @@ file mkdir $WORK_LIB
 set expected_ports [expr {[info exists ::env(CMR_EXPECTED_PORTS)] ? $::env(CMR_EXPECTED_PORTS) : 5}]
 set expected_edges [expr {[info exists ::env(CMR_EXPECTED_EDGES)] ? $::env(CMR_EXPECTED_EDGES) : 20}]
 set expected_path_latches [expr {4 * $expected_ports}]
+set legacy_latch_rtl [expr {[info exists ::env(CMR_LEGACY_LATCH_RTL)] && $::env(CMR_LEGACY_LATCH_RTL) eq "1"}]
 set seed_run ""
 if {[info exists ::env(CMR_DC_SEED_RUN_ID)] && $::env(CMR_DC_SEED_RUN_ID) ne ""} {
   set seed_run $::env(CMR_DC_SEED_RUN_ID)
@@ -21,7 +22,7 @@ set buf_stages 0
 if {[info exists ::env(CMR_RCU_MATCHED_BUF_STAGES)] && $::env(CMR_RCU_MATCHED_BUF_STAGES) ne ""} {
   set buf_stages $::env(CMR_RCU_MATCHED_BUF_STAGES)
 }
-set rcu_unit_ps 50
+set rcu_unit_ps 150
 if {[info exists ::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)] && $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS) ne ""} {
   set rcu_unit_ps $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)
 }
@@ -36,6 +37,20 @@ if {[info exists ::env(CMR_OPM_ACKIN_DELAY_UNIT_PS)] && $::env(CMR_OPM_ACKIN_DEL
 set opm_ackin_steps 1
 if {[info exists ::env(CMR_OPM_ACKIN_DELAY_STEPS)] && $::env(CMR_OPM_ACKIN_DELAY_STEPS) ne ""} {
   set opm_ackin_steps $::env(CMR_OPM_ACKIN_DELAY_STEPS)
+}
+set opm_reqout_steps 1
+if {[info exists ::env(CMR_OPM_REQOUT_DELAY_STEPS)] && $::env(CMR_OPM_REQOUT_DELAY_STEPS) ne ""} {
+  set opm_reqout_steps $::env(CMR_OPM_REQOUT_DELAY_STEPS)
+}
+set opm_reqout_unit_ps 50
+if {[info exists ::env(CMR_OPM_REQOUT_DELAY_UNIT_PS)] && $::env(CMR_OPM_REQOUT_DELAY_UNIT_PS) ne ""} {
+  set opm_reqout_unit_ps $::env(CMR_OPM_REQOUT_DELAY_UNIT_PS)
+}
+set opm_reqout_buffers 1
+if {[info exists ::env(CMR_OPM_REQOUT_BUFFER_STAGES)]} {set opm_reqout_buffers $::env(CMR_OPM_REQOUT_BUFFER_STAGES)}
+set opm_rtm_opt 0
+if {[info exists ::env(CMR_OPM_RTM_OPT)] && $::env(CMR_OPM_RTM_OPT) eq "1"} {
+  set opm_rtm_opt 1
 }
 set ackin_use_buf 0
 if {[info exists ::env(CMR_OPM_ACKIN_USE_BUF)] && $::env(CMR_OPM_ACKIN_USE_BUF) eq "1"} {
@@ -55,7 +70,7 @@ if {$rcu_steps == 0 && $buf_stages > 0} {
   exit 2
 }
 
-source "$RTL_DIR/tech_t28ss.tcl"
+if {[info exists ::env(CMR_TECH_TCL)]} {source $::env(CMR_TECH_TCL)} else {source "$RTL_DIR/tech_t28ss.tcl"}
 define_design_lib WORK -path $WORK_LIB
 
 proc cmr_router_lib_cell {name} {
@@ -251,7 +266,6 @@ if {$seed_run ne ""} {
     "$RTL_DIR/RouteSelAnd2.v" \
     "$RTL_DIR/OPMSelector.v" \
     "$RTL_DIR/PhaseResetDLatch.v" \
-    "$RTL_DIR/LanePhaseAdapter.v" \
     "$RTL_DIR/LanePhaseAdapterDFF.v" \
     "$RTL_DIR/LaneSelector.v" \
     "$RTL_DIR/WriteControlUnit.v" \
@@ -269,12 +283,29 @@ if {$seed_run ne ""} {
   link
 }
 check_design > "$REPORT_DIR/check_design_pre.rpt"
+set_operating_conditions $OPERATING_COND -library $LIB_NAME
+foreach required_cell {DEL050D1BWP12T30P140 BUFFD0BWP12T30P140 DFCNQD1BWP12T30P140 DFCNQOPTMAD8BWP12T30P140} {
+  if {[sizeof_collection [get_lib_cells -quiet $LIB_NAME/$required_cell]] != 1} {
+    puts "CMR_DC_FAIL missing_library_cell=$required_cell corner=$OPERATING_COND"; exit 2
+  }
+}
+redirect "$REPORT_DIR/library_environment.rpt" {report_design}
+set opm_buffer_pre [get_cells -hierarchical -quiet -filter {full_name =~ *OPMReqoutBuffer* && ref_name == BUFFD0BWP12T30P140}]
+if {[sizeof_collection $opm_buffer_pre] != $expected_ports * $opm_reqout_buffers} {
+  puts "CMR_DC_FAIL opm_reqout_buffer_pre_count"; exit 2
+}
+if {[sizeof_collection $opm_buffer_pre] > 0} {set_dont_touch $opm_buffer_pre true}
 
-# Each RCU OPM Selector contains four reset-dominant paper SR states.  They
-# must map to the single-clear implementation; a dual CDN/SDN latch has an
-# illegal crossover window when TailPassed releases while RouteSel is high.
-set path_latches_pre [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathLatch*sr_cell && ref_name =~ LHCNDQD*}]
-set selector_dual_pre [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathLatch*sr_cell && ref_name =~ LHCSNDQD*}]
+# Current RTL uses a RouteSel-clocked DFF; the frozen archive uses the
+# original reset-dominant PathLatch.  Both modes retain an exact instance
+# count and preserve the mapped state cells.
+if {$legacy_latch_rtl} {
+  set path_latches_pre [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathLatch*sr_cell && ref_name =~ LHCNDQD*}]
+  set selector_dual_pre [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathState*path_state_reg}]
+} else {
+  set path_latches_pre [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathState*path_state_reg && ref_name == DFCNQD1BWP12T30P140}]
+  set selector_dual_pre [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathState*path_state_reg && ref_name =~ LHCSNDQD*}]
+}
 set path_latch_pre_count [sizeof_collection $path_latches_pre]
 set selector_dual_pre_count [sizeof_collection $selector_dual_pre]
 if {$path_latch_pre_count != $expected_path_latches || $selector_dual_pre_count != 0} {
@@ -287,12 +318,14 @@ set clear_latches_pre [get_cells -hierarchical -quiet -filter {ref_name =~ LHCND
 set set_latches_pre [get_cells -hierarchical -quiet -filter {ref_name =~ LHSNDQD*}]
 set clear_latch_pre_count [sizeof_collection $clear_latches_pre]
 set set_latch_pre_count [sizeof_collection $set_latches_pre]
-if {$clear_latch_pre_count == 0 || $set_latch_pre_count == 0} {
+if {$clear_latch_pre_count == 0} {
   puts "CMR_DC_FAIL phase_latch_pre_count clear=$clear_latch_pre_count set=$set_latch_pre_count"
   exit 2
 }
 set_dont_touch $clear_latches_pre true
-set_dont_touch $set_latches_pre true
+if {$set_latch_pre_count > 0} {
+  set_dont_touch $set_latches_pre true
+}
 
 source "$RTL_DIR/async_cmr_router.sdc"
 source "$RTL_DIR/async_primitives.tcl"
@@ -314,45 +347,46 @@ if {$seed_run ne ""} {
   }
   compile_ultra -incremental -no_autoungroup
 } else {
-  # Mat cone: dest Q -> RouteSelAnd.A1.  Make AddressRegister Q a startpoint
-  # and give compile a 0.20 ns max so the L1 vs-constant decode is sized.
+  # Mat cone: AddressRegister's Click-clocked destination DFF Q -> RouteSelAnd.A1.
+  # Give compile a 0.20 ns max so the L1 vs-constant decode is sized.
   set mat_max_ns 0.20
   if {[info exists ::env(CMR_RCU_MAT_MAX_NS)] && $::env(CMR_RCU_MAT_MAX_NS) ne ""} {
     set mat_max_ns $::env(CMR_RCU_MAT_MAX_NS)
   }
-  set ::CMR_RCU_MAT_LATCHES ""
   set ::CMR_RCU_MAT_PAIRS {}
   set rcus [get_cells -hierarchical -quiet -filter {
     full_name =~ *InputPortModules_*/RouteComputationUnit && ref_name =~ RCU*
   }]
-  set mat_latch_init 0
   foreach_in_collection rcu $rcus {
     set root [get_object_name $rcu]
-    set latches [get_cells -quiet "$root/AddressRegister/LatchReg/resettable_latch\[*\].latch_cell"]
-    if {[sizeof_collection $latches] > 0} {
-      if {$mat_latch_init == 0} {
-        set ::CMR_RCU_MAT_LATCHES $latches
-        set mat_latch_init 1
-      } else {
-        set ::CMR_RCU_MAT_LATCHES [add_to_collection $::CMR_RCU_MAT_LATCHES $latches]
-      }
+    if {$legacy_latch_rtl} {
+      # Frozen archive AddressRegister stores {Req_rc,dest[23:0]} in one
+      # 25-bit latch bank.  Constraining the complete bank is conservative
+      # and retains the same route-decode optimization target.
+      set dest_q [get_pins -quiet -hierarchical -filter \
+        "full_name =~ $root/AddressRegister/LatchReg/*latch_cell/Q"]
+      set expected_dest_q 25
+    } else {
+      set dest_q [get_pins -quiet -hierarchical -filter \
+        "full_name =~ $root/AddressRegister/*io_dest_FF_reg*/Q"]
+      set expected_dest_q 24
     }
-    set req_q [get_pins -quiet "$root/AddressRegister/LatchReg/resettable_latch\[24\].latch_cell/Q"]
-    set dest_q [get_pins -quiet "$root/AddressRegister/LatchReg/resettable_latch\[*\].latch_cell/Q"]
-    set dest_q [remove_from_collection $dest_q $req_q]
+    if {[sizeof_collection $dest_q] != $expected_dest_q} {
+      puts "CMR_RCU_MAT_DEST_Q root=$root count=[sizeof_collection $dest_q] pins=[get_object_name $dest_q]"
+    }
     set dest_names [get_object_name $dest_q]
     foreach bit {0 1 2 3} {
-      set anda [get_pins -quiet "$root/RouteComputation/RouteSelAnd_${bit}/g/A1"]
+      set anda [get_pins -quiet -hierarchical -filter \
+        "full_name =~ $root/*RouteSelAnd_${bit}*/g/A1"]
       if {[sizeof_collection $anda] != 1} {
-        set anda [get_pins -quiet -hierarchical -filter "full_name =~ $root/*RouteSelAnd_${bit}*/g/A1"]
+        set gate_cells [get_cells -quiet -hierarchical -filter \
+          "full_name =~ $root/*RouteSelAnd_${bit}* && ref_name == AN2D0BWP12T30P140"]
+        set anda [get_pins -quiet -of_objects $gate_cells -filter {name == A1}]
       }
-      if {[llength $dest_names] == 24 && [sizeof_collection $anda] == 1} {
+      if {[llength $dest_names] == $expected_dest_q && [sizeof_collection $anda] == 1} {
         lappend ::CMR_RCU_MAT_PAIRS [list $dest_names [get_object_name $anda]]
       }
     }
-  }
-  if {$mat_latch_init} {
-    set_disable_timing $::CMR_RCU_MAT_LATCHES
   }
   set mat_pairs 0
   set expected_mat_pairs [expr {4 * $expected_ports}]
@@ -369,9 +403,24 @@ if {$seed_run ne ""} {
   foreach pair $::CMR_RCU_MAT_PAIRS {
     catch { reset_path -from [get_pins [lindex $pair 0]] -to [get_pins [lindex $pair 1]] }
   }
-  if {$mat_latch_init} {
-    catch { remove_disable_timing $::CMR_RCU_MAT_LATCHES }
+}
+if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIMING_RECIPE) eq "1"} {
+  if {[catch {
+    source "$PROJECT_DIR/scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
+    cmr_ipm_apply_timing_recipe $expected_ports $REPORT_DIR
+  } recipe_error]} {
+    puts "CMR_DC_FAIL ipm_timing_recipe=$recipe_error"
+    exit 2
   }
+}
+if {$opm_rtm_opt} {
+  if {$opm_reqout_steps != 0} {
+    puts "CMR_OPM_RTM_FAIL optimization_requires_zero_reqout_delay steps=$opm_reqout_steps"
+    exit 2
+  }
+  # Preserve the unoptimized, zero-DEL mapping as a diagnostic checkpoint.
+  write -hierarchy -format ddc -output "$OUTPUT_DIR/CMRRouter_opm_reqout_minmax_preopt.ddc"
+  source "$RTL_DIR/opm_reqout_minmax_overlay.tcl"
 }
 if {[info exists ::env(CMR_DONT_TOUCH_ADAPTERS)] && $::env(CMR_DONT_TOUCH_ADAPTERS) eq "1"} {
   # Mapping must precede preservation: locking an unmapped RTL design leaves
@@ -394,16 +443,27 @@ set mutex4_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref
 set mutex2_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ Mutex2*}]]
 set reset_latch_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ LHCNDQD*}]]
 set sr_latch_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ LHCSNDQD*}]]
-set path_latch_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathLatch*sr_cell && ref_name =~ LHCNDQD*}]]
-set selector_dual_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathLatch*sr_cell && ref_name =~ LHCSNDQD*}]]
+if {$legacy_latch_rtl} {
+  set path_latch_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathLatch*sr_cell && ref_name =~ LHCNDQD*}]]
+  set selector_dual_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathState*path_state_reg}]]
+} else {
+  set path_latch_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathState*path_state_reg && ref_name == DFCNQD1BWP12T30P140}]]
+  set selector_dual_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *Selector*PathState*path_state_reg && ref_name =~ LHCSNDQD*}]]
+}
 set set_reset_latch_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ LHSNDQD*}]]
-set close_event_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ V2CloseEvent* || full_name =~ *RegClose*}]]
+set tail_passed_ff_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *TailPassed*FF*}]]
 set handshake_complete_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ HandshakeComplete*}]]
 set del050_rcu [sizeof_collection [cmr_router_matched_leaves 50]]
 set del075_rcu [sizeof_collection [cmr_router_matched_leaves 75]]
 set del100_rcu [sizeof_collection [cmr_router_matched_leaves 100]]
 set del150_rcu [sizeof_collection [cmr_router_matched_leaves 150]]
 set ackin_glob [cmr_router_matched_leaf_glob $opm_ackin_unit_ps]
+set opm_reqout_glob [cmr_router_matched_leaf_glob $opm_reqout_unit_ps]
+set opm_reqout_delay_count [sizeof_collection [get_cells -hierarchical -quiet -filter "ref_name =~ $opm_reqout_glob && full_name =~ *OPMDelay*"]]
+set opm_reqout_buffer_count [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *OPMReqoutBuffer* && ref_name == BUFFD0BWP12T30P140}]]
+if {$opm_reqout_buffer_count != $expected_ports * $opm_reqout_buffers} {
+  puts "CMR_DC_FAIL opm_reqout_buffer_post_count actual=$opm_reqout_buffer_count"; exit 2
+}
 set ackin_del [sizeof_collection [get_cells -hierarchical -quiet -filter "ref_name =~ DEL*D1* && full_name =~ *AckinDelay*"]]
 if {$ackin_use_buf} {
   set ackin_delayed [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ BUFFD0* && full_name =~ *AckinDelay*}]]
@@ -426,10 +486,11 @@ puts $structure_fd "MUTEX4_COUNT=$mutex4_count"
 puts $structure_fd "MUTEX2_COUNT=$mutex2_count"
 puts $structure_fd "RESET_LATCH_COUNT=$reset_latch_count"
 puts $structure_fd "SR_LATCH_COUNT=$sr_latch_count"
-puts $structure_fd "PATH_LATCH_CLEAR_COUNT=$path_latch_count"
-puts $structure_fd "PATH_LATCH_DUAL_COUNT=$selector_dual_count"
+puts $structure_fd "PATH_STATE_DFF_COUNT=$path_latch_count"
+puts $structure_fd "PATH_STATE_INVALID_CELL_COUNT=$selector_dual_count"
+puts $structure_fd "LEGACY_LATCH_RTL=$legacy_latch_rtl"
 puts $structure_fd "SET_RESET_LATCH_COUNT=$set_reset_latch_count"
-puts $structure_fd "V2_CLOSE_EVENT_COUNT=$close_event_count"
+puts $structure_fd "TAIL_PASSED_FF_COUNT=$tail_passed_ff_count"
 puts $structure_fd "HANDSHAKE_COMPLETE_COUNT=$handshake_complete_count"
 puts $structure_fd "LEGAL_REQ_EDGES=$expected_edges"
 puts $structure_fd "UTURN_EDGES=0"
@@ -446,6 +507,13 @@ puts $structure_fd "OPM_ACKIN_DELAY_UNIT_PS=$opm_ackin_unit_ps"
 puts $structure_fd "OPM_ACKIN_DELAY_STEPS=$opm_ackin_steps"
 puts $structure_fd "OPM_ACKIN_USE_BUF=$ackin_use_buf"
 puts $structure_fd "OPM_ACKIN_DEL_COUNT=$ackin_del"
+puts $structure_fd "OPM_REQOUT_DELAY_STEPS=$opm_reqout_steps"
+puts $structure_fd "OPM_REQOUT_DELAY_UNIT_PS=$opm_reqout_unit_ps"
+puts $structure_fd "OPM_REQOUT_DELAY_COUNT=$opm_reqout_delay_count"
+puts $structure_fd "OPM_REQOUT_BUFFER_STAGES=$opm_reqout_buffers"
+puts $structure_fd "OPM_REQOUT_BUFFER_COUNT=$opm_reqout_buffer_count"
+puts $structure_fd "CORNER=$OPERATING_COND"
+puts $structure_fd "LIBRARY=$LIB_NAME"
 puts $structure_fd "OPM_ACKOUT_CLOSE_DELAY_COUNT=$ackout_close_delay"
 puts $structure_fd "RCU_MATCHED_BUF_COUNT=$matched_buf"
 puts $structure_fd "RCU_MATCHED_BUF_STAGES=$buf_stages"
@@ -453,7 +521,7 @@ puts $structure_fd "RCU_MATCHED_DELAY_UNIT_PS=$rcu_unit_ps"
 puts $structure_fd "RCU_MATCHED_DELAY_STEPS=$rcu_steps"
 puts $structure_fd "OTHERPATH_DEL050_COUNT=$otherpath_del050"
 close $structure_fd
-puts "CMR_STRUCTURE IPM=$ipm_count OPM=$opm_count MUTEX4=$mutex4_count MUTEX2=$mutex2_count ADAPTER=$adapter_count ACKLATCH_E=$acklatch_e_count LANE01_BUF=$lane01_buf stages=$lane01_stages RESET_LATCH=$reset_latch_count SET_RESET_LATCH=$set_reset_latch_count SR_LATCH=$sr_latch_count CLOSE_EVENT=$close_event_count COMPLETE=$handshake_complete_count DEL050=$del050_rcu DEL075=$del075_rcu DEL100=$del100_rcu DEL150=$del150_rcu ACKIN_DELAY=$ackin_delayed ACKIN_UNIT=$opm_ackin_unit_ps ACKIN_STEPS=$opm_ackin_steps ACKIN_BUF=$ackin_use_buf ACKIN_DEL=$ackin_del ACKOUT_CLOSE=$ackout_close_delay BUF=$matched_buf stages=$buf_stages OTHERPATH_DEL050=$otherpath_del050"
+puts "CMR_STRUCTURE IPM=$ipm_count OPM=$opm_count MUTEX4=$mutex4_count MUTEX2=$mutex2_count ADAPTER=$adapter_count ACKLATCH_E=$acklatch_e_count LANE01_BUF=$lane01_buf stages=$lane01_stages RESET_LATCH=$reset_latch_count SET_RESET_LATCH=$set_reset_latch_count SR_LATCH=$sr_latch_count TAIL_PASSED_FF=$tail_passed_ff_count COMPLETE=$handshake_complete_count DEL050=$del050_rcu DEL075=$del075_rcu DEL100=$del100_rcu DEL150=$del150_rcu ACKIN_DELAY=$ackin_delayed ACKIN_UNIT=$opm_ackin_unit_ps ACKIN_STEPS=$opm_ackin_steps ACKIN_BUF=$ackin_use_buf ACKIN_DEL=$ackin_del ACKOUT_CLOSE=$ackout_close_delay OPM_REQOUT_UNIT=$opm_reqout_unit_ps OPM_REQOUT_DELAY=$opm_reqout_delay_count BUF=$matched_buf stages=$buf_stages OTHERPATH_DEL050=$otherpath_del050"
 
 if {$n_gtech > 0 || $n_unmapped > 0} {
   puts "CMR_DC_FAIL unmapped gtech=$n_gtech generic=$n_unmapped"
@@ -467,8 +535,8 @@ if {$handshake_complete_count != 0} {
   puts "CMR_DC_FAIL obsolete_handshake_complete actual=$handshake_complete_count expected=0"
   exit 2
 }
-if {$reset_latch_count == 0 || $close_event_count == 0} {
-  puts "CMR_DC_FAIL async_storage_structure"
+if {$reset_latch_count == 0 || $tail_passed_ff_count != $expected_edges} {
+  puts "CMR_DC_FAIL async_storage_structure reset_latch=$reset_latch_count tail_passed_ff=$tail_passed_ff_count expected_tail_passed_ff=$expected_edges"
   exit 2
 }
 if {$path_latch_count != $expected_path_latches || $selector_dual_count != 0} {
@@ -539,6 +607,11 @@ if {$lane01_buf != $expected_lane01_buf} {
 }
 if {$otherpath_del050 != $expected_otherpath} {
   puts "CMR_DC_FAIL otherpath_del050 actual=$otherpath_del050 expected=$expected_otherpath"
+  exit 2
+}
+set expected_opm_reqout_delay [expr {$expected_ports * $opm_reqout_steps}]
+if {$opm_reqout_delay_count != $expected_opm_reqout_delay} {
+  puts "CMR_DC_FAIL opm_reqout_delay actual=$opm_reqout_delay_count expected=$expected_opm_reqout_delay steps=$opm_reqout_steps"
   exit 2
 }
 

@@ -57,6 +57,9 @@ module tb_cmr_router_hop_ppa;
   integer num_packets;
   integer expected_total;
   integer mesh_mode;
+  integer segment_probe;
+  integer opm_internal_probe;
+  integer opm_head_probe;
   string hop_mode;
   real input_time [0:MAX_EVENTS-1];
   real output_time [0:MAX_EVENTS-1];
@@ -69,6 +72,131 @@ module tb_cmr_router_hop_ppa;
   string vcd_file;
   string hop_kind;
   event rx_activity;
+
+  // Optional read-only timing probe.  It observes phase transitions at the
+  // three requested partition boundaries without changing stimulus or Ack.
+  always @(tb_in_req[0])
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=INPUT_REQ value=%b", $realtime, tb_in_req[0]);
+  always @(dut.InputPortModules_0.Buffer.WriteInterface_io_WriteFire_0)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=WRITE_FIRE value=%b", $realtime,
+        dut.InputPortModules_0.Buffer.WriteInterface_io_WriteFire_0);
+  always @(dut.InputPortModules_0.Buffer.WriteInterface_io_CellFull_0)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=CELL_FULL value=%b", $realtime,
+        dut.InputPortModules_0.Buffer.WriteInterface_io_CellFull_0);
+  always @(dut.InputPortModules_0.Buffer.ReadInterface_3.io_Reqout)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=READ_REQ value=%b", $realtime,
+        dut.InputPortModules_0.Buffer.ReadInterface_3.io_Reqout);
+  always @(dut.InputPortModules_0.Buffer.io_Ackout)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=IPM_ACK_RAW value=%b", $realtime,
+        dut.InputPortModules_0.Buffer.io_Ackout);
+  always @(tb_in_ack[0])
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=INPUT_ACK value=%b", $realtime, tb_in_ack[0]);
+`ifdef GEOM_C1_P4
+  always @(dut.InputPortModules_0.io_Reqout_3)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=IPM_REQ value=%b", $realtime,
+        dut.InputPortModules_0.io_Reqout_3);
+  always @(dut.adapter_OPMReqIn)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=OPM_IN value=%b", $realtime,
+        dut.adapter_OPMReqIn);
+`else
+  always @(dut.InputPortModules_0.io_Reqout_3)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=IPM_REQ value=%b", $realtime,
+        dut.InputPortModules_0.io_Reqout_3);
+  always @(dut.OutputPortModules_4.io_Reqin_0)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=OPM_IN value=%b", $realtime,
+        dut.OutputPortModules_4.io_Reqin_0);
+`endif
+  always @(tb_out_req)
+    if (running && segment_probe)
+      $display("SEG_EVENT t_ns=%0.3f site=OUTPUT_REQ value=%b", $realtime, tb_out_req);
+
+  // Optional read-only Click OPM probe.  These names are preserved in the
+  // frozen post-DC netlists and expose the actual mapped request path.
+`ifdef GEOM_C1_P4
+  always @(dut.OutputPortModules_7.io_PktPathEnable_0)
+    if (running && opm_head_probe)
+      $display("HEAD_EVENT t_ns=%0.3f site=PPE value=%b", $realtime,
+        dut.OutputPortModules_7.io_PktPathEnable_0);
+  always @(dut.OutputPortModules_7.io_Grant_0)
+    if (running && opm_head_probe)
+      $display("HEAD_EVENT t_ns=%0.3f site=GRANT value=%b", $realtime,
+        dut.OutputPortModules_7.io_Grant_0);
+  always @(dut.OutputPortModules_7.MG_0)
+    if (running && opm_head_probe)
+      $display("HEAD_EVENT t_ns=%0.3f site=MG value=%b", $realtime,
+        dut.OutputPortModules_7.MG_0);
+  always @(dut.OutputPortModules_7.io_Reqin_0)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REQ_IN value=%b", $realtime,
+        dut.OutputPortModules_7.io_Reqin_0);
+  always @(dut.OutputPortModules_7._ReqMerged_T[0])
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REQ_SELECTION value=%b", $realtime,
+        dut.OutputPortModules_7._ReqMerged_T[0]);
+  always @(dut.OutputPortModules_7.Reqout_ff_reg.CP)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REG_ENABLE value=%b", $realtime,
+        dut.OutputPortModules_7.Reqout_ff_reg.CP);
+  always @(dut.OutputPortModules_7.Reqout)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REQ_Q value=%b", $realtime,
+        dut.OutputPortModules_7.Reqout);
+  always @(dut.OutputPortModules_7.OPMDelay_Z)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=DEL_OUT value=%b", $realtime,
+        dut.OutputPortModules_7.OPMDelay_Z);
+  always @(dut.OutputPortModules_7.io_Reqout)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=BUF_OUT value=%b", $realtime,
+        dut.OutputPortModules_7.io_Reqout);
+`else
+  always @(dut.OutputPortModules_4.io_PktPathEnable_0)
+    if (running && opm_head_probe)
+      $display("HEAD_EVENT t_ns=%0.3f site=PPE value=%b", $realtime,
+        dut.OutputPortModules_4.io_PktPathEnable_0);
+  always @(dut.OutputPortModules_4.io_Grant_0)
+    if (running && opm_head_probe)
+      $display("HEAD_EVENT t_ns=%0.3f site=GRANT value=%b", $realtime,
+        dut.OutputPortModules_4.io_Grant_0);
+  always @(dut.OutputPortModules_4.MG_0)
+    if (running && opm_head_probe)
+      $display("HEAD_EVENT t_ns=%0.3f site=MG value=%b", $realtime,
+        dut.OutputPortModules_4.MG_0);
+  always @(dut.OutputPortModules_4.io_Reqin_0)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REQ_IN value=%b", $realtime,
+        dut.OutputPortModules_4.io_Reqin_0);
+  always @(dut.OutputPortModules_4._ReqMerged_T[0])
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REQ_SELECTION value=%b", $realtime,
+        dut.OutputPortModules_4._ReqMerged_T[0]);
+  always @(dut.OutputPortModules_4.Reqout_ff_reg.CP)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REG_ENABLE value=%b", $realtime,
+        dut.OutputPortModules_4.Reqout_ff_reg.CP);
+  always @(dut.OutputPortModules_4.Reqout)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=REQ_Q value=%b", $realtime,
+        dut.OutputPortModules_4.Reqout);
+  always @(dut.OutputPortModules_4.OPMDelay_Z)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=DEL_OUT value=%b", $realtime,
+        dut.OutputPortModules_4.OPMDelay_Z);
+  always @(dut.OutputPortModules_4.io_Reqout)
+    if (running && opm_internal_probe)
+      $display("OPM_EVENT t_ns=%0.3f site=BUF_OUT value=%b", $realtime,
+        dut.OutputPortModules_4.io_Reqout);
+`endif
 
   function automatic [FLIT_W-1:0] make_flit(
     input bit head, input bit tail, input [1:0] id
@@ -266,6 +394,9 @@ module tb_cmr_router_hop_ppa;
     if (!$value$plusargs("HOP_MODE=%s", hop_mode)) hop_mode = "isolated";
     if (!$value$plusargs("NUM_PACKETS=%d", num_packets)) num_packets = 1;
     if (!$value$plusargs("MESH=%d", mesh_mode)) mesh_mode = 0;
+    segment_probe = $test$plusargs("SEGMENT_PROBE");
+    opm_internal_probe = $test$plusargs("OPM_INTERNAL_PROBE");
+    opm_head_probe = $test$plusargs("OPM_HEAD_PROBE");
     if (hop_mode == "stream" && num_packets < 2) num_packets = 4;
     if (hop_mode == "idle") num_packets = 0;
     if (hop_mode == "contention") num_packets = 2;

@@ -43,6 +43,8 @@ proc run_cmr_smoke {top generated sources tb_dir tb} {
 }
 
 set opm_sources [list \
+  [file join $repo_root "src" "main" "resources" "ASYNC" "DontTouchBuf_sim.v"] \
+  [file join $opm_dir "DelayElement_sim.v"] \
   [file join $opm_dir "Mutex2_sim.v"] \
   [file join $opm_dir "Mutex4.v"] \
   [file join $opm_dir "MullerC2.v"] \
@@ -57,59 +59,54 @@ set rcu_sources [list \
   [file join $rcu_dir "HeadPredictor.v"] \
   [file join $rcu_dir "PhaseSelector.v"] \
   [file join $rcu_dir "DLatchBank.v"] \
-  [file join $rcu_dir "AddressRegisterUnit.v"] \
   [file join $rcu_dir "InternalAckModule.v"] \
-  [file join $rcu_dir "OPMSelector.v"]]
+  [file join $rcu_dir "OPMSelector.v"] \
+  [file join $rcu_dir "RouteSelAnd2.v"]]
 
 set write_sources [list \
-  [file join $write_dir "PhaseResetDLatch.v"] \
-  [file join $write_dir "Toggle.v"] \
-  [file join $write_dir "WriteControlUnit.v"] \
-  [file join $write_dir "WriteCounter.v"] \
-  [file join $write_dir "WriteAckGenerator.v"]]
+  [file join $write_dir "DelayElement_sim.v"] \
+  [file join $write_dir "WriteAckGenerator.v"] \
+  [file join $write_dir "WriteCounter.v"]]
 
 set read_sources [list \
+  [file join $read_dir "DelayElement_sim.v"] \
   [file join $read_dir "PhaseResetDLatch.v"] \
-  [file join $read_dir "Toggle.v"] \
   [file join $read_dir "ReadControlUnit.v"] \
+  [file join $read_dir "ReadAckGenerator.v"] \
   [file join $read_dir "ReadCounter.v"] \
   [file join $read_dir "ReadRequestGenerator.v"] \
   [file join $read_dir "ReadPhaseSelector.v"] \
-  [file join $read_dir "ReadAckGenerator.v"]]
+  [file join $read_dir "Toggle.v"]]
 
 set buffer_sources [list \
-  [file join $buffer_dir "DLatchBank.v"] \
+  [file join $buffer_dir "DelayElement_sim.v"] \
   [file join $buffer_dir "PhaseResetDLatch.v"] \
+  [file join $buffer_dir "ReadControlUnit.v"] \
   [file join $buffer_dir "Toggle.v"] \
-  [file join $buffer_dir "WriteControlUnit.v"] \
   [file join $buffer_dir "WriteCounter.v"] \
   [file join $buffer_dir "WriteAckGenerator.v"] \
-  [file join $buffer_dir "ReadControlUnit.v"] \
   [file join $buffer_dir "ReadCounter.v"] \
   [file join $buffer_dir "ReadRequestGenerator.v"] \
   [file join $buffer_dir "ReadPhaseSelector.v"] \
   [file join $buffer_dir "ReadAckGenerator.v"]]
 
 set router_sources [list \
+  [file join $repo_root "src" "main" "resources" "ASYNC" "DontTouchBuf_sim.v"] \
   [file join $router_dir "DelayElement_sim.v"] \
+  [file join $router_dir "PhaseResetDLatch.v"] \
+  [file join $router_dir "ReadControlUnit.v"] \
   [file join $router_dir "Mutex2_sim.v"] \
   [file join $router_dir "Mutex4.v"] \
   [file join $router_dir "MullerC2.v"] \
   [file join $router_dir "CMRMutexN.v"] \
   [file join $router_dir "CMRFlattenedTAC.v"] \
   [file join $router_dir "DLatchBank.v"] \
-  [file join $router_dir "V2CloseEvent.v"] \
   [file join $router_dir "Toggle.v"] \
-  [file join $router_dir "HeadPredictor.v"] \
-  [file join $router_dir "PhaseSelector.v"] \
-  [file join $router_dir "AddressRegisterUnit.v"] \
   [file join $router_dir "InternalAckModule.v"] \
   [file join $router_dir "OPMSelector.v"] \
-  [file join $router_dir "PhaseResetDLatch.v"] \
-  [file join $router_dir "WriteControlUnit.v"] \
+  [file join $router_dir "RouteSelAnd2.v"] \
   [file join $router_dir "WriteCounter.v"] \
   [file join $router_dir "WriteAckGenerator.v"] \
-  [file join $router_dir "ReadControlUnit.v"] \
   [file join $router_dir "ReadCounter.v"] \
   [file join $router_dir "ReadRequestGenerator.v"] \
   [file join $router_dir "ReadPhaseSelector.v"] \
@@ -137,14 +134,18 @@ run_cmr_smoke tb_write_interface_control_smoke \
 run_cmr_smoke tb_read_interface_control_smoke \
   [file join $read_dir "ReadInterfaceControl.v"] $read_sources $tb_dir \
   "tb_read_interface_control_smoke.sv"
-run_cmr_smoke tb_cmr_buffer_smoke \
-  [file join $buffer_dir "CMRBuffer.v"] $buffer_sources $tb_dir \
-  "tb_cmr_buffer_smoke.sv"
 run_cmr_smoke tb_cmr_router_smoke \
   [file join $router_dir "CMRRouter.v"] $router_sources $tb_dir \
   "tb_cmr_router_smoke.sv"
-run_cmr_smoke tb_circular_fifo_smoke \
-  [file join $cmr_dir "CircularFIFO.v"] $circular_fifo_sources $tb_dir \
-  "tb_circular_fifo_smoke.sv"
+run_cmr_smoke tb_cmr_buffer_smoke \
+  [file join $buffer_dir "CMRBuffer.v"] $buffer_sources $tb_dir \
+  "tb_cmr_buffer_smoke.sv"
+if {[file exists [file join $cmr_dir "CircularFIFO.v"]]} {
+  run_cmr_smoke tb_circular_fifo_smoke \
+    [file join $cmr_dir "CircularFIFO.v"] $circular_fifo_sources $tb_dir \
+    "tb_circular_fifo_smoke.sv"
+} else {
+  puts "TB_RESULT SKIP legacy CircularFIFO smoke: source absent and not part of RouterL1 DUT"
+}
 
-puts "TB_RESULT PASS CMR local smoke suite"
+puts "TB_RESULT PASS CMR RouterL1 local smoke suite"

@@ -72,7 +72,8 @@ class IPM(
   // Delay only the upstream Ack.  HeadPredictor.complete and the write
   // counter still see Buffer.io.Ackout so En can close while Head remains
   // on Datain.
-  private val AckoutGuard = Module(new DelayElement(1, DelayUnitPs = 150))
+  private val AckoutGuard = Module(new DelayElement(
+    1, DelayUnitPs = CMRParameters.IpmAckoutGuardDelayUnitPs))
   AckoutGuard.io.I := Buffer.io.Ackout
   io.Ackout := AckoutGuard.io.Z
   io.Reqout := Buffer.io.Reqout

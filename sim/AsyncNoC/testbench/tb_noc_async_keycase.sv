@@ -12,7 +12,12 @@ module noc_async_keycase_core #(
   localparam integer NUM_PORTS = NUM_CORES;
   localparam integer MAX_PACKETS = 16384;
   localparam integer MAX_INPUT_FLITS = MAX_PACKETS * 5;
+`ifdef CMR_NOC_PROP_TEMP_M16
+  // M16 cross-tier native F16 can direct 400 five-flit packets to each core.
+  localparam integer MAX_RX_PER_PORT = 4096;
+`else
   localparam integer MAX_RX_PER_PORT = (NUM_CORES <= 256) ? 1024 : 512;
+`endif
   localparam integer STR_CHARS = 256;
 
   initial begin
@@ -61,7 +66,12 @@ module noc_async_keycase_core #(
       .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
     );
   `else
-    `ifdef CMR_NOC_PROP_TEMP
+    `ifdef CMR_NOC_PROP_TEMP_M16
+      async_noc_port_adapter_prop_temp_m16_256 noc (
+        .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
+        .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
+      );
+    `elsif CMR_NOC_PROP_TEMP
       async_noc_port_adapter_prop_temp_256 noc (
         .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
         .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
@@ -84,10 +94,12 @@ module noc_async_keycase_core #(
   reg running, timed_out, finish_requested, write_v3_metrics, x_failed;
   integer reset_cycles, timeout_cycles, inject_max_rate;
   integer warmup_events, measurement_events;
+  integer measurement_start_cycle, measurement_end_cycle;
+  integer upper_mesh_count [0:3][0:15][0:3];
   real case_tick_ns, case_meta_tick_ns, tx_setup_ns, rx_capture_ns, ack_to_next_req_guard_ns, timeout_scale;
   reg case_tick_cli_seen, case_meta_tick_seen;
   real case_epoch_ns, timeout_ns, drain_ns, stall_timeout_ns, hard_timeout_ns;
-  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, v3_metrics_file;
+  reg [STR_CHARS*8-1:0] case_file, csv_file, event_csv_file, latency_csv_file, flit_latency_csv_file, v3_metrics_file, upper_mesh_csv_file;
   reg [STR_CHARS*8-1:0] case_name, case_group;
 
   integer input_count, expected_count;
@@ -115,7 +127,10 @@ module noc_async_keycase_core #(
   reg rx_is_tail [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg [FLIT_W-1:0] rx_flit [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
   reg rx_match [0:NUM_PORTS-1][0:MAX_RX_PER_PORT-1];
+  reg pending_head_valid [0:NUM_PORTS-1];
+  integer pending_head_slot [0:NUM_PORTS-1];
   longint last_egress_ps [0:NUM_PORTS-1];
+  longint packet_head_offer_ps [0:MAX_PACKETS-1];
   longint packet_head_ack_ps [0:MAX_PACKETS-1];
   longint packet_head_req_ps [0:MAX_PACKETS-1];
   integer packet_event_id [0:MAX_PACKETS-1];
@@ -150,19 +165,25 @@ module noc_async_keycase_core #(
   endfunction
 
   task automatic parse_case;
-    integer fd, n, p, cyc, pkt, idx, ndest, dest, is_tail, line_no;
+    integer fd, n, p, cyc, pkt, idx, ndest, dest, is_tail, line_no, t, j, h, l, i;
     reg [STR_CHARS*8-1:0] line, tag, word;
     reg [FLIT_W-1:0] flit;
     begin
       input_count = 0; expected_count = 0;
+      measurement_start_cycle = 2147483647; measurement_end_cycle = -1;
       reset_cycles = 10; timeout_cycles = 5000000;
       warmup_events = 0; measurement_events = 0;
       case_name = ""; case_group = "";
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
         expected_port_count[p] = 0; expected_matched[p] = 0; rx_count[p] = 0;
         last_egress_ps[p] = -1; active_input[p] = -1;
+        pending_head_valid[p] = 1'b0; pending_head_slot[p] = -1;
       end
+      for (t = 0; t < 4; t = t + 1)
+        for (j = 0; j < 16; j = j + 1)
+          for (l = 0; l < 4; l = l + 1) upper_mesh_count[t][j][l] = 0;
       for (idx = 0; idx < MAX_PACKETS; idx = idx + 1) begin
+        packet_head_offer_ps[idx] = -1;
         packet_head_ack_ps[idx] = -1;
         packet_head_req_ps[idx] = -1;
         packet_event_id[idx] = -1;
@@ -228,6 +249,15 @@ module noc_async_keycase_core #(
         end
       end
       $fclose(fd);
+      for (i = 0; i < input_count; i = i + 1)
+        if (packet_event_id[input_pkt_seq[i]] >= warmup_events &&
+            packet_event_id[input_pkt_seq[i]] < warmup_events + measurement_events) begin
+          if (input_cycle[i] < measurement_start_cycle) measurement_start_cycle = input_cycle[i];
+          if (input_cycle[i] > measurement_end_cycle) measurement_end_cycle = input_cycle[i];
+        end
+      if (measurement_end_cycle < measurement_start_cycle) begin
+        $display("TB_FATAL measurement offer window is empty"); $finish;
+      end
     end
   endtask
 
@@ -261,6 +291,7 @@ module noc_async_keycase_core #(
         input_ack_ps[i] = now_ps();
         input_accepted[i] = 1'b1;
         if (input_flit[i][27] && input_pkt_seq[i] >= 0 && input_pkt_seq[i] < MAX_PACKETS) begin
+          packet_head_offer_ps[input_pkt_seq[i]] = input_offer_ps[i];
           packet_head_req_ps[input_pkt_seq[i]] = input_req_ps[i];
           packet_head_ack_ps[input_pkt_seq[i]] = input_ack_ps[i];
         end
@@ -272,7 +303,7 @@ module noc_async_keycase_core #(
   endtask
 
   task automatic receive_port(input integer port);
-    integer slot, scan;
+    integer slot, scan, pkt, head_slot;
     reg found;
     reg [FLIT_W-1:0] captured;
     begin
@@ -290,15 +321,50 @@ module noc_async_keycase_core #(
         rx_egress_ps[port][slot] = last_egress_ps[port];
         rx_flit[port][slot] = captured;
         found = 1'b0;
-        for (scan = 0; scan < expected_port_count[port]; scan = scan + 1)
-          if (!found && !expected_seen[port][scan] && captured === expected_flit[port][scan]) begin
-            found = 1'b1;
-            expected_seen[port][scan] = 1'b1;
-            rx_match[port][slot] = 1'b1;
-            rx_pkt_seq[port][slot] = expected_pkt_seq[port][scan];
-            rx_is_tail[port][slot] = expected_is_tail[port][scan];
-            expected_matched[port] = expected_matched[port] + 1;
+        rx_match[port][slot] = 1'b0;
+        rx_pkt_seq[port][slot] = -1;
+        rx_is_tail[port][slot] = 1'b0;
+        // The routing Head contains only its AABB and is not globally unique.
+        // As in the accepted 64-node scoreboard, hold it until the following
+        // identity Body supplies pkt_seq[25:12], then bind both flits.
+        if (captured[27]) begin
+          if (pending_head_valid[port]) begin
+            unexpected_flits = unexpected_flits + 1;
           end
+          pending_head_valid[port] = 1'b1;
+          pending_head_slot[port] = slot;
+          found = 1'b1;
+        end else if (captured[8:6] === 3'b101) begin
+          pkt = captured[25:12];
+          for (scan = 0; scan < expected_port_count[port]; scan = scan + 1)
+            if (!found && !expected_seen[port][scan] &&
+                expected_pkt_seq[port][scan] == pkt &&
+                captured === expected_flit[port][scan]) begin
+              found = 1'b1;
+              expected_seen[port][scan] = 1'b1;
+              rx_match[port][slot] = 1'b1;
+              rx_pkt_seq[port][slot] = pkt;
+              rx_is_tail[port][slot] = expected_is_tail[port][scan];
+              expected_matched[port] = expected_matched[port] + 1;
+            end
+          if (captured[11:9] == 3'd1 && pending_head_valid[port]) begin
+            head_slot = pending_head_slot[port];
+            for (scan = 0; scan < expected_port_count[port]; scan = scan + 1)
+              if (!expected_seen[port][scan] &&
+                  expected_pkt_seq[port][scan] == pkt &&
+                  expected_flit[port][scan][27] &&
+                  rx_flit[port][head_slot] === expected_flit[port][scan]) begin
+                expected_seen[port][scan] = 1'b1;
+                rx_match[port][head_slot] = 1'b1;
+                rx_pkt_seq[port][head_slot] = pkt;
+                rx_is_tail[port][head_slot] = 1'b0;
+                expected_matched[port] = expected_matched[port] + 1;
+                scan = expected_port_count[port];
+              end
+            pending_head_valid[port] = 1'b0;
+            pending_head_slot[port] = -1;
+          end
+        end
         if (!found) begin
           rx_match[port][slot] = 1'b0;
           rx_pkt_seq[port][slot] = -1;
@@ -313,15 +379,17 @@ module noc_async_keycase_core #(
   endtask
 
   task automatic write_results;
-    integer p, s, i, j, fd_summary, fd_events, fd_latency, fd_v3;
+    integer p, s, i, j, t, l, tx_index, fd_summary, fd_events, fd_latency, fd_flit, fd_v3, fd_upper, tile_sum, all_sum;
     integer packet, injected_packets, unmatched, rank95, rank99;
-    longint tmp, max_lat, p95_lat, p99_lat, lat;
-    real lat_sum, avg_lat_ns, elapsed_ns, throughput;
+    integer measurement_offered_flits, measurement_delivered_flits, measurement_backlog_flits;
+    longint tmp, max_lat, p95_lat, p99_lat, lat, measurement_start_ps, measurement_end_ps;
+    real lat_sum, avg_lat_ns, elapsed_ns, throughput, window_ns, window_s, offered_mflit_port_s;
     reg pass_ok, drainable, backlog_growth;
     begin
       if (csv_dumped) disable write_results;
       csv_dumped = 1'b1;
       injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();
+      measurement_offered_flits = 0; measurement_delivered_flits = 0;
       delivered_packets = 0; latency_count = 0; lat_sum = 0; max_lat = 0;
       for (i = 0; i < input_count; i = i + 1) if (input_accepted[i]) begin
         injected_flits = injected_flits + 1;
@@ -331,18 +399,42 @@ module noc_async_keycase_core #(
       for (p = 0; p < NUM_PORTS; p = p + 1)
         unmatched = unmatched + (expected_port_count[p] - expected_matched[p]);
       missing_flits = unmatched;
+      measurement_start_ps = longint'((case_epoch_ns + measurement_start_cycle * case_tick_ns) * 1000.0 + 0.5);
+      measurement_end_ps = longint'((case_epoch_ns + measurement_end_cycle * case_tick_ns) * 1000.0 + 0.5);
+      for (i = 0; i < input_count; i = i + 1)
+        if (packet_event_id[input_pkt_seq[i]] >= warmup_events &&
+            packet_event_id[input_pkt_seq[i]] < warmup_events + measurement_events &&
+            input_offer_ps[i] >= measurement_start_ps && input_offer_ps[i] < measurement_end_ps)
+          measurement_offered_flits = measurement_offered_flits + 1;
+      for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1)
+        if (rx_match[p][s] &&
+            packet_event_id[rx_pkt_seq[p][s]] >= warmup_events &&
+            packet_event_id[rx_pkt_seq[p][s]] < warmup_events + measurement_events &&
+            rx_egress_ps[p][s] >= measurement_start_ps && rx_egress_ps[p][s] < measurement_end_ps)
+          measurement_delivered_flits = measurement_delivered_flits + 1;
+      measurement_backlog_flits = measurement_offered_flits - measurement_delivered_flits;
       for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1)
         if (rx_match[p][s] && rx_is_tail[p][s]) begin
           packet = rx_pkt_seq[p][s];
-          if (packet >= 0 && packet < MAX_PACKETS && packet_head_ack_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0) begin
-            lat = rx_egress_ps[p][s] - packet_head_ack_ps[packet];
+          if (packet >= 0 && packet < MAX_PACKETS && packet_head_offer_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0)
+            delivered_packets = delivered_packets + 1;
+          if (packet >= 0 && packet < MAX_PACKETS &&
+              packet_event_id[packet] >= warmup_events &&
+              packet_event_id[packet] < warmup_events + measurement_events &&
+              packet_head_offer_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0) begin
+            // End-to-end packet latency includes source-side queueing.  The
+            // previous head-Ack-to-tail metric converges to the in-network
+            // service time under overload and therefore hides source backlog.
+            // Select by offered-event cohort, but allow the Tail to drain
+            // after the measurement window so congested packets are not
+            // right-censored out of the latency distribution.
+            lat = rx_egress_ps[p][s] - packet_head_offer_ps[packet];
             if (latency_count < MAX_INPUT_FLITS) begin
               latency_ps[latency_count] = lat;
               latency_count = latency_count + 1;
             end
             lat_sum = lat_sum + lat;
             if (lat > max_lat) max_lat = lat;
-            delivered_packets = delivered_packets + 1;
           end
         end
       for (i = 0; i < latency_count; i = i + 1) for (j = i + 1; j < latency_count; j = j + 1)
@@ -354,7 +446,10 @@ module noc_async_keycase_core #(
       end else begin p95_lat = 0; p99_lat = 0; end
       avg_lat_ns = latency_count ? (lat_sum * 1.0 / latency_count / 1000.0) : 0.0;
       elapsed_ns = $realtime - case_epoch_ns;
-      throughput = elapsed_ns > 0.0 ? (delivered_flits * case_tick_ns / elapsed_ns) : 0.0;
+      window_ns = (measurement_end_ps - measurement_start_ps) / 1000.0;
+      window_s = window_ns * 1.0e-9;
+      offered_mflit_port_s = window_s > 0.0 ? (measurement_offered_flits / window_s / NUM_CORES / 1.0e6) : 0.0;
+      throughput = window_s > 0.0 ? (measurement_delivered_flits / window_s / NUM_CORES / 1.0e6) : 0.0;
       drainable = !timed_out && !x_failed && (injected_flits == input_count) && (missing_flits == 0) && (unexpected_flits == 0);
       backlog_growth = timed_out && (missing_flits > 0);
       pass_ok = drainable;
@@ -364,10 +459,12 @@ module noc_async_keycase_core #(
                    p, expected_matched[p], expected_port_count[p], rx_count[p]);
 
       fd_summary = $fopen(csv_file, "w");
-      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail\n");
-      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0,%0d,%f,%f,%f,%f,%f,%0s\n",
+      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,measurement_start_ps,measurement_end_ps,measurement_offered_flits,measurement_delivered_flits,measurement_backlog_flits,offered_mflit_port_s,delivered_mflit_port_s,pass_fail\n");
+      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0,%0d,%f,%f,%f,%f,%f,%0d,%0d,%0d,%0d,%0d,%f,%f,%0s\n",
               case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits,
               timed_out, $rtoi(elapsed_ns / case_tick_ns), throughput, avg_lat_ns, max_lat / 1000.0, p95_lat / 1000.0, p99_lat / 1000.0,
+              measurement_start_ps, measurement_end_ps, measurement_offered_flits, measurement_delivered_flits, measurement_backlog_flits,
+              offered_mflit_port_s, throughput,
               pass_ok ? "PASS" : "FAIL");
       $fclose(fd_summary);
 
@@ -380,16 +477,51 @@ module noc_async_keycase_core #(
       $fclose(fd_events);
 
       fd_latency = $fopen(latency_csv_file, "w");
-      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,per_dest_latency_ns,tmax_component_ns\n");
+      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_offer_ps,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,per_dest_latency_ns,tmax_component_ns,source_queue_ns,ingress_service_ns,offer_to_tail_ns\n");
       for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1)
         if (rx_match[p][s] && rx_is_tail[p][s]) begin
           packet = rx_pkt_seq[p][s];
-          $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s],
-                  packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s],
+          $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%0d,%f,%f,%f,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s],
+                  packet_head_offer_ps[packet], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s],
+                  (rx_egress_ps[p][s]-packet_head_offer_ps[packet])/1000.0,
+                  (rx_egress_ps[p][s]-packet_head_req_ps[packet])/1000.0,
+                  (packet_head_ack_ps[packet]-packet_head_offer_ps[packet])/1000.0,
                   (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0,
-                  (rx_egress_ps[p][s]-packet_head_req_ps[packet])/1000.0);
+                  (rx_egress_ps[p][s]-packet_head_offer_ps[packet])/1000.0);
         end
       $fclose(fd_latency);
+
+      fd_flit = $fopen(flit_latency_csv_file, "w");
+      $fwrite(fd_flit, "port,pkt_seq,flit,offer_ps,egress_ps,lat_ns\n");
+      for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1)
+        if (rx_match[p][s]) begin
+          tx_index = -1;
+          for (i = 0; i < input_count; i = i + 1)
+            if (input_pkt_seq[i] == rx_pkt_seq[p][s] && input_flit[i] === rx_flit[p][s])
+              tx_index = i;
+          if (tx_index >= 0 && input_offer_ps[tx_index] >= 0)
+            $fwrite(fd_flit, "%0d,%0d,%h,%0d,%0d,%f\n", p, rx_pkt_seq[p][s],
+                    rx_flit[p][s], input_offer_ps[tx_index], rx_egress_ps[p][s],
+                    (rx_egress_ps[p][s]-input_offer_ps[tx_index])/1000.0);
+        end
+      $fclose(fd_flit);
+
+      if (upper_mesh_csv_file != "") begin
+        fd_upper = $fopen(upper_mesh_csv_file, "w");
+        $fwrite(fd_upper, "record,tile,plane,local_lane,accepted_flits\n");
+        all_sum = 0;
+        for (t = 0; t < 4; t = t + 1) begin
+          tile_sum = 0;
+          for (j = 0; j < 16; j = j + 1) for (l = 0; l < 4; l = l + 1) begin
+            $fwrite(fd_upper, "lane,%0d,%0d,%0d,%0d\n", t, j, l, upper_mesh_count[t][j][l]);
+            tile_sum = tile_sum + upper_mesh_count[t][j][l];
+          end
+          $fwrite(fd_upper, "tile_total,%0d,-1,-1,%0d\n", t, tile_sum);
+          all_sum = all_sum + tile_sum;
+        end
+        $fwrite(fd_upper, "global_total,-1,-1,-1,%0d\n", all_sum);
+        $fclose(fd_upper);
+      end
 
       if (write_v3_metrics) begin
         fd_v3 = $fopen(v3_metrics_file, "w");
@@ -562,6 +694,10 @@ module noc_async_keycase_core #(
                  noc.dut.meshR_13_6.io_outputs_child_3_0_HS_Ack,
                  noc.dut.meshR_13_6.io_outputs_child_3_0_Data_flit)
 
+`ifdef CMR_MESH256_R137_INTERNAL_PROBE
+  // Netlist-sensitive meshR_13_7 internal probe. Keep this out of normal
+  // regressions because synthesis may rename or remove these internal nets.
+  // Enable it only for a matching frozen netlist.
   // meshR_13_7 internal probe: south IPM (InputPortModules_1) -> north OPM (OutputPortModules_3).
   // South branch 2 = North; south is OPM source index 1 on OutputPortModules_3.
   `define R137_INT noc.dut.meshR_13_7
@@ -631,6 +767,7 @@ module noc_async_keycase_core #(
            `R137_SBUF.WriteInterface_io_CellFull_4) begin
     r137_internal_dump("event");
   end
+`endif
 
   task automatic dump_mesh256_path_counts;
     begin
@@ -665,7 +802,7 @@ module noc_async_keycase_core #(
 
   initial begin
     case_file = ""; csv_file = "async_noc_summary.csv"; event_csv_file = "async_noc_events.csv";
-    latency_csv_file = "async_noc_latency.csv"; v3_metrics_file = "";
+    latency_csv_file = "async_noc_latency.csv"; flit_latency_csv_file = "async_noc_flit_latency.csv"; v3_metrics_file = ""; upper_mesh_csv_file = "";
     case_tick_ns = 1.0; case_meta_tick_ns = 0.0;
     case_tick_cli_seen = 1'b0; case_meta_tick_seen = 1'b0;
     tx_setup_ns = 0.05; rx_capture_ns = 0.05;
@@ -676,6 +813,8 @@ module noc_async_keycase_core #(
     if ($value$plusargs("RESULT_CSV=%s", csv_file)) ;
     if ($value$plusargs("EVENT_CSV=%s", event_csv_file)) ;
     if ($value$plusargs("LATENCY_CSV=%s", latency_csv_file)) ;
+    if ($value$plusargs("FLIT_LATENCY_CSV=%s", flit_latency_csv_file)) ;
+    if ($value$plusargs("UPPER_MESH_CSV=%s", upper_mesh_csv_file)) ;
     if ($value$plusargs("V3_METRICS_CSV=%s", v3_metrics_file)) write_v3_metrics = 1;
     if ($value$plusargs("CASE_TICK_NS=%f", case_tick_ns)) case_tick_cli_seen = 1'b1;
     if ($value$plusargs("TX_SETUP_NS=%f", tx_setup_ns)) ;
@@ -739,6 +878,20 @@ module tb_noc_async_keycase;
   localparam integer NUM_CORES = 256;
 `endif
   noc_async_keycase_core #(.NUM_CORES(NUM_CORES), .ROBUST_DIRECT_HANDSHAKE(1)) core();
+`ifdef CMR_NOC_PROP_TEMP_M16
+  // The adapter exposes passive taps for every tile/plane/local-lane ingress.
+  genvar upper_mon_idx;
+  generate for (upper_mon_idx = 0; upper_mon_idx < 256; upper_mon_idx = upper_mon_idx + 1) begin : g_upper_mesh_monitor
+    always @(core.noc.mon_upper_ack[upper_mon_idx]) begin
+      if (core.running &&
+          core.noc.mon_upper_req[upper_mon_idx] === core.noc.mon_upper_ack[upper_mon_idx] &&
+          $realtime >= core.case_epoch_ns + core.measurement_start_cycle * core.case_tick_ns &&
+          $realtime <= core.case_epoch_ns + core.measurement_end_cycle * core.case_tick_ns)
+        core.upper_mesh_count[upper_mon_idx/64][(upper_mon_idx/4)%16][upper_mon_idx%4] =
+          core.upper_mesh_count[upper_mon_idx/64][(upper_mon_idx/4)%16][upper_mon_idx%4] + 1;
+    end
+  end endgenerate
+`endif
 `ifndef CMR_NOC_1024
 `ifdef CMR_NOC_PROP_TEMP
 `define TB_L1_DUP_MON(req, ack, flit, nm) \
@@ -762,6 +915,12 @@ module tb_noc_async_keycase;
     if ($value$plusargs("DUMP_L1_DUP_VCD=%s", dump_l1_vcd)) begin
       $dumpfile(dump_l1_vcd);
       $dumpvars(1, core.noc.dut.propTile_1_0.propL1_q0_i2);
+      // The duplicate packets enter through parent lanes 1 and 3.  Include
+      // exactly their IPM/RCU children so the diagnostic can distinguish a
+      // transient multi-hot Mat/RouteSel from a Selector latch fault without
+      // dumping the complete 256-node design.
+      $dumpvars(2, core.noc.dut.propTile_1_0.propL1_q0_i2.InputPortModules_5);
+      $dumpvars(2, core.noc.dut.propTile_1_0.propL1_q0_i2.InputPortModules_7);
       $display("TB_INFO DUMP_L1_DUP_VCD %0s", dump_l1_vcd);
     end
   end

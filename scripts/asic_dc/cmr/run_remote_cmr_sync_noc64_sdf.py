@@ -4,7 +4,8 @@
 Profiles (CMR_SYNC64_PROFILE):
   thin     (1,1) three-level tree, 1 top lane, 105 ports (default)
   fat1222  L1 1->2, L2/L3 2->2, 2 top lanes, 146 ports, 264 SyncLaneSelector
-  propb8   topology-matched PROP_temp64: 48 routers, 336 ports, 16 top lanes
+  propb8   topology-matched PROP_temp64 B8: 48 routers, 336 ports, 16 top lanes
+  propm16  topology-matched PROP_temp64 M16: 48 routers, 384 ports, 64 top lanes
 
 No Mutex, no DelayElement, no LanePhaseAdapter.  Functional/no-SDF GLS is
 not implemented: emit -> clock DC -> MAXIMUM SDF.
@@ -49,7 +50,9 @@ SIGNED_FAT1222_RUN_ID = FROZEN_SYNC64_FAT1222_RUN_ID
 
 _raw_profile = os.environ.get("CMR_SYNC64_PROFILE", "thin").strip().lower()
 _raw_profile = _raw_profile.replace("-", "").replace("_", "")
-if _raw_profile in ("propb8", "b8", "proptemp"):
+if _raw_profile in ("propm16", "m16", "proptempm16"):
+    PROFILE = "propm16"
+elif _raw_profile in ("propb8", "b8", "proptemp"):
     PROFILE = "propb8"
 elif _raw_profile in ("fat1222", "1222", "fat"):
     PROFILE = "fat1222"
@@ -57,11 +60,23 @@ elif _raw_profile in ("thin", "111"):
     PROFILE = "thin"
 else:
     raise SystemExit(
-        "CMR_SYNC64_PROFILE must be thin, fat1222, or propb8, got %s"
+        "CMR_SYNC64_PROFILE must be thin, fat1222, propb8, or propm16, got %s"
         % os.environ.get("CMR_SYNC64_PROFILE", "")
     )
 
-if PROFILE == "propb8":
+if PROFILE == "propm16":
+    RUN_SUFFIX = "_cmr_sync_prop_temp64_m16_p1000"
+    DEFAULT_CASES = ("noc64_00_to_77_3flit",)
+    EXPECTED_PORTS = 384
+    EXPECTED_TOP = 64
+    EXPECTED_SELECTORS = -1
+    CASE_TOP_LANES = "64"
+    RTL_REMOTE_DIR = "rtl/sync_prop_temp64_m16"
+    GEN_DIR = REPO / "generated_sync_cmr" / "prop_temp64_m16"
+    EMIT_MAIN = "NoC.CMR.SyncPROPtemp64M16Main"
+    EMIT_LABEL = "PROP_temp64 M16 topology-matched sync"
+    GEOMETRY = "prop_temp64_m16_l1_l2_l3_1to4"
+elif PROFILE == "propb8":
     RUN_SUFFIX = "_cmr_sync_prop_temp64_b8_p1000"
     DEFAULT_CASES = ("noc64_00_to_77_3flit",)
     EXPECTED_PORTS = 336
@@ -117,6 +132,7 @@ CASES = tuple(
 )
 REMOTE_CASE_FILE = os.environ.get("CMR_SYNC64_REMOTE_CASE_FILE", "").strip()
 SKIP_GLS = os.environ.get("CMR_SYNC64_SKIP_GLS", "0") == "1"
+SKIP_FETCH = os.environ.get("CMR_SYNC64_SKIP_FETCH", "0") == "1"
 INJECT_MAX_RATE = os.environ.get("CMR_SYNC64_INJECT_MAX_RATE", "0") == "1"
 SIM_ARGS = os.environ.get("CMR_SYNC64_SIM_ARGS", "")
 CLOCK_PERIOD_NS = os.environ.get("CMR_SYNC64_CLOCK_PERIOD_NS", "1.0")
@@ -126,7 +142,7 @@ DC_POLLS = int(os.environ.get("CMR_SYNC64_DC_POLLS", "1440"))
 GLS_POLLS = int(os.environ.get("CMR_SYNC64_GLS_POLLS", "720"))
 DC_BSUB = os.environ.get("CMR_SYNC64_DC_BSUB", "-n 16")
 GLS_BSUB = os.environ.get("CMR_SYNC64_GLS_BSUB", "-n 8")
-EXPECTED_ROUTERS = 48 if PROFILE == "propb8" else 21
+EXPECTED_ROUTERS = 48 if PROFILE in ("propb8", "propm16") else 21
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
 
@@ -204,7 +220,7 @@ def _check_generated(generated: Path) -> Path:
     if not rtl.is_file():
         raise SystemExit("missing generated SyncNoC64: " + str(rtl))
     text = rtl.read_text(encoding="utf-8")
-    router_pattern = r"^\s+SyncCmrRouter(?:_\d+)?\s+syncPropL" if PROFILE == "propb8" else r"^\s+SyncCmrRouter(?:_\d+)?\s+routers?L"
+    router_pattern = r"^\s+SyncCmrRouter(?:_\d+)?\s+syncProp(?:M16)?L" if PROFILE in ("propb8", "propm16") else r"^\s+SyncCmrRouter(?:_\d+)?\s+routers?L"
     router_count = len(re.findall(router_pattern, text, re.M))
     ipm_count = len(re.findall(r"^\s+SyncCmrIPM(?:_\d+)?\s+InputPortModules_\d+", text, re.M))
     opm_count = len(re.findall(r"^\s+SyncOPM(?:_\d+)?\s+OutputPortModules_\d+", text, re.M))
@@ -222,9 +238,9 @@ def _check_generated(generated: Path) -> Path:
         raise SystemExit("generated DUT still has async HS_Req ports")
     if router_count != EXPECTED_ROUTERS:
         raise SystemExit("SyncNoC64 router count %d != %d" % (router_count, EXPECTED_ROUTERS))
-    if PROFILE != "propb8" and ipm_count != EXPECTED_PORTS:
+    if PROFILE not in ("propb8", "propm16") and ipm_count != EXPECTED_PORTS:
         raise SystemExit("SyncNoC64 IPM count %d != %d" % (ipm_count, EXPECTED_PORTS))
-    if PROFILE != "propb8" and opm_count != EXPECTED_PORTS:
+    if PROFILE not in ("propb8", "propm16") and opm_count != EXPECTED_PORTS:
         raise SystemExit("SyncNoC64 OPM count %d != %d" % (opm_count, EXPECTED_PORTS))
     if mutex_count or delay_count or adapter_count or fifo_count:
         raise SystemExit(
@@ -647,23 +663,26 @@ def main():
     (result_dir / "summary.json").write_text(
         json.dumps(status, indent=2) + "\n", encoding="utf-8"
     )
-    sftp = client.open_sftp()
-    fetch_list = [
-        (ROOT + "/reports/dc/" + netlist_run_id, result_dir / "reports_dc"),
-        (ROOT + "/logs/dc/" + run_id + ".log", result_dir / "dc.log"),
-    ]
-    if not SKIP_GLS:
-        fetch_list.append((ROOT + "/logs/gls/" + run_id, result_dir / "logs_gls"))
-    for remote, local in fetch_list:
-        try:
-            if remote.endswith(".log"):
-                result_dir.mkdir(parents=True, exist_ok=True)
-                sftp.get(remote, str(local))
-            else:
-                fetch_tree(sftp, remote, local)
-        except IOError:
-            print("FETCH_SKIP", remote, flush=True)
-    sftp.close()
+    if not SKIP_FETCH:
+        sftp = client.open_sftp()
+        fetch_list = [
+            (ROOT + "/reports/dc/" + netlist_run_id, result_dir / "reports_dc"),
+            (ROOT + "/logs/dc/" + run_id + ".log", result_dir / "dc.log"),
+        ]
+        if not SKIP_GLS:
+            fetch_list.append((ROOT + "/logs/gls/" + run_id, result_dir / "logs_gls"))
+        for remote, local in fetch_list:
+            try:
+                if remote.endswith(".log"):
+                    result_dir.mkdir(parents=True, exist_ok=True)
+                    sftp.get(remote, str(local))
+                else:
+                    fetch_tree(sftp, remote, local)
+            except IOError:
+                print("FETCH_SKIP", remote, flush=True)
+        sftp.close()
+    else:
+        print("REMOTE_EVIDENCE_PRESERVED fetch=skipped", flush=True)
     client.close()
     print("LOCAL_RESULT", result_dir, "PASS" if status["all_pass"] else "FAIL", flush=True)
     print("SYNC64_SUMMARY", result_dir, "PASS" if status["all_pass"] else "FAIL", flush=True)

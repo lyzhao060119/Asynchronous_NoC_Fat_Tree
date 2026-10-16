@@ -216,6 +216,32 @@ class PROPtempTileM16(tileX: Int = 0, tileY: Int = 0) extends Module {
   }
 }
 
+/** Standalone 64-core M16 PROP tree.  The four Mesh-facing planes that join
+  * tiles in PROP_temp256_m16 are deliberately not instantiated here; the
+  * sixteen L3 routers expose their 64 parent lanes as this top-level boundary.
+  */
+class PROPtemp64M16 extends Module {
+  override def desiredName: String = "PROP_temp64_m16"
+  val io = IO(new Bundle {
+    val core_inputs = Vec(64, new HS_Packet)
+    val core_outputs = Flipped(Vec(64, new HS_Packet))
+    val top_input = Vec(64, new HS_Packet)
+    val top_output = Flipped(Vec(64, new HS_Packet))
+  })
+
+  private val tree = Module(new PROPtempTileM16())
+  io <> tree.io
+}
+
+object PROPtemp64M16Main extends App {
+  require(CMRParameters.RcuMatchedDelaySteps == 1 &&
+    CMRParameters.TreeRcuMatchedDelayUnitPs == 100 &&
+    CMRParameters.MeshRcuMatchedDelayUnitPs == 150,
+    "PROP_temp64_m16 emission requires Tree RCU DEL100 (Mesh DEL150 is reserved for the omitted upper planes)")
+  emitVerilog(new PROPtemp64M16,
+    Array("--target-dir", "generated_cmr/prop_temp64_m16"))
+}
+
 /** Four M16 tiles joined by sixteen independent 2x2 Mesh(1,4) planes.
   *
   * Same-tile Mesh routers do not interconnect across planes.  Across tiles,

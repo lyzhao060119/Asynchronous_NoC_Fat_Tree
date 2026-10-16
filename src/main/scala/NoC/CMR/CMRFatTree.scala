@@ -7,13 +7,11 @@ import Router_Architecture.common.{AsyncFifo, AsyncFifoLike, CircularFifo}
 import chisel3._
 import tool.AsyncDelay
 
-/** One complete 64-core CMR quadtree.
+/** One complete 64-core conventional PFAT quadtree.
   *
-  * Lane geometry comes from `scale.channels`.  Thin is all (1,1) with one
-  * top lane.  FatLane1222 is L1 1→2 and 2→2 at L2/L3 (two top lanes).
-  * FatLane1248 is L1 1→2, L2 2→4, L3 4→8 (eight top lanes).  L1 stays one
-  * child lane so the tile is 64 cores.  The same wiring is used for all
-  * three profiles.
+  * Lane geometry comes from `scale.channels`: L1 is 1→2, L2 is 2→4,
+  * and L3 is 4→8.  L1 has one child lane, so the tile covers 64 cores.
+  * PROP/M16 is a separate tree implementation in `PROPtemp.scala`.
   *
   * Set CMR_USE_CIRCULAR_FIFO=1 to replace the inter-level AsyncFifo chain with
   * the Transition-paper circular FIFO on existing depth-three lanes. The
@@ -177,16 +175,24 @@ class CMRFatTree(
 }
 
 object CMRFatTreeMain extends App {
-  private val scale = NoCScaleConfig.q64TreeFromEnv
-  private val targetDir = scale.channels match {
-    case ch if ch == NoCScaleConfig.ThinLane111 => "generated_cmr/fat_tree_1_1_1_1"
-    case ch if ch == NoCScaleConfig.FatLane1222 => "generated_cmr/fat_tree_1_2_2_2"
-    case _ => "generated_cmr/fat_tree_1_2_4_8"
+  private val profile = sys.env.getOrElse("CMR_Q64_PROFILE", "1248")
+    .trim.toLowerCase.replace("-", "").replace("_", "")
+  profile match {
+    case "prop" | "m16" | "propm16" =>
+      emitVerilog(
+        new PROPtemp64M16,
+        Array("--target-dir", "generated_cmr/prop_temp64_m16")
+      )
+    case "1248" | "pfat" | "fatlane1248" =>
+      emitVerilog(
+        new CMRFatTree(scale = NoCScaleConfig.fatTree64),
+        Array("--target-dir", "generated_cmr/fat_tree_1_2_4_8")
+      )
+    case other =>
+      throw new IllegalArgumentException(
+        s"Unsupported CMR_Q64_PROFILE='$other'. Use prop (M16) or 1248."
+      )
   }
-  emitVerilog(
-    new CMRFatTree(scale = scale),
-    Array("--target-dir", targetDir)
-  )
 }
 
 /** Simulation boundary harness for a two-packet, three-level upward path. */

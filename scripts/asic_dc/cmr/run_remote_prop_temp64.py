@@ -3,7 +3,7 @@
 
 Usage:
   python run_remote_prop_temp64.py dc [--static4] [--run-id ID] [--submit-only]
-  python run_remote_prop_temp64.py gls [--static4] [--run-id ID] [--submit-only]
+  python run_remote_prop_temp64.py gls [--static4|--m16] [--run-id ID] [--submit-only]
   python run_remote_prop_temp64.py all [--static4] [--run-id ID]
 """
 from __future__ import annotations
@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shlex
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -36,15 +37,25 @@ from run_remote_cmr_fat_tree_noc16_sdf import (  # noqa: E402
     wait_job,
 )
 from run_remote_cmr_noc64_sdf import collect_gls_result, shared_input_files  # noqa: E402
-from _tmp_paper64_common import LOADS  # noqa: E402
+
+LOADS = (
+    5, 10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260,
+    280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 600, 700, 800,
+)
 
 REPO = HERE.parents[2]
 ROOT = os.environ.get("CMR_REMOTE_ROOT", "/home/ghy19/Asynchronous_Router_CMR")
-CASE_DIR = HERE / "generated_cases" / "20260913_prop_temp64_asap_m5_500_202701" / "cases"
 HOSTS = os.environ.get("CMR_DES_BSUB_EXTRA", '-m "node21 node26 node24 node18"')
 LOGIN_HOSTS = ("192.168.2.9", "192.168.2.8")
 FROZEN_NETLIST = FROZEN_PROP_TEMP64_NETLIST_RUN_ID
-STATE_DIR = HERE / "generated_cases" / "20260913_prop_temp64_asap_m5_500_202701"
+DEFAULT_SEED = 202701
+SEED = DEFAULT_SEED
+
+
+def case_dir() -> Path:
+    if m16():
+        return HERE / "generated_cases" / ("pfat64_asap_m5_800_s%d" % SEED) / "cases"
+    return HERE / "generated_cases" / ("prop_temp64_asap_m5_800_s%d" % SEED) / "cases"
 
 
 def dut_name() -> str:
@@ -55,21 +66,31 @@ def static4() -> bool:
     return dut_name() == "PROP_temp64_static4"
 
 
+def m16() -> bool:
+    return dut_name() == "PROP_temp64_m16"
+
+
 def dc_marker() -> str:
     return "PROP_TEMP64_STATIC4_DC_PASS" if static4() else "PROP_TEMP64_DC_PASS"
 
 
-def output_files() -> tuple[str, str, str, str]:
+def output_files() -> tuple[str, ...]:
     name = dut_name()
+    if m16():
+        return (name + ".ddc", name + "_post.v", name + ".sdf")
     return (name + ".ddc", name + "_post.v", name + ".sdf", name + ".sdc")
 
 
 def state_dir() -> Path:
-    return STATE_DIR / ("static4" if static4() else "dynamic")
+    if m16():
+        return HERE / "generated_cases" / ("pfat64_asap_m5_800_s%d" % SEED) / "prop_m16"
+    return HERE / "generated_cases" / ("prop_temp64_asap_m5_800_s%d" % SEED) / ("static4" if static4() else "dynamic")
 
 
 def case_name(load: int) -> str:
-    return "TOPO-UR_n64_s202701_m%d_PROP_temp64_top16" % load
+    if m16():
+        return "TOPO-UR_n64_s%d_m%d_PFAT64_top8" % (SEED, load)
+    return "TOPO-UR_n64_s%d_m%d_PROP_temp64_top16" % (SEED, load)
 
 
 def case_names(loads=None) -> list[str]:
@@ -151,7 +172,7 @@ def put_text(client, text: str, dest: str):
 
 def require_cases(loads=None) -> list[str]:
     names = case_names(loads)
-    missing = [n for n in names if not (CASE_DIR / (n + ".case")).is_file()]
+    missing = [n for n in names if not (case_dir() / (n + ".case")).is_file()]
     if missing:
         raise SystemExit("missing cases (run gen_prop_temp64_cases.py): " + ",".join(missing[:6]))
     return names
@@ -334,8 +355,8 @@ def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = Non
         REPO / "scripts/asic_dc/sim_gls/patch_gls_netlist.py": sim + "/patch_gls_netlist.py",
     }
     for name in names:
-        files[CASE_DIR / (name + ".case")] = sim + "/cases/" + name + ".case"
-    model = CASE_DIR.parent / "INJECTION_MODEL.json"
+        files[case_dir() / (name + ".case")] = sim + "/cases/" + name + ".case"
+    model = case_dir().parent / "INJECTION_MODEL.json"
     if model.is_file():
         files[model] = sim + "/cases/INJECTION_MODEL.json"
     for source, dest in files.items():
@@ -343,35 +364,59 @@ def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = Non
     shell = "%s/scripts/prop_temp64_%s/run_gls_prop_temp64.sh" % (ROOT, run_id)
     client, _ = remote(client, "chmod +x " + shlex.quote(shell))
     jobs = []
-    for name in names:
-        mode = "sdf"
-        wrapper = "%s/logs/gls/%s/%s_%s.sh" % (ROOT, run_id, mode, name)
-        body = (
-            "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
-            "export CMR_REMOTE_ROOT=%s PROP_TEMP64_RUN_ID=%s PROP_TEMP64_DUT_NAME=%s "
-            "PROP_TEMP64_NETLIST_RUN_ID=%s PROP_TEMP64_MODE=%s "
-            "PROP_TEMP64_CASE_NAME=%s PROP_TEMP64_CASE_FILE=%s/cases/%s.case "
-            "PROP_TEMP64_RX_CAPTURE_NS=0.1\n"
-            "exec bash %s\n"
-            % (ROOT, run_id, dut_name(), netlist_id, mode, name, sim, name, shell)
-        )
-        client = put_text(client, body, wrapper)
-        client, _ = remote(client, "chmod +x " + shlex.quote(wrapper))
-        log = "%s/logs/gls/%s/%s_%s.job.log" % (ROOT, run_id, mode, name)
-        client, submitted = remote(
+    default_modes = "func,sdf" if m16() else "sdf"
+    modes = tuple(mode.strip() for mode in os.environ.get("PROP_TEMP64_GLS_MODES", default_modes).split(",") if mode.strip())
+    if not modes or any(mode not in ("func", "sdf") for mode in modes):
+        raise ValueError("PROP_TEMP64_GLS_MODES must contain func and/or sdf")
+    func_netlist = "%s/%s_func.v" % (sim, dut_name())
+    if "func" in modes:
+        client, patched = remote(
             client,
-            "bsub -n 8 %s -o %s -e %s.err -J %s %s"
+            "python3 %s %s/outputs/%s/%s_post.v %s --mode cmr_func"
             % (
-                HOSTS,
-                shlex.quote(log),
-                shlex.quote(log),
-                shlex.quote("pt64_%s_m%s" % (mode, name.split("_m")[1].split("_")[0])),
-                shlex.quote(wrapper),
+                shlex.quote(sim + "/patch_gls_netlist.py"), ROOT, netlist_id,
+                dut_name(), shlex.quote(func_netlist),
             ),
         )
-        jid = job_id(submitted)
-        jobs.append({"case": name, "mode": mode, "job": jid, "netlist": netlist_id})
-        print("PROP_TEMP64_GLS_SUBMITTED", mode, name, jid, flush=True)
+        if "patched_mutex_modules=0" in patched and "patched_delay_modules=0" in patched:
+            raise RuntimeError(
+                "functional GLS unsupported for this fully mapped netlist: "
+                "no patchable Mutex/Delay modules; use strict SDF"
+            )
+        else:
+            print("PROP_TEMP64_FUNC_NETLIST_PATCHED", func_netlist, flush=True)
+    for name in names:
+        for mode in modes:
+            wrapper = "%s/logs/gls/%s/%s_%s.sh" % (ROOT, run_id, mode, name)
+            body = (
+                "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
+                "export CMR_REMOTE_ROOT=%s PROP_TEMP64_RUN_ID=%s PROP_TEMP64_DUT_NAME=%s "
+                "PROP_TEMP64_NETLIST_RUN_ID=%s PROP_TEMP64_MODE=%s "
+                "PROP_TEMP64_CASE_NAME=%s PROP_TEMP64_CASE_FILE=%s/cases/%s.case "
+                "PROP_TEMP64_RX_CAPTURE_NS=0.1 PROP_TEMP64_FUNC_NETLIST=%s\n"
+                "exec bash %s\n"
+                % (
+                    ROOT, run_id, dut_name(), netlist_id, mode, name, sim, name,
+                    func_netlist, shell,
+                )
+            )
+            client = put_text(client, body, wrapper)
+            client, _ = remote(client, "chmod +x " + shlex.quote(wrapper))
+            log = "%s/logs/gls/%s/%s_%s.job.log" % (ROOT, run_id, mode, name)
+            client, submitted = remote(
+                client,
+                "bsub -n 8 %s -o %s -e %s.err -J %s %s"
+                % (
+                    HOSTS,
+                    shlex.quote(log),
+                    shlex.quote(log),
+                    shlex.quote("pt64_%s_m%s" % (mode, name.split("_m")[1].split("_")[0])),
+                    shlex.quote(wrapper),
+                ),
+            )
+            jid = job_id(submitted)
+            jobs.append({"case": name, "mode": mode, "job": jid, "netlist": netlist_id})
+            print("PROP_TEMP64_GLS_SUBMITTED", mode, name, jid, flush=True)
     state_path = state_dir() / "launch_state.json"
     state = {}
     if state_path.is_file():
@@ -414,7 +459,7 @@ def gls(client, run_id: str, submit_only: bool, netlist_run_id: str | None = Non
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("dc", "gls", "all", "waitdc"))
+    parser.add_argument("stage", choices=("dc", "gls", "all", "waitdc", "materialize"))
     parser.add_argument(
         "--run-id",
         default=os.environ.get("PROP_TEMP64_RUN_ID")
@@ -436,6 +481,10 @@ def main() -> int:
         help="use PROP_temp64_static4 and require zero dynamic LaneSelector cells",
     )
     parser.add_argument(
+        "--m16", action="store_true",
+        help="test PROP_temp64_m16 (64 top lanes) with audited PFAT core-only cases",
+    )
+    parser.add_argument(
         "--reuse-rtl-run-id", default=None,
         help="DC only: reuse verified remote rtl/prop_temp64_<run-id> without upload",
     )
@@ -443,16 +492,43 @@ def main() -> int:
         "--loads", default=None,
         help="comma-separated GLS loads; default is the complete canonical grid",
     )
+    parser.add_argument(
+        "--modes", choices=("func", "sdf", "func,sdf"), default=None,
+        help="GLS modes; M16 defaults to func,sdf and legacy designs to sdf",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_SEED,
+        help="traffic seed (default %d); run once per seed for the paper grid" % DEFAULT_SEED,
+    )
     args = parser.parse_args()
+    global SEED
+    SEED = args.seed
+    if args.static4 and args.m16:
+        raise SystemExit("--static4 and --m16 are mutually exclusive")
     if args.static4:
         os.environ["PROP_TEMP64_DUT_NAME"] = "PROP_temp64_static4"
+    elif args.m16:
+        os.environ["PROP_TEMP64_DUT_NAME"] = "PROP_temp64_m16"
+    if args.modes:
+        os.environ["PROP_TEMP64_GLS_MODES"] = args.modes
     selected_loads = None
     if args.loads:
         selected_loads = [int(value.strip()) for value in args.loads.split(",") if value.strip()]
         if not selected_loads or any(value not in LOADS for value in selected_loads):
             raise SystemExit("--loads must be a nonempty subset of the canonical load grid")
     run_id = checked_id(args.run_id)
-    require_cases()
+    if args.stage == "materialize":
+        subprocess.check_call(
+            [sys.executable, str(HERE / "gen_prop_temp64_cases.py"), "--seed", str(SEED)],
+            cwd=str(HERE),
+        )
+        return 0
+    # A focused low/medium/high validation must only require the explicitly
+    # selected cases.  Requiring the complete 30-point grid here prevented a
+    # valid subset run before gls() could use selected_loads.
+    require_cases(selected_loads)
     client = connect_failover()
     try:
         if args.stage == "dc":

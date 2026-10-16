@@ -6,9 +6,10 @@ import Router_Architecture.CMR.CMRParameters
 import chisel3._
 
 /**
-  * PROP256 / PROP1024: `clusterGrid` × `clusterGrid` Q64 tiles plus a
-  * native-branching CMR TopMesh.  Local hierarchy stays 1-2-2-2 (or the
-  * supplied Q64 channel profile).  H-REP uses this exact netlist; the
+  * Clustered CMR network: `clusterGrid` × `clusterGrid` Q64 tiles plus a
+  * native-branching CMR TopMesh. The conventional tile profile is PFAT
+  * 1-2-4-8; the newer M16 PROP tree has its own dedicated 64-core top. H-REP
+  * uses this exact netlist; the
   * boundary split lives in `HrepBoundaryPolicy`, not in the routers.
   *
   * TopMesh `(meshLanes, localLanes)` is selected from the Q64 top interface.
@@ -88,11 +89,10 @@ class CMRClusteredNoC(
 object CMRClusteredNoCMain extends App {
   private val grid = args.headOption.map(_.toInt).getOrElse(2)
   private val meshLanes = args.drop(1).headOption.map(_.toInt).getOrElse(2)
-  private val q64Profile = args.drop(2).headOption.getOrElse("1222")
+  private val q64Profile = args.drop(2).headOption.getOrElse("1248")
   private val q64Channels = q64Profile match {
-    case "1222" => NoCScaleConfig.FatLane1222
     case "1248" => NoCScaleConfig.FatLane1248
-    case other => throw new IllegalArgumentException(s"unsupported Q64 profile $other; use 1222 or 1248")
+    case other => throw new IllegalArgumentException(s"unsupported Q64 profile $other; use 1248")
   }
   private val q64 = NoCScaleConfig(1, 1, q64Channels)
   emitVerilog(

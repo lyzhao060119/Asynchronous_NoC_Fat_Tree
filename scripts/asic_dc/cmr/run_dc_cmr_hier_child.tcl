@@ -20,7 +20,11 @@ set expected_adapters 0
 if {[info exists ::env(CMR_EXPECTED_ADAPTERS)] && $::env(CMR_EXPECTED_ADAPTERS) ne ""} {
   set expected_adapters $::env(CMR_EXPECTED_ADAPTERS)
 }
-set expected_path_latches [expr {4 * $expected_ports}]
+set expected_path_state_dffs [expr {4 * $expected_ports}]
+set path_state_impl "dff"
+if {[info exists ::env(CMR_PATH_STATE_IMPL)] && $::env(CMR_PATH_STATE_IMPL) ne ""} {
+  set path_state_impl $::env(CMR_PATH_STATE_IMPL)
+}
 set rcu_unit_ps 50
 if {[info exists ::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)] && $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS) ne ""} {
   set rcu_unit_ps $::env(CMR_RCU_MATCHED_DELAY_UNIT_PS)
@@ -29,11 +33,24 @@ set opm_ackin_unit_ps 50
 if {[info exists ::env(CMR_OPM_ACKIN_DELAY_UNIT_PS)] && $::env(CMR_OPM_ACKIN_DELAY_UNIT_PS) ne ""} {
   set opm_ackin_unit_ps $::env(CMR_OPM_ACKIN_DELAY_UNIT_PS)
 }
+set opm_reqout_steps 1
+if {[info exists ::env(CMR_OPM_REQOUT_DELAY_STEPS)] && $::env(CMR_OPM_REQOUT_DELAY_STEPS) ne ""} {
+  set opm_reqout_steps $::env(CMR_OPM_REQOUT_DELAY_STEPS)
+}
+set opm_reqout_unit_ps 50
+if {[info exists ::env(CMR_OPM_REQOUT_DELAY_UNIT_PS)] && $::env(CMR_OPM_REQOUT_DELAY_UNIT_PS) ne ""} {
+  set opm_reqout_unit_ps $::env(CMR_OPM_REQOUT_DELAY_UNIT_PS)
+}
+set opm_reqout_buffer_stages 1
+if {[info exists ::env(CMR_OPM_REQOUT_BUFFER_STAGES)] && $::env(CMR_OPM_REQOUT_BUFFER_STAGES) ne ""} {
+  set opm_reqout_buffer_stages $::env(CMR_OPM_REQOUT_BUFFER_STAGES)
+}
 
 source "$RTL_DIR/tech_t28ss.tcl"
 define_design_lib WORK -path $WORK_LIB
 analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/DelayElement_ASIC.v" \
+  "$RTL_DIR/DontTouchBuf_ASIC.v" \
   "$RTL_DIR/Mutex2_ASIC.v" \
   "$RTL_DIR/Mutex4.v" \
   "$RTL_DIR/MullerC2.v" \
@@ -49,7 +66,6 @@ analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/RouteSelAnd2.v" \
   "$RTL_DIR/OPMSelector.v" \
   "$RTL_DIR/PhaseResetDLatch.v" \
-  "$RTL_DIR/LanePhaseAdapter.v" \
   "$RTL_DIR/LanePhaseAdapterDFF.v" \
   "$RTL_DIR/LaneSelector.v" \
   "$RTL_DIR/WriteControlUnit.v" \
@@ -60,11 +76,6 @@ analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/ReadRequestGenerator.v" \
   "$RTL_DIR/ReadPhaseSelector.v" \
   "$RTL_DIR/ReadAckGenerator.v" \
-  "$RTL_DIR/WriteControlBlock.v" \
-  "$RTL_DIR/ReadControlBlock.v" \
-  "$RTL_DIR/CircularWriteCounter.v" \
-  "$RTL_DIR/CircularReadCounter.v" \
-  "$RTL_DIR/CircularFIFO.v" \
   $DUT_V]
 
 set uniquify_naming_style "${REF}_%s_%d"
@@ -74,19 +85,59 @@ uniquify
 link
 check_design > "$REPORT_DIR/check_design_pre.rpt"
 
-# A uniquified router renames its enclosing Selector instance differently for
-# each coordinate.  The PathLatch/SR-cell suffix is invariant, whereas the
-# preceding Selector path is not.  Keep the check tied to PathLatch so the
-# companion BlockLatch SR state is not included.
-set path_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch*sr_cell && ref_name =~ LHCNDQD*}]
-set selector_dual_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch*sr_cell && ref_name =~ LHCSNDQD*}]
-set path_pre_count [sizeof_collection $path_pre]
-set selector_dual_pre_count [sizeof_collection $selector_dual_pre]
-if {$path_pre_count != $expected_path_latches || $selector_dual_pre_count != 0} {
-  puts "CMR_HIER_CHILD_DC_FAIL path_latch_pre ref=$REF clear=$path_pre_count expected=$expected_path_latches dual=$selector_dual_pre_count"
+# Current RTL uses one PathStateDFF per route bit.  The frozen CMR_v1 archive
+# instead uses reset-dominant BlockLatch + PathLatch pairs.  Keep the default
+# strict DFF audit, but allow an explicit archive-only SR-latch audit rather
+# than rejecting a structurally valid frozen source tree.
+if {$path_state_impl eq "dff"} {
+  set path_state_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathState*path_state_reg && ref_name =~ DFCNQD1BWP12T30P140}]
+  set path_state_pre_count [sizeof_collection $path_state_pre]
+  if {$path_state_pre_count != $expected_path_state_dffs} {
+    puts "CMR_HIER_CHILD_DC_FAIL path_state_dff_pre ref=$REF actual=$path_state_pre_count expected=$expected_path_state_dffs"
+    exit 2
+  }
+  set_dont_touch $path_state_pre true
+} elseif {$path_state_impl eq "srlatch"} {
+  set expected_path_state_latches [expr {8 * $expected_ports}]
+  # Before compile/ungroup the two state holders are hierarchical SRLatch
+  # instances (BlockLatch and PathLatch); the LHCNDQD leaf is below them and
+  # is not returned by this pre-compile design-level query.
+  set block_state_pre [get_cells -hierarchical -quiet -filter {full_name =~ *BlockLatch}]
+  set route_state_pre [get_cells -hierarchical -quiet -filter {full_name =~ *PathLatch}]
+  set path_state_pre [add_to_collection $block_state_pre $route_state_pre]
+  set path_state_pre_count [sizeof_collection $path_state_pre]
+  if {$path_state_pre_count != $expected_path_state_latches} {
+    puts "CMR_HIER_CHILD_DC_FAIL path_state_srlatch_pre ref=$REF actual=$path_state_pre_count expected=$expected_path_state_latches"
+    exit 2
+  }
+} else {
+  puts "CMR_HIER_CHILD_DC_FAIL unsupported_path_state_impl ref=$REF impl=$path_state_impl"
   exit 2
 }
-set_dont_touch $path_pre true
+switch -- $opm_reqout_unit_ps {
+  50  {set opm_reqout_cell DEL050D1BWP12T30P140}
+  75  {set opm_reqout_cell DEL075D1BWP12T30P140}
+  100 {set opm_reqout_cell DEL100D1BWP12T30P140}
+  150 {set opm_reqout_cell DEL150D1BWP12T30P140}
+  250 {set opm_reqout_cell DEL250D1BWP12T30P140}
+  default {
+    puts "CMR_HIER_CHILD_DC_FAIL unsupported_opm_reqout_unit ref=$REF unit=$opm_reqout_unit_ps"
+    exit 2
+  }
+}
+set opm_delay_pre [get_cells -hierarchical -quiet -filter "ref_name =~ $opm_reqout_cell && full_name =~ *OPMDelay*"]
+set opm_buffer_pre [get_cells -hierarchical -quiet -filter {full_name =~ *OutputPortModules_*/OPMReqoutBuffer_*/D0 && ref_name == BUFFD0BWP12T30P140}]
+set opm_delay_pre_count [sizeof_collection $opm_delay_pre]
+set opm_buffer_pre_count [sizeof_collection $opm_buffer_pre]
+set expected_opm_delay_pre_count [expr {$expected_ports * $opm_reqout_steps}]
+set expected_opm_buffer_pre_count [expr {$expected_ports * $opm_reqout_buffer_stages}]
+if {$opm_delay_pre_count != $expected_opm_delay_pre_count || $opm_buffer_pre_count != $expected_opm_buffer_pre_count} {
+  puts "CMR_HIER_CHILD_DC_FAIL opm_output_protection_pre ref=$REF delay=$opm_delay_pre_count expected_delay=$expected_opm_delay_pre_count buffer=$opm_buffer_pre_count expected_buffer=$expected_opm_buffer_pre_count"
+  exit 2
+}
+# Uniquify prefixes DontTouchBuf references, so a ref_name =~ DontTouchBuf*
+# primitive rule does not reliably protect these cells. Preserve exact leaves.
+set_dont_touch $opm_buffer_pre true
 set clear_pre [get_cells -hierarchical -quiet -filter {ref_name =~ LHCNDQD*}]
 set set_pre [get_cells -hierarchical -quiet -filter {ref_name =~ LHSNDQD*}]
 if {[sizeof_collection $clear_pre] == 0 || [sizeof_collection $set_pre] == 0} {
@@ -101,7 +152,22 @@ set_ungroup [get_designs *] false
 set_boundary_optimization [get_designs *] false
 compile_ultra -no_autoungroup
 compile_ultra -incremental -no_autoungroup
+if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIMING_RECIPE) eq "1"} {
+  if {[catch {
+    source "$PROJECT_DIR/scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
+    cmr_ipm_apply_timing_recipe $expected_ports $REPORT_DIR
+  } recipe_error]} {
+    puts "CMR_HIER_CHILD_DC_FAIL ipm_timing_recipe=$recipe_error"
+    exit 2
+  }
+}
 check_design > "$REPORT_DIR/check_design_post.rpt"
+set opm_buffer_post [get_cells -hierarchical -quiet -filter {full_name =~ *OutputPortModules_*/OPMReqoutBuffer_*/D0 && ref_name == BUFFD0BWP12T30P140}]
+if {[sizeof_collection $opm_buffer_post] != $expected_opm_buffer_pre_count} {
+  puts "CMR_HIER_CHILD_DC_FAIL opm_output_buffer_lost ref=$REF actual=[sizeof_collection $opm_buffer_post] expected=$expected_opm_buffer_pre_count"
+  exit 2
+}
+redirect "$REPORT_DIR/opm_output_buffers_post.rpt" {report_cell -connections $opm_buffer_post}
 
 source "$RTL_DIR/assert_no_gtech.tcl"
 set n_gtech [async_assert_no_gtech $REPORT_DIR]

@@ -21,7 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(REPO / "DATE paper" / "experiments" / "scripts"))
+sys.path.insert(0, str(REPO / "DATE_paper" / "experiments" / "scripts"))
 
 from _tmp_paper64_common import connect_failover, remote_run_failover  # noqa: E402
 from cmr_frozen_run_ids import (  # noqa: E402
@@ -32,13 +32,18 @@ from cmr_frozen_run_ids import (  # noqa: E402
 )
 from run_remote_cmr_fat_tree_noc16_sdf import atomic_put_retry, job_id  # noqa: E402
 
-SEED = 202701
+DEFAULT_SEED = 202701
 NODES = 256
 # Rebuilt 2026-09-15 after CASE_TICK_NS=1 fix; do not reuse tick=20-era cases.
-BUNDLE = HERE / "generated_cases" / "20260915_paper256_ur_tick1_m5_800_202701"
-CASE_DIR = BUNDLE / "cases"
-TRACE_DIR = BUNDLE / "traces"
-STATE_DIR = HERE / "results" / "e1_ur_three_dut256"
+# Bundle/staging dirs are per-seed so the 3-seed paper grid can coexist.
+
+
+def bundle_dir(seed: int) -> Path:
+    return HERE / "generated_cases" / ("20260915_paper256_ur_tick1_m5_800_s%d" % seed)
+
+
+def state_dir(seed: int) -> Path:
+    return HERE / "results" / ("e1_ur_three_dut256_s%d" % seed)
 REMOTE_ROOT = os.environ.get("CMR_REMOTE_ROOT", "/home/ghy19/Asynchronous_Router_CMR")
 HOSTS = os.environ.get("CMR_DES_BSUB_EXTRA", '-m "node21 node26 node24 node18"')
 
@@ -70,8 +75,8 @@ DESIGNS = {
 }
 
 
-def case_name(design: str, load: int) -> str:
-    return "TOPO-UR_n256_s%d_m%d_%s_top0" % (SEED, load, design)
+def case_name(design: str, load: int, seed: int) -> str:
+    return "TOPO-UR_n256_s%d_m%d_%s_top0" % (seed, load, design)
 
 
 def netlist_for(design: str) -> str:
@@ -79,30 +84,33 @@ def netlist_for(design: str) -> str:
     return os.environ.get(meta["netlist_env"], meta["default_netlist"]).strip()
 
 
-def materialize(loads: tuple[int, ...]) -> None:
+def materialize(loads: tuple[int, ...], seed: int) -> None:
     from date_v3.canonical_trace import dump_jsonl, generate_trace  # noqa: E402
     from date_v3.hashutil import write_json  # noqa: E402
     from date_v3.materialize_case import materialize_path  # noqa: E402
 
-    TRACE_DIR.mkdir(parents=True, exist_ok=True)
-    CASE_DIR.mkdir(parents=True, exist_ok=True)
+    bundle = bundle_dir(seed)
+    trace_dir = bundle / "traces"
+    case_dir = bundle / "cases"
+    trace_dir.mkdir(parents=True, exist_ok=True)
+    case_dir.mkdir(parents=True, exist_ok=True)
     for load in loads:
-        jsonl = TRACE_DIR / ("TOPO-UR_n256_s%d_m%d.jsonl" % (SEED, load))
+        jsonl = trace_dir / ("TOPO-UR_n256_s%d_m%d.jsonl" % (seed, load))
         if not jsonl.is_file():
             trace = generate_trace(
-                "TOPO-UR", seed=SEED, nodes=NODES, smoke=False, load_point=float(load)
+                "TOPO-UR", seed=seed, nodes=NODES, smoke=False, load_point=float(load)
             )
             trace["header"]["injection_model"] = "v3_exp_header_asap_body"
             dump_jsonl(trace, jsonl)
             print("TRACE", jsonl.name, flush=True)
         for design in DESIGNS:
-            stem = case_name(design, load)
-            target = CASE_DIR / (stem + ".case")
+            stem = case_name(design, load, seed)
+            target = case_dir / (stem + ".case")
             if target.is_file():
                 continue
             path = materialize_path(
                 jsonl,
-                CASE_DIR,
+                case_dir,
                 top_lanes=0,
                 hrep=False,
                 routing="mesh" if design == "FM256" else "quadtree",
@@ -114,9 +122,9 @@ def materialize(loads: tuple[int, ...]) -> None:
                 path.replace(target)
             print("CASE", target.name, flush=True)
     write_json(
-        BUNDLE / "manifest.json",
+        bundle / "manifest.json",
         {
-            "seed": SEED,
+            "seed": seed,
             "loads": list(loads),
             "designs": list(DESIGNS),
             "injection_model": "v3_exp_header_asap_body",
@@ -127,17 +135,18 @@ def materialize(loads: tuple[int, ...]) -> None:
     )
 
 
-def upload(client, designs: list[str], loads: tuple[int, ...]):
+def upload(client, designs: list[str], loads: tuple[int, ...], seed: int):
     sftp = client.open_sftp()
     remote_case_dir = "sim/cases_network"
     client, _ = remote_run_failover(
         client, "mkdir -p %s/%s" % (REMOTE_ROOT, remote_case_dir)
     )
     hashes = {}
+    case_dir = bundle_dir(seed) / "cases"
     for design in designs:
         for load in loads:
-            name = case_name(design, load)
-            local = CASE_DIR / (name + ".case")
+            name = case_name(design, load, seed)
+            local = case_dir / (name + ".case")
             if not local.is_file():
                 raise SystemExit("missing " + str(local))
             dest = remote_case_dir + "/" + name + ".case"
@@ -162,7 +171,7 @@ def upload(client, designs: list[str], loads: tuple[int, ...]):
     return client, hashes
 
 
-def submit(client, run_id: str, designs: list[str], loads: tuple[int, ...]):
+def submit(client, run_id: str, designs: list[str], loads: tuple[int, ...], seed: int):
     jobs = []
     client, _ = remote_run_failover(
         client,
@@ -179,7 +188,7 @@ def submit(client, run_id: str, designs: list[str], loads: tuple[int, ...]):
         # Read-only SKIP_DC reuse; refuse_overwrite is for write protection only.
         meta = DESIGNS[design]
         for load in loads:
-            name = case_name(design, load)
+            name = case_name(design, load, seed)
             wrapper = "logs/gls/%s/sdf_%s.sh" % (run_id, name)
             case_file = "%s/sim/cases_network/%s.case" % (REMOTE_ROOT, name)
             body = (
@@ -230,21 +239,22 @@ def submit(client, run_id: str, designs: list[str], loads: tuple[int, ...]):
             jid = job_id(submitted)
             jobs.append({"design": design, "load": load, "case": name, "job": jid, "netlist": nid})
             print("E1_UR256_SUBMITTED", design, load, jid, flush=True)
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    state_dir(seed).mkdir(parents=True, exist_ok=True)
     state = {
         "run_id": run_id,
         "jobs": jobs,
         "loads": list(loads),
         "designs": designs,
+        "seed": seed,
         "submitted_at": datetime.now(timezone.utc).isoformat(),
     }
-    (STATE_DIR / "state.json").write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    (state_dir(seed) / "state.json").write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
     return client
 
 
 def plot_placeholder() -> None:
     """Write a README pointing finalize script; figures need GLS CSV pull."""
-    out = REPO / "DATE paper" / "experiments" / "figures" / "paper256"
+    out = REPO / "DATE_paper" / "experiments" / "figures" / "paper256"
     out.mkdir(parents=True, exist_ok=True)
     note = out / "e1_ur_three_dut256_PENDING.md"
     note.write_text(
@@ -271,7 +281,20 @@ def main() -> int:
         help="Comma-separated design ids (default: all three)",
     )
     parser.add_argument("--run-id", default="")
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_SEED,
+        help="traffic seed (default %d); run once per seed for the paper grid"
+        % DEFAULT_SEED,
+    )
+    parser.add_argument(
+        "--loads",
+        default="",
+        help="Comma-separated exact loads (default: coarse+fine grid)",
+    )
     args = parser.parse_args()
+    seed = args.seed
     if args.coarse_only and args.fine_only:
         raise SystemExit("choose only one of --coarse-only / --fine-only")
     if args.fine_only:
@@ -280,6 +303,8 @@ def main() -> int:
         loads = COARSE_LOADS
     else:
         loads = DEFAULT_LOADS
+    if args.loads.strip():
+        loads = tuple(sorted({int(x) for x in args.loads.split(",") if x.strip()}))
     if args.prop_only:
         designs = ["PROP_temp256"]
     elif args.designs.strip():
@@ -293,7 +318,7 @@ def main() -> int:
         plot_placeholder()
         return 0
     if args.stage in ("materialize", "all"):
-        materialize(loads)
+        materialize(loads, seed)
         if args.stage == "materialize":
             return 0
     if args.stage == "all" and not args.prop_only:
@@ -307,15 +332,15 @@ def main() -> int:
             plot_placeholder()
             return 0
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_id = args.run_id or ("%s_cmr_e1_ur_three_dut256" % stamp)
+    run_id = args.run_id or ("%s_cmr_e1_ur_three_dut256_s%d" % (stamp, seed))
     if not re.fullmatch(r"[A-Za-z0-9_]+", run_id):
         raise SystemExit("unsafe run id")
     client = connect_failover()
     try:
         if args.stage in ("upload", "all"):
-            client, _ = upload(client, designs, loads)
+            client, _ = upload(client, designs, loads, seed)
         if args.stage in ("submit", "all"):
-            client = submit(client, run_id, designs, loads)
+            client = submit(client, run_id, designs, loads, seed)
     finally:
         client.close()
     return 0

@@ -8,27 +8,35 @@ import chisel3.util.HasBlackBoxResource
 import tool.DelayElement
 
 /** Fig. 6 Address Register Unit: Head Predictor, Phase Selector, and Latch Reg. */
-class AddressRegisterUnit
-    extends BlackBox(Map("ADDRESS_WIDTH" -> CMRParameters.AddressWidth))
-    with HasBlackBoxResource {
+class AddressRegisterUnit extends Module {
   override def desiredName: String = "AddressRegisterUnit"
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val Reqin = Input(Bool())
     val Ackout = Input(Bool())
+    val Ack_rc = Input(Bool())
     val Head = Input(Bool())
-    val Tail = Input(Bool())
     val Address_field = Input(UInt(CMRParameters.AddressWidth.W))
-    val En = Output(Bool())
     val Req_rc = Output(Bool())
     val dest = Output(UInt(CMRParameters.AddressWidth.W))
   })
 
-  addResource("/ASYNC/CMR/AddressRegisterUnit.v")
-  addResource("/ASYNC/CMR/HeadPredictor.v")
-  addResource("/ASYNC/CMR/PhaseSelector.v")
-  addResource("/ASYNC/CMR/Toggle.v")
-  addResource("/ASYNC/DLatchBank.v")
+  val AddressRegisterFire = Wire(Bool())
+  AddressRegisterFire := io.Head & (io.Reqin ^ io.Ackout) & ~(io.Ack_rc ^ io.Req_rc)
+  private val toggle = Wire(Bool())
+  toggle := withClockAndReset(AddressRegisterFire.asClock, reset.asAsyncReset){
+    val ff = RegInit(0.B)
+    ff := ~ff
+    ff
+  }
+  val AddressRegisterDelay = Module(new DelayElement(0))
+  AddressRegisterDelay.io.I := toggle
+  io.Req_rc := AddressRegisterDelay.io.Z
+  io.dest := withClockAndReset(AddressRegisterFire.asClock, reset.asAsyncReset){
+    val FF = RegInit(0.U(CMRParameters.AddressWidth.W))
+    FF := io.Address_field
+    FF
+  }
 }
 
 /** Fig. 6 RouteSel AND: one identical T28 AND2 per multicast bit. */
@@ -205,7 +213,6 @@ class RCU(
   AddressRegister.io.Reqin := io.Reqin
   AddressRegister.io.Ackout := io.Ackout
   AddressRegister.io.Head := io.Datain.flit(PacketLayout.IsHeadIndex)
-  AddressRegister.io.Tail := io.Datain.flit(PacketLayout.IsTailIndex)
   AddressRegister.io.Address_field := CMRParameters.Address_field(io.Datain)
 
   private val RouteComputation = Module(new RouteComputationLogic(
@@ -214,6 +221,7 @@ class RCU(
   ))
   RouteComputation.io.dest := AddressRegister.io.dest
   RouteComputation.io.Req_rc := AddressRegister.io.Req_rc
+  AddressRegister.io.Ack_rc := RouteComputation.io.Ack_rc
 
   private val Selector = Module(new OPMSelector)
   Selector.io.reset := reset.asBool
@@ -228,20 +236,19 @@ class RCU(
 
 private class AddressRegisterUnitElaboration extends Module {
   val io = IO(new Bundle {
-    val Reqin = Input(Bool()); val Ackout = Input(Bool())
-    val Head = Input(Bool()); val Tail = Input(Bool())
+    val Reqin = Input(Bool()); val Ackout = Input(Bool()); val Ack_rc = Input(Bool())
+    val Head = Input(Bool())
     val Address_field = Input(UInt(CMRParameters.AddressWidth.W))
-    val En = Output(Bool()); val Req_rc = Output(Bool())
+    val Req_rc = Output(Bool())
     val dest = Output(UInt(CMRParameters.AddressWidth.W))
   })
   private val AddressRegister = Module(new AddressRegisterUnit)
   AddressRegister.io.reset := reset.asBool
   AddressRegister.io.Reqin := io.Reqin
   AddressRegister.io.Ackout := io.Ackout
+  AddressRegister.io.Ack_rc := io.Ack_rc
   AddressRegister.io.Head := io.Head
-  AddressRegister.io.Tail := io.Tail
   AddressRegister.io.Address_field := io.Address_field
-  io.En := AddressRegister.io.En
   io.Req_rc := AddressRegister.io.Req_rc
   io.dest := AddressRegister.io.dest
 }

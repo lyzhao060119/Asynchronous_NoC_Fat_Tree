@@ -7,7 +7,7 @@ module LanePhaseAdapterDFF #(
 ) (
     input  wire       reset,
     input  wire [LANES-1:0] LaneSelect,
-    input  wire [LANES-1:0] IPMReqOut,
+    input  wire             IPMReqOut,
     input  wire [LANES-1:0] OPMAckOut,
     // One IPM branch has one acknowledgement phase, independent of its
     // selected physical lane.
@@ -27,7 +27,7 @@ module LanePhaseAdapterDFF #(
     wire selected_mismatch;
     wire source_pending;
     assign selected_mismatch = |(LaneSelect & (OPMReqIn ^ OPMAckOut));
-    assign source_pending = IPMReqOut[0] ^ IPMAckIn;
+    assign source_pending = IPMReqOut ^ IPMAckIn;
 
     LaneAdapterAwaitLatch AwaitAckLatch (
         .reset(reset),
@@ -47,7 +47,7 @@ module LanePhaseAdapterDFF #(
     );
     genvar i;
     generate for (i = 0; i < LANES; i = i + 1) begin : lane
-        assign OPMReqInFire[i] = LaneSelect[i] & (IPMReqOut[i] ^ IPMAckIn);
+        assign OPMReqInFire[i] = LaneSelect[i] & (IPMReqOut ^ IPMAckIn);
 
         assign IPMAckInFire[i] = ~(OPMAckOut[i] ^ OPMReqIn[i]);
 

@@ -78,7 +78,7 @@ foreach bit {0 1 2 3} {
   }
   set ppe [get_pins -quiet [format {%s/io_PathEnabled_%s} $rcu $bit]]
   if {[sizeof_collection $ppe] != 1} {
-    set ppe [get_pins -quiet [format {%s/Selector/selector[%s].PathLatch/sr_cell/Q} $rcu $bit]]
+    set ppe [get_pins -quiet [format {%s/Selector/selector[%s].PathState/path_state_reg/Q} $rcu $bit]]
   }
   if {[sizeof_collection $ppe] != 1} {
     puts "CMR_MAT_RS_FAIL ppe_pin bit=$bit count=[sizeof_collection $ppe]"

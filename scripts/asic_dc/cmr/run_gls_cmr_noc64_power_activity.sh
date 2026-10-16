@@ -5,7 +5,7 @@ ROOT=${CMR_REMOTE_ROOT:?}
 DATA_ROOT=${CMR_POWER_DATA_ROOT:-$ROOT}
 RUN_ID=${CMR_POWER_RUN_ID:?}
 NETLIST_RUN_ID=${CMR_POWER_NETLIST_RUN_ID:?}
-DESIGN=${CMR_POWER_DESIGN:?}             # FM64, PFAT64, PROP_temp64, or PROP_temp64_static4
+DESIGN=${CMR_POWER_DESIGN:?}             # FM64, PFAT64, PROP_M16, PROP_temp64, or PROP_temp64_static4
 CASE_NAME=${CMR_POWER_CASE_NAME:?}
 CASE_FILE=${CMR_POWER_CASE_FILE:?}
 LOAD=${CMR_POWER_LOAD_MFLIT:?}
@@ -33,6 +33,12 @@ case "$DESIGN" in
     ADAPTER="$INPUT_ROOT/async_noc64_port_adapter.sv"
     TB_DEFINE=""
     SDF_SCOPE="tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc.noc.dut"
+    ;;
+  PROP_M16)
+    NETLIST="$OUT/PROP_temp64_m16_post.v"; SDF="$OUT/PROP_temp64_m16.sdf"
+    ADAPTER="$INPUT_ROOT/async_prop_temp64_port_adapter.sv"
+    TB_DEFINE="+define+PROP_TEMP64_M16_TOP64"
+    SDF_SCOPE="tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_prop_temp_m16.noc.dut"
     ;;
   PROP_temp64)
     NETLIST="$OUT/PROP_temp64_post.v"; SDF="$OUT/PROP_temp64.sdf"

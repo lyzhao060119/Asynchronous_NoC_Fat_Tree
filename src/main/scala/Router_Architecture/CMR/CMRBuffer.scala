@@ -3,14 +3,12 @@ package Router_Architecture.CMR
 import DataStruct.{Packet, PacketLayout}
 import Router_Architecture.ultra.UltraDLatchBank
 import chisel3._
-import chisel3.util.{HasBlackBoxResource, Mux1H}
+import chisel3.util.{Fill, HasBlackBoxResource, Mux1H}
+import tool.DelayElement
 
 /** Fig. 7 control for one of the five CMR storage cells. */
-class WriteControlUnit(initialPhase: Int)
-    extends BlackBox(Map("INITIAL_PHASE" -> initialPhase))
-    with HasBlackBoxResource {
+class WriteControlUnit(initialPhase: Int) extends Module {
   require(initialPhase == 0 || initialPhase == 1)
-  override def desiredName: String = "WriteControlUnit"
 
   val io = IO(new Bundle {
     val reset = Input(Bool())
@@ -20,11 +18,37 @@ class WriteControlUnit(initialPhase: Int)
     val CellEmpty = Input(UInt(CMRParameters.BranchCount.W))
     val Ackout = Output(Bool())
     val CellFull = Output(Bool())
+    val Write_fire = Output(Bool())
   })
+  private val writeFire = io.WritePointer && (io.Reqin ^ io.Ackout)
+  io.Write_fire := writeFire
+  private val cellFullRaw = withClockAndReset(writeFire.asClock, io.reset.asAsyncReset) {
+    val phase = RegInit((initialPhase == 1).B)
+    phase := ~phase
+    phase
+  }
 
-  addResource("/ASYNC/CMR/WriteControlUnit.v")
-  addResource("/ASYNC/CMR/PhaseResetDLatch.v")
-  addResource("/ASYNC/CMR/Toggle.v")
+  // DEL0 belongs after the phase element, immediately before CellFull.
+  private val WritecellFullDelay = Module(new DelayElement(
+    DelayValue = CMRParameters.WriteCellFullDelaySteps,
+    DelayUnitPs = CMRParameters.WriteCellFullDelayUnitPs
+  ))
+  WritecellFullDelay.io.I := cellFullRaw
+  private val cellFull = WritecellFullDelay.io.Z
+
+  // The raw DFF phase participates directly in the completion XOR. CellFull
+  // itself remains behind the explicit output delay.
+  private val fullPhaseRaw = Fill(CMRParameters.BranchCount, cellFullRaw)
+  private val allCellEmptyMatched = (~(io.CellEmpty ^ fullPhaseRaw)).andR
+  private val tailAck = withClockAndReset(allCellEmptyMatched.asClock, io.reset.asAsyncReset) {
+    val phase = RegInit((initialPhase == 1).B)
+    phase := ~phase
+    phase
+  }
+
+  io.CellFull := cellFull
+  io.Ackout := Mux(io.Tail, tailAck, cellFull)
+
 }
 
 /** Fig. 7 two-phase five-slot one-hot Write Counter. */
@@ -56,16 +80,18 @@ class WriteAckGenerator extends BlackBox with HasBlackBoxResource {
 /** One capture-pass register in the Fig. 5 Storage Unit. */
 class StorageCell extends Module {
   val io = IO(new Bundle {
-    val En = Input(Bool())
+    /** Write event for this cell; used as the DFF clock in the async design. */
+    val clk = Input(Bool())
     val Datain = Input(new Packet)
     val Dataout = Output(new Packet)
   })
 
-  private val LatchReg = Module(new UltraDLatchBank(PacketLayout.FlitWidth))
-  LatchReg.io.reset := reset.asBool
-  LatchReg.io.en := io.En
-  LatchReg.io.d := io.Datain.flit
-  io.Dataout.flit := LatchReg.io.q
+  private val dff = withClockAndReset(io.clk.asClock, reset.asAsyncReset) {
+    val ff = RegInit(0.U(PacketLayout.FlitWidth.W))
+    ff := io.Datain.flit
+    ff
+  }
+  io.Dataout.flit := dff
 }
 
 /** Complete Continuous paper Fig. 7 Write Interface Control. */
@@ -76,6 +102,7 @@ class WriteInterfaceControl extends Module {
     val Tail = Input(Vec(CMRParameters.CellCount, Bool()))
     val Ackout = Output(Bool())
     val WritePointer = Output(Vec(CMRParameters.CellCount, Bool()))
+    val WriteFire = Output(Vec(CMRParameters.CellCount, Bool()))
     val CellFull = Output(Vec(CMRParameters.CellCount, Bool()))
   })
 
@@ -104,6 +131,7 @@ class WriteInterfaceControl extends Module {
   AckGenerator.io.AckoutCell := VecInit(ControlUnit.map(_.io.Ackout)).asUInt
   io.Ackout := AckGenerator.io.Ackout
   io.WritePointer := WritePointer
+  io.WriteFire := VecInit(ControlUnit.map(_.io.Write_fire))
   io.CellFull := VecInit(ControlUnit.map(_.io.CellFull))
 }
 
@@ -265,7 +293,7 @@ class CMRBuffer extends Module {
   WriteInterface.io.Tail := VecInit(StorageUnit.map(_.io.Dataout.flit(PacketLayout.IsTailIndex)))
 
   for (cell <- 0 until CMRParameters.CellCount) {
-    StorageUnit(cell).io.En := WriteInterface.io.WritePointer(cell)
+    StorageUnit(cell).io.clk := WriteInterface.io.WriteFire(cell)
     StorageUnit(cell).io.Datain := io.Datain
   }
 

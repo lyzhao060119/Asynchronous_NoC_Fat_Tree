@@ -12,6 +12,12 @@ module DelayElement
     output wire Z
 );
 
-    assign #(0.2*DelayValue) Z = I;
+    generate
+        if (DelayValue == 0) begin : DelayUnit_bypass
+            assign Z = I;
+        end else begin : DelayUnit_chain
+            assign #(0.2*DelayValue) Z = I;
+        end
+    endgenerate
 
 endmodule

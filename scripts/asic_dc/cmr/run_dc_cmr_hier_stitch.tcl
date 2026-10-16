@@ -51,6 +51,7 @@ source "$RTL_DIR/tech_t28ss.tcl"
 define_design_lib WORK -path $WORK_LIB
 analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/DelayElement_ASIC.v" \
+  "$RTL_DIR/DontTouchBuf_ASIC.v" \
   "$RTL_DIR/Mutex2_ASIC.v" \
   "$RTL_DIR/Mutex4.v" \
   "$RTL_DIR/MullerC2.v" \
@@ -66,7 +67,6 @@ analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/RouteSelAnd2.v" \
   "$RTL_DIR/OPMSelector.v" \
   "$RTL_DIR/PhaseResetDLatch.v" \
-  "$RTL_DIR/LanePhaseAdapter.v" \
   "$RTL_DIR/LanePhaseAdapterDFF.v" \
   "$RTL_DIR/LaneSelector.v" \
   "$RTL_DIR/WriteControlUnit.v" \
@@ -77,11 +77,6 @@ analyze -format verilog -define ASIC_T28 -work WORK [list \
   "$RTL_DIR/ReadRequestGenerator.v" \
   "$RTL_DIR/ReadPhaseSelector.v" \
   "$RTL_DIR/ReadAckGenerator.v" \
-  "$RTL_DIR/WriteControlBlock.v" \
-  "$RTL_DIR/ReadControlBlock.v" \
-  "$RTL_DIR/CircularWriteCounter.v" \
-  "$RTL_DIR/CircularReadCounter.v" \
-  "$RTL_DIR/CircularFIFO.v" \
   $DUT_V]
 
 foreach pair [split $CHILD_LIST ","] {
@@ -94,7 +89,10 @@ foreach pair [split $CHILD_LIST ","] {
     puts "$fail_token missing_child_ddc $ddc"
     exit 2
   }
-  catch { remove_design -designs $ref }
+  # remove_design accepts the design collection/list directly.  The previous
+  # `-designs` form is not a valid DC option and polluted otherwise valid
+  # stitch logs with CMD-001 errors.
+  catch { remove_design $ref }
   read_ddc $ddc
   puts "CMR_HIER_STITCH_LINK ref=$ref ddc=$ddc"
 }

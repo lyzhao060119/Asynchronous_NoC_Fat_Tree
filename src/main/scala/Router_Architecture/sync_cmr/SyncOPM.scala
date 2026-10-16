@@ -26,6 +26,7 @@ class SyncLaneSelector(val laneCount: Int) extends Module {
 
   private val selected = RegInit(0.U(laneCount.W))
   private val holding = selected.orR
+  private val lastLaneOH = RegInit(1.U(laneCount.W))
   private val tailPassedQ = RegNext(io.TailPassed.asUInt, 0.U(laneCount.W))
   private val candidate = VecInit.tabulate(laneCount) { lane =>
     io.PathEnabled && !io.OtherGrant(lane) && !holding
@@ -41,7 +42,12 @@ class SyncLaneSelector(val laneCount: Int) extends Module {
       nextSel := 0.U
     }
   }.elsewhen (candidate.orR) {
-    nextSel := UIntToOH(PriorityEncoder(candidate), laneCount)
+    // Rotating priority over lanes, mirroring SyncOPM's lastOH, so all four
+    // parent lanes are used instead of always picking the lowest free lane.
+    val above = candidate & ~(lastLaneOH | (lastLaneOH - 1.U))
+    val pick = Mux(above.orR, above, candidate)
+    nextSel := UIntToOH(PriorityEncoder(pick), laneCount)
+    lastLaneOH := nextSel
   }
   selected := nextSel
   io.LaneSelect := VecInit(nextSel.asBools)

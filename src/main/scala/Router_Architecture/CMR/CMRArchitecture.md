@@ -137,17 +137,19 @@ Ack_rc 关闭 bundling window 后，`RouteSel` 返回低电平，而 OPM Selecto
 
 ### 3.3 OPMSelector
 
-每个分支对应一个 reset-dominant `SRLatch`：
+每个分支对应一个 T28 `DFCNQD1BWP12T30P140` 状态寄存器：
 
 ```text
-S = RouteSel[i]
-R = TailPassed[i]
+CP = rising edge of RouteSel[i]
+CDN = ~(reset | TailPassed[i])
+D = 1
 Q = PathEnabled[i]
 ```
 
-四个 latch 相互独立，允许多播 packet 同时占用多个 OPM，并允许各输出按自身
-速度读完和释放。`TailPassed` 必须在下一 packet 的 `RouteSel` 之前撤销，禁止
-同一 latch 同时 Set/Reset。
+四个 DFF 相互独立，允许多播 packet 同时占用多个 OPM，并允许各输出按自身
+速度读完和释放。`TailPassed` 异步清除对应状态；清除有效期间 RouteSel 上升沿
+不会置位，清除释放后需等待下一次 RouteSel 上升沿。RouteSel 是局部事件时钟，
+必须通过映射后 SDF 确认其脉宽及 TailPassed/reset 的 recovery/removal 时序。
 
 ## 4. Fig. 7 Write Interface Control
 

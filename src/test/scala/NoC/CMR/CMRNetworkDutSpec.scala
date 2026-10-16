@@ -9,23 +9,21 @@ class CMRNetworkDutSpec extends AnyFlatSpec {
     assert(!result.cycle, s"$label cycle path=${result.path}")
   }
 
-  "CMRNetworkInventory" should "match the V3 structure freeze for 64-node Q64 tiles" in {
-    val thin = CMRNetworkInventory.thin64
-    assert(thin.routers == 21)
-    assert(thin.ipms == 105)
-    assert(thin.adapters == 0)
-    assert(thin.interlevelFifos == 0)
-    assert(thin.topPorts == 1)
-    assert(thin.maxOpmFanIn == 4)
-
+  "CMRNetworkInventory" should "describe the current M16 PROP tree and PFAT64 tile" in {
     val prop = CMRNetworkInventory.prop64
-    assert(prop.routers == 21)
-    assert(prop.ipms == 146)
-    assert(prop.adapters == 264)
+    assert(prop.routers == 48)
+    assert(prop.ipms == 384)
+    assert(prop.opms == 384)
+    assert(prop.adapters == 192)
     assert(prop.interlevelFifos == 0)
-    assert(prop.topPorts == 2)
-    assert(prop.maxOpmFanIn == 8)
-    assert(prop.mutexWidths == Seq(2, 4, 5, 8))
+    assert(prop.corePorts == 64)
+    assert(prop.topPorts == 64)
+    assert(prop.topMeshLanes == 0)
+    assert(prop.interRouterLinks == 128)
+    assert(prop.maxOpmFanIn == 7)
+    assert(prop.mutexWidths == Seq(4, 7))
+    assert(prop.primitives.map(_.count) == Seq(16, 16, 16))
+    assert(prop.notes.contains("no Mesh-plane routers"))
 
     val pfat = CMRNetworkInventory.pfat64
     assert(pfat.routers == 21)

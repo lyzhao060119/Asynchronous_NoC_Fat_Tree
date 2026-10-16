@@ -15,7 +15,11 @@ module noc64_sync_boundary_core #(
   localparam integer NUM_PORTS = NUM_CORES + TOP_LANES;
   localparam integer MAX_INPUT_FLITS = 131072;
   localparam integer MAX_EXPECT_FLITS = 262144;
-  localparam integer MAX_RX_PER_PORT = 8192;
+  // A 64-node all-broadcast case delivers almost all 55k generated flits to
+  // every core port.  Keep the per-port scoreboard large enough for that
+  // expanded copy count even though the case file stores one destination mask
+  // per source flit.
+  localparam integer MAX_RX_PER_PORT = 65536;
   localparam integer MAX_PKT_SEQ = 262144;
   localparam integer STR_CHARS = 256;
   localparam integer MASK_W = 128;
@@ -26,8 +30,8 @@ module noc64_sync_boundary_core #(
       $display("TB_FATAL NUM_CORES must be 64, got %0d", NUM_CORES);
       $finish;
     end
-    if ((TOP_LANES != 1) && (TOP_LANES != 2) && (TOP_LANES != 8) && (TOP_LANES != 16)) begin
-      $display("TB_FATAL TOP_LANES must be 1, 2, 8, or 16 (PROP_temp B8), got %0d", TOP_LANES);
+    if ((TOP_LANES != 1) && (TOP_LANES != 2) && (TOP_LANES != 8) && (TOP_LANES != 16) && (TOP_LANES != 64)) begin
+      $display("TB_FATAL TOP_LANES must be 1, 2, 8, 16, or 64, got %0d", TOP_LANES);
       $finish;
     end
   end
@@ -53,7 +57,13 @@ module noc64_sync_boundary_core #(
   assign tb_out_data = noc_out_data;
   assign noc_out_ready = tb_out_ready;
 
-`ifdef CMR_SYNC64_TOP16
+`ifdef CMR_SYNC64_TOP64
+  sync_noc64_port_adapter_top64 noc (
+    .clock(clock), .reset(reset), .in_valid(noc_in_valid),
+    .in_ready(noc_in_ready), .in_data(noc_in_data), .out_valid(noc_out_valid),
+    .out_ready(noc_out_ready), .out_data(noc_out_data)
+  );
+`elsif CMR_SYNC64_TOP16
   sync_noc64_port_adapter_top16 noc (
     .clock(clock),
     .reset(reset),
@@ -144,10 +154,13 @@ module noc64_sync_boundary_core #(
   longint last_egress_ps [0:NUM_PORTS-1];
   longint packet_head_ack_ps [0:MAX_PKT_SEQ-1];
   longint packet_head_req_ps [0:MAX_PKT_SEQ-1];
+  longint packet_offer_ps [0:MAX_PKT_SEQ-1];
   integer packet_event_id [0:MAX_PKT_SEQ-1];
   integer unexpected_flits, missing_flits, injected_flits, delivered_flits;
   integer delivered_packets, latency_count;
-  longint latency_ps [0:MAX_EXPECT_FLITS-1];
+  localparam integer LAT_HIST_BINS = 20000;
+  localparam integer LAT_HIST_PS = 100;
+  integer latency_hist [0:LAT_HIST_BINS-1];
   integer warmup_events, measurement_events;
   integer measurement_start_cycle, measurement_end_cycle;
   longint measurement_start_ps, measurement_end_ps;
@@ -216,7 +229,8 @@ module noc64_sync_boundary_core #(
         if ((exp_idx < 0) && !expected_seen[scan] && expected_mask[scan][port] &&
             (captured === expected_flit[scan])) begin
           exp_idx = scan;
-          expected_seen[scan] = 1'b1;
+          expected_mask[scan][port] = 1'b0;
+          expected_seen[scan] = (expected_mask[scan] == {MASK_W{1'b0}});
         end
       score_rx_slot(port, slot, exp_idx);
     end
@@ -260,7 +274,8 @@ module noc64_sync_boundary_core #(
               (expected_pkt_seq[scan] == pkt) && expected_flit[scan][27])
             exp_idx = scan;
         if ((exp_idx >= 0) && (head_flit === expected_flit[exp_idx])) begin
-          expected_seen[exp_idx] = 1'b1;
+          expected_mask[exp_idx][port] = 1'b0;
+          expected_seen[exp_idx] = (expected_mask[exp_idx] == {MASK_W{1'b0}});
           score_rx_slot(port, slot, exp_idx);
         end else
           score_rx_slot(port, slot, -1);
@@ -309,6 +324,7 @@ module noc64_sync_boundary_core #(
       for (idx = 0; idx < MAX_PKT_SEQ; idx = idx + 1) begin
         packet_head_ack_ps[idx] = -1;
         packet_head_req_ps[idx] = -1;
+        packet_offer_ps[idx] = -1;
         packet_event_id[idx] = -1;
       end
       fd = $fopen(case_file, "r");
@@ -368,8 +384,8 @@ module noc64_sync_boundary_core #(
         end
       end
       $fclose(fd);
-      if (total_expected() != expected_count) begin
-        $display("TB_FATAL expected masks must be one-hot: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
+      if (total_expected() < expected_count) begin
+        $display("TB_FATAL empty expected mask: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
       end
       measurement_start_cycle = -1; measurement_end_cycle = -1;
       for (idx = 0; idx < input_count; idx = idx + 1)
@@ -413,6 +429,8 @@ module noc64_sync_boundary_core #(
         due_ns = case_epoch_ns + input_cycle[i] * case_tick_ns;
         while ($realtime < due_ns) @(posedge clock);
         input_offer_ps[i] = longint'(due_ns * 1000.0 + 0.5);
+        if (input_flit[i][27] && input_pkt_seq[i] >= 0 && input_pkt_seq[i] < MAX_PKT_SEQ)
+          packet_offer_ps[input_pkt_seq[i]] = input_offer_ps[i];
         port_arrived_count[port] = port_arrived_count[port] + 1;
         source_queue_flits[port] = source_queue_flits[port] + 1;
         -> source_arrival;
@@ -502,49 +520,79 @@ module noc64_sync_boundary_core #(
   endtask
 
   task automatic write_results;
-    integer p, s, i, j, tx_index, fd_summary, fd_events, fd_latency, fd_flit, fd_v3;
-    integer rank95, rank99, packet, injected_packets;
-    longint tmp, max_lat, p95_lat, p99_lat, lat;
-    real lat_sum, avg_lat_ns, elapsed_ns, throughput;
+    integer p, s, i, tx_index, fd_summary, fd_events, fd_latency, fd_flit, fd_v3;
+    integer rank95, rank99, packet, injected_packets, hist_bin, seen, p95_set, p99_set;
+    integer measurement_offered_flits, measurement_delivered_flits, measurement_delivered_copies, measurement_backlog_flits;
+    longint max_lat, p95_lat, p99_lat, lat;
+    real lat_sum, avg_lat_ns, elapsed_ns, window_ns, window_s, offered_rate, delivered_rate;
     reg pass_ok;
     begin
       flush_pending_heads();
       injected_flits = 0; injected_packets = 0; missing_flits = 0; delivered_flits = total_rx();
       delivered_packets = 0; latency_count = 0; lat_sum = 0; max_lat = 0;
+      measurement_offered_flits = 0; measurement_delivered_flits = 0;
+      measurement_delivered_copies = 0; measurement_backlog_flits = 0;
+      for (i = 0; i < LAT_HIST_BINS; i = i + 1) latency_hist[i] = 0;
       for (i = 0; i < input_count; i = i + 1) if (input_accepted[i]) begin
         injected_flits = injected_flits + 1;
         if (input_flit[i][27]) injected_packets = injected_packets + 1;
       end
+      for (i = 0; i < input_count; i = i + 1) begin
+        if (input_offer_ps[i] >= measurement_start_ps && input_offer_ps[i] < measurement_end_ps)
+          measurement_offered_flits = measurement_offered_flits + 1;
+        if (input_offer_ps[i] >= 0 && input_offer_ps[i] < measurement_end_ps &&
+            (!input_accepted[i] || input_ack_ps[i] >= measurement_end_ps))
+          measurement_backlog_flits = measurement_backlog_flits + 1;
+      end
       for (p = 0; p < NUM_PORTS; p = p + 1) begin
         for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s]) begin
           i = rx_expected_index[p][s];
+          if (rx_egress_ps[p][s] >= measurement_start_ps && rx_egress_ps[p][s] < measurement_end_ps) begin
+            measurement_delivered_flits = measurement_delivered_flits + 1;
+            if (expected_is_tail[i]) measurement_delivered_copies = measurement_delivered_copies + 1;
+          end
           if (expected_is_tail[i]) begin
             packet = expected_pkt_seq[i];
-            if (packet >= 0 && packet < MAX_PKT_SEQ && packet_head_ack_ps[packet] >= 0 && rx_egress_ps[p][s] >= 0) begin
-              lat = rx_egress_ps[p][s] - packet_head_ack_ps[packet];
-              latency_ps[latency_count] = lat; latency_count = latency_count + 1;
+            if (packet >= 0 && packet < MAX_PKT_SEQ && packet_offer_ps[packet] >= measurement_start_ps &&
+                packet_offer_ps[packet] < measurement_end_ps && rx_egress_ps[p][s] >= 0) begin
+              // Publication latency includes source-side queueing: the
+              // reference is the scheduled open-loop offer, not ingress Ack.
+              lat = rx_egress_ps[p][s] - packet_offer_ps[packet];
+              hist_bin = (lat <= 0) ? 0 : (lat / LAT_HIST_PS);
+              if (hist_bin >= LAT_HIST_BINS) hist_bin = LAT_HIST_BINS - 1;
+              latency_hist[hist_bin] = latency_hist[hist_bin] + 1;
+              latency_count = latency_count + 1;
               lat_sum = lat_sum + lat; if (lat > max_lat) max_lat = lat;
               delivered_packets = delivered_packets + 1;
             end
           end
         end
       end
-      for (i = 0; i < expected_count; i = i + 1) if (!expected_seen[i]) missing_flits = missing_flits + 1;
-      for (i = 0; i < latency_count; i = i + 1) for (j = i + 1; j < latency_count; j = j + 1)
-        if (latency_ps[j] < latency_ps[i]) begin tmp = latency_ps[i]; latency_ps[i] = latency_ps[j]; latency_ps[j] = tmp; end
+      for (i = 0; i < expected_count; i = i + 1)
+        for (p = 0; p < NUM_PORTS; p = p + 1)
+          if (expected_mask[i][p]) missing_flits = missing_flits + 1;
+      p95_lat = 0; p99_lat = 0; p95_set = 0; p99_set = 0;
       if (latency_count > 0) begin
         rank95 = (95 * latency_count + 99) / 100; if (rank95 > latency_count) rank95 = latency_count;
         rank99 = (99 * latency_count + 99) / 100; if (rank99 > latency_count) rank99 = latency_count;
-        p95_lat = latency_ps[rank95-1]; p99_lat = latency_ps[rank99-1];
-      end else begin p95_lat = 0; p99_lat = 0; end
+        seen = 0;
+        for (i = 0; i < LAT_HIST_BINS; i = i + 1) begin
+          seen = seen + latency_hist[i];
+          if (!p95_set && seen >= rank95) begin p95_lat = i * LAT_HIST_PS; p95_set = 1; end
+          if (!p99_set && seen >= rank99) begin p99_lat = i * LAT_HIST_PS; p99_set = 1; end
+        end
+      end
       avg_lat_ns = latency_count ? (lat_sum * 1.0 / latency_count / 1000.0) : 0.0;
       elapsed_ns = $realtime - case_epoch_ns;
-      throughput = elapsed_ns > 0.0 ? (delivered_flits * case_tick_ns / elapsed_ns) : 0.0;
+      window_ns = (measurement_end_ps - measurement_start_ps) / 1000.0;
+      window_s = window_ns * 1.0e-9;
+      offered_rate = window_s > 0.0 ? measurement_offered_flits / window_s / NUM_CORES / 1.0e6 : 0.0;
+      delivered_rate = window_s > 0.0 ? measurement_delivered_flits / window_s / NUM_CORES / 1.0e6 : 0.0;
       pass_ok = !timed_out && (injected_flits == input_count) && (missing_flits == 0) && (unexpected_flits == 0);
 
       fd_summary = $fopen(csv_file, "w");
-      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail\n");
-      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0,%0d,%f,%f,%f,%f,%f,%0s\n", case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, $rtoi(elapsed_ns/case_tick_ns), throughput, avg_lat_ns, max_lat/1000.0, p95_lat/1000.0, p99_lat/1000.0, pass_ok ? "PASS" : "FAIL");
+      $fwrite(fd_summary, "group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,warmup_original_events,measurement_original_events,measurement_start_ps,measurement_end_ps,measurement_offered_flits,measurement_delivered_flits,measurement_delivered_copies,measurement_backlog_flits,offered_mflit_port_s,delivered_mflit_port_s,offer_to_tail_mean_ns,offer_to_tail_max_ns,offer_to_tail_p95_ns,offer_to_tail_p99_ns,pass_fail\n");
+      $fwrite(fd_summary, "%0s,%0s,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%f,%f,%f,%f,%f,%f,%0s\n", case_group, case_name, injected_packets, delivered_packets, injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, warmup_events, measurement_events, measurement_start_ps, measurement_end_ps, measurement_offered_flits, measurement_delivered_flits, measurement_delivered_copies, measurement_backlog_flits, offered_rate, delivered_rate, avg_lat_ns, max_lat/1000.0, p95_lat/1000.0, p99_lat/1000.0, pass_ok ? "PASS" : "FAIL");
       $fclose(fd_summary);
 
       fd_events = $fopen(event_csv_file, "w");
@@ -556,10 +604,10 @@ module noc64_sync_boundary_core #(
       $fclose(fd_events);
 
       fd_latency = $fopen(latency_csv_file, "w");
-      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,per_dest_latency_ns,tmax_component_ns\n");
+      $fwrite(fd_latency, "port,pkt_seq,original_event_id,tail_flit,head_offer_ps,head_inject_req_ps,head_ingress_ack_ps,tail_egress_req_ps,tail_capture_ps,offer_to_tail_ns,ingress_service_ns\n");
       for (p = 0; p < NUM_PORTS; p = p + 1) for (s = 0; s < rx_count[p]; s = s + 1) if (rx_match[p][s] && expected_is_tail[rx_expected_index[p][s]]) begin
         i = rx_expected_index[p][s]; packet = expected_pkt_seq[i];
-        $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0, (rx_egress_ps[p][s]-packet_head_req_ps[packet])/1000.0);
+        $fwrite(fd_latency, "%0d,%0d,%0d,%h,%0d,%0d,%0d,%0d,%0d,%f,%f\n", p, packet, packet_event_id[packet], rx_flit[p][s], packet_offer_ps[packet], packet_head_req_ps[packet], packet_head_ack_ps[packet], rx_egress_ps[p][s], rx_time_ps[p][s], (rx_egress_ps[p][s]-packet_offer_ps[packet])/1000.0, (rx_egress_ps[p][s]-packet_head_ack_ps[packet])/1000.0);
       end
       $fclose(fd_latency);
       fd_flit = $fopen(flit_latency_csv_file, "w");
@@ -586,7 +634,7 @@ module noc64_sync_boundary_core #(
                 pass_ok ? "PASS" : "FAIL");
         $fclose(fd_v3);
       end
-      $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d injection_model=open_loop_case_queue elapsed_ns=%0.3f flits_per_ns=%0.6f", pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, elapsed_ns, elapsed_ns > 0.0 ? (delivered_flits / elapsed_ns) : 0.0);
+      $display("TB_RESULT %0s injected=%0d delivered=%0d missing=%0d unexpected=%0d timeout=%0d injection_model=open_loop_case_queue offered=%0.6f delivered_rate=%0.6f backlog=%0d", pass_ok ? "PASS" : "FAIL", injected_flits, delivered_flits, missing_flits, unexpected_flits, timed_out, offered_rate, delivered_rate, measurement_backlog_flits);
       finish_requested = 1'b1;
       #1 $finish;
     end
@@ -694,7 +742,11 @@ module noc64_sync_boundary_core #(
 endmodule
 
 module tb_noc64_sync_boundary;
-`ifdef CMR_SYNC64_TOP8
+`ifdef CMR_SYNC64_TOP64
+  noc64_sync_boundary_core #(.NUM_CORES(64), .TOP_LANES(64)) core();
+`elsif CMR_SYNC64_TOP16
+  noc64_sync_boundary_core #(.NUM_CORES(64), .TOP_LANES(16)) core();
+`elsif CMR_SYNC64_TOP8
   noc64_sync_boundary_core #(.NUM_CORES(64), .TOP_LANES(8)) core();
 `elsif CMR_SYNC64_TOP2
   noc64_sync_boundary_core #(.NUM_CORES(64), .TOP_LANES(2)) core();

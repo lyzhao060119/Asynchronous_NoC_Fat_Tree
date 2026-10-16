@@ -12,14 +12,37 @@ object CMRParameters {
 
   require(AddressWidth == 24)
 
-  // Locked hop recipe (2026-09-06): tree and mesh RCU 1xDEL150; Ackin
-  // 1xDEL050.  No rcu_matched_buf chain.  RouteComputation's combinational
+  // Write-side bundled-data protection on CellFull.  The safety baseline
+  // remains a direct connection; timing experiments set this only during
+  // elaboration and remeasure the frozen mapped netlist.
+  val WriteCellFullDelaySteps: Int =
+    sys.env.get("CMR_WRITE_CELLFULL_DELAY_STEPS").map(_.toInt).getOrElse(0)
+  val WriteCellFullDelayUnitPs: Int =
+    sys.env.get("CMR_WRITE_CELLFULL_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
+  require(WriteCellFullDelaySteps >= 0)
+  require(Set(50, 75, 100, 150, 250).contains(WriteCellFullDelayUnitPs))
+
+  // LaneSelector request-hold protection.  This is deliberately independent
+  // of the RCU matched delay: it delays PPE before setting the per-lane hold
+  // DFF and is only instantiated for multi-lane branches.
+  val LaneRequestDelayUnitPs: Int =
+    sys.env.get("CMR_LANE_REQUEST_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
+  require(Set(50, 75, 100, 150, 250).contains(LaneRequestDelayUnitPs))
+
+  // Upstream IPM acknowledgement guard.  It closes the input-side cycle and
+  // is intentionally separate from the forward RCU and lane-select delays.
+  val IpmAckoutGuardDelayUnitPs: Int =
+    sys.env.get("CMR_IPM_ACKOUT_GUARD_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
+  require(Set(50, 75, 100, 150, 250).contains(IpmAckoutGuardDelayUnitPs))
+
+  // Current hop recipe: tree RCU 1xDEL100, mesh RCU 1xDEL150; OPM Ackin is
+  // direct (no delay instance).  No rcu_matched_buf chain.  RouteComputation's combinational
   // Mat bits must settle before Req_rc opens RouteSel.  Steps 0 omits the
   // DelayElement (diagnostic hop netlists only).
   val RcuMatchedDelaySteps: Int =
     sys.env.get("CMR_RCU_MATCHED_DELAY_STEPS").map(_.toInt).getOrElse(1)
   val TreeRcuMatchedDelayUnitPs: Int =
-    sys.env.get("CMR_RCU_MATCHED_DELAY_UNIT_PS").map(_.toInt).getOrElse(150)
+    sys.env.get("CMR_RCU_MATCHED_DELAY_UNIT_PS").map(_.toInt).getOrElse(100)
   val MeshRcuMatchedDelayUnitPs: Int =
     sys.env.get("CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS").map(_.toInt).getOrElse(150)
   val RcuMatchedDelayUnitPs: Int = TreeRcuMatchedDelayUnitPs
@@ -38,11 +61,31 @@ object CMRParameters {
   val OpmAckinUseBuf: Boolean =
     sys.env.get("CMR_OPM_ACKIN_USE_BUF").contains("1")
   val OpmAckinDelaySteps: Int =
-    sys.env.get("CMR_OPM_ACKIN_DELAY_STEPS").map(_.toInt).getOrElse(1)
+    sys.env.get("CMR_OPM_ACKIN_DELAY_STEPS").map(_.toInt).getOrElse(0)
   val OpmAckinDelayUnitPs: Int =
     sys.env.get("CMR_OPM_ACKIN_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
+  // OPM Reqout output protection. Keep the default at one DEL100; alternate
+  // units are isolated characterization candidates.
+  val OpmReqoutDelaySteps: Int =
+    sys.env.get("CMR_OPM_REQOUT_DELAY_STEPS").map(_.toInt).getOrElse(1)
+  val OpmReqoutDelayUnitPs: Int =
+    sys.env.get("CMR_OPM_REQOUT_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
+  val OpmReqoutBufferStages: Int =
+    sys.env.get("CMR_OPM_REQOUT_BUFFER_STAGES").map(_.toInt).getOrElse(1)
+  // TailPassed is asynchronously released by Grant and captured on the
+  // RegEnable close edge.  Keep this protection on the TailPassed-only clock
+  // branch: it must not delay Reqout, DataReg, Ackout, or reset release.
+  val OpmTailCaptureDelaySteps: Int =
+    sys.env.get("CMR_OPM_TAIL_CAPTURE_DELAY_STEPS").map(_.toInt).getOrElse(1)
+  val OpmTailCaptureDelayUnitPs: Int =
+    sys.env.get("CMR_OPM_TAIL_CAPTURE_DELAY_UNIT_PS").map(_.toInt).getOrElse(50)
   require(OpmAckinDelaySteps >= 0)
+  require(OpmReqoutDelaySteps >= 0)
+  require(OpmReqoutBufferStages >= 0)
+  require(OpmTailCaptureDelaySteps >= 0)
+  require(Set(50, 75, 100, 150, 250).contains(OpmReqoutDelayUnitPs))
   require(Set(50, 75, 100, 150, 250).contains(OpmAckinDelayUnitPs))
+  require(Set(50, 75, 100, 150, 250).contains(OpmTailCaptureDelayUnitPs))
 
   def Address_field(Datain: Packet): UInt =
     Datain.flit(PacketLayout.Y1Hi, PacketLayout.X0Lo)

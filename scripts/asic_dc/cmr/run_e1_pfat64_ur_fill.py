@@ -39,20 +39,34 @@ from _tmp_paper64_common import (  # noqa: E402
 )
 from run_remote_cmr_fat_tree_noc16_sdf import atomic_put_retry  # noqa: E402
 
-# Default is the deleted historical ID; override with --netlist after a new DC PASS.
-DEFAULT_NETLIST = "20260912_195012_cmr_pfat64_rpsdel050_1248"
+# Current PFAT64 DC PASS (the historical 20260912_195012 ID was deleted remotely).
+DEFAULT_NETLIST = "20260915_080229_cmr_pfat64_rpsdel050_1248"
 FROZEN_NETLIST = os.environ.get("CMR_PFAT64_NETLIST_RUN_ID", DEFAULT_NETLIST)
 EXISTING_LOADS = (5, 10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200)
 FILL_LOADS = tuple(load for load in LOADS if load not in EXISTING_LOADS)
-SEED = 202701
+DEFAULT_SEED = 202701
+SEED = DEFAULT_SEED
 DESIGN = "PFAT64"
 TOP = 8
-BUNDLE = HERE / "generated_cases" / "20260915_pfat64_asap_m5_800_202701"
-CASE_DIR = BUNDLE / "cases"
-STATE_DIR = HERE / "results" / "e1_pfat64_ur_fill"
-ARCHIVE_ROOT = REPO / "DATE paper" / "experiments" / "raw" / "paper64"
+ARCHIVE_ROOT = REPO / "DATE_paper" / "experiments" / "raw" / "paper64"
 REMOTE_ROOT = os.environ.get("CMR_REMOTE_ROOT", "/home/ghy19/Asynchronous_Router_CMR")
 HOSTS = os.environ.get("CMR_DES_BSUB_EXTRA", '-m "node21 node26 node24 node18"')
+
+
+def bundle_dir() -> Path:
+    return HERE / "generated_cases" / ("pfat64_asap_m5_800_s%d" % SEED)
+
+
+def case_dir() -> Path:
+    return bundle_dir() / "cases"
+
+
+def state_dir() -> Path:
+    return HERE / "results" / ("e1_pfat64_ur_fill_s%d" % SEED)
+
+
+def run_loads(all_loads: bool) -> tuple[int, ...]:
+    return LOADS if (all_loads or SEED != DEFAULT_SEED) else FILL_LOADS
 
 
 def case_name(load: int) -> str:
@@ -91,8 +105,8 @@ def git_evidence() -> tuple[str, bool]:
 
 def materialize() -> None:
     script = HERE / "gen_pfat64_ur_cases.py"
-    subprocess.check_call([sys.executable, str(script)], cwd=str(HERE))
-    missing = [case_name(load) for load in FILL_LOADS if not (CASE_DIR / (case_name(load) + ".case")).is_file()]
+    subprocess.check_call([sys.executable, str(script), "--seed", str(SEED)], cwd=str(HERE))
+    missing = [case_name(load) for load in LOADS if not (case_dir() / (case_name(load) + ".case")).is_file()]
     if missing:
         raise SystemExit("materialize incomplete: " + ",".join(missing[:6]))
 
@@ -103,14 +117,14 @@ def upload_cases(client, loads: tuple[int, ...]) -> dict[str, str]:
     try:
         for load in loads:
             name = case_name(load)
-            local = CASE_DIR / (name + ".case")
+            local = case_dir() / (name + ".case")
             if not local.is_file():
                 raise SystemExit("missing local case %s" % local)
             dest = "sim/cases_noc64/" + name + ".case"
             print("UPLOAD", dest, flush=True)
             client, sftp, digest = atomic_put_retry(client, sftp, local, dest)
             hashes[name] = digest
-        model = BUNDLE / "INJECTION_MODEL.json"
+        model = bundle_dir() / "INJECTION_MODEL.json"
         if model.is_file():
             client, sftp, digest = atomic_put_retry(
                 client, sftp, model, "sim/cases_noc64/INJECTION_MODEL_PFAT64_FILL.json"
@@ -146,7 +160,7 @@ def submit_gls(client, run_id: str, loads: tuple[int, ...], netlist: str) -> dic
             "CMR_NOC64_CASES": joined,
             "CMR_NOC64_FUNC_CASES": joined,
             "CMR_NOC64_SKIP_GLS": "0",
-            "CMR_NOC64_V3_CASE_DIR": str(CASE_DIR),
+            "CMR_NOC64_V3_CASE_DIR": str(case_dir()),
             "CMR_DESCAL": "1",
             "CMR_DESCAL_SUBMIT_ONLY": "1",
         }
@@ -179,8 +193,8 @@ def submit_gls(client, run_id: str, loads: tuple[int, ...], netlist: str) -> dic
         "remote_root": REMOTE_ROOT,
         "note": "SKIP_DC GLS only; no re-synthesis",
     }
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    (STATE_DIR / ("state_%s.json" % run_id)).write_text(
+    state_dir().mkdir(parents=True, exist_ok=True)
+    (state_dir() / ("state_%s.json" % run_id)).write_text(
         json.dumps(state, indent=2) + "\n", encoding="utf-8"
     )
     if completed.returncode != 0:
@@ -266,8 +280,9 @@ def _validate_collected_case(case_dir: Path, load: int) -> dict[str, object]:
     }
 
 
-def collect(client, run_id: str, output: Path | None = None) -> Path:
-    """Download and hash-verify the immutable 18-point PFAT fill evidence."""
+def collect(client, run_id: str, output: Path | None = None, loads: tuple[int, ...] | None = None) -> Path:
+    """Download and hash-verify the immutable PFAT UR evidence (loads in scope)."""
+    loads = tuple(loads) if loads is not None else FILL_LOADS
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     final = output or (ARCHIVE_ROOT / f"pfat64_ur_fill_{stamp}")
     final = final.resolve()
@@ -277,7 +292,7 @@ def collect(client, run_id: str, output: Path | None = None) -> Path:
     staging.mkdir(parents=True)
     remote_base = f"{REMOTE_ROOT}/logs/gls/{run_id}/sdf"
     manifest_lines = []
-    for load in FILL_LOADS:
+    for load in loads:
         name = case_name(load)
         for filename in COLLECT_FILES:
             remote = f"{remote_base}/{name}/{filename}"
@@ -335,7 +350,7 @@ def collect(client, run_id: str, output: Path | None = None) -> Path:
 
     acceptance = [
         _validate_collected_case(staging / "cases" / case_name(load), load)
-        for load in FILL_LOADS
+        for load in loads
     ]
     with (staging / "acceptance.csv").open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(acceptance[0]))
@@ -351,7 +366,7 @@ def collect(client, run_id: str, output: Path | None = None) -> Path:
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "run_id": run_id,
         "remote_root": REMOTE_ROOT,
-        "loads": list(FILL_LOADS),
+        "loads": list(loads),
         "case_count": len(acceptance),
         "artifact_count": len(hash_rows),
         "all_full_drain_pass": True,
@@ -394,8 +409,23 @@ def main() -> int:
         type=Path,
         help="new local collection/finalize directory (must not already exist)",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_SEED,
+        help="traffic seed (default %d); run once per seed for the paper grid" % DEFAULT_SEED,
+    )
+    parser.add_argument(
+        "--loads",
+        default="",
+        help="Comma-separated exact loads (default: fill/full grid per seed)",
+    )
     args = parser.parse_args()
-    loads = LOADS if args.all_loads else FILL_LOADS
+    global SEED
+    SEED = args.seed
+    loads = run_loads(args.all_loads)
+    if args.loads.strip():
+        loads = tuple(sorted({int(x) for x in args.loads.split(",") if x.strip()}))
     netlist = args.netlist
     run_id = checked_id(
         args.run_id
@@ -419,8 +449,8 @@ def main() -> int:
         if args.stage in ("upload", "all"):
             hashes = upload_cases(client, loads)
             print("UPLOAD_OK cases=%d" % (len(hashes) - (1 if "INJECTION_MODEL_PFAT64_FILL.json" in hashes else 0)), flush=True)
-            (STATE_DIR).mkdir(parents=True, exist_ok=True)
-            (STATE_DIR / ("upload_%s.json" % run_id)).write_text(
+            (state_dir()).mkdir(parents=True, exist_ok=True)
+            (state_dir() / ("upload_%s.json" % run_id)).write_text(
                 json.dumps({"run_id": run_id, "hashes": hashes, "loads": list(loads), "netlist": netlist}, indent=2)
                 + "\n",
                 encoding="utf-8",
@@ -431,7 +461,7 @@ def main() -> int:
         if args.stage == "status":
             status(client, run_id)
         if args.stage == "collect":
-            collect(client, run_id, args.output)
+            collect(client, run_id, args.output, loads)
     finally:
         client.close()
     return 0

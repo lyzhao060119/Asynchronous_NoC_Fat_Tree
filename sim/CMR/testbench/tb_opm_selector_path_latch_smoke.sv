@@ -25,42 +25,6 @@ module tb_opm_selector_path_latch_smoke;
     end
   endtask
 
-  task automatic force_clear;
-    begin
-      RouteSel[0] = 1'b0;
-      TailPassed[0] = 1'b1;
-      check_q(1'b0, "force_clear");
-      TailPassed[0] = 1'b0;
-      check_q(1'b0, "clear_hold");
-    end
-  endtask
-
-  task automatic release_r_with_s_lead(input realtime lead_ns);
-    begin
-      force_clear();
-      TailPassed[0] = 1'b1;
-      RouteSel[0] = 1'b1;
-      #(lead_ns);
-      TailPassed[0] = 1'b0;
-      check_q(1'b1, "S_before_R_release");
-      RouteSel[0] = 1'b0;
-      check_q(1'b1, "set_hold");
-    end
-  endtask
-
-  task automatic set_after_r_release(input realtime lag_ns);
-    begin
-      force_clear();
-      TailPassed[0] = 1'b1;
-      #(lag_ns);
-      TailPassed[0] = 1'b0;
-      #(lag_ns);
-      RouteSel[0] = 1'b1;
-      check_q(1'b1, "R_release_before_S");
-      RouteSel[0] = 1'b0;
-    end
-  endtask
-
   initial begin
     errors = 0;
     reset = 1'b1;
@@ -69,41 +33,38 @@ module tb_opm_selector_path_latch_smoke;
     #2.000;
     check_q(1'b0, "reset");
     reset = 1'b0;
+    // Satisfy the mapped DFF's recovery/removal window before its first
+    // RouteSel clock edge.
+    #0.100;
 
     RouteSel[0] = 1'b1;
-    check_q(1'b1, "set");
+    check_q(1'b1, "routesel_rising_sets");
     RouteSel[0] = 1'b0;
-    check_q(1'b1, "hold");
+    check_q(1'b1, "holds_after_routesel_falls");
     TailPassed[0] = 1'b1;
-    check_q(1'b0, "clear");
-
-    RouteSel[0] = 1'b1;
-    check_q(1'b0, "S_and_R_clear_dominant");
+    check_q(1'b0, "tailpassed_async_clear");
     TailPassed[0] = 1'b0;
-    check_q(1'b1, "release_R_with_S_high");
+    check_q(1'b0, "stays_clear_after_tailpassed");
+    #0.100;
+
+    // A high RouteSel during TailPassed must not set the state when the
+    // asynchronous clear releases; only a subsequent rising edge may do so.
+    RouteSel[0] = 1'b1;
+    TailPassed[0] = 1'b1;
+    check_q(1'b0, "clear_dominates_route_event");
+    TailPassed[0] = 1'b0;
+    check_q(1'b0, "no_retrigger_while_routesel_high");
     RouteSel[0] = 1'b0;
-
-    release_r_with_s_lead(0.025);
-    release_r_with_s_lead(0.050);
-    release_r_with_s_lead(0.100);
-    release_r_with_s_lead(0.200);
-    set_after_r_release(0.025);
-    set_after_r_release(0.050);
-    set_after_r_release(0.100);
-    set_after_r_release(0.200);
-
-    force_clear();
-    TailPassed[0] = 1'b1;
+    #0.100;
     RouteSel[0] = 1'b1;
-    TailPassed[0] = 1'b0;
-    check_q(1'b1, "zero_skew_release");
+    check_q(1'b1, "next_routesel_rising_sets_again");
 
     reset = 1'b1;
     check_q(1'b0, "final_reset");
     if (errors == 0)
-      $display("TB_RESULT PASS CMR OPMSelector PathLatch reset-dominant smoke");
+      $display("TB_RESULT PASS CMR OPMSelector RouteSel-clocked DFF smoke");
     else
-      $display("TB_RESULT FAIL CMR OPMSelector PathLatch errors=%0d", errors);
+      $display("TB_RESULT FAIL CMR OPMSelector PathStateDFF errors=%0d", errors);
     $finish;
   end
 endmodule

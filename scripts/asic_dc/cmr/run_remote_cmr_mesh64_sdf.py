@@ -81,7 +81,11 @@ SDF_RX_CAPTURE_NS = os.environ.get("CMR_MESH64_RX_CAPTURE_NS", "0.1")
 FUNC_RX_CAPTURE_NS = os.environ.get("CMR_MESH64_FUNC_RX_CAPTURE_NS", "5")
 RCU_STEPS = os.environ.get("CMR_RCU_MATCHED_DELAY_STEPS", "1")
 RCU_UNIT_PS = os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50")
+MESH_RCU_UNIT_PS = os.environ.get("CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS", "150")
 ACKIN_UNIT_PS = os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50")
+OPM_REQOUT_STEPS = int(os.environ.get("CMR_OPM_REQOUT_DELAY_STEPS", "1"))
+OPM_REQOUT_UNIT_PS = int(os.environ.get("CMR_OPM_REQOUT_DELAY_UNIT_PS", "50"))
+OPM_REQOUT_BUFFER_STAGES = int(os.environ.get("CMR_OPM_REQOUT_BUFFER_STAGES", "1"))
 GRANT_HOLD_BUF = os.environ.get("CMR_EXPECTED_GRANT_HOLD_BUF", "").strip()
 LATCH_REOPEN_DEL = os.environ.get("CMR_EXPECTED_LATCH_REOPEN_DEL", "").strip()
 DC_POLLS = int(os.environ.get("CMR_MESH64_DC_POLLS", "1440"))
@@ -161,18 +165,28 @@ def _check_generated(generated: Path) -> Path:
     if async_count:
         raise SystemExit("mesh64 expected no FIFO got async=%d" % async_count)
     matched_params = "#(.DelayUnitPs(%s), .DelayValue(%s))" % (
-        RCU_UNIT_PS,
+        MESH_RCU_UNIT_PS,
         RCU_STEPS,
     )
     matched_ok = (
         ("DelayElement %s MatchedDelay" % matched_params) in text
         or ("DelayElement %s BundlingSignal_MatchedDelay" % matched_params) in text
     )
-    ackin = "DelayElement #(.DelayUnitPs(%s), .DelayValue(1)) AckinDelay" % ACKIN_UNIT_PS
     if not matched_ok:
-        raise SystemExit("mesh64 MatchedDelay is not %sxDEL%s" % (RCU_STEPS, RCU_UNIT_PS))
-    if ackin not in text:
-        raise SystemExit("mesh64 AckinDelay is not 1xDEL%s" % ACKIN_UNIT_PS)
+        raise SystemExit("mesh64 MatchedDelay is not %sxDEL%s" % (RCU_STEPS, MESH_RCU_UNIT_PS))
+    opm_modules = len(re.findall(r"^module OPM(?:_\d+)?\b", text, re.M))
+    opm_delay = (
+        "DelayElement #(.DelayUnitPs(%d), .DelayValue(%d)) OPMDelay"
+        % (OPM_REQOUT_UNIT_PS, OPM_REQOUT_STEPS)
+    )
+    delay_count = text.count(opm_delay)
+    buffer_count = len(re.findall(r"^\s*DontTouchBuf OPMReqoutBuffer_\d+\s*\(", text, re.M))
+    expected_buffers = opm_modules * OPM_REQOUT_BUFFER_STAGES
+    if opm_modules == 0 or delay_count != opm_modules or buffer_count != expected_buffers:
+        raise SystemExit(
+            "mesh64 OPM output protection mismatch: modules=%d delay=%d buffers=%d expected_buffers=%d"
+            % (opm_modules, delay_count, buffer_count, expected_buffers)
+        )
     if "GrantHoldBuf" in text:
         raise SystemExit("mesh64 still has GrantHoldBuf; reopen experiment removed it")
     reopen = "DelayElement #(.DelayUnitPs(%s), .DelayValue(1)) LatchReopenDelay" % ACKIN_UNIT_PS
@@ -202,8 +216,14 @@ def generate_rtl() -> Path:
     env["CMR_FORCE_EMIT"] = "1"
     env["CMR_RCU_MATCHED_DELAY_STEPS"] = str(RCU_STEPS)
     env["CMR_RCU_MATCHED_DELAY_UNIT_PS"] = str(RCU_UNIT_PS)
-    env["CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS"] = str(RCU_UNIT_PS)
+    # Mesh has its own characterized RCU protection (currently DEL150).
+    # Do not overwrite it with the tree/general RCU unit while emitting the
+    # Mesh RTL; doing so silently produced a DEL100 Mesh network.
+    env["CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS"] = str(MESH_RCU_UNIT_PS)
     env["CMR_OPM_ACKIN_DELAY_UNIT_PS"] = str(ACKIN_UNIT_PS)
+    env["CMR_OPM_REQOUT_DELAY_STEPS"] = str(OPM_REQOUT_STEPS)
+    env["CMR_OPM_REQOUT_DELAY_UNIT_PS"] = str(OPM_REQOUT_UNIT_PS)
+    env["CMR_OPM_REQOUT_BUFFER_STAGES"] = str(OPM_REQOUT_BUFFER_STAGES)
     sbt = os.environ.get("SBT_CMD", "sbt.bat" if os.name == "nt" else "sbt")
     print("MESH64_EMIT n=8 lanes=1,1", flush=True)
     subprocess.run(
@@ -547,7 +567,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
                         EXPECTED_PORTS,
                         EXPECTED_ROUTERS,
                         shlex.quote(str(RCU_STEPS)),
-                        shlex.quote(str(RCU_UNIT_PS)),
+                        shlex.quote(str(MESH_RCU_UNIT_PS)),
                         shlex.quote(str(ACKIN_UNIT_PS)),
                         extra_export,
                         ROOT,
@@ -579,7 +599,7 @@ def run_mesh(client, case_files: dict[str, Path]) -> dict:
         "expected_ports": EXPECTED_PORTS,
         "expected_adapters": EXPECTED_ADAPTERS,
         "rcu_matched_delay_steps": int(RCU_STEPS),
-        "rcu_matched_delay_unit_ps": int(RCU_UNIT_PS),
+        "rcu_matched_delay_unit_ps": int(MESH_RCU_UNIT_PS),
         "opm_ackin_delay_unit_ps": int(ACKIN_UNIT_PS),
         "grant_hold_buf": GRANT_HOLD_BUF,
         "latch_reopen_del": LATCH_REOPEN_DEL,
@@ -699,10 +719,10 @@ def main():
         refuse_overwrite(BASE_RUN_ID, action="descal-mesh64")
     if not CASES:
         raise SystemExit("CMR_MESH64_CASES is empty")
-    if int(ACKIN_UNIT_PS) != 50 or int(RCU_STEPS) < 1 or int(RCU_UNIT_PS) not in (50, 75, 100, 150):
+    if int(ACKIN_UNIT_PS) != 50 or int(RCU_STEPS) < 1 or int(MESH_RCU_UNIT_PS) not in (50, 75, 100, 150):
         raise SystemExit(
             "mesh64 delay recipe invalid: RCU requires positive steps and DEL050/075/100/150; Ackin must be DEL050, got rcu=%sx%s ackin=%s"
-            % (RCU_STEPS, RCU_UNIT_PS, ACKIN_UNIT_PS)
+            % (RCU_STEPS, MESH_RCU_UNIT_PS, ACKIN_UNIT_PS)
         )
     print(
         "MESH64_LAUNCH cases=%s func_cases=%s rx_sdf=%s rx_func=%s skip_func=%s"

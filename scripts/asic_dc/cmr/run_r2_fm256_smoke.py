@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Round-2 FlatMesh256 smoke: KEY-256 + low-load UR on frozen hier netlist."""
 from __future__ import annotations
 

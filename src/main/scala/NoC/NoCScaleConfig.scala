@@ -65,70 +65,48 @@ final case class NoCScaleConfig(
 }
 
 object NoCScaleConfig {
-  /** Fat 1-2-4-8: L1 1→2, L2 2→4, L3 4→8, eight top parent lanes. */
+  /** PFAT 1-2-4-8: L1 1→2, L2 2→4, L3 4→8, eight top parent lanes. */
   val FatLane1248: NoCRouterChannelConfig = NoCRouterChannelConfig()
 
-  /** Fat 1-2-2-2: L1 1→2, L2 and L3 both 2→2, two top parent lanes. */
-  val FatLane1222: NoCRouterChannelConfig = NoCRouterChannelConfig(
-    l1ChildLanes = 1,
-    l1ParentLanes = 2,
-    l2ParentLanes = 2,
-    l3ParentLanes = 2,
-    topChildLanes = 2
-  )
-
-  /** Thin (1,1) at L1/L2/L3: one child lane, one parent lane, one top port.
-    * Async THIN64 and the Sync 64-core counterpart share this geometry.
-    */
-  val ThinLane111: NoCRouterChannelConfig = NoCRouterChannelConfig(
-    l1ChildLanes = 1,
-    l1ParentLanes = 1,
-    l2ParentLanes = 1,
-    l3ParentLanes = 1,
-    topChildLanes = 1
-  )
-
-  val DefaultRouterChannels: NoCRouterChannelConfig = FatLane1222
+  // M16 PROP is a separate three-level tree (1x4 at each level), not a
+  // NoCRouterChannelConfig: its L2/L3 child geometries do not follow the
+  // conventional shared-lane quadtree relation encoded by this case class.
+  // This config is therefore the remaining conventional fat-tree profile.
+  val DefaultRouterChannels: NoCRouterChannelConfig = FatLane1248
 
   def fatLaneProfileName: String = {
-    val raw = sys.env.getOrElse("CMR_FAT_LANE_PROFILE", "1222").trim
+    val raw = sys.env.getOrElse("CMR_FAT_LANE_PROFILE", "1248").trim
     raw.toLowerCase.replace("-", "").replace("_", "") match {
-      case "1248" | "fatlane1248" => "1248"
-      case "1222" | "fatlane1222" => "1222"
+      case "1248" | "fatlane1248" | "pfat" => "1248"
       case _ =>
         throw new IllegalArgumentException(
-          s"Unknown CMR_FAT_LANE_PROFILE='$raw'. Supported: 1248, 1222."
+          s"Unknown CMR_FAT_LANE_PROFILE='$raw'. Only 1248 remains; use CMR_Q64_PROFILE=prop for M16."
         )
     }
   }
 
   def fatLaneChannels: NoCRouterChannelConfig =
-    fatLaneProfileName match {
-      case "1248" => FatLane1248
-      case "1222" => FatLane1222
-    }
+    FatLane1248
 
   def fatLaneTopLanes: Int = fatLaneChannels.l3.parentLanes
 
   /** One 64-core quadtree tile using the selected Fat lane profile. */
   def fatTree64: NoCScaleConfig = NoCScaleConfig(1, 1, fatLaneChannels)
 
-  /** One 64-core Thin quadtree: 16 L1 + 4 L2 + 1 L3, all (1,1). */
-  def thinTree64: NoCScaleConfig = NoCScaleConfig(1, 1, ThinLane111)
-
-  /** Q64 tile for DATE V3 network DUTs.  `CMR_Q64_PROFILE=thin|1222|1248`
-    * selects the tree; omitted falls back to `CMR_FAT_LANE_PROFILE`.
-    */
+  /** Conventional Q64 fat tree. PROP/M16 uses its dedicated RTL top. */
   def q64TreeFromEnv: NoCScaleConfig = {
     sys.env.get("CMR_Q64_PROFILE").map(_.trim.toLowerCase.replace("-", "").replace("_", "")) match {
-      case Some("thin") | Some("1111") | Some("thin111") => thinTree64
       case Some("1248") | Some("pfat") | Some("fatlane1248") =>
         NoCScaleConfig(1, 1, FatLane1248)
-      case Some("1222") | Some("prop") | Some("fatlane1222") =>
-        NoCScaleConfig(1, 1, FatLane1222)
+      case Some("prop") | Some("m16") | Some("propm16") =>
+        throw new IllegalArgumentException(
+          "PROP selects the dedicated PROPtemp64M16 top; it is not a NoCScaleConfig fat tree"
+        )
+      case Some("thin") | Some("1111") | Some("thin111") | Some("1222") | Some("fatlane1222") =>
+        throw new IllegalArgumentException(s"CMR_Q64_PROFILE '${sys.env("CMR_Q64_PROFILE")}' was removed")
       case Some(other) =>
         throw new IllegalArgumentException(
-          s"Unknown CMR_Q64_PROFILE='$other'. Supported: thin, 1222, 1248."
+          s"Unknown CMR_Q64_PROFILE='$other'. Supported: prop (M16), 1248."
         )
       case None => fatTree64
     }
@@ -151,11 +129,6 @@ object NoCScaleConfig {
     )
     NoCScaleConfig(clusterGrid, clusterGrid, q64Channels)
   }
-
-  /** Sync Fat 1-2-2-2 64-core tile.  Pinned so CMR_FAT_LANE_PROFILE cannot
-    * silently switch this DUT to 1-2-4-8.
-    */
-  def syncFatTree64_1222: NoCScaleConfig = NoCScaleConfig(1, 1, FatLane1222)
 
   /** Sync Fat 1-2-4-8 64-core tile.  This is explicitly pinned so a
     * synchronous baseline cannot be changed by CMR_FAT_LANE_PROFILE. */

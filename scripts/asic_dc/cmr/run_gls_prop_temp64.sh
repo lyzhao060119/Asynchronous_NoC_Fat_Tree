@@ -22,40 +22,61 @@ test "$MODE" = func -o "$MODE" = sdf
 test -s "$RAW" && test -s "$CASE_FILE" && test -s "$ADAPTER" && test -s "$TB" && test -s "$FAILFAST"
 if [[ "$MODE" == sdf ]]; then test -s "$SDF"; fi
 mkdir -p "$WORK" "$LOG" "$(dirname "$CSV")"
-cd "$WORK"
 module load vcs 2>/dev/null || module load vcs/vcs2023.12 2>/dev/null || true
 export VCS_HOME=${VCS_HOME:-/soft/synopsys/vcs/V-2023.12}
 export PATH="$VCS_HOME/bin:$PATH"
 sha256sum "$CASE_FILE" "$RAW" "$ADAPTER" "$TB" "$FAILFAST" > "$LOG/input_hashes.log"
-if [[ "$MODE" == func ]]; then
-  NETLIST="$WORK/${TOP}_func.v"
-  python3 "$PATCH" "$RAW" "$NETLIST" --mode cmr_func > "$LOG/netlist_patch.log"
-  grep -q 'q0 = ~(req0 & q1)' "$NETLIST"
-  grep -q 'assign #(1.0)' "$NETLIST"
-  TIMING='+notimingcheck +no_notifier'
-  BOOT=''
-else
-  NETLIST="$RAW"
-  TIMING='+neg_tchk'
-  BOOT="$WORK/sdf_boot.sv"
-  sha256sum "$SDF" >> "$LOG/input_hashes.log"
-  cat > "$BOOT" <<EOF
+CACHE="$ROOT/sim/cache/prop_temp64/$RUN_ID/$MODE"
+mkdir -p "$CACHE"
+(
+flock -x 9
+if [[ ! -x "$CACHE/simv" || ! -s "$CACHE/compile.ok" ]]; then
+  cd "$CACHE"
+  if [[ "$MODE" == func ]]; then
+    NETLIST=${PROP_TEMP64_FUNC_NETLIST:-$CACHE/${TOP}_func.v}
+    if [[ ! -s "$NETLIST" ]]; then
+      python3 "$PATCH" "$RAW" "$NETLIST" --mode cmr_func > "$CACHE/netlist_patch.log"
+    fi
+    TIMING='+notimingcheck +no_notifier'
+    BOOT=''
+  else
+    NETLIST="$RAW"
+    TIMING='+neg_tchk'
+    BOOT="$CACHE/sdf_boot.sv"
+    SDF_SCOPE='tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_prop_temp.noc.dut'
+    if [[ "$TOP" == "PROP_temp64_m16" ]]; then
+      SDF_SCOPE='tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_prop_temp_m16.noc.dut'
+    fi
+    cat > "$BOOT" <<EOF
 module sdf_boot;
   initial begin
-    \$sdf_annotate("$SDF", tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc_prop_temp.noc.dut, , "sdf_annotate.log", "MAXIMUM", ,);
+    \$sdf_annotate("$SDF", $SDF_SCOPE, , "sdf_annotate.log", "MAXIMUM", ,);
     \$display("TB_INFO %s MAXIMUM SDF annotation", "$TOP");
   end
 endmodule
 EOF
+  fi
+  printf '%s\n' "$LIB" "$NETLIST" "$ADAPTER" "$TB" "$FAILFAST" ${BOOT:+"$BOOT"} > "$CACHE/filelist.f"
+  STATIC_DEFINE=""
+  TOPO_DEFINE="+define+PROP_TEMP64_TOP16"
+  if [[ "$TOP" == "PROP_temp64_static4" ]]; then STATIC_DEFINE="+define+PROP_TEMP64_STATIC4"; fi
+  if [[ "$TOP" == "PROP_temp64_m16" ]]; then TOPO_DEFINE="+define+PROP_TEMP64_M16_TOP64"; fi
+  vcs -full64 -sverilog -timescale=1ns/1ps $TIMING $TOPO_DEFINE $STATIC_DEFINE \
+    -f "$CACHE/filelist.f" -top tb_cmr_noc64_async_boundary_failfast ${BOOT:+-top sdf_boot} \
+    -o "$CACHE/simv" -l "$CACHE/compile.log"
+  sha256sum "$RAW" "$ADAPTER" "$TB" "$FAILFAST" > "$CACHE/compile.ok"
+  if [[ "$MODE" == sdf ]]; then sha256sum "$SDF" >> "$CACHE/compile.ok"; fi
 fi
-printf '%s\n' "$LIB" "$NETLIST" "$ADAPTER" "$TB" "$FAILFAST" ${BOOT:+"$BOOT"} > filelist.f
-STATIC_DEFINE=""
-if [[ "$TOP" == "PROP_temp64_static4" ]]; then STATIC_DEFINE="+define+PROP_TEMP64_STATIC4"; fi
-vcs -full64 -sverilog -timescale=1ns/1ps $TIMING +define+PROP_TEMP64_TOP16 $STATIC_DEFINE \
-  -f filelist.f -top tb_cmr_noc64_async_boundary_failfast ${BOOT:+-top sdf_boot} \
-  -o simv -l "$LOG/compile.log"
+) 9>"$CACHE/compile.lock"
+cp "$CACHE/compile.log" "$LOG/compile.log"
+if [[ "$MODE" == sdf ]]; then sha256sum "$SDF" >> "$LOG/input_hashes.log"; fi
+cd "$WORK"
+if [[ "$MODE" == sdf ]]; then
+  exec 8>"$CACHE/run.lock"
+  flock -x 8
+fi
 set +e
-./simv +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
+"$CACHE/simv" +CASE_FILE="$CASE_FILE" +RESULT_CSV="$CSV" \
   +EVENT_CSV="$LOG/events.csv" +LATENCY_CSV="$LOG/latency.csv" \
   +FLIT_LATENCY_CSV="$LOG/flit_latency.csv" +MISSING_CSV="$LOG/missing_expected.csv" \
   +V3_METRICS_CSV="$LOG/v3_metrics.csv" +CASE_TICK_NS=1 \
@@ -65,7 +86,10 @@ set +e
   -l "$LOG/run.log" 2>&1 | tee "$LOG/stdout.log"
 rc=${PIPESTATUS[0]}
 set -e
-if [[ "$MODE" == sdf ]]; then cp sdf_annotate.log "$LOG/" 2>/dev/null || true; fi
+if [[ "$MODE" == sdf ]]; then
+  cp "$CACHE/sdf_annotate.log" "$LOG/sdf_annotate.log" 2>/dev/null || true
+  flock -u 8
+fi
 if [[ "$MODE" == sdf ]]; then
   test -s "$LOG/sdf_annotate.log" || { echo "PROP_TEMP64_GLS_FAIL missing SDF annotation log" >&2; exit 3; }
   if grep -Eiq 'Total errors:[[:space:]]*[1-9]|SDF[^[:space:]]*[[:space:]]+error' "$LOG/sdf_annotate.log"; then

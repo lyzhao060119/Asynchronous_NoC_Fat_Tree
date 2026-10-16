@@ -198,7 +198,7 @@ def require_locked_delay_structure(values: dict[str, str], *, label: str) -> Non
 
 
 def require_emit_locked_delays(
-    text: str, *, label: str, ackin_unit_ps: int, rcu_unit_ps: int = LOCKED_RCU_UNIT_PS
+    text: str, *, label: str, ackin_unit_ps: int | None, rcu_unit_ps: int = LOCKED_RCU_UNIT_PS
 ) -> None:
     params = "#(.DelayUnitPs(%d), .DelayValue(%d))" % (
         rcu_unit_ps,
@@ -208,12 +208,16 @@ def require_emit_locked_delays(
         ("DelayElement %s MatchedDelay" % params) in text
         or ("DelayElement %s BundlingSignal_MatchedDelay" % params) in text
     )
+    if not matched_ok:
+        raise SystemExit("%s MatchedDelay is not RCU 1x%sps" % (label, rcu_unit_ps))
+    if ackin_unit_ps is None:
+        if " AckinDelay" in text:
+            raise SystemExit("%s current Click OPM unexpectedly contains AckinDelay" % label)
+        return
     ackin = "DelayElement #(.DelayUnitPs(%d), .DelayValue(%d)) AckinDelay" % (
         ackin_unit_ps,
         LOCKED_ACKIN_STEPS,
     )
-    if not matched_ok:
-        raise SystemExit("%s MatchedDelay is not RCU 1x%sps" % (label, rcu_unit_ps))
     if ackin not in text:
         raise SystemExit("%s AckinDelay is not 1x%sps" % (label, ackin_unit_ps))
     if ackin_unit_ps != LOCKED_ACKIN_UNIT_PS:

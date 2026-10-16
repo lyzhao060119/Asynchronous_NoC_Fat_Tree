@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
-"""Remote DC + SDF GLS for 64-core CMR fat-tree.
+"""Remote DC + SDF GLS for the 64-core PFAT 1-2-4-8 tree.
 
-Profiles (CMR_FAT_LANE_PROFILE or CMR_Q64_PROFILE):
-  1222  L1 1->2, L2/L3 2->2, two top lanes (default)
-  1248  L1 1->2, L2 2->4, L3 4->8, eight top lanes
-  thin  L1/L2/L3 1->1, one top lane.  Emit sets CMR_Q64_PROFILE=thin;
-        do not set CMR_FAT_LANE_PROFILE=thin on the Scala fat-lane parser.
+PROP uses the separate M16 tree entry in run_remote_cmr_hier_dc.py.  The
+removed Thin and 1-2-2-2 tree profiles are intentionally not selectable here.
 
 Does not reuse NoC16 netlists.  Unset CMR_NOC16_NETLIST_RUN_ID.
 GLS is MAXIMUM SDF only (no cmr_func patch), RX_CAPTURE=0.1 ns.
 Functional GLS is opt-in via CMR_NOC64_SKIP_FUNC=0.
-Delay default is RCU 1xDEL050 / Ackin 1xDEL050.  The signed network
-netlist 20260830_095259_cmr_noc64_p50_1222 is Ackin DEL250: SKIP_DC it,
-do not overwrite it, and do not cite it as Fat vs Thin hop delay.
+Current local-emission recipe is RCU 1xDEL050 plus the RTL's OPM output
+1xDEL050 and one DontTouchBuf. Ackin is direct in the current OPM RTL;
+historical frozen network netlists remain read-only.
 
 DATE V3 5-flit cases are mandatory: CMR_NOC64_V3_CASE_DIR must point at
 materialized .case files.  The legacy Bernoulli 3-flit generator is not an
-async NoC64 fallback.  CMR_DESCAL=1 refuses the
-Ackin-250 netlist unless CMR_NOC64_ALLOW_ACKIN250=1.  1-2-4-8 and thin
-network GLS are allowed on the DES-cal path.
+async NoC64 fallback. CMR_DESCAL=1 refuses the Ackin-250 netlist unless
+CMR_NOC64_ALLOW_ACKIN250=1.
 """
 from __future__ import annotations
 
@@ -34,7 +30,7 @@ from pathlib import Path
 
 from check_cmr_router_geometry import check_noc64
 from cmr_descal_env import apply_bsub, submit_only
-from cmr_frozen_run_ids import refuse_overwrite, require_emit_locked_delays
+from cmr_frozen_run_ids import refuse_overwrite
 from run_remote_cmr_flow import atomic_put_bytes, remote_run
 from run_remote_cmr_fat_tree_noc16_sdf import (
     CIRCULAR_RTL,
@@ -97,6 +93,13 @@ LANE01_STAGES = os.environ.get("CMR_LANE01_BUF_STAGES", "0").strip() or "0"
 RCU_STEPS = os.environ.get("CMR_RCU_MATCHED_DELAY_STEPS", "1")
 RCU_UNIT_PS = os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50")
 ACKIN_UNIT_PS = os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50")
+OPM_REQOUT_STEPS = int(os.environ.get("CMR_OPM_REQOUT_DELAY_STEPS", "1"))
+OPM_REQOUT_UNIT_PS = int(os.environ.get("CMR_OPM_REQOUT_DELAY_UNIT_PS", "50"))
+OPM_REQOUT_BUFFER_STAGES = int(os.environ.get("CMR_OPM_REQOUT_BUFFER_STAGES", "1"))
+# PFAT needs the full DEL150 upstream acknowledgement turnaround guard.  The
+# generic Router/Thin/Mesh default remains DEL050 in CMRTypes; this launcher is
+# PFAT-only and must not silently regenerate the failed DEL050 network.
+IPM_ACKOUT_GUARD_UNIT_PS = int(os.environ.get("CMR_IPM_ACKOUT_GUARD_DELAY_UNIT_PS", "150"))
 DC_POLLS = int(os.environ.get("CMR_NOC64_DC_POLLS", "1440"))
 GLS_POLLS = int(os.environ.get("CMR_NOC64_GLS_POLLS", "720"))
 DC_BSUB = apply_bsub(os.environ.get("CMR_NOC64_DC_BSUB", "-n 16"))
@@ -106,26 +109,12 @@ EXPECTED_ROUTERS = 21
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
 PROFILES = {
-    "1222": {
-        "geometry": "fat_tree_noc64_l1_1to2_l2_2to2_l3_2to2",
-        "top_lanes": 2,
-        "expected_ports": 146,
-        "expected_adapters": 264,
-        "expected_fifos_if_enabled": 80,
-    },
     "1248": {
         "geometry": "fat_tree_noc64_l1_1to2_l2_2to4_l3_4to8",
         "top_lanes": 8,
         "expected_ports": 168,
         "expected_adapters": 352,
         "expected_fifos_if_enabled": 96,
-    },
-    "thin": {
-        "geometry": "fat_tree_noc64_l1_1to1_l2_1to1_l3_1to1",
-        "top_lanes": 1,
-        "expected_ports": 105,
-        "expected_adapters": 0,
-        "expected_fifos_if_enabled": 80,
     },
 }
 
@@ -134,20 +123,14 @@ def selected_profiles() -> tuple[str, ...]:
     raw = (
         os.environ.get("CMR_FAT_LANE_PROFILE")
         or os.environ.get("CMR_Q64_PROFILE")
-        or "1222"
+        or "1248"
     )
     raw = raw.strip().lower()
     raw = raw.replace("-", "").replace("_", "")
-    if raw in ("both", "all", "1248,1222", "1222,1248"):
-        return ("1222", "1248")
-    if raw in ("1222", "fatlane1222"):
-        return ("1222",)
     if raw in ("1248", "fatlane1248", "pfat"):
         return ("1248",)
-    if raw in ("thin", "111", "1111", "thin111"):
-        return ("thin",)
     raise SystemExit(
-        "CMR_FAT_LANE_PROFILE / CMR_Q64_PROFILE must be 1222, 1248, thin, or both; got %r"
+        "CMR_FAT_LANE_PROFILE / CMR_Q64_PROFILE must be 1248 (PFAT); PROP/M16 uses the hierarchical entry; got %r"
         % raw
     )
 
@@ -222,7 +205,36 @@ def _check_generated(generated: Path, profile: str) -> Path:
         raise SystemExit("NoC64 adapter count %d != %d" % (adapter_count, cfg["expected_adapters"]))
     if top_ports != cfg["top_lanes"]:
         raise SystemExit("NoC64 top ports %d != %d" % (top_ports, cfg["top_lanes"]))
-    require_emit_locked_delays(text, label="NoC64", ackin_unit_ps=int(ACKIN_UNIT_PS))
+    matched = (
+        "DelayElement #(.DelayUnitPs(%s), .DelayValue(%s)) BundlingSignal_MatchedDelay"
+        % (RCU_UNIT_PS, RCU_STEPS)
+    )
+    if matched not in text:
+        raise SystemExit("NoC64 MatchedDelay is not RCU %sxDEL%sps" % (RCU_STEPS, RCU_UNIT_PS))
+    opm_modules = len(re.findall(r"^module OPM(?:_\d+)?\b", text, re.M))
+    ipm_modules = len(re.findall(r"^module IPM(?:_\d+)?\b", text, re.M))
+    ipm_guard = (
+        "DelayElement #(.DelayUnitPs(%d), .DelayValue(1)) AckoutGuard"
+        % IPM_ACKOUT_GUARD_UNIT_PS
+    )
+    ipm_guard_count = text.count(ipm_guard)
+    if ipm_modules == 0 or ipm_guard_count != ipm_modules:
+        raise SystemExit(
+            "NoC64 IPM AckoutGuard mismatch: modules=%d DEL%d=%d"
+            % (ipm_modules, IPM_ACKOUT_GUARD_UNIT_PS, ipm_guard_count)
+        )
+    opm_delay = (
+        "DelayElement #(.DelayUnitPs(%d), .DelayValue(%d)) OPMDelay"
+        % (OPM_REQOUT_UNIT_PS, OPM_REQOUT_STEPS)
+    )
+    delay_count = text.count(opm_delay)
+    buffer_count = len(re.findall(r"^\s*DontTouchBuf OPMReqoutBuffer_\d+\s*\(", text, re.M))
+    expected_buffers = opm_modules * OPM_REQOUT_BUFFER_STAGES
+    if opm_modules == 0 or delay_count != opm_modules or buffer_count != expected_buffers:
+        raise SystemExit(
+            "NoC64 OPM output protection mismatch: modules=%d delay=%d buffers=%d expected_buffers=%d"
+            % (opm_modules, delay_count, buffer_count, expected_buffers)
+        )
     if BYPASS_INTERLEVEL_FIFO and (async_count or circular_count):
         raise SystemExit(
             "NoC64 bypass expected no FIFO got async=%d circular=%d"
@@ -255,15 +267,16 @@ def generate_rtl(profile: str) -> Path:
     env["ASYNC_PRIMITIVES"] = "asic"
     env["CMR_FORCE_EMIT"] = "1"
     env["CMR_Q64_PROFILE"] = profile
-    if profile == "thin":
-        env.pop("CMR_FAT_LANE_PROFILE", None)
-    else:
-        env["CMR_FAT_LANE_PROFILE"] = profile
+    env["CMR_FAT_LANE_PROFILE"] = profile
     env["CMR_USE_CIRCULAR_FIFO"] = "1" if USE_CIRCULAR_FIFO else "0"
     env["CMR_BYPASS_INTERLEVEL_FIFO"] = "1" if BYPASS_INTERLEVEL_FIFO else "0"
     env["CMR_RCU_MATCHED_DELAY_STEPS"] = str(RCU_STEPS)
     env["CMR_RCU_MATCHED_DELAY_UNIT_PS"] = str(RCU_UNIT_PS)
     env["CMR_OPM_ACKIN_DELAY_UNIT_PS"] = str(ACKIN_UNIT_PS)
+    env["CMR_OPM_REQOUT_DELAY_STEPS"] = str(OPM_REQOUT_STEPS)
+    env["CMR_OPM_REQOUT_DELAY_UNIT_PS"] = str(OPM_REQOUT_UNIT_PS)
+    env["CMR_OPM_REQOUT_BUFFER_STAGES"] = str(OPM_REQOUT_BUFFER_STAGES)
+    env["CMR_IPM_ACKOUT_GUARD_DELAY_UNIT_PS"] = str(IPM_ACKOUT_GUARD_UNIT_PS)
     sbt = os.environ.get("SBT_CMD", "sbt.bat" if os.name == "nt" else "sbt")
     print("FAT64_EMIT profile=%s bypass=%s" % (profile, "1" if BYPASS_INTERLEVEL_FIFO else "0"), flush=True)
     subprocess.run(
@@ -281,6 +294,7 @@ def shared_input_files() -> dict[Path, str]:
     files = {}
     for name in (
         "DelayElement_ASIC.v",
+        "DontTouchBuf_ASIC.v",
         "Mutex2_ASIC.v",
         "Mutex4.v",
         "MullerC2.v",
@@ -288,7 +302,7 @@ def shared_input_files() -> dict[Path, str]:
         "V2CloseEvent.v",
     ):
         files[async_resource / name] = "rtl/" + name
-    for name in (
+    cmr_sources = [
         "CMRMutexN.v",
         "CMRFlattenedTAC.v",
         "Toggle.v",
@@ -299,7 +313,6 @@ def shared_input_files() -> dict[Path, str]:
         "RouteSelAnd2.v",
         "OPMSelector.v",
         "PhaseResetDLatch.v",
-        "LanePhaseAdapter.v",
         "LanePhaseAdapterDFF.v",
         "LaneSelector.v",
         "WriteControlUnit.v",
@@ -310,7 +323,14 @@ def shared_input_files() -> dict[Path, str]:
         "ReadRequestGenerator.v",
         "ReadPhaseSelector.v",
         "ReadAckGenerator.v",
-    ) + CIRCULAR_RTL:
+    ]
+    # The current bypass-FIFO 64-node designs do not instantiate CircularFIFO,
+    # and the legacy LanePhaseAdapter RTL has been removed from this checkout.
+    # Only stage the circular-FIFO sources for an explicitly enabled circular
+    # FIFO build; the current network synthesis runs use the bypass form.
+    if not BYPASS_INTERLEVEL_FIFO and USE_CIRCULAR_FIFO:
+        cmr_sources.extend(CIRCULAR_RTL)
+    for name in cmr_sources:
         files[cmr_resource / name] = "rtl/" + name
     files.update({
         REPO / "scripts/asic_dc/tech_t28ss.tcl": "rtl/tech_t28ss.tcl",
@@ -356,7 +376,7 @@ def collect_gls_result(client, run_id, mode, name, jid):
     annotate = ""
     if mode == "sdf":
         client, annotate = remote_run_retry(
-            client, "cat %s/sdf_annotate.log 2>/dev/null" % base
+            client, "grep -E 'Total (errors|warnings):' %s/sdf_annotate.log 2>/dev/null" % base
         )
     errors = re.search(r"Total errors:\s*(\d+)", annotate)
     failure_tokens = (
@@ -367,6 +387,7 @@ def collect_gls_result(client, run_id, mode, name, jid):
         "TB_HARD_TIMEOUT",
         "TB_PROTOCOL_X",
         "TB_FATAL",
+        "Fatal:",
         "Timing violation",
     )
     first_failure = next(
@@ -391,12 +412,18 @@ def collect_gls_result(client, run_id, mode, name, jid):
             None,
         ),
     }
+    entry["result_marker_count"] = len(re.findall(r"(?m)^TB_RESULT (?:PASS|FAIL)\b", run_log))
+    entry["has_failure_marker"] = first_failure is not None
     if mode == "sdf":
         entry["annotation_done"] = "Doing SDF annotation ...... Done" in run_log
         entry["annotation_errors"] = int(errors.group(1)) if errors else None
+        warnings = re.search(r"Total warnings:\s*(\d+)", annotate)
+        entry["annotation_warnings"] = int(warnings.group(1)) if warnings else None
         entry["ifnsdfa"] = "IFNSDFA" in run_log
         passed = (
             entry["tb_pass"]
+            and entry["result_marker_count"] == 1
+            and not entry["has_failure_marker"]
             and entry["annotation_done"]
             and entry["annotation_errors"] == 0
             and not entry["ifnsdfa"]
@@ -410,6 +437,8 @@ def collect_gls_result(client, run_id, mode, name, jid):
     else:
         passed = (
             entry["tb_pass"]
+            and entry["result_marker_count"] == 1
+            and not entry["has_failure_marker"]
             and not entry["x_failure"]
             and not entry["unexpected_failure"]
             and not entry["stall_failure"]

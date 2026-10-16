@@ -16,6 +16,7 @@ FLIT_W = 28
 SPECS = (
     (256, "prop", "NoC_256nodes"),
     (256, "prop_temp", "PROP_temp256"),
+    (256, "prop_temp_m16", "PROP_temp256_m16"),
     (256, "pfat_temp", "PFAT_temp256"),
     (256, "fm", "CMRMeshNoC"),
     (1024, "prop", "NoC_1024nodes"),
@@ -46,25 +47,52 @@ def emit_module(nodes: int, kind: str, dut: str) -> str:
     name = "async_noc_port_adapter_%s_%d" % (kind, nodes)
     ins, outs = emit_core_ports(nodes)
     ports = ins + outs
+    monitor = kind == "prop_temp_m16"
+    monitor_ports = [
+        "  output wire [255:0]            mon_upper_req,",
+        "  output wire [255:0]            mon_upper_ack",
+    ] if monitor else []
+    monitor_assignments = []
+    if monitor:
+        for tile in range(4):
+            for plane_j in range(4):
+                for plane_h in range(4):
+                    plane = plane_j * 4 + plane_h
+                    for lane in range(4):
+                        bit = tile * 64 + plane * 4 + lane
+                        # DC retains the flattened Req name from the tile side
+                        # and the matching Ack name from the mesh side.
+                        tile_x, tile_y = tile % 2, tile // 2
+                        tile_port = 16 * plane_j + 4 * lane + plane_h
+                        req = f"dut.propTile_{tile_x}_{tile_y}_io_top_output_{tile_port}_HS_Req"
+                        ack = f"dut.propMesh_j{plane_j}_h{plane_h}_io_local_inputs_{tile}_{lane}_HS_Ack"
+                        monitor_assignments.append(f"  assign mon_upper_req[{bit}] = {req};")
+                        monitor_assignments.append(f"  assign mon_upper_ack[{bit}] = {ack};")
+    port_lines = [
+        "  input  wire                      reset,",
+        "  input  wire [NUM_PORTS-1:0]      in_req,",
+        "  output wire [NUM_PORTS-1:0]      in_ack,",
+        "  input  wire [NUM_PORTS*FLIT_W-1:0] in_data,",
+        "  output wire [NUM_PORTS-1:0]      out_req,",
+        "  input  wire [NUM_PORTS-1:0]      out_ack,",
+        "  output wire [NUM_PORTS*FLIT_W-1:0] out_data" + ("," if monitor else ""),
+    ]
+    if monitor:
+        port_lines.extend(monitor_ports)
     return "\n".join(
         [
             "module %s #(" % name,
             "  parameter integer FLIT_W = %d," % FLIT_W,
             "  parameter integer NUM_PORTS = %d" % nodes,
             ") (",
-            "  input  wire                      reset,",
-            "  input  wire [NUM_PORTS-1:0]      in_req,",
-            "  output wire [NUM_PORTS-1:0]      in_ack,",
-            "  input  wire [NUM_PORTS*FLIT_W-1:0] in_data,",
-            "  output wire [NUM_PORTS-1:0]      out_req,",
-            "  input  wire [NUM_PORTS-1:0]      out_ack,",
-            "  output wire [NUM_PORTS*FLIT_W-1:0] out_data",
+            *port_lines,
             ");",
             "  wire unused_clock = 1'b0;",
             "  %s dut (" % dut,
             "    .clock(unused_clock), .reset(reset),",
             ",\n".join(ports),
             "  );",
+            *monitor_assignments,
             "endmodule",
         ]
     )

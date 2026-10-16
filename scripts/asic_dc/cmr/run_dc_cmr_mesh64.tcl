@@ -155,6 +155,15 @@ set_ungroup [get_designs *] false
 set_boundary_optimization [get_designs *] false
 compile_ultra -no_autoungroup
 compile_ultra -incremental -no_autoungroup
+if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIMING_RECIPE) eq "1"} {
+  if {[catch {
+    source "$PROJECT_DIR/scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
+    cmr_ipm_apply_timing_recipe $expected_ports $REPORT_DIR
+  } recipe_error]} {
+    puts "CMR_MESH64_DC_FAIL ipm_timing_recipe=$recipe_error"
+    exit 2
+  }
+}
 check_design > "$REPORT_DIR/check_design_post.rpt"
 
 source "$RTL_DIR/assert_no_gtech.tcl"

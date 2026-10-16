@@ -79,7 +79,9 @@ object CMRNetworkInventory {
     val mutex: Set[Int] = CMRParameters.mutexWidths(child, parent)
   }
 
-  val Thin11: Geom = Geom(1, 1)
+  // A 1x1 router geometry remains an essential flat-mesh primitive; it is
+  // not exposed as a separate 1-1-1-1 tree topology.
+  val Mesh11: Geom = Geom(1, 1)
   val Fat12: Geom = Geom(1, 2)
   val Prop22: Geom = Geom(2, 2)
   val Pfat24: Geom = Geom(2, 4)
@@ -133,7 +135,7 @@ object CMRNetworkInventory {
       maxOpmFanIn = Seq(l1.maxFanIn, l2.maxFanIn, l3.maxFanIn).max,
       mutexWidths = mutex,
       primitives = Seq(
-        CMRPrimitiveCount(s"async_${if (l1 == Thin11) "thin_1x1" else "fat_1x2"}", 1, l1.child, l1.parent, useMeshRouting = false, L1Count),
+        CMRPrimitiveCount(s"async_${if (l1 == Mesh11) "mesh_1x1" else "fat_1x2"}", 1, l1.child, l1.parent, useMeshRouting = false, L1Count),
         CMRPrimitiveCount(primitiveName(l2, level = 2), 2, l2.child, l2.parent, useMeshRouting = false, L2Count),
         CMRPrimitiveCount(primitiveName(l3, level = 3), 3, l3.child, l3.parent, useMeshRouting = false, L3Count)
       ),
@@ -142,7 +144,7 @@ object CMRNetworkInventory {
   }
 
   private def primitiveName(geom: Geom, level: Int): String = geom match {
-    case Thin11 => "async_thin_1x1"
+    case Mesh11 => "async_mesh_1x1"
     case Fat12 => "async_fat_1x2"
     case Prop22 => "async_prop_2x2"
     case Pfat24 => "async_pfat_2x4"
@@ -152,11 +154,42 @@ object CMRNetworkInventory {
     case _ => s"async_l${level}_c${geom.child}_p${geom.parent}"
   }
 
-  def thin64: CMRNetworkStructure =
-    q64("THIN64", "1-1-1-1", Thin11, Thin11, Thin11)
-
-  def prop64: CMRNetworkStructure =
-    q64("PROP64", "1-2-2-2", Fat12, Prop22, Prop22)
+  /** Current 64-core PROP: three M16 tree levels, with no upper Mesh planes. */
+  def prop64: CMRNetworkStructure = {
+    val geom = Geom(1, 4)
+    val routersPerLevel = 16
+    val routerCount = routersPerLevel * 3
+    val portsPerRouter = geom.ports
+    val links = 64 + 64 // L1->L2 and L2->L3, four parent lanes per router.
+    CMRNetworkStructure(
+      designId = "PROP64",
+      nodes = 64,
+      laneProfile = "M16-tree-1x4x3",
+      routing = "three_level_tree_m16",
+      clusterGrid = Some(1),
+      topMeshLanes = 0,
+      hrepPolicy = false,
+      sharesNetlistWith = None,
+      elaborated = true,
+      routers = routerCount,
+      ipms = routerCount * portsPerRouter,
+      opms = routerCount * portsPerRouter,
+      adapters = routerCount * geom.adapters,
+      interlevelFifos = 0,
+      corePorts = 64,
+      topPorts = 64,
+      interRouterLinks = links,
+      channelBits = links * FlitWidthBits,
+      maxOpmFanIn = geom.maxFanIn,
+      mutexWidths = geom.mutex.toSeq.sorted,
+      primitives = Seq(
+        CMRPrimitiveCount("async_m16_l1_1x4", 1, 1, 4, useMeshRouting = false, routersPerLevel),
+        CMRPrimitiveCount("async_m16_l2_1x4", 2, 1, 4, useMeshRouting = false, routersPerLevel),
+        CMRPrimitiveCount("async_m16_l3_1x4", 3, 1, 4, useMeshRouting = false, routersPerLevel)
+      ),
+      notes = "Standalone three-level 64-core M16 tree; 64 L3 parent lanes are external; no Mesh-plane routers instantiated."
+    )
+  }
 
   def pfat64: CMRNetworkStructure =
     q64(
@@ -171,7 +204,7 @@ object CMRNetworkInventory {
   def flatMesh(n: Int): CMRNetworkStructure = {
     require(Set(8, 16, 32).contains(n))
     val nodes = n * n
-    val ports = nodes * Thin11.ports
+    val ports = nodes * Mesh11.ports
     val links = flatMeshLinks(n, 1)
     val designId = s"FM$nodes"
     CMRNetworkStructure(
@@ -193,8 +226,8 @@ object CMRNetworkInventory {
       topPorts = 0,
       interRouterLinks = links,
       channelBits = links * FlitWidthBits,
-      maxOpmFanIn = Thin11.maxFanIn,
-      mutexWidths = Thin11.mutex.toSeq.sorted,
+      maxOpmFanIn = Mesh11.maxFanIn,
+      mutexWidths = Mesh11.mutex.toSeq.sorted,
       primitives = Seq(
         CMRPrimitiveCount("async_flatmesh_1x1", 1, 1, 1, useMeshRouting = true, nodes)
       )
@@ -307,7 +340,6 @@ object CMRNetworkInventory {
   }
 
   def allPaperDuts: Seq[CMRNetworkStructure] = Seq(
-    thin64,
     prop64,
     pfat64,
     flatMesh(8),
@@ -318,15 +350,7 @@ object CMRNetworkInventory {
     clusteredProp(4, 2, hrep = true, designId = Some("HREP1024")),
     clusteredProp(4, 1, designId = Some("PROP1024_MESH1")),
     clusteredProp(4, 2, designId = Some("PROP1024_MESH2")),
-    clusteredProp(4, 4, designId = Some("PROP1024_MESH4")),
-    thin64.copy(
-      designId = "SYNC_THIN64",
-      notes = "Sync Thin64; same instance counts as THIN64. Phase 2.5 1-cycle Head."
-    ),
-    prop64.copy(
-      designId = "SYNC_PROP64",
-      notes = "Sync PROP64; same instance counts as PROP64. Phase 2.5 1-cycle Head."
-    )
+    clusteredProp(4, 4, designId = Some("PROP1024_MESH4"))
   )
 
   def byId: Map[String, CMRNetworkStructure] =

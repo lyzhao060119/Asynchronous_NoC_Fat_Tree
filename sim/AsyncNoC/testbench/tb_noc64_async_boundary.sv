@@ -32,7 +32,7 @@ module noc64_async_boundary_core #(
                NUM_CORES, TOP_LANES);
       $finish;
     end
-    if ((TOP_LANES != 16) && (TOP_LANES != 8) && (TOP_LANES != 2) && (TOP_LANES != 1) && (TOP_LANES != 0)) begin
+    if ((TOP_LANES != 64) && (TOP_LANES != 16) && (TOP_LANES != 8) && (TOP_LANES != 2) && (TOP_LANES != 1) && (TOP_LANES != 0)) begin
       $display("TB_FATAL TOP_LANES must be 16, 8, 2, 1, or 0, got %0d", TOP_LANES);
       $finish;
     end
@@ -182,7 +182,8 @@ module noc64_async_boundary_core #(
         if ((exp_idx < 0) && !expected_seen[scan] && expected_mask[scan][port] &&
             (captured === expected_flit[scan])) begin
           exp_idx = scan;
-          expected_seen[scan] = 1'b1;
+          expected_mask[scan][port] = 1'b0;
+          expected_seen[scan] = (expected_mask[scan] == {MASK_W{1'b0}});
         end
       score_rx_slot(port, slot, exp_idx);
     end
@@ -226,7 +227,8 @@ module noc64_async_boundary_core #(
               (expected_pkt_seq[scan] == pkt) && expected_flit[scan][27])
             exp_idx = scan;
         if ((exp_idx >= 0) && (head_flit === expected_flit[exp_idx])) begin
-          expected_seen[exp_idx] = 1'b1;
+          expected_mask[exp_idx][port] = 1'b0;
+          expected_seen[exp_idx] = (expected_mask[exp_idx] == {MASK_W{1'b0}});
           score_rx_slot(port, slot, exp_idx);
         end else
           score_rx_slot(port, slot, -1);
@@ -263,6 +265,17 @@ module noc64_async_boundary_core #(
       assign tb_out_req = noc_out_req;
       assign tb_out_data = noc_out_data;
       assign noc_out_ack = tb_out_ack;
+    end else if (TOP_LANES == 64) begin : g_behavioral_noc_prop_temp_m16
+      assign noc_in_req = tb_in_req;
+      assign noc_in_data = tb_in_data;
+      assign tb_in_ack = noc_in_ack;
+      assign tb_out_req = noc_out_req;
+      assign tb_out_data = noc_out_data;
+      assign noc_out_ack = tb_out_ack;
+      async_prop_temp64_m16_port_adapter_top64 noc (
+        .reset(reset), .in_req(noc_in_req), .in_ack(noc_in_ack), .in_data(noc_in_data),
+        .out_req(noc_out_req), .out_ack(noc_out_ack), .out_data(noc_out_data)
+      );
     end else if (TOP_LANES == 16) begin : g_behavioral_noc_prop_temp
       assign noc_in_req = tb_in_req;
       assign noc_in_data = tb_in_data;
@@ -436,8 +449,8 @@ module noc64_async_boundary_core #(
         end
       end
       $fclose(fd);
-      if (total_expected() != expected_count) begin
-        $display("TB_FATAL expected masks must be one-hot: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
+      if (total_expected() < expected_count) begin
+        $display("TB_FATAL empty expected mask: entries=%0d expanded=%0d", expected_count, total_expected()); $finish;
       end
       measurement_start_cycle = -1; measurement_end_cycle = -1;
       for (idx = 0; idx < input_count; idx = idx + 1)
@@ -583,7 +596,8 @@ module noc64_async_boundary_core #(
       flush_pending_heads();
       missing_count = 0;
       for (i = 0; i < expected_count; i = i + 1)
-        if (!expected_seen[i]) missing_count = missing_count + 1;
+        for (p = 0; p < NUM_PORTS; p = p + 1)
+          if (expected_mask[i][p]) missing_count = missing_count + 1;
       fd = $fopen(missing_csv_file, "w");
       if (fd == 0) begin
         $display("TB_MISSING_EXPORT_FAIL cannot open %0s", missing_csv_file);
@@ -634,6 +648,12 @@ module noc64_async_boundary_core #(
                 head_idx >= 0 ? input_req_ps[head_idx] : -1,
                 head_idx >= 0 ? input_ack_ps[head_idx] : -1,
                 packet_flit0, packet_flit1, packet_flit2, packet_flit3, packet_flit4);
+        // A compressed multicast expect row can have several outstanding
+        // destination bits.  Consume exactly the diagnostic row just emitted
+        // so the next rank reports the next missing copy rather than skipping
+        // the rest of the mask.
+        expected_mask[best][best_dest] = 1'b0;
+        expected_seen[best] = (expected_mask[best] == {MASK_W{1'b0}});
         last_cycle = best_cycle; last_pkt = best_pkt; last_dest = best_dest; last_line = best_line;
       end
       $fclose(fd);
@@ -715,7 +735,9 @@ module noc64_async_boundary_core #(
           end
         end
       end
-      for (i = 0; i < expected_count; i = i + 1) if (!expected_seen[i]) missing_flits = missing_flits + 1;
+      for (i = 0; i < expected_count; i = i + 1)
+        for (p = 0; p < NUM_PORTS; p = p + 1)
+          if (expected_mask[i][p]) missing_flits = missing_flits + 1;
       latency_count = flit_latency_count;
       flit_p50 = 0; flit_p95 = 0; flit_p99 = 0; packet_p50 = 0; packet_p95 = 0; packet_p99 = 0;
       flit_p50_set = 0; flit_p95_set = 0; flit_p99_set = 0;

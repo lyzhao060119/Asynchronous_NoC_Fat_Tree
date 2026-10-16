@@ -15,6 +15,9 @@ set START_NS $::env(CMR_POWER_START_NS)
 set END_NS $::env(CMR_POWER_END_NS)
 set OUT "$ROOT/outputs/$NETLIST_RUN_ID"
 set REPORT_DIR "$ROOT/reports/hop_ppa/$RUN_ID/power"
+if {[info exists ::env(CMR_POWER_REPORT_DIR)] && $::env(CMR_POWER_REPORT_DIR) ne ""} {
+  set REPORT_DIR $::env(CMR_POWER_REPORT_DIR)
+}
 set DUT_NAME "CMRRouter"
 if {[info exists ::env(CMR_DUT_NAME)] && $::env(CMR_DUT_NAME) ne ""} {
   set DUT_NAME $::env(CMR_DUT_NAME)

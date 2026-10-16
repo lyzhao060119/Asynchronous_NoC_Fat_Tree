@@ -64,7 +64,10 @@ class LaneSelectorCelement(val laneCount: Int)
 /** Packet-lifetime lane selector.  Raw Empty is pulse-extended before the
   * mutex, then the mutex grant feeds back until PathEnabled falls. */
 class LaneSelector(val laneCount: Int)
-    extends BlackBox(Map("LANES" -> laneCount)) with HasBlackBoxResource {
+    extends BlackBox(Map(
+      "LANES" -> laneCount,
+      "REQUEST_DELAY_UNIT_PS" -> CMRParameters.LaneRequestDelayUnitPs
+    )) with HasBlackBoxResource {
   require(Set(2, 4, 8).contains(laneCount))
   override def desiredName: String = "LaneSelector"
   val io = IO(new Bundle {
@@ -111,7 +114,7 @@ class LanePhaseAdapterDFF(val laneCount: Int)
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val LaneSelect = Input(UInt(laneCount.W))
-    val IPMReqOut = Input(UInt(laneCount.W))
+    val IPMReqOut = Input(Bool())
     val OPMAckOut = Input(UInt(laneCount.W))
     val IPMAckIn = Output(Bool())
     val OPMReqIn = Output(UInt(laneCount.W))

@@ -5,7 +5,7 @@ Same-level nodes keep compile-time coordinates.  Each unique CMRRouter*
 module is one DC job; the stitch job only instantiates those DDC files and
 writes NoC_64nodes_post.v / CMRMeshNoC_post.v plus hierarchical MAXIMUM SDF.
 
-CMR_HIER_KIND=thin|1248|1222|mesh|prop256|prop_temp256|prop_temp256_m16|mesh256|prop1024|mesh1024.
+CMR_HIER_KIND=1248|mesh|prop_temp64_m16|prop256|prop_temp256|prop_temp256_m16|mesh256|prop1024|mesh1024.
 CMR_DESCAL_SUBMIT_ONLY=1 returns after bsub.
 If stitch/SDF scope fails, the matrix launcher falls back to one full-network
 DC per missing design (still parallel across designs).
@@ -19,6 +19,7 @@ import re
 import shlex
 import sys
 import base64
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -38,7 +39,7 @@ from run_remote_cmr_fat_tree_noc16_sdf import (
 
 REPO = Path(__file__).resolve().parents[3]
 ROOT = os.environ.get("CMR_REMOTE_ROOT", "/home/ghy19/Asynchronous_Router_CMR")
-KIND = os.environ.get("CMR_HIER_KIND", "thin").strip().lower()
+KIND = os.environ.get("CMR_HIER_KIND", "1248").strip().lower()
 PARENT_RUN_ID = os.environ.get(
     "CMR_HIER_STITCH_RUN_ID",
     os.environ.get("CMR_NOC64_RUN_ID")
@@ -55,9 +56,22 @@ DC_POLLS = int(os.environ.get("CMR_HIER_DC_POLLS", "1440"))
 CHILD_BATCH_SIZE = int(os.environ.get("CMR_HIER_CHILD_BATCH_SIZE", "8"))
 SKIP_UPLOAD = os.environ.get("CMR_HIER_SKIP_UPLOAD", "0") == "1"
 RCU_STEPS = int(os.environ.get("CMR_RCU_MATCHED_DELAY_STEPS", "1"))
-RCU_UNIT_PS = int(os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "50"))
+RCU_UNIT_PS = int(os.environ.get("CMR_RCU_MATCHED_DELAY_UNIT_PS", "100"))
 MESH_RCU_UNIT_PS = int(os.environ.get("CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS", "150"))
 ACKIN_UNIT_PS = int(os.environ.get("CMR_OPM_ACKIN_DELAY_UNIT_PS", "50"))
+OPM_REQOUT_STEPS = int(os.environ.get("CMR_OPM_REQOUT_DELAY_STEPS", "1"))
+OPM_REQOUT_UNIT_PS = int(os.environ.get("CMR_OPM_REQOUT_DELAY_UNIT_PS", "50"))
+OPM_REQOUT_BUFFER_STAGES = int(os.environ.get("CMR_OPM_REQOUT_BUFFER_STAGES", "1"))
+OPM_TAIL_CAPTURE_DELAY_STEPS = int(os.environ.get("CMR_OPM_TAIL_CAPTURE_DELAY_STEPS", "1"))
+OPM_TAIL_CAPTURE_DELAY_UNIT_PS = int(os.environ.get("CMR_OPM_TAIL_CAPTURE_DELAY_UNIT_PS", "50"))
+APPLY_IPM_TIMING_RECIPE = os.environ.get("CMR_APPLY_IPM_TIMING_RECIPE", "0") == "1"
+PATH_STATE_IMPL = os.environ.get("CMR_PATH_STATE_IMPL", "dff").strip().lower()
+if PATH_STATE_IMPL not in ("dff", "srlatch"):
+    raise SystemExit("unsupported CMR_PATH_STATE_IMPL=" + PATH_STATE_IMPL)
+IPM_ACKOUT_GUARD_UNIT_PS = int(os.environ.get("CMR_IPM_ACKOUT_GUARD_DELAY_UNIT_PS", "50"))
+LIBRARY_CORNER = os.environ.get("CMR_LIBRARY_CORNER", "tt0p8v25c").strip()
+if LIBRARY_CORNER not in ("tt0p8v25c", "ssg0p81v125c"):
+    raise SystemExit("unsupported CMR_LIBRARY_CORNER=" + LIBRARY_CORNER)
 RESULT_ROOT = REPO / "scripts" / "asic_dc" / "cmr" / "results"
 
 
@@ -71,10 +85,32 @@ def upload_large_verified(client, source: Path, destination: str):
     data = source.read_bytes().replace(b"\r\n", b"\n")
     digest = hashlib.sha256(data).hexdigest()
     remote = ROOT + "/" + destination
-    temporary = "%s.upload.%d" % (remote, os.getpid())
-    client, _ = remote_run_retry(client, ": > " + shlex.quote(temporary))
     block_bytes = 48 * 1024
-    for index, offset in enumerate(range(0, len(data), block_bytes)):
+    temporary = os.environ.get("CMR_HIER_UPLOAD_RESUME_TEMP") or "%s.upload.%d" % (remote, os.getpid())
+    start_offset = 0
+    if os.environ.get("CMR_HIER_UPLOAD_RESUME_TEMP"):
+        client, probe = remote_run_retry(
+            client,
+            "test -f %s && stat -c %%s %s && sha256sum %s || true"
+            % (shlex.quote(temporary), shlex.quote(temporary), shlex.quote(temporary)),
+        )
+        lines = [line.strip() for line in probe.splitlines() if line.strip()]
+        sizes = [int(line) for line in lines if line.isdigit()]
+        remote_hashes = [line.split()[0] for line in lines if len(line.split()) >= 2 and len(line.split()[0]) == 64]
+        if sizes and remote_hashes:
+            candidate = sizes[-1]
+            local_prefix = hashlib.sha256(data[:candidate]).hexdigest() if 0 <= candidate <= len(data) else ""
+            if candidate % block_bytes == 0 and remote_hashes[-1] == local_prefix:
+                start_offset = candidate
+                print("UPLOAD_LARGE_RESUME_OK", destination, start_offset, len(data), flush=True)
+            else:
+                raise RuntimeError("unsafe upload resume prefix mismatch for %s" % destination)
+        else:
+            raise RuntimeError("requested upload resume file is missing: " + temporary)
+    else:
+        client, _ = remote_run_retry(client, ": > " + shlex.quote(temporary))
+    for offset in range(start_offset, len(data), block_bytes):
+        index = offset // block_bytes
         encoded = base64.b64encode(data[offset : offset + block_bytes]).decode("ascii")
         command = (
             "printf %%s %s | base64 -d | dd of=%s bs=%d seek=%d conv=notrunc status=none && echo CMR_BLOCK_OK"
@@ -120,6 +156,39 @@ def _parse_stat_sizes(text: str) -> dict[str, int]:
     return sizes
 
 
+def _emit_prop_temp64_m16() -> Path:
+    generated = REPO / "generated_cmr" / "prop_temp64_m16"
+    dut = generated / "PROP_temp64_m16.v"
+    force_emit = os.environ.get("CMR_FORCE_EMIT", "0") == "1"
+    if dut.is_file() and not force_emit:
+        return generated
+    env = os.environ.copy()
+    env.update({
+        "ASYNC_PRIMITIVES": "asic",
+        "CMR_RCU_MATCHED_DELAY_STEPS": "1",
+        "CMR_RCU_MATCHED_DELAY_UNIT_PS": "100",
+        "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS": "150",
+        "CMR_OPM_ACKIN_DELAY_UNIT_PS": "50",
+        "CMR_OPM_REQOUT_DELAY_STEPS": str(OPM_REQOUT_STEPS),
+        "CMR_OPM_REQOUT_DELAY_UNIT_PS": str(OPM_REQOUT_UNIT_PS),
+        "CMR_OPM_REQOUT_BUFFER_STAGES": str(OPM_REQOUT_BUFFER_STAGES),
+        "CMR_BYPASS_INTERLEVEL_FIFO": "1",
+        "CMR_USE_CIRCULAR_FIFO": "0",
+        "CMR_FORCE_EMIT": "1",
+    })
+    sbt = os.environ.get("SBT_CMD", "sbt.bat" if os.name == "nt" else "sbt")
+    print("PROP_M16_TREE64_EMIT top=PROP_temp64_m16 cores=64 mesh_planes=0", flush=True)
+    subprocess.run(
+        [sbt, "runMain NoC.CMR.PROPtemp64M16Main"],
+        cwd=REPO,
+        env=env,
+        check=True,
+    )
+    if not dut.is_file() or dut.stat().st_size == 0:
+        raise SystemExit("M16 PROP64 emission produced no non-empty Verilog: " + str(dut))
+    return generated
+
+
 def _child_artifacts_ok(client, cid: str, ref: str):
     """Return (client, ok) if child log PASSed and ddc/post.v/sdf are non-empty."""
     dc_log = ROOT + "/logs/dc/" + cid + ".log"
@@ -159,7 +228,19 @@ def _prepare() -> dict:
         remote_dut = "rtl/mesh64/CMRMeshNoC.v"
         expected = {"routers": 64, "ports": 320, "adapters": 0}
         files = shared_input_files()
-    elif KIND in ("thin", "1248", "1222"):
+    elif KIND == "prop_temp64_m16":
+        from run_remote_cmr_noc64_sdf import shared_input_files
+
+        generated = _emit_prop_temp64_m16()
+        dut_name = "PROP_temp64_m16.v"
+        top = "PROP_temp64_m16"
+        remote_dut = "rtl/prop_temp64_m16/PROP_temp64_m16.v"
+        expected = {"routers": 48, "ports": 384, "adapters": 192}
+        files = shared_input_files()
+        files[REPO / "sim/AsyncNoC/async_prop_temp64_port_adapter.sv"] = (
+            "sim/tb/async_prop_temp64_port_adapter.sv"
+        )
+    elif KIND == "1248":
         from run_remote_cmr_noc64_sdf import PROFILES, generate_rtl, shared_input_files
 
         generated = generate_rtl(KIND)
@@ -209,7 +290,7 @@ def _prepare() -> dict:
     elif KIND in ("prop256", "mesh256", "prop1024", "mesh1024"):
         from v31_emit import asic_input_files, generate_network_rtl
 
-        sys.path.insert(0, str(REPO / "DATE paper" / "experiments" / "scripts"))
+        sys.path.insert(0, str(REPO / "DATE_paper" / "experiments" / "scripts"))
         from date_v3.network_matrix import matrix_row
 
         design_id = {
@@ -232,7 +313,7 @@ def _prepare() -> dict:
         files = asic_input_files(design_id)
     else:
         raise SystemExit(
-            "CMR_HIER_KIND must be thin, 1248, 1222, mesh, prop256, prop_temp256, "
+            "CMR_HIER_KIND must be 1248, mesh, prop_temp64_m16, prop256, prop_temp256, "
             "prop_temp256_m16, pfat_temp256, mesh256, prop1024, or mesh1024; got %r"
             % KIND
         )
@@ -243,6 +324,7 @@ def _prepare() -> dict:
     files[generated / dut_name] = remote_dut
     files[REPO / "scripts/asic_dc/cmr/run_dc_cmr_hier_child.tcl"] = "scripts/dc/run_dc_cmr_hier_child.tcl"
     files[REPO / "scripts/asic_dc/cmr/run_dc_cmr_hier_stitch.tcl"] = "scripts/dc/run_dc_cmr_hier_stitch.tcl"
+    files[REPO / "scripts/asic_dc/cmr/apply_cmr_ipm_timing_recipe.tcl"] = "scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_noc64.sh"] = "scripts/run_gls_cmr_noc64.sh"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_mesh64.sh"] = "scripts/run_gls_cmr_mesh64.sh"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_network.sh"] = "scripts/run_gls_cmr_network.sh"
@@ -250,6 +332,7 @@ def _prepare() -> dict:
         "prop256": 256,
         "prop_temp256": 256,
         "prop_temp256_m16": 256,
+        "prop_temp64_m16": 64,
         "pfat_temp256": 256,
         "mesh256": 256,
         "prop1024": 1024,
@@ -269,6 +352,7 @@ def _prepare() -> dict:
             "prop256",
             "prop_temp256",
             "prop_temp256_m16",
+            "prop_temp64_m16",
             "pfat_temp256",
             "mesh256",
             "prop1024",
@@ -282,7 +366,7 @@ def _prepare() -> dict:
                 if KIND == "pfat_temp256"
                 else (
                     "prop_temp"
-                    if KIND in ("prop_temp256", "prop_temp256_m16")
+                    if KIND in ("prop_temp64_m16", "prop_temp256", "prop_temp256_m16")
                     else "prop"
                 )
             )
@@ -291,7 +375,9 @@ def _prepare() -> dict:
 
 
 def main() -> None:
-    refuse_overwrite(PARENT_RUN_ID, action="hier-dc")
+    resume = os.environ.get("CMR_HIER_RESUME", "0") == "1"
+    if not resume:
+        refuse_overwrite(PARENT_RUN_ID, action="hier-dc")
     prep = _prepare()
     print(
         "HIER_PLAN kind=%s parent=%s unique_refs=%d top=%s"
@@ -356,7 +442,8 @@ def main() -> None:
       for batch_offset, job in enumerate(batch_jobs):
         index = batch_start + batch_offset
         cid = child_run_id(PARENT_RUN_ID, index, job["ref"])
-        refuse_overwrite(cid, action="hier-child")
+        if not resume:
+          refuse_overwrite(cid, action="hier-child")
         if not force_child:
           client, already = _child_artifacts_ok(client, cid, job["ref"])
           if already:
@@ -389,8 +476,12 @@ def main() -> None:
             "module load syn 2>/dev/null || true\n"
             "export CMR_REMOTE_ROOT=%s CMR_HIER_CHILD_RUN_ID=%s CMR_HIER_REF=%s "
             "CMR_HIER_DUT_V=%s CMR_EXPECTED_PORTS=%d CMR_EXPECTED_ADAPTERS=%d "
+            "CMR_LIBRARY_CORNER=%s "
             "CMR_RCU_MATCHED_DELAY_STEPS=%d CMR_RCU_MATCHED_DELAY_UNIT_PS=%d "
-            "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS=%d CMR_OPM_ACKIN_DELAY_UNIT_PS=%d\n"
+            "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS=%d CMR_OPM_ACKIN_DELAY_UNIT_PS=%d "
+            "CMR_OPM_REQOUT_DELAY_STEPS=%d CMR_OPM_REQOUT_DELAY_UNIT_PS=%d "
+            "CMR_OPM_REQOUT_BUFFER_STAGES=%d CMR_APPLY_IPM_TIMING_RECIPE=%d "
+            "CMR_PATH_STATE_IMPL=%s\n"
             "cd %s\nexec dc_shell-t -64 -f %s/scripts/dc/run_dc_cmr_hier_child.tcl\n"
             % (
                 ROOT,
@@ -399,10 +490,16 @@ def main() -> None:
                 shlex.quote(ROOT + "/" + prep["remote_dut"]),
                 job["expected_ports"],
                 job["expected_adapters"],
+                shlex.quote(LIBRARY_CORNER),
                 RCU_STEPS,
                 RCU_UNIT_PS,
                 MESH_RCU_UNIT_PS,
                 ACKIN_UNIT_PS,
+                OPM_REQOUT_STEPS,
+                OPM_REQOUT_UNIT_PS,
+                OPM_REQOUT_BUFFER_STAGES,
+                int(APPLY_IPM_TIMING_RECIPE),
+                shlex.quote(PATH_STATE_IMPL),
                 ROOT,
                 ROOT,
             )
@@ -530,7 +627,7 @@ def main() -> None:
         + "export CMR_REMOTE_ROOT=%s CMR_HIER_STITCH_RUN_ID=%s CMR_HIER_TOP=%s "
         "CMR_HIER_DUT_V=%s CMR_HIER_CHILD_LIST=%s "
         "CMR_EXPECTED_ROUTERS=%d CMR_EXPECTED_PORTS=%d CMR_EXPECTED_ADAPTERS=%d "
-        "CMR_EXPECTED_FIFOS=0 CMR_NETWORK_NODES=%s\n"
+        "CMR_EXPECTED_FIFOS=0 CMR_NETWORK_NODES=%s CMR_LIBRARY_CORNER=%s\n"
         "cd %s\nexec dc_shell-t -64 -f %s/scripts/dc/run_dc_cmr_hier_stitch.tcl\n"
         % (
             ROOT,
@@ -542,6 +639,7 @@ def main() -> None:
             prep["expected"]["ports"],
             prep["expected"]["adapters"],
             shlex.quote(str(prep.get("nodes", 64))),
+            shlex.quote(LIBRARY_CORNER),
             ROOT,
             ROOT,
         )
@@ -605,7 +703,7 @@ def main() -> None:
         gls_bsub = apply_bsub(os.environ.get("CMR_HIER_GLS_BSUB", "-n 8"))
         for name in case_names:
             wrapper = ROOT + "/logs/gls/%s/sdf_%s.sh" % (PARENT_RUN_ID, name)
-            if prep["large"]:
+            if prep["large"] and prep.get("nodes", 64) > 64:
                 body = (
                     "#!/bin/bash\nsource /etc/profile 2>/dev/null || true\n"
                     "export CMR_REMOTE_ROOT=%s CMR_NETWORK_RUN_ID=%s "
@@ -673,10 +771,52 @@ def main() -> None:
             gls_jobs.append(gjid)
             print("HIER_GLS_JOB", name, gjid, flush=True)
 
+    generator_sources = [
+        REPO / "src/main/scala/NoC/NoCScaleConfig.scala",
+        REPO / "src/main/scala/NoC/CMR/CMRFatTree.scala",
+        REPO / "src/main/scala/NoC/CMR/CMRFatTreeNoC64.scala",
+        REPO / "src/main/scala/NoC/CMR/CMRMeshNoC.scala",
+        REPO / "src/main/scala/NoC/CMR/PROPtemp.scala",
+        REPO / "src/main/scala/Router_Architecture/CMR/CMRTypes.scala",
+        REPO / "src/main/scala/Router_Architecture/CMR/RCU.scala",
+        REPO / "src/main/scala/Router_Architecture/CMR/OPM.scala",
+        REPO / "src/main/scala/Router_Architecture/CMR/CMRRouter.scala",
+    ]
+    missing_generator_sources = [str(path) for path in generator_sources if not path.is_file()]
+    if missing_generator_sources:
+        raise RuntimeError("missing generator RTL sources: " + ", ".join(missing_generator_sources))
     status = {
         "kind": KIND,
         "parent_run_id": PARENT_RUN_ID,
         "top": prep["top"],
+        "expected": prep["expected"],
+        "library_corner": LIBRARY_CORNER,
+        "delay_recipe": {
+            "steps": RCU_STEPS,
+            "tree_rcu_unit_ps": RCU_UNIT_PS,
+            "mesh_rcu_unit_ps": MESH_RCU_UNIT_PS,
+            "opm_ackin_delay_instance": "absent; current OPM Ackin is direct",
+            "opm_reqout_delay_steps": OPM_REQOUT_STEPS,
+            "opm_reqout_delay_unit_ps": OPM_REQOUT_UNIT_PS,
+            "opm_reqout_buffer_stages": OPM_REQOUT_BUFFER_STAGES,
+            "opm_tail_capture_delay_steps": OPM_TAIL_CAPTURE_DELAY_STEPS,
+            "opm_tail_capture_delay_unit_ps": OPM_TAIL_CAPTURE_DELAY_UNIT_PS,
+            "ipm_ackout_guard_delay_steps": 1,
+            "ipm_ackout_guard_delay_unit_ps": IPM_ACKOUT_GUARD_UNIT_PS,
+            "ipm_timing_recipe": APPLY_IPM_TIMING_RECIPE,
+        },
+        "generator_source_sha256": {
+            str(source.relative_to(REPO)).replace("\\", "/"): hashlib.sha256(
+                source.read_bytes().replace(b"\r\n", b"\n")
+            ).hexdigest()
+            for source in generator_sources
+        },
+        "input_sha256": {
+            destination: hashlib.sha256(
+                source.read_bytes().replace(b"\r\n", b"\n")
+            ).hexdigest()
+            for source, destination in prep["files"].items()
+        },
         "unique_refs": [job["ref"] for job in prep["jobs"]],
         "child_jobs": child_jids,
         "stitch_job": stitch_jid,
@@ -694,7 +834,7 @@ def main() -> None:
     client = wait_job(client, stitch_jid, "hier_stitch", polls=DC_POLLS)
     client, log = remote_run_retry(client, "cat %s %s.err 2>/dev/null" % (stitch_log, stitch_log))
     token = "CMR_NOC64_DC_PASS"
-    if prep["large"]:
+    if prep["large"] and prep.get("nodes", 64) > 64:
         token = "CMR_NETWORK_DC_PASS"
     elif prep["top"] == "CMRMeshNoC":
         token = "CMR_MESH64_DC_PASS"

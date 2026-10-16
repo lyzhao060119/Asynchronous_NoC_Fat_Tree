@@ -12,6 +12,9 @@ PATH_PROBE=${CMR_HOP_PATH_PROBE:-0}
 NO_SDF=${CMR_HOP_NO_SDF:-0}
 TB_NAME=${CMR_HOP_TB_NAME:-tb_cmr_router_hop_ppa.sv}
 NO_VCD=${CMR_HOP_NO_VCD:-0}
+SEGMENT_PROBE=${CMR_HOP_SEGMENT_PROBE:-0}
+OPM_INTERNAL_PROBE=${CMR_HOP_OPM_INTERNAL_PROBE:-0}
+OPM_HEAD_PROBE=${CMR_HOP_OPM_HEAD_PROBE:-0}
 OUT="$ROOT/outputs/$NETLIST_RUN_ID"
 LOG="$ROOT/logs/hop_ppa/$RUN_ID/gls"
 WORK_BASE=${CMR_HOP_WORK_BASE:-$ROOT/sim/work/hop_ppa}
@@ -125,6 +128,15 @@ vcs -full64 -sverilog -timescale=1ns/1ps +neg_tchk +no_notifier +incdir+$WORK \
 SIMV_PLUS=""
 if [ "$PATH_PROBE" = "1" ] || [ "$NO_VCD" = "1" ]; then
   SIMV_PLUS="+NO_FULL_VCD"
+fi
+if [ "$SEGMENT_PROBE" = "1" ]; then
+  SIMV_PLUS="$SIMV_PLUS +SEGMENT_PROBE"
+fi
+if [ "$OPM_INTERNAL_PROBE" = "1" ]; then
+  SIMV_PLUS="$SIMV_PLUS +OPM_INTERNAL_PROBE"
+fi
+if [ "$OPM_HEAD_PROBE" = "1" ]; then
+  SIMV_PLUS="$SIMV_PLUS +OPM_HEAD_PROBE"
 fi
 if [ "$NO_SDF" = "1" ]; then
   # Zero-delay gates hang in mutex/C-element loops.  Unit delay lets time

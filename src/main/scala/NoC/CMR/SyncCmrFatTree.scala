@@ -5,17 +5,16 @@ import Router_Architecture.CMR.CMRParameters
 import Router_Architecture.sync_cmr.{SyncCmrRouter, SyncVrPacket}
 import chisel3._
 
-/** Clocked valid/ready 64-core CMR quadtree.
+/** Clocked valid/ready 64-core PFAT 1-2-4-8 quadtree.
   *
-  * Lane geometry comes from `scale.channels`.  Thin is all (1,1) with one
-  * top lane.  Fat 1-2-2-2 is L1 (1,2) and L2/L3 (2,2) with two top lanes.
-  * Inter-level links are direct wires; storage is only the in-router
-  * 5-cell buffer.
+  * Lane geometry comes from `scale.channels`. Inter-level links are direct
+  * wires; storage is only the in-router 5-cell buffer. M16 PROP is an
+  * asynchronous three-level tree and is not represented by this module.
   */
 class SyncCmrFatTree(
     coordinateX: Int = 0,
     coordinateY: Int = 0,
-    scale: NoCScaleConfig = NoCScaleConfig.thinTree64
+    scale: NoCScaleConfig = NoCScaleConfig.fatTree64
 ) extends Module {
   private val l1 = scale.channels.l1
   private val l2 = scale.channels.l2
@@ -118,89 +117,6 @@ class SyncCmrFatTree(
     routerL3.io.inputs.parent(lane) <> io.top_input(lane)
     routerL3.io.outputs.parent(lane) <> io.top_output(lane)
   }
-}
-
-/** Wrapper-compatible 64-core Thin sync quadtree.  Module name stays
-  * `SyncNoC_64nodes` so the clocked TB/adapter can bind without colliding
-  * with the async `NoC_64nodes` netlists.
-  */
-class SyncCmrFatTreeNoC64(
-    scale: NoCScaleConfig = NoCScaleConfig.thinTree64
-) extends Module {
-  override def desiredName: String = "SyncNoC_64nodes"
-
-  require(scale.coresPerQuad == 64)
-  require((scale.channels.l1.childLanes, scale.channels.l1.parentLanes) == (1, 1),
-    s"Sync Thin L1 must be (1,1), got (${scale.channels.l1.childLanes},${scale.channels.l1.parentLanes})")
-  require((scale.channels.l2.childLanes, scale.channels.l2.parentLanes) == (1, 1),
-    s"Sync Thin L2 must be (1,1), got (${scale.channels.l2.childLanes},${scale.channels.l2.parentLanes})")
-  require((scale.channels.l3.childLanes, scale.channels.l3.parentLanes) == (1, 1),
-    s"Sync Thin L3 must be (1,1), got (${scale.channels.l3.childLanes},${scale.channels.l3.parentLanes})")
-  require(scale.channels.l3.parentLanes == 1,
-    s"Sync Thin NoC64 top lanes must be 1, got ${scale.channels.l3.parentLanes}")
-
-  val io = IO(new Bundle {
-    val core_inputs = Vec(64, new SyncVrPacket)
-    val core_outputs = Flipped(Vec(64, new SyncVrPacket))
-    val top_input = Vec(1, new SyncVrPacket)
-    val top_output = Flipped(Vec(1, new SyncVrPacket))
-  })
-
-  private val tree = Module(new SyncCmrFatTree(
-    coordinateX = 0,
-    coordinateY = 0,
-    scale = scale
-  ))
-
-  io <> tree.io
-}
-
-object SyncCmrFatTreeNoC64Main extends App {
-  emitVerilog(
-    new SyncCmrFatTreeNoC64(NoCScaleConfig.thinTree64),
-    Array("--target-dir", "generated_sync_cmr/fat_tree_noc64_thin")
-  )
-}
-
-/** Fat 1-2-2-2 clocked 64-core tree.  Same `SyncNoC_64nodes` module name as
-  * Thin; emit directory and TB `TOP_LANES=2` keep the netlists apart.
-  */
-class SyncCmrFatTreeNoC64Fat1222(
-    scale: NoCScaleConfig = NoCScaleConfig.syncFatTree64_1222
-) extends Module {
-  override def desiredName: String = "SyncNoC_64nodes"
-
-  require(scale.coresPerQuad == 64)
-  require((scale.channels.l1.childLanes, scale.channels.l1.parentLanes) == (1, 2),
-    s"Sync Fat1222 L1 must be (1,2), got (${scale.channels.l1.childLanes},${scale.channels.l1.parentLanes})")
-  require((scale.channels.l2.childLanes, scale.channels.l2.parentLanes) == (2, 2),
-    s"Sync Fat1222 L2 must be (2,2), got (${scale.channels.l2.childLanes},${scale.channels.l2.parentLanes})")
-  require((scale.channels.l3.childLanes, scale.channels.l3.parentLanes) == (2, 2),
-    s"Sync Fat1222 L3 must be (2,2), got (${scale.channels.l3.childLanes},${scale.channels.l3.parentLanes})")
-  require(scale.channels.l3.parentLanes == 2,
-    s"Sync Fat1222 top lanes must be 2, got ${scale.channels.l3.parentLanes}")
-
-  val io = IO(new Bundle {
-    val core_inputs = Vec(64, new SyncVrPacket)
-    val core_outputs = Flipped(Vec(64, new SyncVrPacket))
-    val top_input = Vec(2, new SyncVrPacket)
-    val top_output = Flipped(Vec(2, new SyncVrPacket))
-  })
-
-  private val tree = Module(new SyncCmrFatTree(
-    coordinateX = 0,
-    coordinateY = 0,
-    scale = scale
-  ))
-
-  io <> tree.io
-}
-
-object SyncCmrFatTreeNoC64Fat1222Main extends App {
-  emitVerilog(
-    new SyncCmrFatTreeNoC64Fat1222(NoCScaleConfig.syncFatTree64_1222),
-    Array("--target-dir", "generated_sync_cmr/fat_tree_noc64_1222")
-  )
 }
 
 /** Fat 1-2-4-8 clocked 64-core tree.  It is the synchronous Q64 counterpart
@@ -318,4 +234,77 @@ class SyncPROPtemp64 extends Module {
 object SyncPROPtemp64Main extends App {
   emitVerilog(new SyncPROPtemp64,
     Array("--target-dir", "generated_sync_cmr/prop_temp64_b8"))
+}
+
+/** Clocked topology match for PROPtemp64M16.
+  *
+  * L1/L2/L3 are all c1p4 and the sixteen L3 routers expose 64 parent lanes.
+  * No upper Mesh is instantiated in this standalone 64-core experiment.
+  */
+class SyncPROPtemp64M16 extends Module {
+  override def desiredName: String = "SyncNoC_64nodes"
+  val io = IO(new Bundle {
+    val core_inputs = Vec(64, new SyncVrPacket)
+    val core_outputs = Flipped(Vec(64, new SyncVrPacket))
+    val top_input = Vec(64, new SyncVrPacket)
+    val top_output = Flipped(Vec(64, new SyncVrPacket))
+  })
+
+  private def xy(n: Int): (Int, Int) = (n / 2, n % 2)
+  private def topIndex(j: Int, k: Int, h: Int): Int = 16 * j + 4 * k + h
+
+  private val l1 = Seq.tabulate(4, 4) { (q, i) =>
+    val (qx, qy) = xy(q)
+    val (ix, iy) = xy(i)
+    val r = Module(new SyncCmrRouter(2 * qx + ix, 2 * qy + iy,
+      routerLevel = 1, childLanes = 1, parentLanes = 4))
+    r.suggestName(s"syncPropM16L1_q${q}_i${i}")
+    r
+  }
+  private val l2 = Seq.tabulate(4, 4) { (q, k) =>
+    val (qx, qy) = xy(q)
+    val r = Module(new SyncCmrRouter(qx, qy, routerLevel = 2,
+      childLanes = 1, parentLanes = 4))
+    r.suggestName(s"syncPropM16L2_q${q}_k${k}")
+    r
+  }
+  private val l3 = Seq.tabulate(4, 4) { (j, k) =>
+    val r = Module(new SyncCmrRouter(0, 0, routerLevel = 3,
+      childLanes = 1, parentLanes = 4))
+    r.suggestName(s"syncPropM16L3_j${j}_k${k}")
+    r
+  }
+
+  for (q <- 0 until 4; i <- 0 until 4) {
+    val (qx, qy) = xy(q)
+    val (ix, iy) = xy(i)
+    val x = 4 * qx + 2 * ix
+    val y = 4 * qy + 2 * iy
+    val cores = Seq((x + 1) + 8 * (y + 1), (x + 1) + 8 * y,
+      x + 8 * (y + 1), x + 8 * y)
+    for (d <- 0 until 4) {
+      l1(q)(i).io.inputs.child(d)(0) <> io.core_inputs(cores(d))
+      l1(q)(i).io.outputs.child(d)(0) <> io.core_outputs(cores(d))
+    }
+  }
+  for (q <- 0 until 4; i <- 0 until 4; k <- 0 until 4) {
+    val d = (~i) & 3
+    l1(q)(i).io.outputs.parent(k) <> l2(q)(k).io.inputs.child(d)(0)
+    l2(q)(k).io.outputs.child(d)(0) <> l1(q)(i).io.inputs.parent(k)
+  }
+  for (q <- 0 until 4; k <- 0 until 4; j <- 0 until 4) {
+    val d = (~q) & 3
+    l2(q)(k).io.outputs.parent(j) <> l3(j)(k).io.inputs.child(d)(0)
+    l3(j)(k).io.outputs.child(d)(0) <> l2(q)(k).io.inputs.parent(j)
+  }
+  for (j <- 0 until 4; k <- 0 until 4; h <- 0 until 4) {
+    val p = topIndex(j, k, h)
+    l3(j)(k).io.inputs.parent(h) <> io.top_input(p)
+    l3(j)(k).io.outputs.parent(h) <> io.top_output(p)
+  }
+}
+
+object SyncPROPtemp64M16Main extends App {
+  emitVerilog(new SyncPROPtemp64M16,
+    Array("--target-dir", "generated_sync_cmr/prop_temp64_m16"))
 }

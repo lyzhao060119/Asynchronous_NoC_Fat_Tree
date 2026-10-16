@@ -1,9 +1,12 @@
 `timescale 1ns/1ps
 
 // CMR fail-fast shell around tb_noc64_async_boundary.
-// TOP_LANES: 8 Fat 1-2-4-8, 2 Fat 1-2-2-2 (`CMR_NOC64_TOP2), 1 Thin (`CMR_NOC64_THIN), 0 mesh (`CMR_NOC64_MESH).
+// TOP_LANES: 64 PROP M16 tree, 16 legacy PROP, 8 PFAT 1-2-4-8, 0 Mesh64.
 module tb_cmr_noc64_async_boundary_failfast;
-`ifdef PROP_TEMP64_TOP16
+`ifdef PROP_TEMP64_M16_TOP64
+  localparam integer TOP_LANES = 64;
+  localparam integer NUM_CORES = 64;
+`elsif PROP_TEMP64_TOP16
   localparam integer TOP_LANES = 16;
   localparam integer NUM_CORES = 64;
 `elsif CMR_MESH16
@@ -493,6 +496,111 @@ module tb_cmr_noc64_async_boundary_failfast;
                            core.noc_in_ack[diagnostic_port]);
               end
             end
+`ifdef CMR_PFAT_STALL_DIAG
+            $display("PFAT_IPM_DIAG port=48 req=%b raw_ack=%b ack=%b reqout=%b ackin=%b path=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Reqin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.Buffer.io_Ackout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Ackout,
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Reqout_3,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Reqout_2,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Reqout_1,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Reqout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Ackin_3,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Ackin_2,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Ackin_1,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_Ackin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_PathEnabled_3,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_PathEnabled_2,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_PathEnabled_1,
+                      core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_3.io_PathEnabled_0});
+            $display("PFAT_IPM_DIAG port=57 req=%b raw_ack=%b ack=%b reqout=%b ackin=%b path=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Reqin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.Buffer.io_Ackout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Ackout,
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Reqout_3, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Reqout_2, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Reqout_1, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Reqout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Ackin_3, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Ackin_2, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Ackin_1, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_Ackin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_PathEnabled_3, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_PathEnabled_2, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_PathEnabled_1, core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.InputPortModules_0.io_PathEnabled_0});
+            $display("PFAT_IPM_DIAG port=51 req=%b raw_ack=%b ack=%b reqout=%b ackin=%b path=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Reqin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.Buffer.io_Ackout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Ackout,
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Reqout_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Reqout_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Reqout_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Reqout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Ackin_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Ackin_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Ackin_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_Ackin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_PathEnabled_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_PathEnabled_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_PathEnabled_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_1.io_PathEnabled_0});
+            $display("PFAT_IPM_DIAG port=58 req=%b raw_ack=%b ack=%b reqout=%b ackin=%b path=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Reqin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.Buffer.io_Ackout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Ackout,
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Reqout_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Reqout_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Reqout_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Reqout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Ackin_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Ackin_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Ackin_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_Ackin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_PathEnabled_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_PathEnabled_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_PathEnabled_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.InputPortModules_2.io_PathEnabled_0});
+            $display("PFAT_IPM_DIAG port=61 req=%b raw_ack=%b ack=%b reqout=%b ackin=%b path=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Reqin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.Buffer.io_Ackout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Ackout,
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Reqout_3, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Reqout_2, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Reqout_1, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Reqout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Ackin_3, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Ackin_2, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Ackin_1, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_Ackin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_PathEnabled_3, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_PathEnabled_2, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_PathEnabled_1, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_0.io_PathEnabled_0});
+            $display("PFAT_IPM_DIAG port=60 req=%b raw_ack=%b ack=%b reqout=%b ackin=%b path=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Reqin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.Buffer.io_Ackout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Ackout,
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Reqout_3, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Reqout_2, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Reqout_1, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Reqout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Ackin_3, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Ackin_2, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Ackin_1, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_Ackin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_PathEnabled_3, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_PathEnabled_2, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_PathEnabled_1, core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.InputPortModules_2.io_PathEnabled_0});
+            $display("PFAT_ADAPTER_DIAG port=48 lane=%b ipm_req=%b ipm_ack=%b opm_req=%b opm_ack=%b await=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter_3.LaneSelect,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter_3.IPMReqOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter_3.IPMAckIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter_3.OPMReqIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter_3.OPMAckOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter_3.AwaitAck);
+            $display("PFAT_ADAPTER_DIAG port=57 lane=%b ipm_req=%b ipm_ack=%b opm_req=%b opm_ack=%b await=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter.LaneSelect,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter.IPMReqOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter.IPMAckIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter.OPMReqIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter.OPMAckOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_0_3.adapter.AwaitAck);
+            $display("PFAT_ADAPTER_DIAG port=51 lane=%b ipm_req=%b ipm_ack=%b opm_req=%b opm_ack=%b await=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_1.LaneSelect,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_1.IPMReqOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_1.IPMAckIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_1.OPMReqIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_1.OPMAckOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_1.AwaitAck);
+            $display("PFAT_ADAPTER_DIAG port=58 lane=%b ipm_req=%b ipm_ack=%b opm_req=%b opm_ack=%b await=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_2.LaneSelect,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_2.IPMReqOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_2.IPMAckIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_2.OPMReqIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_2.OPMAckOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.adapter_2.AwaitAck);
+            $display("PFAT_ADAPTER_DIAG port=61 lane=%b ipm_req=%b ipm_ack=%b opm_req=%b opm_ack=%b await=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter.LaneSelect,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter.IPMReqOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter.IPMAckIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter.OPMReqIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter.OPMAckOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter.AwaitAck);
+            $display("PFAT_ADAPTER_DIAG port=60 lane=%b ipm_req=%b ipm_ack=%b opm_req=%b opm_ack=%b await=%b",
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter_2.LaneSelect,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter_2.IPMReqOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter_2.IPMAckIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter_2.OPMReqIn,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter_2.OPMAckOut,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_2_3.adapter_2.AwaitAck);
+            $display("PFAT_OPM_DIAG router=L1_1_3 lane=1 reqin=%b path=%b grant=%b ackout=%b tail=%b reqout=%b ackin=%b fire=%b raw_req=%b",
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Reqin_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Reqin_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Reqin_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Reqin_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_PktPathEnable_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_PktPathEnable_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_PktPathEnable_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_PktPathEnable_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Grant_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Grant_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Grant_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Grant_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Ackout_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Ackout_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Ackout_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Ackout_0},
+                     {core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_TailPassed_3, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_TailPassed_2, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_TailPassed_1, core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_TailPassed_0},
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Reqout,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.io_Ackin,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.RegEnable,
+                     core.g_behavioral_noc.noc.dut.tree.routersL1_1_3.OutputPortModules_5.Reqout);
+`endif
             diagnostic_trigger = 1'b1;
             #0;
             stop_now("TB_STALL_FAIL no useful asynchronous handshake progress");

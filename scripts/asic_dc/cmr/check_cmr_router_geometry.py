@@ -98,6 +98,18 @@ EXPECTED = {
         "mutex_widths": {4, 7},
         "opm_instances": 8,
     },
+    "router_l2_c1_p4": {
+        "adapters": 4,
+        "adapter_lanes": {4: 4},
+        "mutex_widths": {4, 7},
+        "opm_instances": 8,
+    },
+    "router_l3_c1_p4": {
+        "adapters": 4,
+        "adapter_lanes": {4: 4},
+        "mutex_widths": {4, 7},
+        "opm_instances": 8,
+    },
     "router_l2_c2_p2": {
         "adapters": 40,
         "adapter_lanes": {2: 40},

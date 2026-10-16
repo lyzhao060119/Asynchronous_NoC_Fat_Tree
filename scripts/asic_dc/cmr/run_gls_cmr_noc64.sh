@@ -1,5 +1,8 @@
 #!/bin/bash
-# CMR NoC64 GLS: MODE=func (no SDF, patched Mutex/Delay) or MODE=sdf (MAXIMUM).
+# CMR NoC64 GLS:
+#   MODE=func    no SDF, legacy patched Mutex/Delay behavioral diagnostic
+#   MODE=netlist no SDF, unmodified synthesized netlist diagnostic
+#   MODE=sdf     strict MAXIMUM-SDF verification
 set -euo pipefail
 
 ROOT=${CMR_REMOTE_ROOT:?}
@@ -10,6 +13,7 @@ NETLIST_RUN_ID=${CMR_NOC64_NETLIST_RUN_ID:-$RUN_ID}
 MODE=${CMR_NOC64_GLS_MODE:-sdf}
 PROFILE=${CMR_FAT_LANE_PROFILE:-1222}
 EXTRA_SIM_ARGS=${CMR_NOC64_SIM_ARGS:-}
+TB_DEFINE_EXTRA=${CMR_NOC64_TB_DEFINE_EXTRA:-}
 INJECT_MAX_RATE=${CMR_NOC64_INJECT_MAX_RATE:-0}
 STALL_TIMEOUT_NS=${CMR_NOC64_STALL_TIMEOUT_NS:-50000}
 HARD_TIMEOUT_NS=${CMR_NOC64_HARD_TIMEOUT_NS:-400000}
@@ -28,10 +32,10 @@ else
   SDF_SCOPE="tb_cmr_noc64_async_boundary_failfast.core.g_behavioral_noc.noc.dut"
 fi
 
-if [[ "$MODE" == "func" ]]; then
+if [[ "$MODE" == "func" || "$MODE" == "netlist" ]]; then
   RX_CAPTURE_NS=${CMR_NOC64_RX_CAPTURE_NS:-5}
-  LOG="$ROOT/logs/gls/$RUN_ID/func/$CASE_NAME"
-  WORK="$ROOT/sim/work/$RUN_ID/func/$CASE_NAME"
+  LOG="$ROOT/logs/gls/$RUN_ID/$MODE/$CASE_NAME"
+  WORK="$ROOT/sim/work/$RUN_ID/$MODE/$CASE_NAME"
 else
   MODE=sdf
   RX_CAPTURE_NS=${CMR_NOC64_RX_CAPTURE_NS:-0.1}
@@ -87,6 +91,17 @@ $ROOT/sim/tb/tb_cmr_noc64_async_boundary_failfast.sv
 EOF
   TIMING_ARGS="+notimingcheck +no_notifier"
   TOP_EXTRA=""
+elif [[ "$MODE" == "netlist" ]]; then
+  NETLIST="$NETLIST_RAW"
+  cat > "$WORK/filelist.f" <<EOF
+$LIB
+$NETLIST
+$ROOT/sim/tb/async_noc64_port_adapter.sv
+$ROOT/sim/tb/tb_noc64_async_boundary.sv
+$ROOT/sim/tb/tb_cmr_noc64_async_boundary_failfast.sv
+EOF
+  TIMING_ARGS="+notimingcheck +no_notifier"
+  TOP_EXTRA=""
 else
   test -s "$SDF"
   sha256sum "$SDF" >> "$LOG/input_hashes.log"
@@ -112,7 +127,7 @@ fi
 
 cd "$WORK"
 # shellcheck disable=SC2086
-vcs -full64 -sverilog -timescale=1ns/1ps $TIMING_ARGS $TB_DEFINE -f filelist.f \
+vcs -full64 -sverilog -timescale=1ns/1ps $TIMING_ARGS $TB_DEFINE $TB_DEFINE_EXTRA -f filelist.f \
   -top tb_cmr_noc64_async_boundary_failfast $TOP_EXTRA \
   -o simv -l "$LOG/compile.log"
 
@@ -126,7 +141,7 @@ fi
 
 set +e
 SIMV_TIMING=""
-if [[ "$MODE" == "func" ]]; then
+if [[ "$MODE" == "func" || "$MODE" == "netlist" ]]; then
   SIMV_TIMING="$TIMING_ARGS"
 fi
 # shellcheck disable=SC2086

@@ -18,12 +18,14 @@ RX_CAPTURE_NS=${CMR_SYNC64_RX_CAPTURE_NS:-0}
 TOP_LANES=${CMR_SYNC64_TOP_LANES:-1}
 SDF_SCOPE="tb_cmr_noc64_sync_boundary_failfast.core.noc.dut"
 TB_DEFINE=""
-if [[ "$TOP_LANES" == "16" ]]; then
+if [[ "$TOP_LANES" == "64" ]]; then
+  TB_DEFINE="+define+CMR_SYNC64_TOP64"
+elif [[ "$TOP_LANES" == "16" ]]; then
   TB_DEFINE="+define+CMR_SYNC64_TOP16"
 elif [[ "$TOP_LANES" == "2" ]]; then
   TB_DEFINE="+define+CMR_SYNC64_TOP2"
 elif [[ "$TOP_LANES" != "1" ]]; then
-  echo "CMR_SYNC64_GLS_FAIL TOP_LANES must be 1, 2, or 16, got $TOP_LANES" >&2
+  echo "CMR_SYNC64_GLS_FAIL TOP_LANES must be 1, 2, 16, or 64, got $TOP_LANES" >&2
   exit 2
 fi
 

@@ -1,9 +1,11 @@
 `timescale 1ns / 1ps
 
 // DFF-based packet-lifetime request. Start sets Q.  PPE falling produces a
-// finite DEL100 ClearPulse, so asynchronous clear is released before the
+// finite configurable ClearPulse delay, so asynchronous clear is released before the
 // following packet's Start event.
-module LaneRequestDFF (
+module LaneRequestDFF #(
+    parameter REQUEST_DELAY_UNIT_PS = 50
+) (
     input  wire reset,
     input  wire PPE,
     input  wire RawLaneIsEmpty,
@@ -16,7 +18,7 @@ module LaneRequestDFF (
     assign Start = PPEDelayed & RawLaneIsEmpty;
     DelayElement #(
         .DelayValue(1),
-        .DelayUnitPs(100)
+        .DelayUnitPs(REQUEST_DELAY_UNIT_PS)
     ) ClearPulseDelay (
         .I(PPE),
         .Z(PPEDelayed)
@@ -49,7 +51,8 @@ endmodule
 // clocks a DFF request hold.  Once selected, LaneSelect feeds back into the
 // Mutex request and remains active until PPE falls.
 module LaneSelector #(
-    parameter LANES = 2
+    parameter LANES = 2,
+    parameter REQUEST_DELAY_UNIT_PS = 50
 ) (
     input wire reset,
     input wire [LANES-1:0] LaneIsEmpty,
@@ -60,7 +63,9 @@ module LaneSelector #(
     wire [LANES-1:0] ReqHold;
     genvar i;
     generate for (i = 0; i < LANES; i = i + 1) begin : select_hold
-        LaneRequestDFF RequestHold (
+        LaneRequestDFF #(
+            .REQUEST_DELAY_UNIT_PS(REQUEST_DELAY_UNIT_PS)
+        ) RequestHold (
             .reset(reset),
             .PPE(PPE),
             .RawLaneIsEmpty(LaneIsEmpty[i]),
