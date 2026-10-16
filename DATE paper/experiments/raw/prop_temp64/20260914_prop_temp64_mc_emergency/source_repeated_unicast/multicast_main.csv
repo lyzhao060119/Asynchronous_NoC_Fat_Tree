@@ -1,2 +1,0 @@
-load,offered_transactions,completed_transactions,useful_delivery_rate,mean_completion_latency,p95_completion_latency,p99_completion_latency,injected_flits,link_traversals,backlog
-5,0.3426989013457046,0.3426989013457046,5.483182421531273,148.60242249999976,248.7489999999998,327.0069999999996,32000,116540,0

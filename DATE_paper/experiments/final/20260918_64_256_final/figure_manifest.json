@@ -1,10 +1,10 @@
 {
   "status": "FINAL_RESULTS_PASS",
   "figures": {
-    "figures/fig01_64_throughput.pdf": "341d9e1ea5bc8e758a962aba129f54a7b581f75e2b0bc7cdadd62f9654c2a5d1",
-    "figures/fig01_64_throughput.png": "1b02883ad3d75be26945127456c0cdd254885ae7380eff37b5e19e904f2d7ea6",
-    "figures/fig02_64_latency.pdf": "16da0abd741e91b9d4957bcb2b8fe75fbe5fb80b777f84c77870955cc10f044f",
-    "figures/fig02_64_latency.png": "2097251cfd56f1ca7e78bc1ece02442a04c16c512f023f55398fcae50d823155",
+    "figures/fig01_64_throughput.pdf": "9be010b3ae46d28950515a3e304fbc52fdbfc66657945c85fc0664aef76f14f0",
+    "figures/fig01_64_throughput.png": "85416bd2adddb3ca2f51257f3c07f8afd60ae562f8fe9a1bfc6e7041464f5a86",
+    "figures/fig02_64_latency.pdf": "1c0fca736619a644abf72fdd74be6bd283e696f1d867dc74bf50bc4de96b353d",
+    "figures/fig02_64_latency.png": "4614f4fdedb7026e98e01a66d2b7e26ad34118d76f1f9d476e95de69281d99d3",
     "figures/fig03_256_global_locality.pdf": "ddeeb3b2c527d0c5b83b7e743ce029ddc10f7dea744fd1768bdc0575bbb4b1fb",
     "figures/fig03_256_global_locality.png": "7549b54b77704fa39bfd8201bc445dfdc72b550b542a4fbaccda783fbfa99830",
     "figures/fig04_multicast.pdf": "4b8122b10b7fed1f86bf65d96f1c8d21cddf8abcc890c0942d928052e40007d3",

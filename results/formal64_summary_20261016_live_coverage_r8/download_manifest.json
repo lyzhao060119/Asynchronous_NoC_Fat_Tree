@@ -1,0 +1,14 @@
+{
+  "remote_summary": "/prjtemp/ghy19/date2027_formal64/summary_snapshots/20261016_175500_live_coverage_r8/reports",
+  "files_sha256": {
+    "manifest.json": "41bd02e3895970d5eed317d62266cf35299f9952e671a2a43ac87ba53b8a904c",
+    "formal64_results_long.csv": "abb1a02508371b8e6dde53d0cd63e9b46237a44dca0824faee36c718e7f5ddb3",
+    "formal64_seed_averages.csv": "01f446395af3ceb7cfc5be18ce62ac3f5b948eeb427e53d354b5347c7528cf1e",
+    "formal64_max_throughput_points.csv": "3b5e9f121067de3a9b1a4bde6bd1648b84c7213b360a83aef975665a9d9c5de0",
+    "formal64_missing_or_rejected.csv": "a2046a762188488588d8542ec955964be0831ef7183cd0c88e08b2998e1ab33a",
+    "formal64_coverage_by_design_benchmark.csv": "4670ec8df5e2e4bc8e9d495196859ca23a09cd076f58c2e5cca10d42528a92f2"
+  },
+  "expected_rows": 2880,
+  "found_rows": 1977,
+  "accepted_rows": 1975
+}

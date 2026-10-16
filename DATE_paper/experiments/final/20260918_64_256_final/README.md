@@ -1,7 +1,9 @@
 # Final 64/256-node results
 
-This folder is the paper-facing result set derived only from
-`experiments/curated/validated_64_256_csv_20260918`. Raw logs and older figure
+This folder is the paper-facing result set derived from the frozen
+`experiments/curated/validated_64_256_csv_20260918` baseline plus two compact,
+locally verified supplemental tables: the repaired Mesh64 UR M100--M300 scan
+and the missing PFAT64 BC/Hotspot10 scan. Loose raw logs and older figure
 directories are not parsed by the final builder.
 
 ## Metric policy
@@ -62,6 +64,8 @@ configuration names and run identifiers remain in CSV provenance columns.
 ## Exclusions and limitations
 
 - 64-node multicast M60 and 256-node cross-tier F16 M40 are censored stress points.
+- PFAT64 Hotspot10 M420 failed correctness; M440--M800 were skipped after the
+  fail-fast stop. These points are not connected to the accepted FAT curve.
 - 256-node locality p=0.90 is excluded from the paired positive comparison because
   PROP is not near-lossless there.
 - 256-node power is outside the experiment plan.
@@ -88,7 +92,9 @@ configuration names and run identifiers remain in CSV provenance columns.
 ## Node-level (isolated router primitive) PPA
 
 Per-router hop delay, DC cell area and power for the seven frozen async router
-primitives, from the paper hop-PPA campaign `20260912_205700_cmr_primitive_hop_ppa_rpsdel050`
+primitives from the paper hop-PPA campaign `20260912_205700_cmr_primitive_hop_ppa_rpsdel050`,
+plus the c1p4 (fat_1x4, one child x four parent) primitive and its synchronous
+counterpart from the separate `20260914_cmr_c1p4_async_sync_hop_ppa` bundle
 (post-synthesis, MAXIMUM-SDF + time-based PT-PX, no place-and-route). The full
 per-flit power/energy breakdown is retained in `data/node_ppa.csv`; the network-level
 64-node area/power lives separately in `data/area_summary.csv` and
@@ -99,15 +105,20 @@ per-flit power/energy breakdown is retained in `data/node_ppa.csv`; the network-
 | Thin | async_thin_1x1 | 7293 | 0.710 | 0.475 | 0.521 | 0.469 | 1.578 | 6.68 |
 | Mesh | async_flatmesh_1x1 | 7273 | 0.709 | 0.475 | 0.521 | 0.467 | 1.564 | 6.58 |
 | FAT | async_fat_1x2 | 9189 | 1.038 | 0.692 | 0.746 | 0.586 | 1.499 | 8.32 |
+| FAT | async_fat_1x4 | 12602 | 1.101 | 0.722 | 0.768 | 0.799 | 1.702 | 9.64 |
 | PROP | async_prop_2x2 | 18145 | 1.194 | 0.768 | 0.819 | 1.138 | 2.033 | 12.00 |
 | TopMesh | async_topmesh_2x2 | 18130 | 1.193 | 0.768 | 0.819 | 1.138 | 2.023 | 11.89 |
 | PFAT | async_pfat_2x4 | 23002 | 1.257 | 0.797 | 0.841 | 1.429 | 2.315 | 13.97 |
 | PFAT | async_pfat_4x8 | 61187 | 1.584 | 0.913 | 0.960 | 3.642 | 4.526 | 30.42 |
+| Sync | sync_fat_1x4 | 11374 | 1.000 | 1.000 | 1.000 | 6.944 | 7.167 | 94.28 |
 
 - Geometry is child x parent tier ports; `max_opm_fanin` and per-flit head/body/tail
   power/energy are carried in `data/node_ppa.csv`.
 - These are isolated-primitive measurements: they are not the 64/256-node
   network totals and should not be summed into network area/power directly.
+- `sync_fat_1x4` is the synchronous counterpart of the c1p4 FAT primitive (1.0 ns
+  clock); its head/body/tail latency is quantized to the clock period (1 cycle per
+  hop), so it is not directly comparable to the async measured propagation delay.
 
 ## Accepted input counts
 

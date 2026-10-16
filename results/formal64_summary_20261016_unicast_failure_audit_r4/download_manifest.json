@@ -1,0 +1,13 @@
+{
+  "remote_summary": "/prjtemp/ghy19/date2027_formal64/summary_snapshots/20261016_unicast_failure_audit_r4/reports",
+  "files_sha256": {
+    "manifest.json": "90ed25153d14c6635abac41b1d469c31453464903bbdd80af51d33a6ffd49eb8",
+    "formal64_results_long.csv": "7865b6915147cbec3cc15325e2b0f3692988146f318a413f4c3e99bb821d280e",
+    "formal64_seed_averages.csv": "01f446395af3ceb7cfc5be18ce62ac3f5b948eeb427e53d354b5347c7528cf1e",
+    "formal64_max_throughput_points.csv": "3b5e9f121067de3a9b1a4bde6bd1648b84c7213b360a83aef975665a9d9c5de0",
+    "formal64_missing_or_rejected.csv": "1b941415178a3963d15e244e1e425265355adbac3e6604897fc6eeabdc42590b"
+  },
+  "expected_rows": 2880,
+  "found_rows": 1951,
+  "accepted_rows": 1949
+}
