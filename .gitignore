@@ -138,3 +138,38 @@ __pycache__/
 project/
 scripts/asic_dc/cmr/generated_cases
 scripts/asic_dc/cmr/generated_cases/20260912_paper64_m100_900_202701
+DATE_paper/experiments/intermediate
+DATE_paper/experiments/configs
+DATE_paper/experiments/figures
+DATE_paper/experiments/registry
+DATE_paper/experiments/raw
+DATE_paper/references
+DATE_paper/previous DATE
+DATE_paper/experiments/scripts
+DATE_paper/experiments/archives
+.codex/
+scripts/
+archive/
+
+# Keep the RouterL1 paired-click STA driver sources visible despite the
+# repository-wide scripts/ ignore rule; run artifacts remain ignored.
+!scripts/
+scripts/*
+!scripts/asic_dc/
+scripts/asic_dc/*
+!scripts/asic_dc/cmr/
+scripts/asic_dc/cmr/*
+!scripts/asic_dc/cmr/run_sta_cmr_router_click_catalog.tcl
+!scripts/asic_dc/cmr/run_remote_cmr_router_sta_click_catalog.py
+!scripts/asic_dc/cmr/run_remote_cmr_router_sdf_rtc_probe.py
+!scripts/asic_dc/cmr/run_sta_cmr_opm_sdf_guided_loopcut.tcl
+!scripts/asic_dc/cmr/run_remote_cmr_router_sta_opm_sdf_guided_loopcut.py
+
+# Local build snapshots and cleanup audit
+/outputs/archive_pfat64_build_*/
+/DATE_paper/paper/**/*.aux
+/DATE_paper/paper/**/*.fdb_latexmk
+/DATE_paper/paper/**/*.fls
+/DATE_paper/paper/**/*.log
+/DATE_paper/paper/**/~$*
+/DATE_paper/paper/**/main_pdf_text.txt
