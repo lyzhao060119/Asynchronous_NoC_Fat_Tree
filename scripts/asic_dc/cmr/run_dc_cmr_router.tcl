@@ -404,10 +404,12 @@ if {$seed_run ne ""} {
     catch { reset_path -from [get_pins [lindex $pair 0]] -to [get_pins [lindex $pair 1]] }
   }
 }
-if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIMING_RECIPE) eq "1"} {
+if {![info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] || $::env(CMR_APPLY_IPM_TIMING_RECIPE) ne "0"} {
   if {[catch {
     source "$PROJECT_DIR/scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
     cmr_ipm_apply_timing_recipe $expected_ports $REPORT_DIR
+    source "$PROJECT_DIR/scripts/dc/apply_cmr_router_cell_recipe.tcl"
+    cmr_router_apply_cell_recipe $REPORT_DIR
   } recipe_error]} {
     puts "CMR_DC_FAIL ipm_timing_recipe=$recipe_error"
     exit 2

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Structure gate for PROP_temp256 / PFAT_temp256 paper 256-node DUTs."""
+"""Structure gate for paper-scale CMR 256/1024-node DUTs."""
 from __future__ import annotations
 
 import re
@@ -45,6 +45,42 @@ def check_prop_temp256_m16(path: Path) -> None:
         path.name,
         "routers",
         256,
+        "tree_rcu_del100",
+        rcu100,
+        "mesh_rcu_del150",
+        rcu150,
+        "size",
+        path.stat().st_size,
+    )
+
+
+def check_prop_temp1024_m16(path: Path) -> None:
+    text = path.read_text(encoding="utf-8")
+    assert re.search(r"^module PROP_temp1024_m16\(", text, re.MULTILINE), path
+    assert count(r"^  PROPtempTileM16\w* propTile_\d_\d \(", text) == 16
+    assert count(r"^  CMRTopMesh\w* propMesh_j\d_h\d \(", text) == 16
+    for level in (1, 2, 3):
+        actual = count(r"^  CMRRouter\w* propL%d_\w+ \(" % level, text)
+        assert actual == 256, (path, level, actual)
+    # FIRRTL may deduplicate identical plane modules; the top-level instance
+    # count and the 1024 core ports are the authoritative expansion checks.
+    assert count(r"^  CMRRouter\w* topMesh_\d_\d \(", text) in (16, 256)
+    for idx in range(1024):
+        assert "io_core_inputs_%d_HS_Req" % idx in text
+    rcu100 = count(
+        r"DelayElement #\(\.DelayUnitPs\(100\), \.DelayValue\(1\)\) BundlingSignal_MatchedDelay",
+        text,
+    )
+    rcu150 = count(
+        r"DelayElement #\(\.DelayUnitPs\(150\), \.DelayValue\(1\)\) BundlingSignal_MatchedDelay",
+        text,
+    )
+    assert rcu100 > 0 and rcu150 > 0, (rcu100, rcu150)
+    print(
+        "PROP_TEMP1024_M16_STRUCTURE_PASS",
+        path.name,
+        "routers",
+        1024,
         "tree_rcu_del100",
         rcu100,
         "mesh_rcu_del150",
@@ -101,11 +137,33 @@ def check_fm256(path: Path) -> None:
     print("FM256_STRUCTURE_PASS", path.name, "router_text", routers, "size", path.stat().st_size)
 
 
+def check_flat_mesh(path: Path, nodes: int) -> None:
+    text = path.read_text(encoding="utf-8")
+    assert re.search(r"^module CMRMeshNoC", text, re.MULTILINE), path
+    routers = count(r"^  CMRRouter\w* meshR_", text)
+    if routers == 0:
+        routers = count(r"^  CMRRouter\w* ", text)
+    assert routers in (nodes, 1) or routers >= int(nodes ** 0.5), (path, nodes, routers)
+    for idx in range(nodes):
+        assert "io_core_inputs_%d_HS_Req" % idx in text
+    print("FM%d_STRUCTURE_PASS" % nodes, path.name, "router_text", routers, "size", path.stat().st_size)
+
+
 def main() -> None:
     prop = REPO / "generated_cmr/prop_temp256/PROP_temp256.v"
     prop_m16 = REPO / "generated_cmr/prop_temp256_m16/PROP_temp256_m16.v"
     pfat = REPO / "generated_cmr/pfat_temp256/PFAT_temp256.v"
     fm = REPO / "generated_cmr/mesh_noc256_11/CMRMeshNoC.v"
+    prop_m16_1024 = REPO / "generated_cmr/prop_temp1024_m16/PROP_temp1024_m16.v"
+    if "--m16-1024-only" in sys.argv:
+        check_prop_temp1024_m16(prop_m16_1024)
+        return
+    if "--fm256-only" in sys.argv:
+        check_flat_mesh(fm, 256)
+        return
+    if "--fm1024-only" in sys.argv:
+        check_flat_mesh(REPO / "generated_cmr/mesh_noc1024_11/CMRMeshNoC.v", 1024)
+        return
     if "--m16-only" in sys.argv:
         check_prop_temp256_m16(prop_m16)
         return

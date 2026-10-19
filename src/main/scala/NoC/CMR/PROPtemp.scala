@@ -155,7 +155,9 @@ object PROPtemp256Main extends App {
   * MeshPlane[j][h].local[k] in PROP_temp256_m16.
   */
 class PROPtempTileM16(tileX: Int = 0, tileY: Int = 0) extends Module {
-  require(tileX >= 0 && tileX < 2 && tileY >= 0 && tileY < 2)
+  // PROP_temp256_m16 uses the lower 2x2 subset; PROP_temp1024_m16 expands
+  // the same tile to a 4x4 array.  The tile-local tree is unchanged.
+  require(tileX >= 0 && tileX < 4 && tileY >= 0 && tileY < 4)
   val io = IO(new Bundle {
     val core_inputs = Vec(64, new HS_Packet)
     val core_outputs = Flipped(Vec(64, new HS_Packet))
@@ -290,4 +292,57 @@ object PROPtemp256M16Main extends App {
     "PROP_temp256_m16 emission requires Tree RCU DEL100 and Mesh RCU DEL150")
   emitVerilog(new PROPtemp256M16,
     Array("--target-dir", "generated_cmr/prop_temp256_m16"))
+}
+
+/** Sixteen M16 tiles joined by sixteen independent 4x4 Mesh(1,4) planes.
+  *
+  * This is the direct scale-out of `PROPtemp256M16`: the tile-local M16 tree
+  * and the sixteen (j,h) planes are unchanged, while each plane grows from a
+  * 2x2 to a 4x4 top mesh.  Wiring remains
+  *   L3(j,k).parent[h] <-> MeshPlane[j][h].local[k].
+  */
+class PROPtemp1024M16 extends Module {
+  override def desiredName: String = "PROP_temp1024_m16"
+  val io = IO(new Bundle {
+    val core_inputs = Vec(1024, new HS_Packet)
+    val core_outputs = Flipped(Vec(1024, new HS_Packet))
+  })
+
+  private val tiles = Seq.tabulate(4, 4) { (tx, ty) =>
+    val t = Module(new PROPtempTileM16(tx, ty))
+    t.suggestName(s"propTile_${tx}_${ty}")
+    t
+  }
+  private val planes = Seq.tabulate(4, 4) { (j, h) =>
+    val m = Module(new CMRTopMesh(4, 4, meshLanes = 1, localLanes = 4))
+    m.suggestName(s"propMesh_j${j}_h${h}")
+    m
+  }
+
+  for (ty <- 0 until 4; tx <- 0 until 4) {
+    val t = tiles(tx)(ty)
+    val tile = tx + 4 * ty
+    for (local <- 0 until 64) {
+      val x = local % 8 + 8 * tx
+      val y = local / 8 + 8 * ty
+      val global = x + 32 * y
+      t.io.core_inputs(local) <> io.core_inputs(global)
+      t.io.core_outputs(local) <> io.core_outputs(global)
+    }
+    for (j <- 0 until 4; k <- 0 until 4; h <- 0 until 4) {
+      val m = planes(j)(h)
+      val p = 16 * j + 4 * k + h
+      t.io.top_output(p) <> m.io.local_inputs(tile)(k)
+      m.io.local_outputs(tile)(k) <> t.io.top_input(p)
+    }
+  }
+}
+
+object PROPtemp1024M16Main extends App {
+  require(CMRParameters.RcuMatchedDelaySteps == 1 &&
+    CMRParameters.TreeRcuMatchedDelayUnitPs == 100 &&
+    CMRParameters.MeshRcuMatchedDelayUnitPs == 150,
+    "PROP_temp1024_m16 emission requires Tree RCU DEL100 and Mesh RCU DEL150")
+  emitVerilog(new PROPtemp1024M16,
+    Array("--target-dir", "generated_cmr/prop_temp1024_m16"))
 }

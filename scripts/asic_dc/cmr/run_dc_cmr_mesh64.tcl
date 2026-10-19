@@ -194,6 +194,8 @@ set rcu_matched_count [sizeof_collection [cmr_mesh_matched_leaves $rcu_unit_ps]]
 set expected_rcu_matched_count [expr {$expected_ports * $rcu_steps}]
 set ackin_count [sizeof_collection [cmr_mesh_ackin_leaves $opm_ackin_unit_ps]]
 set ackin_del250 [sizeof_collection [cmr_mesh_ackin_leaves 250]]
+set opm_reqout_delay_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ DEL050D1* && full_name =~ *OPMDelay*}]]
+set opm_reqout_buffer_count [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ BUFFD0* && full_name =~ *OPMReqoutBuffer*}]]
 set latch_reopen_count [sizeof_collection [cmr_mesh_reopen_leaves $opm_ackin_unit_ps]]
 set grant_hold_buf [sizeof_collection [get_cells -hierarchical -quiet -filter {full_name =~ *GrantHoldBuf* && ref_name =~ BUFFD0*}]]
 set otherpath_del050 [sizeof_collection [get_cells -hierarchical -quiet -filter {ref_name =~ DEL050D1* && full_name =~ *OtherPathDelay*}]]
@@ -229,6 +231,8 @@ puts $fd "RCU_MATCHED_DELAY_EXPECTED_COUNT=$expected_rcu_matched_count"
 puts $fd "OPM_ACKIN_DELAY_COUNT=$ackin_count"
 puts $fd "OPM_ACKIN_DELAY_UNIT_PS=$opm_ackin_unit_ps"
 puts $fd "OPM_ACKIN_DEL250_COUNT=$ackin_del250"
+puts $fd "OPM_REQOUT_DEL050_COUNT=$opm_reqout_delay_count"
+puts $fd "OPM_REQOUT_BUFFER_COUNT=$opm_reqout_buffer_count"
 puts $fd "LATCH_REOPEN_DEL_COUNT=$latch_reopen_count"
 puts $fd "GRANT_HOLD_BUF_COUNT=$grant_hold_buf"
 puts $fd "OTHERPATH_DEL050_COUNT=$otherpath_del050"
@@ -243,7 +247,7 @@ if {$router_count != $expected_routers || $async_fifo_count != 0 || $ipm_count !
   puts "CMR_MESH64_DC_FAIL router_or_port_structure router=$router_count fifo=$async_fifo_count ipm=$ipm_count opm=$opm_count"
   exit 2
 }
-if {$clear_count != $clear_pre_count || $set_count != $set_pre_count || $rps_count != $expected_phase_selectors || $correction_count != $expected_phase_selectors || $legacy_path_count != 0 || $close_count == 0} {
+if {$clear_count != $clear_pre_count || $set_count != $set_pre_count || $rps_count != $expected_phase_selectors || $correction_count != $expected_phase_selectors || $legacy_path_count != 0} {
   puts "CMR_MESH64_DC_FAIL selector_post_structure clear=$clear_count expected_clear=$clear_pre_count set=$set_count expected_set=$set_pre_count rps=$rps_count correction=$correction_count expected=$expected_phase_selectors legacy_path=$legacy_path_count close=$close_count"
   exit 2
 }
@@ -280,12 +284,12 @@ if {$otherpath_del050 != $expected_otherpath} {
   puts "CMR_MESH64_DC_FAIL otherpath_delay DEL050=$otherpath_del050 expected=$expected_otherpath"
   exit 2
 }
-if {$ackin_count != $expected_ports} {
-  puts "CMR_MESH64_DC_FAIL opm_ackin_delay actual=$ackin_count expected=$expected_ports unit=$opm_ackin_unit_ps"
+if {$ackin_count != 0 || $ackin_del250 != 0} {
+  puts "CMR_MESH64_DC_FAIL obsolete_opm_ackin_delay actual=$ackin_count del250=$ackin_del250 expected=0"
   exit 2
 }
-if {$opm_ackin_unit_ps != 250 && $ackin_del250 != 0} {
-  puts "CMR_MESH64_DC_FAIL leftover_ackin_del250 actual=$ackin_del250"
+if {$opm_reqout_delay_count != $expected_ports || $opm_reqout_buffer_count != $expected_ports} {
+  puts "CMR_MESH64_DC_FAIL opm_reqout_protection delay=$opm_reqout_delay_count buffer=$opm_reqout_buffer_count expected=$expected_ports"
   exit 2
 }
 if {$expected_grant_hold >= 0 && $grant_hold_buf != $expected_grant_hold} {

@@ -5,7 +5,7 @@ Same-level nodes keep compile-time coordinates.  Each unique CMRRouter*
 module is one DC job; the stitch job only instantiates those DDC files and
 writes NoC_64nodes_post.v / CMRMeshNoC_post.v plus hierarchical MAXIMUM SDF.
 
-CMR_HIER_KIND=1248|mesh|prop_temp64_m16|prop256|prop_temp256|prop_temp256_m16|mesh256|prop1024|mesh1024.
+CMR_HIER_KIND=1248|mesh|prop_temp64_m16|prop256|prop_temp256|prop_temp256_m16|prop_temp1024_m16|mesh256|prop1024|mesh1024.
 CMR_DESCAL_SUBMIT_ONLY=1 returns after bsub.
 If stitch/SDF scope fails, the matrix launcher falls back to one full-network
 DC per missing design (still parallel across designs).
@@ -189,6 +189,40 @@ def _emit_prop_temp64_m16() -> Path:
     return generated
 
 
+def _emit_prop_temp_scaled_m16(nodes: int) -> Path:
+    if nodes not in (256, 1024):
+        raise ValueError("unsupported scaled M16 node count %d" % nodes)
+    tag = "prop_temp%d_m16" % nodes
+    top = "PROP_temp%d_m16" % nodes
+    generated = REPO / "generated_cmr" / tag
+    dut = generated / (top + ".v")
+    force_emit = os.environ.get("CMR_FORCE_EMIT", "0") == "1"
+    if dut.is_file() and not force_emit:
+        return generated
+    env = os.environ.copy()
+    env.update({
+        "ASYNC_PRIMITIVES": "asic",
+        "CMR_RCU_MATCHED_DELAY_STEPS": "1",
+        "CMR_RCU_MATCHED_DELAY_UNIT_PS": "100",
+        "CMR_MESH_RCU_MATCHED_DELAY_UNIT_PS": "150",
+        "CMR_OPM_ACKIN_DELAY_UNIT_PS": "50",
+        "CMR_OPM_REQOUT_DELAY_STEPS": str(OPM_REQOUT_STEPS),
+        "CMR_OPM_REQOUT_DELAY_UNIT_PS": str(OPM_REQOUT_UNIT_PS),
+        "CMR_OPM_REQOUT_BUFFER_STAGES": str(OPM_REQOUT_BUFFER_STAGES),
+        "CMR_BYPASS_INTERLEVEL_FIFO": "1",
+        "CMR_USE_CIRCULAR_FIFO": "0",
+        "CMR_FORCE_EMIT": "1",
+    })
+    sbt = os.environ.get("SBT_CMD", "sbt.bat" if os.name == "nt" else "sbt")
+    main = "NoC.CMR.PROPtemp%dM16Main" % nodes
+    print("PROP_M16_EMIT top=%s cores=%d tile_grid=%dx%d mesh_planes=16" %
+          (top, nodes, 2 if nodes == 256 else 4, 2 if nodes == 256 else 4), flush=True)
+    subprocess.run([sbt, "runMain " + main], cwd=REPO, env=env, check=True)
+    if not dut.is_file() or dut.stat().st_size == 0:
+        raise SystemExit("M16 emission produced no non-empty Verilog: " + str(dut))
+    return generated
+
+
 def _child_artifacts_ok(client, cid: str, ref: str):
     """Return (client, ok) if child log PASSed and ddc/post.v/sdf are non-empty."""
     dc_log = ROOT + "/logs/dc/" + cid + ".log"
@@ -269,11 +303,21 @@ def _prepare() -> dict:
         # M16 variant: L3(1,4) + 16 Mesh(1,4) planes. Independent of frozen B8.
         from run_remote_cmr_noc64_sdf import shared_input_files
 
-        generated = REPO / "generated_cmr" / "prop_temp256_m16"
+        generated = _emit_prop_temp_scaled_m16(256)
         dut_name = "PROP_temp256_m16.v"
         top = "PROP_temp256_m16"
         remote_dut = "rtl/network_prop_temp256_m16/PROP_temp256_m16.v"
         expected = {"routers": 256, "ports": 2048, "adapters": 1024}
+        files = shared_input_files()
+    elif KIND == "prop_temp1024_m16":
+        # Direct M16 scale-out: 16 M16 tiles + sixteen 4x4 Mesh(1,4) planes.
+        from run_remote_cmr_noc64_sdf import shared_input_files
+
+        generated = _emit_prop_temp_scaled_m16(1024)
+        dut_name = "PROP_temp1024_m16.v"
+        top = "PROP_temp1024_m16"
+        remote_dut = "rtl/network_prop_temp1024_m16/PROP_temp1024_m16.v"
+        expected = {"routers": 1024, "ports": 8192, "adapters": 4096}
         files = shared_input_files()
     elif KIND == "pfat_temp256":
         from run_remote_cmr_noc64_sdf import shared_input_files
@@ -314,7 +358,7 @@ def _prepare() -> dict:
     else:
         raise SystemExit(
             "CMR_HIER_KIND must be 1248, mesh, prop_temp64_m16, prop256, prop_temp256, "
-            "prop_temp256_m16, pfat_temp256, mesh256, prop1024, or mesh1024; got %r"
+            "prop_temp256_m16, prop_temp1024_m16, pfat_temp256, mesh256, prop1024, or mesh1024; got %r"
             % KIND
         )
     verilog = (generated / dut_name).read_text(encoding="utf-8")
@@ -325,6 +369,7 @@ def _prepare() -> dict:
     files[REPO / "scripts/asic_dc/cmr/run_dc_cmr_hier_child.tcl"] = "scripts/dc/run_dc_cmr_hier_child.tcl"
     files[REPO / "scripts/asic_dc/cmr/run_dc_cmr_hier_stitch.tcl"] = "scripts/dc/run_dc_cmr_hier_stitch.tcl"
     files[REPO / "scripts/asic_dc/cmr/apply_cmr_ipm_timing_recipe.tcl"] = "scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
+    files[REPO / "scripts/asic_dc/cmr/apply_cmr_router_cell_recipe.tcl"] = "scripts/dc/apply_cmr_router_cell_recipe.tcl"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_noc64.sh"] = "scripts/run_gls_cmr_noc64.sh"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_mesh64.sh"] = "scripts/run_gls_cmr_mesh64.sh"
     files[REPO / "scripts/asic_dc/cmr/run_gls_cmr_network.sh"] = "scripts/run_gls_cmr_network.sh"
@@ -332,6 +377,7 @@ def _prepare() -> dict:
         "prop256": 256,
         "prop_temp256": 256,
         "prop_temp256_m16": 256,
+        "prop_temp1024_m16": 1024,
         "prop_temp64_m16": 64,
         "pfat_temp256": 256,
         "mesh256": 256,
@@ -352,6 +398,7 @@ def _prepare() -> dict:
             "prop256",
             "prop_temp256",
             "prop_temp256_m16",
+            "prop_temp1024_m16",
             "prop_temp64_m16",
             "pfat_temp256",
             "mesh256",
@@ -366,7 +413,7 @@ def _prepare() -> dict:
                 if KIND == "pfat_temp256"
                 else (
                     "prop_temp"
-                    if KIND in ("prop_temp64_m16", "prop_temp256", "prop_temp256_m16")
+                    if KIND in ("prop_temp64_m16", "prop_temp256", "prop_temp256_m16", "prop_temp1024_m16")
                     else "prop"
                 )
             )

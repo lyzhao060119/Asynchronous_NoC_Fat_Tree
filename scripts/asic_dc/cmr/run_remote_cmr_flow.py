@@ -573,6 +573,8 @@ def main():
         REPO / "scripts/asic_dc/cmr/run_dc_cmr_router.tcl": "scripts/dc/run_dc_cmr_router.tcl",
         REPO / "scripts/asic_dc/cmr/apply_cmr_ipm_timing_recipe.tcl":
             "scripts/dc/apply_cmr_ipm_timing_recipe.tcl",
+        REPO / "scripts/asic_dc/cmr/apply_cmr_router_cell_recipe.tcl":
+            "scripts/dc/apply_cmr_router_cell_recipe.tcl",
         REPO / "scripts/asic_dc/cmr/run_gls_cmr_router.sh": "scripts/run_gls_cmr_router.sh",
         REPO / "scripts/asic_dc/cmr/run_gls_cmr_router_hop_ppa.sh":
             "scripts/run_gls_cmr_router_hop_ppa.sh",
@@ -778,7 +780,7 @@ def main():
            shlex.quote(ROOT + "/rtl/runs/" + RUN_ID + "/CMRRouter.v"),
            shlex.quote(os.environ.get("CMR_DONT_TOUCH_ADAPTERS", "0")),
            "1" if LEGACY_LATCH_RTL else "0",
-           shlex.quote(os.environ.get("CMR_APPLY_IPM_TIMING_RECIPE", "0")),
+            shlex.quote(os.environ.get("CMR_APPLY_IPM_TIMING_RECIPE", "1")),
            ROOT, ROOT)
     )
     sftp = client.open_sftp()

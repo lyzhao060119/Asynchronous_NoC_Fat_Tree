@@ -34,7 +34,10 @@ set fail_token "CMR_NOC64_DC_FAIL"
 set out_v "${TOP}_post.v"
 set out_sdf "${TOP}.sdf"
 set out_ddc "${TOP}.ddc"
-if {$TOP eq "CMRMeshNoC"} {
+if {[info exists ::env(CMR_NETWORK_NODES)] && $::env(CMR_NETWORK_NODES) > 64} {
+  set pass_token "CMR_NETWORK_DC_PASS"
+  set fail_token "CMR_NETWORK_DC_FAIL"
+} elseif {$TOP eq "CMRMeshNoC"} {
   if {![info exists ::env(CMR_NETWORK_NODES)] || $::env(CMR_NETWORK_NODES) eq "64"} {
     set pass_token "CMR_MESH64_DC_PASS"
     set fail_token "CMR_MESH64_DC_FAIL"

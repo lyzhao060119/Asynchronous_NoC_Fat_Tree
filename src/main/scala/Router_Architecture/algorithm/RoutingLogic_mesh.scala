@@ -5,7 +5,7 @@ import chisel3._
 import chisel3.util._
 
 /**
-  * Core-grid XY + rectangle expansion for an 8x8 CMR mesh.
+  * Core-grid X-first, then per-column Y multicast for a CMR mesh.
   *
   * Same W/S/E/N/Local numbering as `RoutingLogic_top_layer`.  Flat mesh
   * uses PE coordinates (`coordShift=0`).  Q64 TopMesh uses cluster
@@ -17,8 +17,6 @@ object RoutingLogicMeshModel {
   val DirEast = 2
   val DirNorth = 3
   val DirLocal = 4
-
-  private def absDiff(a: Int, b: Int): Int = if (a >= b) a - b else b - a
 
   def routeMask(
       coordinateX: Int,
@@ -49,26 +47,10 @@ object RoutingLogicMeshModel {
     val inRectRow = cy >= yLo && cy <= yHi
     val localHit = inRectColumn && inRectRow
 
-    val dLL = absDiff(cx, xLo) + absDiff(cy, yLo)
-    val dLH = absDiff(cx, xLo) + absDiff(cy, yHi)
-    val dHL = absDiff(cx, xHi) + absDiff(cy, yLo)
-    val dHH = absDiff(cx, xHi) + absDiff(cy, yHi)
-    val chooseLH = dLH < dLL
-    val bestXLeft = xLo
-    val bestYLeft = if (chooseLH) yHi else yLo
-    val bestDLeft = if (chooseLH) dLH else dLL
-    val chooseHH = dHH < dHL
-    val bestXRight = xHi
-    val bestYRight = if (chooseHH) yHi else yLo
-    val bestDRight = if (chooseHH) dHH else dHL
-    val chooseRight = bestDRight < bestDLeft
-    val targetX = if (chooseRight) bestXRight else bestXLeft
-    val targetY = if (chooseRight) bestYRight else bestYLeft
-
     val eastNeeded = cx < xHi
     val westNeeded = cx > xLo
-    val northNeeded = inRectColumn && cy < yHi
-    val southNeeded = inRectColumn && cy > yLo
+    val northNeeded = cy < yHi
+    val southNeeded = cy > yLo
 
     var goWest = false
     var goSouth = false
@@ -76,45 +58,33 @@ object RoutingLogicMeshModel {
     var goNorth = false
     var goLocal = false
 
-    if (!localHit) {
-      if (cx < targetX) goEast = true
-      else if (cx > targetX) goWest = true
-      else if (cy < targetY) goNorth = true
-      else if (cy > targetY) goSouth = true
-    } else {
-      if (ingressDir != DirLocal) goLocal = true
-      ingressDir match {
-        case DirWest =>
-          goEast = eastNeeded
+    if (ingressDir != DirLocal && localHit) goLocal = true
+    ingressDir match {
+      // A packet travelling in X keeps travelling in that same X direction.
+      // At every covered column it spawns the required Y branch(es).
+      case DirWest =>
+        goEast = eastNeeded
+        if (inRectColumn) {
           goNorth = northNeeded
           goSouth = southNeeded
-        case DirEast =>
-          goWest = westNeeded
+        }
+      case DirEast =>
+        goWest = westNeeded
+        if (inRectColumn) {
           goNorth = northNeeded
           goSouth = southNeeded
-        case DirNorth =>
-          if (cy == yHi) {
-            goWest = westNeeded
-            goEast = eastNeeded
-          }
-          goSouth = southNeeded
-        case DirSouth =>
-          if (cy == yLo) {
-            goWest = westNeeded
-            goEast = eastNeeded
-          }
-          goNorth = northNeeded
-        case DirLocal =>
-          if (cx < xLo) goEast = true
-          else if (cx > xHi) goWest = true
-          else {
-            goWest = westNeeded
-            goEast = eastNeeded
-          }
+        }
+      // Once a branch enters Y, it never returns to X.
+      case DirNorth => goSouth = southNeeded
+      case DirSouth => goNorth = northNeeded
+      case DirLocal =>
+        goWest = westNeeded
+        goEast = eastNeeded
+        if (inRectColumn) {
           goNorth = northNeeded
           goSouth = southNeeded
-        case _ =>
-      }
+        }
+      case _ =>
     }
 
     if (cx == 0) goWest = false
@@ -184,16 +154,6 @@ class RoutingLogic_mesh(
     !(bothBelow || bothAbove)
   }
 
-  /**
-    * True iff the unordered pair is strictly closer to the high endpoint.
-    * `|c-max| < |c-min|` iff `a+b < 2c`.  Sum is commutative, so `a`/`b`
-    * need not be ordered; adding them in parallel with min/max avoids
-    * sitting the 7-bit adder behind the compare-mux.
-    */
-  private def closerHiU6(a: UInt, b: UInt, c: Int): Bool = {
-    (a +& b) < (2 * c).U(7.W)
-  }
-
   def routeMask(
       x0: UInt,
       y0: UInt,
@@ -232,22 +192,10 @@ class RoutingLogic_mesh(
     val inRectRow = !(gtMaxY || ltMinY)
     val localHit = inRectColumn && inRectRow
 
-    // closerHi is a+b<2c (parallel with the compares).  Walk flags are
-    // 1-bit muxes of those compares, not (cx < Mux(min,max)).
-    val closerXHi = closerHiU6(xs0, xs1, cx)
-    val closerYHi = closerHiU6(ys0, ys1, cy)
-    val xyEast = Mux(closerXHi, ltMaxX, ltMinX)
-    val xyWest = Mux(closerXHi, gtMaxX, gtMinX)
-    val atTargetX = !(xyEast || xyWest)
-    val xyNorth = atTargetX && Mux(closerYHi, ltMaxY, ltMinY)
-    val xySouth = atTargetX && Mux(closerYHi, gtMaxY, gtMinY)
-
     val eastNeeded = ltMaxX
     val westNeeded = gtMinX
-    val northNeeded = inRectColumn && ltMaxY
-    val southNeeded = inRectColumn && gtMinY
-    val atMaxY = !(ltMaxY || gtMaxY)
-    val atMinY = !(ltMinY || gtMinY)
+    val northNeeded = ltMaxY
+    val southNeeded = gtMinY
 
     val expandWest = WireInit(false.B)
     val expandSouth = WireInit(false.B)
@@ -256,36 +204,32 @@ class RoutingLogic_mesh(
     switch(ingressDir) {
       is(DirWest) {
         expandEast := eastNeeded
-        expandNorth := northNeeded
-        expandSouth := southNeeded
+        expandNorth := inRectColumn && northNeeded
+        expandSouth := inRectColumn && southNeeded
       }
       is(DirEast) {
         expandWest := westNeeded
-        expandNorth := northNeeded
-        expandSouth := southNeeded
+        expandNorth := inRectColumn && northNeeded
+        expandSouth := inRectColumn && southNeeded
       }
       is(DirNorth) {
-        expandWest := atMaxY && westNeeded
-        expandEast := atMaxY && eastNeeded
         expandSouth := southNeeded
       }
       is(DirSouth) {
-        expandWest := atMinY && westNeeded
-        expandEast := atMinY && eastNeeded
         expandNorth := northNeeded
       }
       is(DirLocal) {
         expandWest := westNeeded
         expandEast := eastNeeded
-        expandNorth := northNeeded
-        expandSouth := southNeeded
+        expandNorth := inRectColumn && northNeeded
+        expandSouth := inRectColumn && southNeeded
       }
     }
 
-    val goWest = packetValid && Mux(localHit, expandWest, xyWest)
-    val goSouth = packetValid && Mux(localHit, expandSouth, xySouth)
-    val goEast = packetValid && Mux(localHit, expandEast, xyEast)
-    val goNorth = packetValid && Mux(localHit, expandNorth, xyNorth)
+    val goWest = packetValid && expandWest
+    val goSouth = packetValid && expandSouth
+    val goEast = packetValid && expandEast
+    val goNorth = packetValid && expandNorth
     val goLocal = packetValid && localHit && (ingressDir =/= DirLocal)
 
     val westOut = if (coordinate_x == 0) false.B else goWest

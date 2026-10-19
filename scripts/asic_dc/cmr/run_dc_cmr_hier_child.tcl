@@ -156,6 +156,8 @@ if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIM
   if {[catch {
     source "$PROJECT_DIR/scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
     cmr_ipm_apply_timing_recipe $expected_ports $REPORT_DIR
+    source "$PROJECT_DIR/scripts/dc/apply_cmr_router_cell_recipe.tcl"
+    cmr_router_apply_cell_recipe $REPORT_DIR
   } recipe_error]} {
     puts "CMR_HIER_CHILD_DC_FAIL ipm_timing_recipe=$recipe_error"
     exit 2

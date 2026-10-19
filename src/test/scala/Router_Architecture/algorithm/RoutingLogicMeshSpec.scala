@@ -76,6 +76,70 @@ class RoutingLogicMeshSpec extends AnyFlatSpec with ChiselScalatestTester {
     assert((fromWest & (1 << DirWest)) == 0)
   }
 
+  it should "never turn from Y back into X" in {
+    for {
+      cx <- 0 until Grid
+      cy <- 0 until Grid
+      ingress <- Seq(DirSouth, DirNorth)
+      x0 <- 0 until Grid
+      x1 <- 0 until Grid
+      y0 <- 0 until Grid
+      y1 <- 0 until Grid
+    } {
+      val mask = model(cx, cy, ingress, x0, y0, x1, y1)
+      assert((mask & ((1 << DirWest) | (1 << DirEast))) == 0)
+    }
+  }
+
+  it should "expand X first and spawn only per-column Y branches" in {
+    // Source lies west and below the destination rectangle.  It first walks X.
+    assert(model(0, 0, DirLocal, 2, 2, 4, 4) == (1 << DirEast))
+    // At the first covered column it continues X and starts the north branch.
+    val atFirstColumn = model(2, 0, DirWest, 2, 2, 4, 4)
+    assert((atFirstColumn & (1 << DirEast)) != 0)
+    assert((atFirstColumn & (1 << DirNorth)) != 0)
+    assert((atFirstColumn & (1 << DirWest)) == 0)
+    // That Y branch may only continue north; it must never restart X.
+    assert(model(2, 1, DirSouth, 2, 2, 4, 4) == (1 << DirNorth))
+  }
+
+  it should "deliver every AABB exactly once without leaving the rectangle destination set" in {
+    import scala.collection.mutable
+
+    for {
+      sx <- 0 until Grid
+      sy <- 0 until Grid
+      xLo <- 0 until Grid
+      xHi <- xLo until Grid
+      yLo <- 0 until Grid
+      yHi <- yLo until Grid
+    } {
+      val pending = mutable.Queue((sx, sy, DirLocal))
+      val visited = mutable.Set.empty[(Int, Int, Int)]
+      val delivered = mutable.ArrayBuffer.empty[(Int, Int)]
+
+      while (pending.nonEmpty) {
+        val state @ (cx, cy, ingress) = pending.dequeue()
+        assert(visited.add(state), s"route reconverged at $state")
+        val mask = model(cx, cy, ingress, xLo, yLo, xHi, yHi)
+        if ((mask & (1 << DirLocal)) != 0) delivered += ((cx, cy))
+        if ((mask & (1 << DirWest)) != 0) pending.enqueue((cx - 1, cy, DirEast))
+        if ((mask & (1 << DirSouth)) != 0) pending.enqueue((cx, cy - 1, DirNorth))
+        if ((mask & (1 << DirEast)) != 0) pending.enqueue((cx + 1, cy, DirWest))
+        if ((mask & (1 << DirNorth)) != 0) pending.enqueue((cx, cy + 1, DirSouth))
+      }
+
+      val expected = (for {
+        x <- xLo to xHi
+        y <- yLo to yHi
+        if x != sx || y != sy
+      } yield (x, y)).toSet
+      assert(delivered.size == delivered.distinct.size)
+      assert(delivered.toSet == expected,
+        s"source=($sx,$sy) rect=($xLo,$yLo)-($xHi,$yHi)")
+    }
+  }
+
   it should "steer a unicast on West/South/East/North and deliver Local" in {
     assert(model(3, 3, DirLocal, 0, 3, 0, 3) == (1 << DirWest))
     assert(model(3, 3, DirLocal, 7, 3, 7, 3) == (1 << DirEast))

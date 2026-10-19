@@ -711,13 +711,14 @@ def main():
             flush=True,
         )
     global FUNC_CASES
-    if V3_CASE_DIR is None or not V3_CASE_DIR.is_dir():
-        raise SystemExit("async Mesh64 GLS requires CMR_NOC64_V3_CASE_DIR or CMR_MESH64_V3_CASE_DIR")
-    if SKIP_FUNC:
-        FUNC_CASES = tuple(name for name in FUNC_CASES if name in CASES)
+    if not SKIP_GLS:
+        if V3_CASE_DIR is None or not V3_CASE_DIR.is_dir():
+            raise SystemExit("async Mesh64 GLS requires CMR_NOC64_V3_CASE_DIR or CMR_MESH64_V3_CASE_DIR")
+        if SKIP_FUNC:
+            FUNC_CASES = tuple(name for name in FUNC_CASES if name in CASES)
     if DESCAL:
         refuse_overwrite(BASE_RUN_ID, action="descal-mesh64")
-    if not CASES:
+    if not SKIP_GLS and not CASES:
         raise SystemExit("CMR_MESH64_CASES is empty")
     if int(ACKIN_UNIT_PS) != 50 or int(RCU_STEPS) < 1 or int(MESH_RCU_UNIT_PS) not in (50, 75, 100, 150):
         raise SystemExit(
@@ -735,7 +736,7 @@ def main():
         ),
         flush=True,
     )
-    case_files = generate_cases()
+    case_files = {} if SKIP_GLS else generate_cases()
     client = connect()
     status = run_mesh(client, case_files)
     client.close()

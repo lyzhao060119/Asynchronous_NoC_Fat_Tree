@@ -1,0 +1,24 @@
+{
+  "schema": "formal64-full-aggregation-v1",
+  "expected_rows": 2880,
+  "found_rows": 2098,
+  "accepted_rows": 2096,
+  "missing_rows": 782,
+  "rejected_rows": 2,
+  "pressure_failed_rows": 261,
+  "stall_failed_rows": 9,
+  "case_failed_rows": 0,
+  "no_final_result_rows": 512,
+  "final_status_coverage_complete": false,
+  "complete": false,
+  "max_throughput_rule": "highest offered load where all three seeds are accepted and delivered at least 99% of canonical destination-copy flits within the measurement window",
+  "inputs": {
+    "async_unicast": [
+      "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results",
+      "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/results"
+    ],
+    "sync_unicast": "/prjtemp/ghy19/date2027_formal64/20261015_230000_formal64_unicast_sync_m16_r1/results",
+    "async_multicast": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results",
+    "sync_multicast": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/SYNC_M16"
+  }
+}

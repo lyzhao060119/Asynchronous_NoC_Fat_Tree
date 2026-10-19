@@ -898,6 +898,15 @@ remains pending.
 
 # LaneSelector 器件级压缩（2026-10-11）
 
+2026-10-18 integration: `apply_cmr_router_cell_recipe.tcl` applies the
+in-place Click XNR4D2/OAI221D2/INVD6 and multi-lane fast_buf1_keep recipe
+after the IPM recipe in router and hierarchical-child DC. It checks OPM
+counts, CP drivers and shared MG loads; mismatches fail the child. Single
+router launches default to enabled (`CMR_APPLY_IPM_TIMING_RECIPE=1`). M16
+network runs enable it explicitly. Existing Mesh256 outputs are unchanged.
+This integration is pending mapped-child and SDF validation; a recipe PASS
+is structural coverage, not a timing signoff result.
+
 本轮以 c1p4 `20261010_ipm_lane_delay_opt_r4_del050` 为冻结输入，只做等价
 综合网表 ECO，不修改 `LaneSelector.v` 的方程、接口、Mutex 拓扑或握手语义。
 
