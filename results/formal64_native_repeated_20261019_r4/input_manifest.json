@@ -1,0 +1,27 @@
+{
+  "schema": "formal64-native-repeated-input-v1",
+  "campaign_root": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1",
+  "points": [
+    {
+      "benchmark": "MULTICAST10-AABB",
+      "load": 20
+    },
+    {
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 10
+    }
+  ],
+  "seeds": [
+    202701,
+    202702,
+    202703
+  ],
+  "case_count": 12,
+  "warmup_original_events": 100,
+  "measurement_original_events": 1000,
+  "packet_flits": 5,
+  "source_queue_included_in_latency": true,
+  "event_destination_equivalence": "PASS",
+  "generator_sha256": "8652bcc330325eebcb9f1d5d474bb0ece2307acabf38536d395867fa98e29d7b",
+  "case_manifest_sha256": "4f196fc8c7f2aef674f8a4a9c9f6fabf98301b5ec93cb654218dcf5710f88e4d"
+}

@@ -1,0 +1,10 @@
+Information: Using automatic max wire load selection group 'WireAreaForZero'. (ENV-003)
+Information: Using automatic min wire load selection group 'WireAreaForZero'. (ENV-003)
+Warning: Some timing arcs have been disabled for breaking timing loops or because of constant propagation. Use the 'report_disable_timing' command to get the list of these disabled timing arcs. (PTE-003)
+Information: Building multi voltage information for entire design. (MV-022)
+Information: Checking 'out_of_table_range'.
+Warning: There are 38874 out_of_range ramps.
+Warning: There are 2400 out_of_range loads.
+Information: Checking 'missing_table'.
+Information: Checking 'missing_function'.
+0

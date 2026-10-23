@@ -1,0 +1,3440 @@
+{
+  "Mesh256": {
+    "expected": 90,
+    "found": 90,
+    "passed": 90,
+    "failures": [],
+    "curve_eligible_points": 10,
+    "rows": [
+      {
+        "seed": 202701,
+        "load": 5,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.591316
+      },
+      {
+        "seed": 202701,
+        "load": 10,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.7684934
+      },
+      {
+        "seed": 202701,
+        "load": 20,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 19.128448
+      },
+      {
+        "seed": 202701,
+        "load": 40,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 20.0151032
+      },
+      {
+        "seed": 202701,
+        "load": 60,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 21.300101
+      },
+      {
+        "seed": 202701,
+        "load": 80,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 23.3214996
+      },
+      {
+        "seed": 202701,
+        "load": 100,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 28.7631826
+      },
+      {
+        "seed": 202701,
+        "load": 120,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 57.822677
+      },
+      {
+        "seed": 202701,
+        "load": 140,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9997,
+        "latency_ns": 137.6905941
+      },
+      {
+        "seed": 202701,
+        "load": 160,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 246.4389282
+      },
+      {
+        "seed": 202701,
+        "load": 180,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99412,
+        "latency_ns": 331.3674174
+      },
+      {
+        "seed": 202701,
+        "load": 200,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.97856,
+        "latency_ns": 376.4716095
+      },
+      {
+        "seed": 202701,
+        "load": 220,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.84292,
+        "latency_ns": 450.4121643
+      },
+      {
+        "seed": 202701,
+        "load": 240,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.81728,
+        "latency_ns": 497.1885668
+      },
+      {
+        "seed": 202701,
+        "load": 260,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.7647,
+        "latency_ns": 539.8960093
+      },
+      {
+        "seed": 202701,
+        "load": 280,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.60904,
+        "latency_ns": 584.1320788
+      },
+      {
+        "seed": 202701,
+        "load": 300,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.60144,
+        "latency_ns": 605.0767831
+      },
+      {
+        "seed": 202701,
+        "load": 320,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.52098,
+        "latency_ns": 630.7340137
+      },
+      {
+        "seed": 202701,
+        "load": 340,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.55358,
+        "latency_ns": 636.5422291
+      },
+      {
+        "seed": 202701,
+        "load": 360,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.46292,
+        "latency_ns": 687.0482316
+      },
+      {
+        "seed": 202701,
+        "load": 380,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.45644,
+        "latency_ns": 683.4776467
+      },
+      {
+        "seed": 202701,
+        "load": 400,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.40896,
+        "latency_ns": 706.0999136
+      },
+      {
+        "seed": 202701,
+        "load": 420,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.44196,
+        "latency_ns": 717.1173152
+      },
+      {
+        "seed": 202701,
+        "load": 440,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.36348,
+        "latency_ns": 736.9194815
+      },
+      {
+        "seed": 202701,
+        "load": 460,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.40646,
+        "latency_ns": 733.8671075
+      },
+      {
+        "seed": 202701,
+        "load": 480,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.40376,
+        "latency_ns": 740.7882346
+      },
+      {
+        "seed": 202701,
+        "load": 500,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.31982,
+        "latency_ns": 763.2003715
+      },
+      {
+        "seed": 202701,
+        "load": 600,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.2819,
+        "latency_ns": 790.5712687
+      },
+      {
+        "seed": 202701,
+        "load": 700,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.21444,
+        "latency_ns": 819.228496
+      },
+      {
+        "seed": 202701,
+        "load": 800,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.201,
+        "latency_ns": 851.9185375
+      },
+      {
+        "seed": 202702,
+        "load": 5,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.37198
+      },
+      {
+        "seed": 202702,
+        "load": 10,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.5540956
+      },
+      {
+        "seed": 202702,
+        "load": 20,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.9172241
+      },
+      {
+        "seed": 202702,
+        "load": 40,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 19.81623
+      },
+      {
+        "seed": 202702,
+        "load": 60,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 21.1766703
+      },
+      {
+        "seed": 202702,
+        "load": 80,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99988,
+        "latency_ns": 22.7539784
+      },
+      {
+        "seed": 202702,
+        "load": 100,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 27.2310778
+      },
+      {
+        "seed": 202702,
+        "load": 120,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 42.6215375
+      },
+      {
+        "seed": 202702,
+        "load": 140,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 100.5123759
+      },
+      {
+        "seed": 202702,
+        "load": 160,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 214.6026182
+      },
+      {
+        "seed": 202702,
+        "load": 180,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.98446,
+        "latency_ns": 311.1053592
+      },
+      {
+        "seed": 202702,
+        "load": 200,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.93206,
+        "latency_ns": 358.7860074
+      },
+      {
+        "seed": 202702,
+        "load": 220,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.8856,
+        "latency_ns": 431.9403647
+      },
+      {
+        "seed": 202702,
+        "load": 240,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.78588,
+        "latency_ns": 481.7270503
+      },
+      {
+        "seed": 202702,
+        "load": 260,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.73644,
+        "latency_ns": 506.5020959
+      },
+      {
+        "seed": 202702,
+        "load": 280,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.65938,
+        "latency_ns": 547.4831475
+      },
+      {
+        "seed": 202702,
+        "load": 300,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.56094,
+        "latency_ns": 594.8850286
+      },
+      {
+        "seed": 202702,
+        "load": 320,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.61918,
+        "latency_ns": 599.6910717
+      },
+      {
+        "seed": 202702,
+        "load": 340,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.52302,
+        "latency_ns": 617.7859022
+      },
+      {
+        "seed": 202702,
+        "load": 360,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.51348,
+        "latency_ns": 653.3499831
+      },
+      {
+        "seed": 202702,
+        "load": 380,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.4553,
+        "latency_ns": 665.5281906
+      },
+      {
+        "seed": 202702,
+        "load": 400,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.4487,
+        "latency_ns": 680.1406218
+      },
+      {
+        "seed": 202702,
+        "load": 420,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.41164,
+        "latency_ns": 700.8251711
+      },
+      {
+        "seed": 202702,
+        "load": 440,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.38006,
+        "latency_ns": 708.8138514
+      },
+      {
+        "seed": 202702,
+        "load": 460,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.3594,
+        "latency_ns": 724.6909373
+      },
+      {
+        "seed": 202702,
+        "load": 480,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.3904,
+        "latency_ns": 731.5929739
+      },
+      {
+        "seed": 202702,
+        "load": 500,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.37732,
+        "latency_ns": 741.9031586
+      },
+      {
+        "seed": 202702,
+        "load": 600,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.28082,
+        "latency_ns": 780.0793907
+      },
+      {
+        "seed": 202702,
+        "load": 700,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.27052,
+        "latency_ns": 812.9185667
+      },
+      {
+        "seed": 202702,
+        "load": 800,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.22978,
+        "latency_ns": 825.1984713
+      },
+      {
+        "seed": 202703,
+        "load": 5,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.4853457
+      },
+      {
+        "seed": 202703,
+        "load": 10,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.6519346
+      },
+      {
+        "seed": 202703,
+        "load": 20,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 19.0211632
+      },
+      {
+        "seed": 202703,
+        "load": 40,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 19.9530767
+      },
+      {
+        "seed": 202703,
+        "load": 60,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99988,
+        "latency_ns": 21.2650543
+      },
+      {
+        "seed": 202703,
+        "load": 80,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 23.5730451
+      },
+      {
+        "seed": 202703,
+        "load": 100,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 27.1347561
+      },
+      {
+        "seed": 202703,
+        "load": 120,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 44.8497459
+      },
+      {
+        "seed": 202703,
+        "load": 140,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 127.2653424
+      },
+      {
+        "seed": 202703,
+        "load": 160,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99982,
+        "latency_ns": 214.9506123
+      },
+      {
+        "seed": 202703,
+        "load": 180,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.98802,
+        "latency_ns": 286.1658186
+      },
+      {
+        "seed": 202703,
+        "load": 200,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.93324,
+        "latency_ns": 390.3768354
+      },
+      {
+        "seed": 202703,
+        "load": 220,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.89592,
+        "latency_ns": 415.0297012
+      },
+      {
+        "seed": 202703,
+        "load": 240,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.79906,
+        "latency_ns": 471.2691048
+      },
+      {
+        "seed": 202703,
+        "load": 260,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.7455,
+        "latency_ns": 522.9219931
+      },
+      {
+        "seed": 202703,
+        "load": 280,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.6977,
+        "latency_ns": 542.3118941
+      },
+      {
+        "seed": 202703,
+        "load": 300,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.60522,
+        "latency_ns": 596.1978414
+      },
+      {
+        "seed": 202703,
+        "load": 320,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.58122,
+        "latency_ns": 607.9518961
+      },
+      {
+        "seed": 202703,
+        "load": 340,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.49246,
+        "latency_ns": 641.3311113
+      },
+      {
+        "seed": 202703,
+        "load": 360,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.4761,
+        "latency_ns": 657.1449789
+      },
+      {
+        "seed": 202703,
+        "load": 380,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.42338,
+        "latency_ns": 671.7932346
+      },
+      {
+        "seed": 202703,
+        "load": 400,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.45002,
+        "latency_ns": 698.0142737
+      },
+      {
+        "seed": 202703,
+        "load": 420,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.43464,
+        "latency_ns": 711.1829995
+      },
+      {
+        "seed": 202703,
+        "load": 440,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.39478,
+        "latency_ns": 719.7157158
+      },
+      {
+        "seed": 202703,
+        "load": 460,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.37108,
+        "latency_ns": 732.6648002
+      },
+      {
+        "seed": 202703,
+        "load": 480,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.34742,
+        "latency_ns": 755.9381057
+      },
+      {
+        "seed": 202703,
+        "load": 500,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.32528,
+        "latency_ns": 756.1812424
+      },
+      {
+        "seed": 202703,
+        "load": 600,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.28868,
+        "latency_ns": 800.937675
+      },
+      {
+        "seed": 202703,
+        "load": 700,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.24336,
+        "latency_ns": 822.4829052
+      },
+      {
+        "seed": 202703,
+        "load": 800,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.16228,
+        "latency_ns": 840.2040553
+      }
+    ]
+  },
+  "M16_256": {
+    "expected": 90,
+    "found": 90,
+    "passed": 90,
+    "failures": [],
+    "curve_eligible_points": 15,
+    "rows": [
+      {
+        "seed": 202701,
+        "load": 5,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 14.5833844
+      },
+      {
+        "seed": 202701,
+        "load": 10,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 15.0697851
+      },
+      {
+        "seed": 202701,
+        "load": 20,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 16.0849139
+      },
+      {
+        "seed": 202701,
+        "load": 40,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.7868007
+      },
+      {
+        "seed": 202701,
+        "load": 60,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 21.4684697
+      },
+      {
+        "seed": 202701,
+        "load": 80,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 25.5486757
+      },
+      {
+        "seed": 202701,
+        "load": 100,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 33.5761951
+      },
+      {
+        "seed": 202701,
+        "load": 120,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 41.0781379
+      },
+      {
+        "seed": 202701,
+        "load": 140,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9997,
+        "latency_ns": 53.3840756
+      },
+      {
+        "seed": 202701,
+        "load": 160,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 71.6648535
+      },
+      {
+        "seed": 202701,
+        "load": 180,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99968,
+        "latency_ns": 96.3789149
+      },
+      {
+        "seed": 202701,
+        "load": 200,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 127.9971899
+      },
+      {
+        "seed": 202701,
+        "load": 220,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 157.7467771
+      },
+      {
+        "seed": 202701,
+        "load": 240,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 178.6868603
+      },
+      {
+        "seed": 202701,
+        "load": 260,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 224.0174833
+      },
+      {
+        "seed": 202701,
+        "load": 280,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.94518,
+        "latency_ns": 237.667494
+      },
+      {
+        "seed": 202701,
+        "load": 300,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.91064,
+        "latency_ns": 289.932694
+      },
+      {
+        "seed": 202701,
+        "load": 320,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.8243,
+        "latency_ns": 299.442564
+      },
+      {
+        "seed": 202701,
+        "load": 340,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.86636,
+        "latency_ns": 308.9181315
+      },
+      {
+        "seed": 202701,
+        "load": 360,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.76798,
+        "latency_ns": 329.5044198
+      },
+      {
+        "seed": 202701,
+        "load": 380,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.73868,
+        "latency_ns": 352.953933
+      },
+      {
+        "seed": 202701,
+        "load": 400,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.69446,
+        "latency_ns": 348.7735356
+      },
+      {
+        "seed": 202701,
+        "load": 420,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.71652,
+        "latency_ns": 370.8732938
+      },
+      {
+        "seed": 202701,
+        "load": 440,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.60558,
+        "latency_ns": 388.7971933
+      },
+      {
+        "seed": 202701,
+        "load": 460,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.67596,
+        "latency_ns": 390.5947968
+      },
+      {
+        "seed": 202701,
+        "load": 480,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.66096,
+        "latency_ns": 402.3675211
+      },
+      {
+        "seed": 202701,
+        "load": 500,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.53278,
+        "latency_ns": 427.8166721
+      },
+      {
+        "seed": 202701,
+        "load": 600,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.47254,
+        "latency_ns": 453.2625724
+      },
+      {
+        "seed": 202701,
+        "load": 700,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.35044,
+        "latency_ns": 489.9360971
+      },
+      {
+        "seed": 202701,
+        "load": 800,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.33526,
+        "latency_ns": 509.3733752
+      },
+      {
+        "seed": 202702,
+        "load": 5,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 14.4837256
+      },
+      {
+        "seed": 202702,
+        "load": 10,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 14.9085271
+      },
+      {
+        "seed": 202702,
+        "load": 20,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 15.9554933
+      },
+      {
+        "seed": 202702,
+        "load": 40,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.2626938
+      },
+      {
+        "seed": 202702,
+        "load": 60,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 21.619691
+      },
+      {
+        "seed": 202702,
+        "load": 80,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99988,
+        "latency_ns": 25.1510249
+      },
+      {
+        "seed": 202702,
+        "load": 100,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 30.8999488
+      },
+      {
+        "seed": 202702,
+        "load": 120,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 38.090655
+      },
+      {
+        "seed": 202702,
+        "load": 140,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 47.6017545
+      },
+      {
+        "seed": 202702,
+        "load": 160,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 63.9923028
+      },
+      {
+        "seed": 202702,
+        "load": 180,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 91.6747752
+      },
+      {
+        "seed": 202702,
+        "load": 200,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 115.1882156
+      },
+      {
+        "seed": 202702,
+        "load": 220,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 147.1413362
+      },
+      {
+        "seed": 202702,
+        "load": 240,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 178.8708302
+      },
+      {
+        "seed": 202702,
+        "load": 260,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99344,
+        "latency_ns": 209.0676881
+      },
+      {
+        "seed": 202702,
+        "load": 280,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.97358,
+        "latency_ns": 237.7284261
+      },
+      {
+        "seed": 202702,
+        "load": 300,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.88786,
+        "latency_ns": 264.9092659
+      },
+      {
+        "seed": 202702,
+        "load": 320,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.93658,
+        "latency_ns": 278.1074701
+      },
+      {
+        "seed": 202702,
+        "load": 340,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.82678,
+        "latency_ns": 302.0898743
+      },
+      {
+        "seed": 202702,
+        "load": 360,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.84112,
+        "latency_ns": 310.98576
+      },
+      {
+        "seed": 202702,
+        "load": 380,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.74324,
+        "latency_ns": 328.0918723
+      },
+      {
+        "seed": 202702,
+        "load": 400,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.72996,
+        "latency_ns": 348.5632557
+      },
+      {
+        "seed": 202702,
+        "load": 420,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.6837,
+        "latency_ns": 359.2884608
+      },
+      {
+        "seed": 202702,
+        "load": 440,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.6318,
+        "latency_ns": 373.0611017
+      },
+      {
+        "seed": 202702,
+        "load": 460,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.5952,
+        "latency_ns": 389.0820175
+      },
+      {
+        "seed": 202702,
+        "load": 480,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.61746,
+        "latency_ns": 409.6565095
+      },
+      {
+        "seed": 202702,
+        "load": 500,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.63966,
+        "latency_ns": 396.9981643
+      },
+      {
+        "seed": 202702,
+        "load": 600,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.4753,
+        "latency_ns": 440.2409632
+      },
+      {
+        "seed": 202702,
+        "load": 700,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.46366,
+        "latency_ns": 468.3814338
+      },
+      {
+        "seed": 202702,
+        "load": 800,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.37398,
+        "latency_ns": 488.6875159
+      },
+      {
+        "seed": 202703,
+        "load": 5,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 14.5243466
+      },
+      {
+        "seed": 202703,
+        "load": 10,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 15.001607
+      },
+      {
+        "seed": 202703,
+        "load": 20,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 15.8328328
+      },
+      {
+        "seed": 202703,
+        "load": 40,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 18.7276049
+      },
+      {
+        "seed": 202703,
+        "load": 60,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 21.4779356
+      },
+      {
+        "seed": 202703,
+        "load": 80,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 25.2999189
+      },
+      {
+        "seed": 202703,
+        "load": 100,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 30.4375881
+      },
+      {
+        "seed": 202703,
+        "load": 120,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9998,
+        "latency_ns": 39.9536939
+      },
+      {
+        "seed": 202703,
+        "load": 140,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 49.7396918
+      },
+      {
+        "seed": 202703,
+        "load": 160,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 65.6641546
+      },
+      {
+        "seed": 202703,
+        "load": 180,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 88.3438633
+      },
+      {
+        "seed": 202703,
+        "load": 200,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9997,
+        "latency_ns": 120.30335
+      },
+      {
+        "seed": 202703,
+        "load": 220,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.9999,
+        "latency_ns": 146.9241108
+      },
+      {
+        "seed": 202703,
+        "load": 240,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99884,
+        "latency_ns": 182.0021235
+      },
+      {
+        "seed": 202703,
+        "load": 260,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.99626,
+        "latency_ns": 218.1701942
+      },
+      {
+        "seed": 202703,
+        "load": 280,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.98328,
+        "latency_ns": 238.2544676
+      },
+      {
+        "seed": 202703,
+        "load": 300,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.93672,
+        "latency_ns": 256.3934276
+      },
+      {
+        "seed": 202703,
+        "load": 320,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.90932,
+        "latency_ns": 276.040441
+      },
+      {
+        "seed": 202703,
+        "load": 340,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.81848,
+        "latency_ns": 287.1071633
+      },
+      {
+        "seed": 202703,
+        "load": 360,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.76394,
+        "latency_ns": 323.4924124
+      },
+      {
+        "seed": 202703,
+        "load": 380,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.70428,
+        "latency_ns": 324.4435204
+      },
+      {
+        "seed": 202703,
+        "load": 400,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.75728,
+        "latency_ns": 341.789652
+      },
+      {
+        "seed": 202703,
+        "load": 420,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.72138,
+        "latency_ns": 361.2979891
+      },
+      {
+        "seed": 202703,
+        "load": 440,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.6599,
+        "latency_ns": 381.5165602
+      },
+      {
+        "seed": 202703,
+        "load": 460,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.62592,
+        "latency_ns": 373.6139972
+      },
+      {
+        "seed": 202703,
+        "load": 480,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.60614,
+        "latency_ns": 392.6496626
+      },
+      {
+        "seed": 202703,
+        "load": 500,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.5467,
+        "latency_ns": 411.6835565
+      },
+      {
+        "seed": 202703,
+        "load": 600,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.5122,
+        "latency_ns": 434.8489918
+      },
+      {
+        "seed": 202703,
+        "load": 700,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.41544,
+        "latency_ns": 476.5760737
+      },
+      {
+        "seed": 202703,
+        "load": 800,
+        "passed": true,
+        "checks": {
+          "metric_valid": true,
+          "tb_pass": true,
+          "raw_pass": true,
+          "counts": true,
+          "no_missing": true,
+          "no_unexpected": true,
+          "no_timeout": true,
+          "all_originals": true,
+          "clean_runtime": true,
+          "annotation": true
+        },
+        "delivery_fraction": 0.29524,
+        "latency_ns": 491.58693949999997
+      }
+    ]
+  }
+}

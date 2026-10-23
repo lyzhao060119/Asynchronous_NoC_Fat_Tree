@@ -1,0 +1,38 @@
+****************************************
+Report : Time Based Power
+Design : CMRMeshNoC
+Version: V-2023.12
+Date   : Fri Oct 16 18:51:33 2026
+****************************************
+
+
+
+  Attributes
+  ----------
+      i  -  Including register clock pin internal power
+      u  -  User defined power group
+
+                        Internal  Switching  Leakage    Total
+Power Group             Power     Power      Power      Power   (     %)  Attrs
+--------------------------------------------------------------------------------
+clock_network              0.0000    0.0000    0.0000    0.0000 ( 0.00%)  i
+register                   0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+combinational           1.302e-03 9.863e-04 5.743e-04 2.863e-03 (24.67%)  
+sequential              6.864e-03 5.787e-04 1.302e-03 8.744e-03 (75.33%)  
+memory                     0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+io_pad                     0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+black_box                  0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+
+  Net Switching Power  = 1.565e-03   (13.48%)
+  Cell Internal Power  = 8.166e-03   (70.35%)
+  Cell Leakage Power   = 1.876e-03   (16.16%)
+                         ---------
+Total Power            =    0.0116  (100.00%)
+
+X Transition Power     =    0.0000
+Glitching Power        = 5.837e-07
+
+Peak Power             =    0.0877
+Peak Time              = 32820.573
+
+1

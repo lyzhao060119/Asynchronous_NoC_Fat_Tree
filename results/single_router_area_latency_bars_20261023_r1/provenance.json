@@ -1,0 +1,31 @@
+{
+  "sources": [
+    {
+      "path": "results\\single_router_final_20261022\\final_results.json",
+      "sha256": "a38d62796b6a961cf9adccfcf30a0a59f5d51439a72420ecac58b6df58c10cc7"
+    },
+    {
+      "path": "results\\single_router_c2p4_c4p8_20261022_r5\\summary.json",
+      "sha256": "be5a1c6dd7fcd8c52b4544d4784cbff996422e36cf2c2b08b2735ee67d05b48f"
+    }
+  ],
+  "latency_definition": "Head request at ingress to tail request at egress, divided by 5; not mean individual flit residence time.",
+  "area_definition": "Synthesized standard-cell area, um^2; before place and route.",
+  "data": [
+    {
+      "router": "Thin (c1p1)",
+      "area_um2": 9990.120009,
+      "packet_completion_div5_ns": 0.7419999999999959
+    },
+    {
+      "router": "c2p4",
+      "area_um2": 30105.935967,
+      "packet_completion_div5_ns": 1.114399999999995
+    },
+    {
+      "router": "c4p8",
+      "area_um2": 77433.88773,
+      "packet_completion_div5_ns": 1.2867999999999937
+    }
+  ]
+}

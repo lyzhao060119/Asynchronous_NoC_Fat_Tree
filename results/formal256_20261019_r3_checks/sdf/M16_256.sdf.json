@@ -1,0 +1,15 @@
+{
+  "source": "/home/ghy19/Asynchronous_Router_CMR/outputs/20261019_085616_m16_dc256_tt_r1/PROP_temp256_m16.sdf",
+  "source_sha256": "cd4cc796f0f3a21aa3433ce15d536c586ef2d83c480718f5c74e47633147ed9a",
+  "target": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261019_formal256_r3_checks/sdf/M16_256.sdf",
+  "target_sha256": "793eabb6f8af027a13c754570806ba8a8000e4f6a8d82f90d601ef8cf36ec234",
+  "counts": {
+    "RECREM": 600432,
+    "SETUPHOLD": 1174240,
+    "unpaired_hold": 0,
+    "timingcheck_blocks": 600432
+  },
+  "delay_lines_unchanged": true,
+  "exact_edge_condition_pairing": true,
+  "numeric_values_unchanged": true
+}

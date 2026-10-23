@@ -1,0 +1,17 @@
+Command: /prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/work/FM64/simv +CASE_FILE=/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-MULTICAST-AABB_n64_s202701_m5_FM64_top0.case +RESULT_CSV=/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/FM64/ALL-MULTICAST-AABB_n64_s202701_m5_FM64.csv +EVENT_CSV=/dev/null +LATENCY_CSV=/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/logs/FM64/ALL-MULTICAST-AABB_n64_s202701_m5_FM64/latency.csv +FLIT_LATENCY_CSV=/dev/null +MISSING_CSV=/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/logs/FM64/ALL-MULTICAST-AABB_n64_s202701_m5_FM64/missing_expected.csv +V3_METRICS_CSV=/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/logs/FM64/ALL-MULTICAST-AABB_n64_s202701_m5_FM64/v3_metrics.csv +CASE_TICK_NS=1 +RX_CAPTURE_NS=0.1 +STALL_TIMEOUT_NS=50000 +HARD_TIMEOUT_NS=400000 -l /prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/logs/FM64/ALL-MULTICAST-AABB_n64_s202701_m5_FM64/run.log
+Chronologic VCS simulator copyright 1991-2023
+Contains Synopsys proprietary information.
+Compiler version V-2023.12_Full64; Runtime version V-2023.12_Full64;  Oct 18 07:19 2026
+Doing SDF annotation ...... Done
+TB_INFO NUM_CORES=64 TOP_LANES=0 NUM_PORTS=64 ACK_TO_NEXT_REQ_GUARD_NS=0.200 INJECT_MAX_RATE=0 CASE_TICK_NS=1.000 RX_CAPTURE_NS=0.100
+TB_INFO CASE_HAS_IDENTITY=1 expected=55000
+TB_INFO E2 FM64 MAXIMUM SDF annotation
+TB_METRICS_V2 window_ps=8090001:222915001 warmup_events=1000 measurement_events=10000
+TB_INFO CMR NoC64 fail-fast armed top_lanes=0 ports=64 stall_ns=50000.000 hard_ns=400000.000
+TB_RESULT PASS injected=55000 delivered=415600 missing=0 unexpected=0 timeout=0 metrics_v2 offered=3.636681 delivered_rate=27.487490 backlog=3 flit_lat_mean_ns=10.092
+$finish called from file "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/src/tb_noc64_async_boundary.sv", line 825.
+$finish at simulation time            223955175
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 223955175 ps
+CPU Time:    235.020 seconds;       Data structure size: 121.8Mb
+Sun Oct 18 07:23:00 2026

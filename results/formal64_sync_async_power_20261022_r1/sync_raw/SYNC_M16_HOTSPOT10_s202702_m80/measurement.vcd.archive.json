@@ -1,0 +1,9 @@
+{
+  "schema": "formal64-power-vcd-archive-v1",
+  "source": "/prjtemp/ghy19/formal64_power_supplement/20261021_sync_and_broadcast_r1/vcd/SYNC_M16_HOTSPOT10_s202702_m80/measurement.vcd",
+  "archive": "/prjtemp/ghy19/formal64_power_supplement/20261021_sync_and_broadcast_r1/vcd/SYNC_M16_HOTSPOT10_s202702_m80/measurement.vcd.gz",
+  "uncompressed_bytes": 2323600207,
+  "archive_bytes": 455051354,
+  "uncompressed_sha256": "ee1a2962d79b2ce517125f4e52e800322deeb40e9770c1cace05e878bf1247b0",
+  "roundtrip_sha256": "ee1a2962d79b2ce517125f4e52e800322deeb40e9770c1cace05e878bf1247b0"
+}

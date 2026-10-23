@@ -1,0 +1,27 @@
+{
+  "source": "D:\\NoC\\asynchronous_fat_tree_multicast\\results\\formal64_all_20261021_r1\\throughput_summary.csv",
+  "scan_source": "D:\\NoC\\asynchronous_fat_tree_multicast\\results\\formal64_all_20261021_r1\\scan_results_all_seeds.csv",
+  "metric": "maximum three-seed mean measurement-window delivered destination-copy throughput",
+  "units": "Mflit/s/port",
+  "designs": [
+    "PROP_M16",
+    "FM64",
+    "PFAT64"
+  ],
+  "benchmarks": [
+    "TOPO-UR",
+    "TOPO-BC",
+    "HOTSPOT10",
+    "MULTICAST5-AABB",
+    "MULTICAST10-AABB",
+    "MULTICAST-STATIC-AABB"
+  ],
+  "limitations": [
+    "Mesh all-broadcast M20 is plotted provisionally from unvalidated CSV values pending strict-SDF rerun."
+  ],
+  "sha256": {
+    "formal64_peak_throughput.csv": "4f4694f39d7c75bae0ddec0cf17fe2e145b8fd914a69355a70978159915c7cf5",
+    "formal64_peak_throughput.png": "0465b45c207b06346506be4514a2642200800d883a21736760d537bc15895bb7",
+    "formal64_peak_throughput.pdf": "4cba42875368de2ad08ad6a4a6be33ba6a9ac98e61e18ebca93f5cbcd98bd5db"
+  }
+}

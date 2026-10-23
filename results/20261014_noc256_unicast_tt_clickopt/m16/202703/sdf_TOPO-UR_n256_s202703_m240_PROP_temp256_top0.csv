@@ -1,2 +1,0 @@
-group,case_name,injected_packets,delivered_packets,injected_flits,delivered_flits,missing_expected_flits,unexpected_flits,timeout_hit,rx_overflow,measure_cycles,delivered_throughput,avg_packet_latency_ns,max_packet_latency_ns,p95_latency_ns,p99_latency_ns,pass_fail
-TOPO-UR,TOPO-UR_n256_s202703_m240_PROP_temp256_top0,11000,11000,55000,55000,0,0,0,0,2594,21.198747,87.722852,624.959000,235.154000,362.291000,PASS

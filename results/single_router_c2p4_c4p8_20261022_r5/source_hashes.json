@@ -1,0 +1,7 @@
+{
+  "scripts\\asic_dc\\cmr\\results\\20261022_router_ppa_r5c_async_c2p4\\reports_dc\\post_hashes.sha256": "cff00baa2010489baa9c35b08ad6c95410f40d71c6c6ac35620c4260feaad74f",
+  "scripts\\asic_dc\\cmr\\results\\20261022_router_ppa_r5b_async_c4p8\\reports_dc\\post_hashes.sha256": "69e0dd17c6fd913d69a7a41e3778a4be0f4e1c91af02a3af2ab3ffd8026da92f",
+  "results\\single_router_c2p4_c4p8_20261022_r5\\summary.json": "be5a1c6dd7fcd8c52b4544d4784cbff996422e36cf2c2b08b2735ee67d05b48f",
+  "results\\single_router_c2p4_c4p8_20261022_r5\\packet_power_samples.json": "74feb231f2cb9ccd537a8d8518ec1a19a820f1a73366f489f2db979ee871679e",
+  "results\\single_router_c2p4_c4p8_20261022_r5\\packet_release_audit.json": "4da90b685cbb0bdd25ce5a10f31cc6251f87d17cd4c09f753464540be06fa74a"
+}

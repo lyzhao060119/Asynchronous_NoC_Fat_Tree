@@ -1,0 +1,19 @@
+{
+  "coverage.csv": "140b447996931cd64ced681fb2b3284f1ae6891dcf734e688c2bae50a8c193d7",
+  "formal64_async_latency_curves.pdf": "d99198d971252ef3ebb0a85aab219106e8c5b9bce91a2ca494b65c5fced8c45e",
+  "formal64_async_latency_curves.png": "6e23dddec989e0c95176cdb03ea5063eeafde7e00df354ad40c353d352e38a8a",
+  "formal64_async_throughput_curves.pdf": "03909b5ea3402ae5b7b74dcea389981510b7e03cd79ff3b99c600276e27715b4",
+  "formal64_async_throughput_curves.png": "698e5ca6cb8b601ff1657d7db04cb25ea7031e1a079005c1cf5e7c9db7fb81f9",
+  "formal64_native_repeated.pdf": "2b52a3a6d75c47fa9a8037c1e58573b6d23d95387ec42d7985b576b912d12e3d",
+  "formal64_native_repeated.png": "8826563cd7dd49399b4985e68a9c79678f9a346f7788b7c96b22961efafec547",
+  "formal64_power_energy.pdf": "05ea2eb44965984b322d25391fa21a6c6fd44cdd34dd6b350b70857f922bae9f",
+  "formal64_power_energy.png": "74099f5989240d4ca8479bbb1b39af83e341a15a719fb4bc7ddb739e7a14adea",
+  "formal64_seed_averages.csv": "8c698a82aa2272a93b8c8d67b4a4bc3b9e55fbb1256ea203ce3025dcd36bd29b",
+  "formal64_throughput_summary.pdf": "58740a6da02c407dc1b8bd82cc0dc2f1e38b355613121072ba362eb9beebc42b",
+  "formal64_throughput_summary.png": "06aba2e99c230c046767311484d908d3e548acccd97f5a6a0c2274c51764d2ab",
+  "missing_or_rejected.csv": "5f85cfab93ebd7cae1f5f5d45fd30ebcea01772f56ed6f49bb263349dea4f6e6",
+  "native_repeated_seed_averages.csv": "ff4e6ad68b17be5af470b664291d56d2a4b3440ab33f734574547778fad34fca",
+  "plot_manifest.json": "5a44dcf328b02ff8e96753616d68d47d8c2a0f6eb322f62fde11d436707b62a5",
+  "power_seed_averages.csv": "d085f9ebe5bf6ab7054e90dc81c0cd945868c399e06e566c3f30057fbd37b6e0",
+  "throughput_summary.csv": "eec0b0bd85f64664d74dcf8bbf627a4bdc6b7e4fdea47c50df9dca7d60c0d9c1"
+}

@@ -1,0 +1,26 @@
+{
+  "batch": "single_router_packet_power_20261022_r4",
+  "dc_runs": {
+    "async_c1p1": "20261022_router_ppa_r1_async_c1p1",
+    "async_c1p4": "20261022_router_ppa_r1_async_c1p4",
+    "sync_c1p4": "20261022_router_ppa_r1_sync_c1p4"
+  },
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "packet_flits": 5,
+  "flit_bits": 28,
+  "sources": 1,
+  "route": "child0 to parent; unicast destination (8,8)",
+  "body_payload": "24-bit pseudorandom data; 2-bit source tag; Head route fields fixed",
+  "injection": "continuous packet, input handshake paced, no wait for per-flit output",
+  "corner": "TT 0.8V 25C",
+  "sync_clock_ns": 1,
+  "input_slew_ns": 0.05,
+  "output_load_pf": 0.005,
+  "power_windows": "head ingress to tail capture; also +2 ns, +5 ns, and tail capture+10..20 ns idle",
+  "simulation_post_drain_ns": 25,
+  "scope": "entire DUT; internal + switching + leakage; no idle subtraction; no P&R/SPEF"
+}

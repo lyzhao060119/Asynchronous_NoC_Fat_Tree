@@ -1,0 +1,10 @@
+{
+  "scripts\\asic_dc\\cmr\\results\\20261022_router_ppa_r1_async_c1p1\\reports_dc\\qor.rpt": "c1daf217eab7f7f6e22bc8b4be7767fe560f54ea51ad0ad533dbfe9fe3ace30a",
+  "scripts\\asic_dc\\cmr\\results\\20261022_router_ppa_r1_async_c1p4\\reports_dc\\qor.rpt": "e2533d159df58d8d4da96ec75254613dfb24051336ec54dfe2d3e702d59d4340",
+  "scripts\\asic_dc\\cmr\\results\\20261022_router_ppa_r1_sync_c1p4\\reports_dc\\qor.rpt": "1c0e2995633a74b9fa8647d6820fc6036771cc06e3c3b805aa30f9aaaffd09f9",
+  "results\\single_router_latency_power_audit_20261022_r3\\summary.json": "f8b5419415ce82c481d03e55652036c92842c732570c7e358909fdbb48386437",
+  "results\\single_router_latency_power_audit_20261022_r3\\energy_comparison.json": "b6afa98e63b23aa4979a620fc15cba1d5d7417f3a36d3f4c5f25566b43254db3",
+  "results\\single_router_packet_power_20261022_r4\\packet_power_summary.json": "429fa940964fe66b7eada00081aa2f049e963c20b802590ffeff25f919d89c53",
+  "results\\single_router_packet_power_20261022_r4\\packet_release_audit.json": "70f6e8f02330b27828039cb4cf2738344bd80334bef2067c2dbae49a98c229f6",
+  "scripts\\asic_dc\\cmr\\results\\single_router_packet_power_20261022_r4\\gls_packets.json": "9118e1a087f08972d4cf5452328901b64d42b75353805c902abcab3c56436fc1"
+}

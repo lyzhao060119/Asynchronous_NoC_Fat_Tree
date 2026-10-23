@@ -1,0 +1,41 @@
+[
+  {
+    "config": "async_c1p1",
+    "low_toggle_default_pin_pj_bit": 0.050109369685714285,
+    "random_default_pin_pj_bit": 0.06508239717857144,
+    "random_nominal_pin_pj_bit": 0.06595197409285715,
+    "random_nominal_pin_pj_useful_payload_bit": 0.09617996221875001,
+    "pin_scenario_min_pj_bit": 0.06521826857142857,
+    "pin_scenario_max_pj_bit": 0.06695742240000001,
+    "nominal_leakage_uw": 40.4,
+    "nominal_total_mw": 2.427,
+    "nominal_internal_mw": 1.905,
+    "nominal_switching_mw": 0.4817
+  },
+  {
+    "config": "async_c1p4",
+    "low_toggle_default_pin_pj_bit": 0.04807338044196428,
+    "random_default_pin_pj_bit": 0.06198541954017857,
+    "random_nominal_pin_pj_bit": 0.06274389512946427,
+    "random_nominal_pin_pj_useful_payload_bit": 0.09150151373046872,
+    "pin_scenario_min_pj_bit": 0.06208521895982141,
+    "pin_scenario_max_pj_bit": 0.0636321099642857,
+    "nominal_leakage_uw": 66.66,
+    "nominal_total_mw": 6.287,
+    "nominal_internal_mw": 4.921,
+    "nominal_switching_mw": 1.299
+  },
+  {
+    "config": "sync_c1p4",
+    "low_toggle_default_pin_pj_bit": 0.096097725,
+    "random_default_pin_pj_bit": 0.10224135,
+    "random_nominal_pin_pj_bit": 0.10315575,
+    "random_nominal_pin_pj_useful_payload_bit": 0.15043546875,
+    "pin_scenario_min_pj_bit": 0.10286999999999999,
+    "pin_scenario_max_pj_bit": 0.1052703,
+    "nominal_leakage_uw": 36.23,
+    "nominal_total_mw": 7.22,
+    "nominal_internal_mw": 6.443,
+    "nominal_switching_mw": 0.74
+  }
+]

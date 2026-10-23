@@ -1,0 +1,70 @@
+{
+  "groups": {
+    "Mesh256/TOPO-UR/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "Mesh256/MULTICAST10-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "Mesh256/ALL-MULTICAST-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "M16_256/TOPO-UR/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "M16_256/MULTICAST10-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "M16_256/ALL-MULTICAST-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "Mesh256/MULTICAST10-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    },
+    "M16_256/MULTICAST10-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    },
+    "Mesh256/ALL-MULTICAST-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    },
+    "M16_256/ALL-MULTICAST-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    }
+  },
+  "failures": [],
+  "expected": 552,
+  "runtime_log_audit": {
+    "checked": 552,
+    "failures": []
+  }
+}

@@ -1,0 +1,4 @@
+ARCHIVE=/home/ghy19/Asynchronous_Router_CMR
+MESH_RUN=20261018_123500_mesh256_xfirsty_tt_resynth_r1
+M16_RUN=20261019_085616_m16_dc256_tt_r1
+LIB_V=/process/course_lib/t28hpc+/tcbn28hpcplusbwp12t30p140.v

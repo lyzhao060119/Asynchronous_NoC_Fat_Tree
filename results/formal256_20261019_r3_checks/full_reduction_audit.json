@@ -1,0 +1,75 @@
+{
+  "groups": {
+    "Mesh256/TOPO-UR/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "Mesh256/MULTICAST10-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "Mesh256/ALL-MULTICAST-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "M16_256/TOPO-UR/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "M16_256/MULTICAST10-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "M16_256/ALL-MULTICAST-AABB/native": {
+      "expected": 90,
+      "measured": 90,
+      "valid": 90,
+      "invalid": 0
+    },
+    "Mesh256/MULTICAST10-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    },
+    "M16_256/MULTICAST10-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    },
+    "Mesh256/ALL-MULTICAST-AABB/repeated": {
+      "expected": 3,
+      "measured": 2,
+      "valid": 2,
+      "invalid": 0
+    },
+    "M16_256/ALL-MULTICAST-AABB/repeated": {
+      "expected": 3,
+      "measured": 3,
+      "valid": 3,
+      "invalid": 0
+    }
+  },
+  "failures": [
+    {
+      "design": "Mesh256",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "seed": 202703,
+      "load": 20,
+      "mode": "repeated",
+      "error": "[Errno 2] No such file or directory: '/home/ghy19/Asynchronous_Router_CMR/experiments/20261019_formal256_r3_checks/logs/Mesh256/ALL-MULTICAST-AABB_n256_s202703_m20_repeated/latency.csv'"
+    }
+  ],
+  "expected": 552
+}

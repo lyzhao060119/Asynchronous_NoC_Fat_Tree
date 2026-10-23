@@ -1,0 +1,32 @@
+[
+  {
+    "config": "async_c2p4",
+    "level": 2,
+    "area_um2": 30105.935967,
+    "packet_completion_ns": 5.571999999999974,
+    "packet_completion_div5_ns": 1.114399999999995,
+    "mean_individual_flit_latency_ns": 2.872,
+    "packet_power_mw": 1.6576666666666668,
+    "packet_energy_pj": 9.38570866666663,
+    "packet_energy_pj_sample_std": 0.11690807510746712,
+    "packet_pj_per_bit": 0.06704077619047594,
+    "guard5_energy_pj": 10.512376599999978,
+    "guard5_pj_per_bit": 0.07508840428571413,
+    "last_nonclock_release_ns": 0.578000000000003
+  },
+  {
+    "config": "async_c4p8",
+    "level": 3,
+    "area_um2": 77433.88773,
+    "packet_completion_ns": 6.433999999999969,
+    "packet_completion_div5_ns": 1.2867999999999937,
+    "mean_individual_flit_latency_ns": 3.5036,
+    "packet_power_mw": 1.878,
+    "packet_energy_pj": 12.252071999999947,
+    "packet_energy_pj_sample_std": 0.11905182824299662,
+    "packet_pj_per_bit": 0.08751479999999963,
+    "guard5_energy_pj": 14.639321333333298,
+    "guard5_pj_per_bit": 0.1045665809523807,
+    "last_nonclock_release_ns": 0.6160000000000139
+  }
+]

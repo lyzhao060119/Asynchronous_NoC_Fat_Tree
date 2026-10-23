@@ -1,0 +1,38 @@
+****************************************
+Report : Time Based Power
+Design : PROP_temp64_m16
+Version: V-2023.12
+Date   : Mon Oct 19 21:03:43 2026
+****************************************
+
+
+
+  Attributes
+  ----------
+      i  -  Including register clock pin internal power
+      u  -  User defined power group
+
+                        Internal  Switching  Leakage    Total
+Power Group             Power     Power      Power      Power   (     %)  Attrs
+--------------------------------------------------------------------------------
+clock_network              0.0000    0.0000    0.0000    0.0000 ( 0.00%)  i
+register                   0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+combinational           1.459e-03 1.134e-03 7.405e-04 3.334e-03 (25.45%)  
+sequential              7.524e-03 6.070e-04 1.633e-03 9.765e-03 (74.55%)  
+memory                     0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+io_pad                     0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+black_box                  0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+
+  Net Switching Power  = 1.741e-03   (13.29%)
+  Cell Internal Power  = 8.984e-03   (68.58%)
+  Cell Leakage Power   = 2.374e-03   (18.12%)
+                         ---------
+Total Power            =    0.0131  (100.00%)
+
+X Transition Power     =    0.0000
+Glitching Power        = 1.615e-06
+
+Peak Power             =    0.0777
+Peak Time              = 11458.199
+
+1

@@ -1,0 +1,4 @@
+config,adjacent_body_payload_toggle_fraction,compared_body_transitions
+async_c1p1,0.4861111111111111,24000
+async_c1p4,0.4861111111111111,24000
+sync_c1p4,0.4861111111111111,24000

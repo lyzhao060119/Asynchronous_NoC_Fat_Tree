@@ -1,0 +1,51 @@
+{
+  "config": "async_c1p2",
+  "netlist_run": "20261023_router_latency_r1b_async_c1p2",
+  "gls_pass": true,
+  "sdf_errors_zero": true,
+  "metric": "mean(output_req-input_req), five output-paced low-switching flits; 90ps capture offset removed",
+  "mean_flit_latency_ns": 0.7725999999999942,
+  "events": [
+    {
+      "flit": 0,
+      "input_req_ns": 210.05,
+      "output_req_ns": 211.231,
+      "latency_ns": 1.1809999999999832,
+      "lane": 1
+    },
+    {
+      "flit": 1,
+      "input_req_ns": 211.571,
+      "output_req_ns": 212.22299999999998,
+      "latency_ns": 0.6519999999999868,
+      "lane": 1
+    },
+    {
+      "flit": 2,
+      "input_req_ns": 212.563,
+      "output_req_ns": 213.253,
+      "latency_ns": 0.6899999999999977,
+      "lane": 1
+    },
+    {
+      "flit": 3,
+      "input_req_ns": 213.593,
+      "output_req_ns": 214.24699999999999,
+      "latency_ns": 0.6539999999999964,
+      "lane": 1
+    },
+    {
+      "flit": 4,
+      "input_req_ns": 214.587,
+      "output_req_ns": 215.273,
+      "latency_ns": 0.686000000000007,
+      "lane": 1
+    }
+  ],
+  "corner": "TT 0.8V 25C; MAXIMUM SDF; post-synthesis",
+  "source_tb_sha256": "bb45def077fa864aff25c41553dda6c7dc19daa8902bf2316f1fa0fb25a3248a",
+  "dc_pass": true,
+  "dc_job_id": "15010801",
+  "gls_job_id": "15011301",
+  "cell_recipe_note": "Same sizing targets as Thin; geometry-specific XNR4 count checked as exactly 8 instead of c1p4-derived 12."
+}

@@ -1,0 +1,41 @@
+{
+  "batch": "single_router_c2p4_c4p8_20261022_r5",
+  "configs": [
+    {
+      "name": "async_c2p4",
+      "kind": "async_pfat_2x4",
+      "netlist": "20261022_router_ppa_r5c_async_c2p4",
+      "sync": false,
+      "lanes": 4,
+      "child": 2,
+      "level": 2
+    },
+    {
+      "name": "async_c4p8",
+      "kind": "async_pfat_4x8",
+      "netlist": "20261022_router_ppa_r5b_async_c4p8",
+      "sync": false,
+      "lanes": 8,
+      "child": 4,
+      "level": 3
+    }
+  ],
+  "corner": "tt0p8v25c",
+  "flit_bits": 28,
+  "packet_flits": 5,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "injection": "one source, one packet per reset, input-Ack paced; child0 to parent, destination (8,8)",
+  "latency": "output_tail_req-input_head_req; amortized flit latency=packet_completion/5; also retain per-flit input/output timestamps",
+  "power": "entire DUT; random 24-bit Body/Tail payload; 50ps input slew; 5fF output load; internal+switching+leakage; no idle subtraction",
+  "power_windows": [
+    "head input to tail capture",
+    "tail capture +2ns",
+    "tail capture +5ns",
+    "idle tail capture+10..20ns"
+  ],
+  "scope": "post-synthesis, no extracted P&R/SPEF/CTS"
+}

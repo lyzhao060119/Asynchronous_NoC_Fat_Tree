@@ -1,0 +1,18 @@
+{
+  "dc_runs": {
+    "async_c1p1": "20261022_router_ppa_r1_async_c1p1",
+    "async_c1p4": "20261022_router_ppa_r1_async_c1p4",
+    "sync_c1p4": "20261022_router_ppa_r1_sync_c1p4"
+  },
+  "corner": "TT 0.8V 25C",
+  "sync_clock_ns": 1,
+  "isolated": "five flits; each waits for previous output; low switching",
+  "packet": "one five-flit packet, input-Ack/ready paced; low switching",
+  "aggregate": "four sources, 48000 flits, 40000 measured; pseudorandom 24-bit body/tail plus 2-bit source tag",
+  "latency_definitions": {
+    "mean_flit": "mean(output_i-input_i)",
+    "packet_completion": "output_tail-input_head",
+    "packet_amortized": "packet_completion/5"
+  },
+  "power_scope": "all DUT cells; internal + switching + leakage; post-synthesis no P&R/SPEF; input/output external drivers excluded"
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "config": "async_c1p1",
+    "adjacent_body_payload_toggle_fraction": 0.4861111111111111,
+    "compared_body_transitions": 24000
+  },
+  {
+    "config": "async_c1p4",
+    "adjacent_body_payload_toggle_fraction": 0.4861111111111111,
+    "compared_body_transitions": 24000
+  },
+  {
+    "config": "sync_c1p4",
+    "adjacent_body_payload_toggle_fraction": 0.4861111111111111,
+    "compared_body_transitions": 24000
+  }
+]

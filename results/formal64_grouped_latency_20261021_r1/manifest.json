@@ -1,0 +1,207 @@
+{
+  "source": "results\\formal64_all_20261021_r1\\formal64_seed_averages.csv",
+  "source_sha256": "8c698a82aa2272a93b8c8d67b4a4bc3b9e55fbb1256ea203ce3025dcd36bd29b",
+  "xlim": [
+    0,
+    300
+  ],
+  "ylim_by_group": {
+    "unicast": [
+      1,
+      40
+    ],
+    "multicast": [
+      1,
+      60
+    ]
+  },
+  "yscale": "linear",
+  "metric": "offer_to_tail_mean_ns_mean",
+  "topology_color": {
+    "PROP_M16": "#2463A0",
+    "FM64": "#D77732",
+    "PFAT64": "#4A8962"
+  },
+  "smoothing": false,
+  "sync_included": false,
+  "axes_box_aspect": 0.8,
+  "line_width_pt": 2,
+  "marker_size_pt": 6,
+  "benchmark_line_styles": [
+    "solid",
+    "dashed",
+    "dashdot"
+  ],
+  "curves": [
+    {
+      "group": "unicast",
+      "design": "PROP_M16",
+      "benchmark": "TOPO-UR",
+      "marker": "o",
+      "points": 17,
+      "above_display": 1,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "PROP_M16",
+      "benchmark": "TOPO-BC",
+      "marker": "s",
+      "points": 17,
+      "above_display": 0,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "PROP_M16",
+      "benchmark": "HOTSPOT10",
+      "marker": "^",
+      "points": 17,
+      "above_display": 1,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "FM64",
+      "benchmark": "TOPO-UR",
+      "marker": "o",
+      "points": 17,
+      "above_display": 5,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "FM64",
+      "benchmark": "TOPO-BC",
+      "marker": "s",
+      "points": 17,
+      "above_display": 8,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "FM64",
+      "benchmark": "HOTSPOT10",
+      "marker": "^",
+      "points": 17,
+      "above_display": 5,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "PFAT64",
+      "benchmark": "TOPO-UR",
+      "marker": "o",
+      "points": 17,
+      "above_display": 8,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "PFAT64",
+      "benchmark": "TOPO-BC",
+      "marker": "s",
+      "points": 17,
+      "above_display": 9,
+      "below_display": 0
+    },
+    {
+      "group": "unicast",
+      "design": "PFAT64",
+      "benchmark": "HOTSPOT10",
+      "marker": "^",
+      "points": 15,
+      "above_display": 6,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "PROP_M16",
+      "benchmark": "MULTICAST5-AABB",
+      "marker": "o",
+      "points": 17,
+      "above_display": 1,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "PROP_M16",
+      "benchmark": "MULTICAST10-AABB",
+      "marker": "s",
+      "points": 17,
+      "above_display": 3,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "PROP_M16",
+      "benchmark": "MULTICAST-STATIC-AABB",
+      "marker": "^",
+      "points": 17,
+      "above_display": 7,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "FM64",
+      "benchmark": "MULTICAST5-AABB",
+      "marker": "o",
+      "points": 17,
+      "above_display": 5,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "FM64",
+      "benchmark": "MULTICAST10-AABB",
+      "marker": "s",
+      "points": 17,
+      "above_display": 6,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "FM64",
+      "benchmark": "MULTICAST-STATIC-AABB",
+      "marker": "^",
+      "points": 17,
+      "above_display": 9,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "PFAT64",
+      "benchmark": "MULTICAST5-AABB",
+      "marker": "o",
+      "points": 17,
+      "above_display": 8,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "PFAT64",
+      "benchmark": "MULTICAST10-AABB",
+      "marker": "s",
+      "points": 17,
+      "above_display": 8,
+      "below_display": 0
+    },
+    {
+      "group": "multicast",
+      "design": "PFAT64",
+      "benchmark": "MULTICAST-STATIC-AABB",
+      "marker": "^",
+      "points": 17,
+      "above_display": 9,
+      "below_display": 0
+    }
+  ],
+  "outputs_sha256": {
+    "latency_multicast.pdf": "f40f762df06a88afeabd9279aeb78f79601e6153e6dfe5727c323b71f25be36d",
+    "latency_multicast.png": "5b0fc42a49576560fccd185135236737cc0b898ed4a27e91705ec06e776959b3",
+    "latency_unicast.pdf": "8feb8bb69a0c2d550b9c0c26e4fa307db89d4a1f6206b0b87aa769188ccb5a85",
+    "latency_unicast.png": "07131d890cb8f8a8eb8913af0061b65a6fb42fbbf8dcf6226900512ae28fafd5",
+    "qa_multicast.png": "bd6ca4f7462127ccb312c8278a59807f3fe67671bd34a457e17c8ea6c258ff59",
+    "qa_unicast.png": "60ec053859d357437a19a9678c95559513f16318572cb4990a410e24eb4f2102"
+  }
+}

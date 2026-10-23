@@ -1,0 +1,122 @@
+{
+  "topology": "M16",
+  "nodes": 64,
+  "metric": "offer_to_tail_mean_ns",
+  "definition": "TB-reported offer_to_tail_mean_ns, unchanged; not reinterpreted as per-original last-destination completion",
+  "error_bars": "sample standard deviation across three seeds",
+  "warmup_original_events": 100,
+  "measurement_original_events": 1000,
+  "seeds": [
+    202701,
+    202702,
+    202703
+  ],
+  "sources": [
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_MULTICAST10-AABB_s202701_m20_NATIVE.csv",
+      "sha256": "e3f6407c9fa1d6303ddf0062e099572cc1d2a84f32433a45242d4068f6fd54d6",
+      "seed": 202701,
+      "latency_ns": 10.8906
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_MULTICAST10-AABB_s202702_m20_NATIVE.csv",
+      "sha256": "9edab4d115cc1763f1bcd001b18d95f4da19adc9cd0e7a4577d27f75d8cb0682",
+      "seed": 202702,
+      "latency_ns": 11.049673
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_MULTICAST10-AABB_s202703_m20_NATIVE.csv",
+      "sha256": "539dedcdc2539fbc2c5606b669475c0e70a01c413b83af9e0bd00fec430a193e",
+      "seed": 202703,
+      "latency_ns": 10.907239
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_MULTICAST10-AABB_s202701_m20_REPEATED.csv",
+      "sha256": "97365b9dec384f11db24e001f17a457910b31b3b2287c1bcdb822e0f7f6a4670",
+      "seed": 202701,
+      "latency_ns": 28.364602
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_MULTICAST10-AABB_s202702_m20_REPEATED.csv",
+      "sha256": "d65cfc27ffe1701ee9720c6d4f6472e1eab002692f5252a6b99d0918e5ea26d8",
+      "seed": 202702,
+      "latency_ns": 33.285746
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_MULTICAST10-AABB_s202703_m20_REPEATED.csv",
+      "sha256": "2bab3aa4c2303b7ac268285066bc87e4e080c1681780920d56fd3a106b0b40c0",
+      "seed": 202703,
+      "latency_ns": 28.265916
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_ALL-MULTICAST-AABB_s202701_m10_NATIVE.csv",
+      "sha256": "3eff350580c11bfe25a78099c541c3f6895fe6a32edef40a66617f0b9c3eb6cf",
+      "seed": 202701,
+      "latency_ns": 11.02548
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_ALL-MULTICAST-AABB_s202702_m10_NATIVE.csv",
+      "sha256": "8c92c248d5a7af49412fa014dcc7fa7ae2b9f80a6d0377003b5afe42c415c500",
+      "seed": 202702,
+      "latency_ns": 11.039356
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_ALL-MULTICAST-AABB_s202703_m10_NATIVE.csv",
+      "sha256": "6c787b1577a267fb3f3c9f7fa061e30eb1d6cc9eb652e7fab8fbcc8bcc177783",
+      "seed": 202703,
+      "latency_ns": 11.023976
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_ALL-MULTICAST-AABB_s202701_m10_REPEATED.csv",
+      "sha256": "8d813fca4b7f58fb34275832c60bbff816d33266cffef5b1a38bf3fb227fad03",
+      "seed": 202701,
+      "latency_ns": 58.444179
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_ALL-MULTICAST-AABB_s202702_m10_REPEATED.csv",
+      "sha256": "1135f95ca891f51bde34cb9860f56cea4ae627195bcd6baf73ddba5cb594c3ec",
+      "seed": 202702,
+      "latency_ns": 58.667204
+    },
+    {
+      "path": "results\\formal64_all_20261021_r1\\native_repeated\\PROP_M16_ALL-MULTICAST-AABB_s202703_m10_REPEATED.csv",
+      "sha256": "070700499bcdd01028e3d1b1da6f0da3b7ea4212b559396ea8a522365002fab1",
+      "seed": 202703,
+      "latency_ns": 60.680797
+    }
+  ],
+  "summary": [
+    {
+      "benchmark": "MULTICAST10-AABB",
+      "load_mflit_port_s": 20,
+      "mode": "NATIVE",
+      "mean_ns": 10.949170666666667,
+      "sample_sd_ns": 0.08743428008700814,
+      "n_seeds": 3
+    },
+    {
+      "benchmark": "MULTICAST10-AABB",
+      "load_mflit_port_s": 20,
+      "mode": "REPEATED",
+      "mean_ns": 29.972088000000003,
+      "sample_sd_ns": 2.8701361879485803,
+      "n_seeds": 3
+    },
+    {
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load_mflit_port_s": 10,
+      "mode": "NATIVE",
+      "mean_ns": 11.029603999999999,
+      "sample_sd_ns": 0.008478893324013536,
+      "n_seeds": 3
+    },
+    {
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load_mflit_port_s": 10,
+      "mode": "REPEATED",
+      "mean_ns": 59.26406,
+      "sample_sd_ns": 1.2319873510036539,
+      "n_seeds": 3
+    }
+  ]
+}

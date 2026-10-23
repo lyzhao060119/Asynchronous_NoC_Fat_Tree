@@ -1,0 +1,9 @@
+{
+  "schema": "formal64-power-vcd-archive-v1",
+  "source": "/prjtemp/ghy19/formal64_power_supplement/20261021_sync_and_broadcast_r1/vcd/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/measurement.vcd",
+  "archive": "/prjtemp/ghy19/formal64_power_supplement/20261021_sync_and_broadcast_r1/vcd/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/measurement.vcd.gz",
+  "uncompressed_bytes": 3515648229,
+  "archive_bytes": 549578934,
+  "uncompressed_sha256": "bd27d19833a09a879fb52d50375072bb1cffcfa63d02e06d0e71f5bdd00c084a",
+  "roundtrip_sha256": "bd27d19833a09a879fb52d50375072bb1cffcfa63d02e06d0e71f5bdd00c084a"
+}

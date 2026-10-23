@@ -1,0 +1,17 @@
+{
+  "summary\\area_comparison.csv": "093f5e2f8c03f0b1b2a06a2ba4c99a462c18671a0f17c3e4a725f3d76789af03",
+  "summary\\coverage.json": "a733724774df9b0be9cabd5b752705f67df228d57b31656be14a52c9122b4423",
+  "summary\\local_aggregation_audit.json": "6052e699d4ab3573ca6e60c2e5da893773738e62fd103fea256d5297966689af",
+  "summary\\native_repeated_comparison.csv": "0cdc1f3c3d0cdc9a046ff1f2c8bdeb484e96b2632da846686d0aa443fd27b3c9",
+  "summary\\raw_metrics.csv": "777ba391c23635d6b3e4223d184cba63eb6a9d6a384559cb126cf73b9c648aaf",
+  "summary\\scan_coverage.csv": "da28b6d666aae5f33677e43077f1dcb16d17f07c86d7255949176ffcd5c35f34",
+  "summary\\three_seed_means.csv": "92bdcdcb35bfbd2c56eb5bb3557259a1127855fbae0b4de9916fdf266c37dfe7",
+  "figures\\formal256_curves.pdf": "cd4fc92f4b66d774036ed5f7105a7e27de54f0702ad585271fe0accd800f6fbc",
+  "figures\\formal256_curves.png": "71b53b57a19b0d68c2c63bbff5612fa26ecc786b92cfb6853e09cfa23aad1b6c",
+  "figures\\formal256_latency.pdf": "1fdab218a92a8e6a597f06141dc1d96377be6c1f9cd83d1af75f88a9d79bbde7",
+  "figures\\formal256_latency.png": "9659d6bee9dcc5db6fbac43cc5a9278f7efd9faea6921af29599af9fd716911f",
+  "figures\\formal256_native_repeated.pdf": "0a7c6e795b7044b226f825c0f36eef9501b320e580de2f51bd8c3a7d46e8d935",
+  "figures\\formal256_native_repeated.png": "fe47f57f043ef2455b2f2c93c95907719a2da58a84279248b637cdf00d055ffc",
+  "figures\\formal256_throughput.pdf": "ec761b91f9b13de3329490f7795c96b7270163aa88dfe2ffaf225eb386d6a252",
+  "figures\\formal256_throughput.png": "c02dfb2e37a052b8c3e848d1f2e4f38802606482af46766289a7e51a16490538"
+}

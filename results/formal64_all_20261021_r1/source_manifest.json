@@ -1,0 +1,1045 @@
+{
+  "scan_sources": [
+    {
+      "path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results",
+      "design": null,
+      "allow": [
+        "TOPO-UR",
+        "TOPO-BC",
+        "HOTSPOT10"
+      ],
+      "priority": 0
+    },
+    {
+      "path": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/results",
+      "design": null,
+      "allow": [
+        "TOPO-UR",
+        "TOPO-BC",
+        "HOTSPOT10"
+      ],
+      "priority": 1
+    },
+    {
+      "path": "/prjtemp/ghy19/date2027_formal64/20261015_230000_formal64_unicast_sync_m16_r1/results",
+      "design": "SYNC_M16",
+      "allow": [
+        "TOPO-UR",
+        "TOPO-BC",
+        "HOTSPOT10"
+      ],
+      "priority": 0
+    },
+    {
+      "path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results",
+      "design": null,
+      "allow": [
+        "MULTICAST5-AABB",
+        "MULTICAST10-AABB",
+        "MULTICAST-STATIC-AABB",
+        "ALL-MULTICAST-AABB",
+        "ALL-BROADCAST"
+      ],
+      "priority": 0
+    },
+    {
+      "path": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/results",
+      "design": "PFAT64",
+      "allow": [
+        "MULTICAST5-AABB",
+        "MULTICAST10-AABB",
+        "MULTICAST-STATIC-AABB",
+        "ALL-MULTICAST-AABB",
+        "ALL-BROADCAST"
+      ],
+      "priority": 5
+    }
+  ],
+  "mesh_xfirst_launches": [
+    {
+      "path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/jobs/20261017_191000_mesh64_xfirsty_multicast_scan_r2.json",
+      "content": {
+        "schema": "formal64-fm64-xfirst-multicast-launch-v1",
+        "input_run": "20261015_193500_formal64_multicast_inputs_r1",
+        "scan_run": "20261017_191000_mesh64_xfirsty_multicast_scan_r2",
+        "netlist_run": "20261017_190000_mesh64_xfirsty_dc_r3",
+        "dc_job": "14398301",
+        "benchmarks": [
+          "MULTICAST5-AABB",
+          "MULTICAST10-AABB",
+          "MULTICAST-STATIC-AABB",
+          "ALL-MULTICAST-AABB",
+          "ALL-BROADCAST"
+        ],
+        "seeds": [
+          202701,
+          202702,
+          202703
+        ],
+        "loads_per_grid": 30,
+        "expected_cases": 450,
+        "source_hashes": {
+          "run_formal64_multicast_async_grid.sh": "4800327e00039e58c11ed02dbde015223ee28a57d5170eccc6c7a58ad078907d",
+          "run_e2_bc_hotspot64_remote.sh": "9241b74dec3be62915bd8f45f5cf2e3f6cf9267af0b2e8c7c0127f74ee8bf61a"
+        },
+        "compile_job": "14398401",
+        "smoke_job": "14398501",
+        "grid_jobs": {
+          "MULTICAST5-AABB_202701": "14398601",
+          "MULTICAST5-AABB_202702": "14398701",
+          "MULTICAST5-AABB_202703": "14398801",
+          "MULTICAST10-AABB_202701": "14398901",
+          "MULTICAST10-AABB_202702": "14399001",
+          "MULTICAST10-AABB_202703": "14399101",
+          "MULTICAST-STATIC-AABB_202701": "14399201",
+          "MULTICAST-STATIC-AABB_202702": "14399301",
+          "MULTICAST-STATIC-AABB_202703": "14399401",
+          "ALL-MULTICAST-AABB_202701": "14399501",
+          "ALL-MULTICAST-AABB_202702": "14399601",
+          "ALL-MULTICAST-AABB_202703": "14399701",
+          "ALL-BROADCAST_202701": "14399801",
+          "ALL-BROADCAST_202702": "14399901",
+          "ALL-BROADCAST_202703": "14400001"
+        }
+      }
+    },
+    {
+      "path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/jobs/20261017_153000_mesh64_xfirsty_multicast_scan_r1.json",
+      "content": {
+        "schema": "formal64-fm64-xfirst-multicast-launch-v1",
+        "input_run": "20261015_193500_formal64_multicast_inputs_r1",
+        "scan_run": "20261017_153000_mesh64_xfirsty_multicast_scan_r1",
+        "netlist_run": "20261017_151000_mesh64_xfirsty_dc_r2",
+        "dc_job": "14376601",
+        "benchmarks": [
+          "MULTICAST5-AABB",
+          "MULTICAST10-AABB",
+          "MULTICAST-STATIC-AABB",
+          "ALL-MULTICAST-AABB",
+          "ALL-BROADCAST"
+        ],
+        "seeds": [
+          202701,
+          202702,
+          202703
+        ],
+        "loads_per_grid": 30,
+        "expected_cases": 450,
+        "source_hashes": {
+          "run_formal64_multicast_async_grid.sh": "4800327e00039e58c11ed02dbde015223ee28a57d5170eccc6c7a58ad078907d",
+          "run_e2_bc_hotspot64_remote.sh": "9241b74dec3be62915bd8f45f5cf2e3f6cf9267af0b2e8c7c0127f74ee8bf61a"
+        },
+        "compile_job": "14378401",
+        "smoke_job": "14378501",
+        "grid_jobs": {
+          "MULTICAST5-AABB_202701": "14378601",
+          "MULTICAST5-AABB_202702": "14378701",
+          "MULTICAST5-AABB_202703": "14378801",
+          "MULTICAST10-AABB_202701": "14378901",
+          "MULTICAST10-AABB_202702": "14379001",
+          "MULTICAST10-AABB_202703": "14379101",
+          "MULTICAST-STATIC-AABB_202701": "14379201",
+          "MULTICAST-STATIC-AABB_202702": "14379301",
+          "MULTICAST-STATIC-AABB_202703": "14379401",
+          "ALL-MULTICAST-AABB_202701": "14379501",
+          "ALL-MULTICAST-AABB_202702": "14379601",
+          "ALL-MULTICAST-AABB_202703": "14379701",
+          "ALL-BROADCAST_202701": "14379801",
+          "ALL-BROADCAST_202702": "14379901",
+          "ALL-BROADCAST_202703": "14380001"
+        }
+      }
+    }
+  ],
+  "power_manifests": [
+    {
+      "path": "/prjtemp/ghy19/formal64_power_pfat/20261020_fig2_8bench_3seed_r2/manifest.json",
+      "content": {
+        "selection": "/prjtemp/ghy19/date2027_formal64/power_selection_r2/mesh64_power_points.json",
+        "netlist": "/home/ghy19/Asynchronous_Router_CMR/outputs/20261019_archive_pfat64_fig2_tailrel100buf0_tt_r1",
+        "scan_audit": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/manifests/final_acceptance_r3.json",
+        "jobs": [
+          {
+            "benchmark": "TOPO-UR",
+            "seed": 202701,
+            "load": 80,
+            "case": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/cases/TOPO-UR_n64_s202701_m80_PFAT64_top8.case",
+            "tag": "TOPO-UR_s202701_m80",
+            "case_sha256": "473b843127fafcb183e0fd99090670c99c7775ac9dd091396546d47371efe613",
+            "activity_job": "14649501",
+            "ptpx_job": "14649601",
+            "archive_job": "14649701"
+          },
+          {
+            "benchmark": "TOPO-UR",
+            "seed": 202702,
+            "load": 80,
+            "case": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/cases/TOPO-UR_n64_s202702_m80_PFAT64_top8.case",
+            "tag": "TOPO-UR_s202702_m80",
+            "case_sha256": "3f9c986319e25b787ac2f8607171f7ae89d78dbc80ec03c25c9bfff8867b18b3",
+            "activity_job": "14649801",
+            "ptpx_job": "14649901",
+            "archive_job": "14650001"
+          },
+          {
+            "benchmark": "TOPO-UR",
+            "seed": 202703,
+            "load": 80,
+            "case": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/cases/TOPO-UR_n64_s202703_m80_PFAT64_top8.case",
+            "tag": "TOPO-UR_s202703_m80",
+            "case_sha256": "ab41567c7373602404f61f62a14f6a5bcde0582c7311ebab853688fee7cd4fda",
+            "activity_job": "14650101",
+            "ptpx_job": "14650201",
+            "archive_job": "14650301"
+          },
+          {
+            "benchmark": "TOPO-BC",
+            "seed": 202701,
+            "load": 40,
+            "case": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/TOPO-BC_n64_s202701_m40_PFAT64_top8.case",
+            "tag": "TOPO-BC_s202701_m40",
+            "case_sha256": "d83dc8a0bbe288c6eab74fbab65e50bdb973c78db88f923f8646ce4bc3acfbb5",
+            "activity_job": "14650401",
+            "ptpx_job": "14650501",
+            "archive_job": "14650601"
+          },
+          {
+            "benchmark": "TOPO-BC",
+            "seed": 202702,
+            "load": 40,
+            "case": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/TOPO-BC_n64_s202702_m40_PFAT64_top8.case",
+            "tag": "TOPO-BC_s202702_m40",
+            "case_sha256": "e98fb11fc7014b44eb6a0d32202eeb657eb537b7673de10b5bf55a6daf4c80c8",
+            "activity_job": "14650701",
+            "ptpx_job": "14650801",
+            "archive_job": "14650901"
+          },
+          {
+            "benchmark": "TOPO-BC",
+            "seed": 202703,
+            "load": 40,
+            "case": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/TOPO-BC_n64_s202703_m40_PFAT64_top8.case",
+            "tag": "TOPO-BC_s202703_m40",
+            "case_sha256": "f633247476f07ca92b35de3313114209ddab582c73ea464d9ea5d9923b06ad47",
+            "activity_job": "14651001",
+            "ptpx_job": "14651101",
+            "archive_job": "14651201"
+          },
+          {
+            "benchmark": "HOTSPOT10",
+            "seed": 202701,
+            "load": 80,
+            "case": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/HOTSPOT10_n64_s202701_m80_PFAT64_top8.case",
+            "tag": "HOTSPOT10_s202701_m80",
+            "case_sha256": "647fb1f6be8d215bd75cf51c4434825599459e29e29185ada30ce545ebd17476",
+            "activity_job": "14651301",
+            "ptpx_job": "14651401",
+            "archive_job": "14651501"
+          },
+          {
+            "benchmark": "HOTSPOT10",
+            "seed": 202702,
+            "load": 80,
+            "case": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/HOTSPOT10_n64_s202702_m80_PFAT64_top8.case",
+            "tag": "HOTSPOT10_s202702_m80",
+            "case_sha256": "6513c6e52026094461ad83ba4804382c616b25ff477111877955e7d1749e3375",
+            "activity_job": "14651601",
+            "ptpx_job": "14651701",
+            "archive_job": "14651801"
+          },
+          {
+            "benchmark": "HOTSPOT10",
+            "seed": 202703,
+            "load": 80,
+            "case": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/HOTSPOT10_n64_s202703_m80_PFAT64_top8.case",
+            "tag": "HOTSPOT10_s202703_m80",
+            "case_sha256": "bb6d7d58580bf2f1d635bf4349f4f31ef9b83c4d10cd1e4fdf39c97602a83fbe",
+            "activity_job": "14651901",
+            "ptpx_job": "14652001",
+            "archive_job": "14652101"
+          },
+          {
+            "benchmark": "MULTICAST5-AABB",
+            "seed": 202701,
+            "load": 40,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST5-AABB_n64_s202701_m40_PFAT64_top8.case",
+            "tag": "MULTICAST5-AABB_s202701_m40",
+            "case_sha256": "019dc1001c49194a241d554fb90ecd9ac89ca7f3073ea4ed4b64fefbfb632df3",
+            "activity_job": "14652201",
+            "ptpx_job": "14652301",
+            "archive_job": "14652401"
+          },
+          {
+            "benchmark": "MULTICAST5-AABB",
+            "seed": 202702,
+            "load": 40,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST5-AABB_n64_s202702_m40_PFAT64_top8.case",
+            "tag": "MULTICAST5-AABB_s202702_m40",
+            "case_sha256": "84a53243119e4f16b7a399b6017f5b01bd84b142ada04e307a5bcf26441e97d1",
+            "activity_job": "14652501",
+            "ptpx_job": "14652601",
+            "archive_job": "14652701"
+          },
+          {
+            "benchmark": "MULTICAST5-AABB",
+            "seed": 202703,
+            "load": 40,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST5-AABB_n64_s202703_m40_PFAT64_top8.case",
+            "tag": "MULTICAST5-AABB_s202703_m40",
+            "case_sha256": "397d7c4f6a8b315213e0e9230e02a857b2d1cd140e78c22b2b85fc8264543f2a",
+            "activity_job": "14652801",
+            "ptpx_job": "14652901",
+            "archive_job": "14653001"
+          },
+          {
+            "benchmark": "MULTICAST10-AABB",
+            "seed": 202701,
+            "load": 20,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST10-AABB_n64_s202701_m20_PFAT64_top8.case",
+            "tag": "MULTICAST10-AABB_s202701_m20",
+            "case_sha256": "f06332542065ff9cd1c499f14abacac0fc39a7c5f58c3d06f905bbd1bd1f8db1",
+            "activity_job": "14653101",
+            "ptpx_job": "14653201",
+            "archive_job": "14653301"
+          },
+          {
+            "benchmark": "MULTICAST10-AABB",
+            "seed": 202702,
+            "load": 20,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST10-AABB_n64_s202702_m20_PFAT64_top8.case",
+            "tag": "MULTICAST10-AABB_s202702_m20",
+            "case_sha256": "e27e05f8e8d2ea52359765467820ae541a5ab20b3cfbc529463a0aee942b2c29",
+            "activity_job": "14653401",
+            "ptpx_job": "14653501",
+            "archive_job": "14653601"
+          },
+          {
+            "benchmark": "MULTICAST10-AABB",
+            "seed": 202703,
+            "load": 20,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST10-AABB_n64_s202703_m20_PFAT64_top8.case",
+            "tag": "MULTICAST10-AABB_s202703_m20",
+            "case_sha256": "0706e1b071d74f3cbc72360d43df18263eebef501281f498bd4c9a8e404c1117",
+            "activity_job": "14653701",
+            "ptpx_job": "14653801",
+            "archive_job": "14653901"
+          },
+          {
+            "benchmark": "MULTICAST-STATIC-AABB",
+            "seed": 202701,
+            "load": 20,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST-STATIC-AABB_n64_s202701_m20_PFAT64_top8.case",
+            "tag": "MULTICAST-STATIC-AABB_s202701_m20",
+            "case_sha256": "9c473e75a12c816a4194242ffca5b1c7be8f69d28dc9908bcd3f030a1824e8da",
+            "activity_job": "14654001",
+            "ptpx_job": "14654101",
+            "archive_job": "14654201"
+          },
+          {
+            "benchmark": "MULTICAST-STATIC-AABB",
+            "seed": 202702,
+            "load": 20,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST-STATIC-AABB_n64_s202702_m20_PFAT64_top8.case",
+            "tag": "MULTICAST-STATIC-AABB_s202702_m20",
+            "case_sha256": "2c073052ac185c6ed9d08dbaf1b32e9c1ccbd26efa6b9f70a68a9909226c5a62",
+            "activity_job": "14654301",
+            "ptpx_job": "14654401",
+            "archive_job": "14654501"
+          },
+          {
+            "benchmark": "MULTICAST-STATIC-AABB",
+            "seed": 202703,
+            "load": 20,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/MULTICAST-STATIC-AABB_n64_s202703_m20_PFAT64_top8.case",
+            "tag": "MULTICAST-STATIC-AABB_s202703_m20",
+            "case_sha256": "3b174b3accfe03d5dc895007169dd98e048c2c671f31dcac4e3d306ef1cb5232",
+            "activity_job": "14654601",
+            "ptpx_job": "14654701",
+            "archive_job": "14654801"
+          },
+          {
+            "benchmark": "ALL-MULTICAST-AABB",
+            "seed": 202701,
+            "load": 10,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/ALL-MULTICAST-AABB_n64_s202701_m10_PFAT64_top8.case",
+            "tag": "ALL-MULTICAST-AABB_s202701_m10",
+            "case_sha256": "433aee4c2a68b407874ffc0484a5ee3b7ceee64e61193fc89d1232466102978e",
+            "activity_job": "14654901",
+            "ptpx_job": "14655001",
+            "archive_job": "14655101"
+          },
+          {
+            "benchmark": "ALL-MULTICAST-AABB",
+            "seed": 202702,
+            "load": 10,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/ALL-MULTICAST-AABB_n64_s202702_m10_PFAT64_top8.case",
+            "tag": "ALL-MULTICAST-AABB_s202702_m10",
+            "case_sha256": "96dbbb121d2ec523e40da32115b65cf5044940b3ad54b2334d374e802178a29a",
+            "activity_job": "14655201",
+            "ptpx_job": "14655301",
+            "archive_job": "14655401"
+          },
+          {
+            "benchmark": "ALL-MULTICAST-AABB",
+            "seed": 202703,
+            "load": 10,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/ALL-MULTICAST-AABB_n64_s202703_m10_PFAT64_top8.case",
+            "tag": "ALL-MULTICAST-AABB_s202703_m10",
+            "case_sha256": "b4f0c67da277f15c473f8dfd9d2add7e4b237d6693ab380cd2dcdd70d2eb45b3",
+            "activity_job": "14655501",
+            "ptpx_job": "14655601",
+            "archive_job": "14655701"
+          },
+          {
+            "benchmark": "ALL-BROADCAST",
+            "seed": 202701,
+            "load": 5,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/ALL-BROADCAST_n64_s202701_m5_PFAT64_top8.case",
+            "tag": "ALL-BROADCAST_s202701_m5",
+            "case_sha256": "47e462e190065110b38ce3b427516c7631f8143ffc6b07d2f141989166931454",
+            "activity_job": "14655801",
+            "ptpx_job": "14655901",
+            "archive_job": "14656001"
+          },
+          {
+            "benchmark": "ALL-BROADCAST",
+            "seed": 202702,
+            "load": 5,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/ALL-BROADCAST_n64_s202702_m5_PFAT64_top8.case",
+            "tag": "ALL-BROADCAST_s202702_m5",
+            "case_sha256": "501c841008e0998f84fbfa64510a55a015fd024d830bfec6fcb06708b9801394",
+            "activity_job": "14656101",
+            "ptpx_job": "14656201",
+            "archive_job": "14656301"
+          },
+          {
+            "benchmark": "ALL-BROADCAST",
+            "seed": 202703,
+            "load": 5,
+            "case": "/home/ghy19/Asynchronous_Router_CMR/experiments/20261020_pfat64_fig2_mc_r1/cases/ALL-BROADCAST_n64_s202703_m5_PFAT64_top8.case",
+            "tag": "ALL-BROADCAST_s202703_m5",
+            "case_sha256": "745f4159d2b4e70b8858464321b9f643b857352990a21674e1ddd8c7b670efd6",
+            "activity_job": "14656401",
+            "ptpx_job": "14656501",
+            "archive_job": "14656601"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/manifest.json",
+      "content": {
+        "schema": "formal64-m16-power-batch-v1",
+        "root": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2",
+        "selection": [
+          "/prjtemp/ghy19/date2027_formal64/power_selection_r1/mesh64_power_points.json",
+          "/prjtemp/ghy19/date2027_formal64/power_selection_r2/mesh64_power_points.json"
+        ],
+        "netlist": "/home/ghy19/Asynchronous_Router_CMR/outputs/20261011_prop_m16_current_timingopt_dc_lmh_r1",
+        "scripts_sha256": {
+          "activity_runner": "87694bffd5bc8bd2f5c1760453c9eb2aa5a4081d220c0269c55776e7760f8192",
+          "ptpx_runner": "07099fed7976329d585fb8319aec58b9c44a62f22bffbda8f33f070e90d0f95c",
+          "archive_runner": "78d5ca02b5eb8fe177f6ddea776ced2cfa706a14c34b48460b60be981cfc2b10",
+          "ptpx_tcl": "21820cd4bdf06667f07bdde51ef8a5e228dbb7efe3b6da7b803ec8203eab64ac"
+        },
+        "jobs": [
+          {
+            "benchmark": "TOPO-UR",
+            "seed": 202701,
+            "load": 80,
+            "case_name": "TOPO-UR_n64_s202701_m80_PROP_M16",
+            "source_case_name": "TOPO-UR_n64_s202701_m80_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/cases/TOPO-UR_n64_s202701_m80_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/results/PROP_M16/TOPO-UR_n64_s202701_m80_PROP_M16.csv",
+            "result_sha256": "dc824dbbb399f9e9b7285c661baf3fd8fd091ff816d51cfb04f24dd1eeb6558b",
+            "tag": "PROP_M16_TOPO-UR_s202701_m80",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_TOPO-UR_s202701_m80",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_TOPO-UR_s202701_m80",
+            "activity_job_id": "14433001",
+            "ptpx_job_id": "14433101",
+            "archive_job_id": "14433201",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-UR_s202701_m80/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-UR_s202701_m80/archive.log"
+          },
+          {
+            "benchmark": "TOPO-UR",
+            "seed": 202702,
+            "load": 80,
+            "case_name": "TOPO-UR_n64_s202702_m80_PROP_M16",
+            "source_case_name": "TOPO-UR_n64_s202702_m80_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/cases/TOPO-UR_n64_s202702_m80_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/results/PROP_M16/TOPO-UR_n64_s202702_m80_PROP_M16.csv",
+            "result_sha256": "be9ab6773aa420cec253b528b33bda05d23c0e6f41e0433c19148f5fb4ebbd28",
+            "tag": "PROP_M16_TOPO-UR_s202702_m80",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_TOPO-UR_s202702_m80",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_TOPO-UR_s202702_m80",
+            "activity_job_id": "14433301",
+            "ptpx_job_id": "14433401",
+            "archive_job_id": "14433501",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-UR_s202702_m80/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-UR_s202702_m80/archive.log"
+          },
+          {
+            "benchmark": "TOPO-UR",
+            "seed": 202703,
+            "load": 80,
+            "case_name": "TOPO-UR_n64_s202703_m80_PROP_M16",
+            "source_case_name": "TOPO-UR_n64_s202703_m80_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/cases/TOPO-UR_n64_s202703_m80_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261016_120000_formal64_unicast_async_current_r1/results/PROP_M16/TOPO-UR_n64_s202703_m80_PROP_M16.csv",
+            "result_sha256": "1d1ed766ce64b211c8800e34b75fffd136b7fb1370eb39fd4f133dd2cee13b9d",
+            "tag": "PROP_M16_TOPO-UR_s202703_m80",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_TOPO-UR_s202703_m80",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_TOPO-UR_s202703_m80",
+            "activity_job_id": "14433601",
+            "ptpx_job_id": "14433701",
+            "archive_job_id": "14433801",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-UR_s202703_m80/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-UR_s202703_m80/archive.log"
+          },
+          {
+            "benchmark": "TOPO-BC",
+            "seed": 202701,
+            "load": 40,
+            "case_name": "TOPO-BC_n64_s202701_m40_PROP_M16",
+            "source_case_name": "TOPO-BC_n64_s202701_m40_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/TOPO-BC_n64_s202701_m40_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results/PROP_M16/TOPO-BC_n64_s202701_m40_PROP_M16.csv",
+            "result_sha256": "d3e3c4b6ca50e0eab9b0df86ccd58df284b0c30edfc13ec5bc7ba35ac51a7bef",
+            "tag": "PROP_M16_TOPO-BC_s202701_m40",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_TOPO-BC_s202701_m40",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_TOPO-BC_s202701_m40",
+            "activity_job_id": "14433901",
+            "ptpx_job_id": "14434001",
+            "archive_job_id": "14434101",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-BC_s202701_m40/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-BC_s202701_m40/archive.log"
+          },
+          {
+            "benchmark": "TOPO-BC",
+            "seed": 202702,
+            "load": 40,
+            "case_name": "TOPO-BC_n64_s202702_m40_PROP_M16",
+            "source_case_name": "TOPO-BC_n64_s202702_m40_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/TOPO-BC_n64_s202702_m40_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results/PROP_M16/TOPO-BC_n64_s202702_m40_PROP_M16.csv",
+            "result_sha256": "097668b50aed8e415126cb8ba14cf640574813ff48f875df8187c0d308f99a9e",
+            "tag": "PROP_M16_TOPO-BC_s202702_m40",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_TOPO-BC_s202702_m40",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_TOPO-BC_s202702_m40",
+            "activity_job_id": "14434201",
+            "ptpx_job_id": "14434301",
+            "archive_job_id": "14434401",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-BC_s202702_m40/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-BC_s202702_m40/archive.log"
+          },
+          {
+            "benchmark": "TOPO-BC",
+            "seed": 202703,
+            "load": 40,
+            "case_name": "TOPO-BC_n64_s202703_m40_PROP_M16",
+            "source_case_name": "TOPO-BC_n64_s202703_m40_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/TOPO-BC_n64_s202703_m40_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results/PROP_M16/TOPO-BC_n64_s202703_m40_PROP_M16.csv",
+            "result_sha256": "d964c7c5953409ffe4cd6a335e12d8ca9dac1b5ae8434862c1a43f3b80b73407",
+            "tag": "PROP_M16_TOPO-BC_s202703_m40",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_TOPO-BC_s202703_m40",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_TOPO-BC_s202703_m40",
+            "activity_job_id": "14434501",
+            "ptpx_job_id": "14434601",
+            "archive_job_id": "14434701",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-BC_s202703_m40/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_TOPO-BC_s202703_m40/archive.log"
+          },
+          {
+            "benchmark": "HOTSPOT10",
+            "seed": 202701,
+            "load": 80,
+            "case_name": "HOTSPOT10_n64_s202701_m80_PROP_M16",
+            "source_case_name": "HOTSPOT10_n64_s202701_m80_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/HOTSPOT10_n64_s202701_m80_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results/PROP_M16/HOTSPOT10_n64_s202701_m80_PROP_M16.csv",
+            "result_sha256": "d98e86573277105936b96b415f93417ba588514081c6032827ddabf0da083131",
+            "tag": "PROP_M16_HOTSPOT10_s202701_m80",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_HOTSPOT10_s202701_m80",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_HOTSPOT10_s202701_m80",
+            "activity_job_id": "14434801",
+            "ptpx_job_id": "14434901",
+            "archive_job_id": "14435001",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_HOTSPOT10_s202701_m80/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_HOTSPOT10_s202701_m80/archive.log"
+          },
+          {
+            "benchmark": "HOTSPOT10",
+            "seed": 202702,
+            "load": 80,
+            "case_name": "HOTSPOT10_n64_s202702_m80_PROP_M16",
+            "source_case_name": "HOTSPOT10_n64_s202702_m80_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/HOTSPOT10_n64_s202702_m80_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results/PROP_M16/HOTSPOT10_n64_s202702_m80_PROP_M16.csv",
+            "result_sha256": "1679314642f45df0dc3da620743e5ca08b57f914401b5d6ae3af8c12c1be0e0d",
+            "tag": "PROP_M16_HOTSPOT10_s202702_m80",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_HOTSPOT10_s202702_m80",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_HOTSPOT10_s202702_m80",
+            "activity_job_id": "14435101",
+            "ptpx_job_id": "14435201",
+            "archive_job_id": "14435301",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_HOTSPOT10_s202702_m80/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_HOTSPOT10_s202702_m80/archive.log"
+          },
+          {
+            "benchmark": "HOTSPOT10",
+            "seed": 202703,
+            "load": 80,
+            "case_name": "HOTSPOT10_n64_s202703_m80_PROP_M16",
+            "source_case_name": "HOTSPOT10_n64_s202703_m80_PFAT64_top8",
+            "case_file": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/cases/HOTSPOT10_n64_s202703_m80_PFAT64_top8.case",
+            "result_path": "/prjtemp/ghy19/date2027_e2/20261015_100000_formal64_three_mode_three_seed_r4/results/PROP_M16/HOTSPOT10_n64_s202703_m80_PROP_M16.csv",
+            "result_sha256": "273970b05723199a35cca7692f086686c024f409bd1ad5b72f0ab114f0b126a7",
+            "tag": "PROP_M16_HOTSPOT10_s202703_m80",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_HOTSPOT10_s202703_m80",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_HOTSPOT10_s202703_m80",
+            "activity_job_id": "14435401",
+            "ptpx_job_id": "14435501",
+            "archive_job_id": "14435601",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_HOTSPOT10_s202703_m80/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_HOTSPOT10_s202703_m80/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST5-AABB",
+            "seed": 202701,
+            "load": 40,
+            "case_name": "MULTICAST5-AABB_n64_s202701_m40_PROP_M16",
+            "source_case_name": "MULTICAST5-AABB_n64_s202701_m40_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST5-AABB_n64_s202701_m40_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST5-AABB_n64_s202701_m40_PROP_M16.csv",
+            "result_sha256": "6a48aeacfee65736573dd212efcdd94b66aa399901d7ab1b819099b658998d7e",
+            "tag": "PROP_M16_MULTICAST5-AABB_s202701_m40",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST5-AABB_s202701_m40",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST5-AABB_s202701_m40",
+            "activity_job_id": "14435701",
+            "ptpx_job_id": "14435801",
+            "archive_job_id": "14435901",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST5-AABB_s202701_m40/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST5-AABB_s202701_m40/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST5-AABB",
+            "seed": 202702,
+            "load": 40,
+            "case_name": "MULTICAST5-AABB_n64_s202702_m40_PROP_M16",
+            "source_case_name": "MULTICAST5-AABB_n64_s202702_m40_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST5-AABB_n64_s202702_m40_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST5-AABB_n64_s202702_m40_PROP_M16.csv",
+            "result_sha256": "01a0d25265ad7a6f1a3a1bea7ad2706969220965f7464d2702f8a88abb8c641f",
+            "tag": "PROP_M16_MULTICAST5-AABB_s202702_m40",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST5-AABB_s202702_m40",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST5-AABB_s202702_m40",
+            "activity_job_id": "14436001",
+            "ptpx_job_id": "14436101",
+            "archive_job_id": "14436201",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST5-AABB_s202702_m40/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST5-AABB_s202702_m40/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST5-AABB",
+            "seed": 202703,
+            "load": 40,
+            "case_name": "MULTICAST5-AABB_n64_s202703_m40_PROP_M16",
+            "source_case_name": "MULTICAST5-AABB_n64_s202703_m40_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST5-AABB_n64_s202703_m40_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST5-AABB_n64_s202703_m40_PROP_M16.csv",
+            "result_sha256": "4b6e00a8522b17f938f481b3fd905db11954eb0c77d179dd662ba0cf815c6afd",
+            "tag": "PROP_M16_MULTICAST5-AABB_s202703_m40",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST5-AABB_s202703_m40",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST5-AABB_s202703_m40",
+            "activity_job_id": "14436301",
+            "ptpx_job_id": "14436401",
+            "archive_job_id": "14436501",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST5-AABB_s202703_m40/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST5-AABB_s202703_m40/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST10-AABB",
+            "seed": 202701,
+            "load": 20,
+            "case_name": "MULTICAST10-AABB_n64_s202701_m20_PROP_M16",
+            "source_case_name": "MULTICAST10-AABB_n64_s202701_m20_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST10-AABB_n64_s202701_m20_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST10-AABB_n64_s202701_m20_PROP_M16.csv",
+            "result_sha256": "d158e88765a24e204323617c4b48b8336688fd942b7305af8df08bfdfede411b",
+            "tag": "PROP_M16_MULTICAST10-AABB_s202701_m20",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST10-AABB_s202701_m20",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST10-AABB_s202701_m20",
+            "activity_job_id": "14436601",
+            "ptpx_job_id": "14436701",
+            "archive_job_id": "14436801",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST10-AABB_s202701_m20/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST10-AABB_s202701_m20/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST10-AABB",
+            "seed": 202702,
+            "load": 20,
+            "case_name": "MULTICAST10-AABB_n64_s202702_m20_PROP_M16",
+            "source_case_name": "MULTICAST10-AABB_n64_s202702_m20_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST10-AABB_n64_s202702_m20_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST10-AABB_n64_s202702_m20_PROP_M16.csv",
+            "result_sha256": "ae0055a3a6f3d2a7de62f5927c179cdb58983aa6c6b2913c09aa33843cac6ffd",
+            "tag": "PROP_M16_MULTICAST10-AABB_s202702_m20",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST10-AABB_s202702_m20",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST10-AABB_s202702_m20",
+            "activity_job_id": "14436901",
+            "ptpx_job_id": "14437001",
+            "archive_job_id": "14437201",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST10-AABB_s202702_m20/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST10-AABB_s202702_m20/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST10-AABB",
+            "seed": 202703,
+            "load": 20,
+            "case_name": "MULTICAST10-AABB_n64_s202703_m20_PROP_M16",
+            "source_case_name": "MULTICAST10-AABB_n64_s202703_m20_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST10-AABB_n64_s202703_m20_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST10-AABB_n64_s202703_m20_PROP_M16.csv",
+            "result_sha256": "183fe0e6bf4f407d41decfd33b1fd640abafefc1eec39a081cdf36ce384998ae",
+            "tag": "PROP_M16_MULTICAST10-AABB_s202703_m20",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST10-AABB_s202703_m20",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST10-AABB_s202703_m20",
+            "activity_job_id": "14437301",
+            "ptpx_job_id": "14437401",
+            "archive_job_id": "14437501",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST10-AABB_s202703_m20/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST10-AABB_s202703_m20/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST-STATIC-AABB",
+            "seed": 202701,
+            "load": 20,
+            "case_name": "MULTICAST-STATIC-AABB_n64_s202701_m20_PROP_M16",
+            "source_case_name": "MULTICAST-STATIC-AABB_n64_s202701_m20_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST-STATIC-AABB_n64_s202701_m20_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST-STATIC-AABB_n64_s202701_m20_PROP_M16.csv",
+            "result_sha256": "7bb633c13561abf06e97e17161be0dce10670c590a78e22a3c90493c47478076",
+            "tag": "PROP_M16_MULTICAST-STATIC-AABB_s202701_m20",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20",
+            "activity_job_id": "14437601",
+            "ptpx_job_id": "14437701",
+            "archive_job_id": "14437801",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST-STATIC-AABB",
+            "seed": 202702,
+            "load": 20,
+            "case_name": "MULTICAST-STATIC-AABB_n64_s202702_m20_PROP_M16",
+            "source_case_name": "MULTICAST-STATIC-AABB_n64_s202702_m20_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST-STATIC-AABB_n64_s202702_m20_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST-STATIC-AABB_n64_s202702_m20_PROP_M16.csv",
+            "result_sha256": "126ed75acca1daa18f15685d128cfbc8a42fbf12873e604bde71b810ca704142",
+            "tag": "PROP_M16_MULTICAST-STATIC-AABB_s202702_m20",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20",
+            "activity_job_id": "14437901",
+            "ptpx_job_id": "14438001",
+            "archive_job_id": "14438101",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20/archive.log"
+          },
+          {
+            "benchmark": "MULTICAST-STATIC-AABB",
+            "seed": 202703,
+            "load": 20,
+            "case_name": "MULTICAST-STATIC-AABB_n64_s202703_m20_PROP_M16",
+            "source_case_name": "MULTICAST-STATIC-AABB_n64_s202703_m20_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/MULTICAST-STATIC-AABB_n64_s202703_m20_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/MULTICAST-STATIC-AABB_n64_s202703_m20_PROP_M16.csv",
+            "result_sha256": "52501687848a42b5fe15f9e95b6aa3a033b33bc492d7615195bac7c69bf4c18c",
+            "tag": "PROP_M16_MULTICAST-STATIC-AABB_s202703_m20",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20",
+            "activity_job_id": "14438201",
+            "ptpx_job_id": "14438301",
+            "archive_job_id": "14438401",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20/archive.log"
+          },
+          {
+            "benchmark": "ALL-MULTICAST-AABB",
+            "seed": 202701,
+            "load": 10,
+            "case_name": "ALL-MULTICAST-AABB_n64_s202701_m10_PROP_M16",
+            "source_case_name": "ALL-MULTICAST-AABB_n64_s202701_m10_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-MULTICAST-AABB_n64_s202701_m10_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/ALL-MULTICAST-AABB_n64_s202701_m10_PROP_M16.csv",
+            "result_sha256": "a6bbca5c56319e56bd71372b0f507adcc7571328ca23fe3f482a7790bf95dc0f",
+            "tag": "PROP_M16_ALL-MULTICAST-AABB_s202701_m10",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_ALL-MULTICAST-AABB_s202701_m10",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_ALL-MULTICAST-AABB_s202701_m10",
+            "activity_job_id": "14438501",
+            "ptpx_job_id": "14438601",
+            "archive_job_id": "14438701",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-MULTICAST-AABB_s202701_m10/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-MULTICAST-AABB_s202701_m10/archive.log"
+          },
+          {
+            "benchmark": "ALL-MULTICAST-AABB",
+            "seed": 202702,
+            "load": 10,
+            "case_name": "ALL-MULTICAST-AABB_n64_s202702_m10_PROP_M16",
+            "source_case_name": "ALL-MULTICAST-AABB_n64_s202702_m10_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-MULTICAST-AABB_n64_s202702_m10_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/ALL-MULTICAST-AABB_n64_s202702_m10_PROP_M16.csv",
+            "result_sha256": "a1108dc53e1b3e8d7b8458d2a927ede4731c48b6c154b787b7f3347661ab27e8",
+            "tag": "PROP_M16_ALL-MULTICAST-AABB_s202702_m10",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_ALL-MULTICAST-AABB_s202702_m10",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_ALL-MULTICAST-AABB_s202702_m10",
+            "activity_job_id": "14438801",
+            "ptpx_job_id": "14438901",
+            "archive_job_id": "14439001",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-MULTICAST-AABB_s202702_m10/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-MULTICAST-AABB_s202702_m10/archive.log"
+          },
+          {
+            "benchmark": "ALL-MULTICAST-AABB",
+            "seed": 202703,
+            "load": 10,
+            "case_name": "ALL-MULTICAST-AABB_n64_s202703_m10_PROP_M16",
+            "source_case_name": "ALL-MULTICAST-AABB_n64_s202703_m10_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-MULTICAST-AABB_n64_s202703_m10_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/ALL-MULTICAST-AABB_n64_s202703_m10_PROP_M16.csv",
+            "result_sha256": "53d0c3a6c294acbe69f042e8dcd3bd30915d00ab59ae8774efac890a24acfca7",
+            "tag": "PROP_M16_ALL-MULTICAST-AABB_s202703_m10",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_ALL-MULTICAST-AABB_s202703_m10",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_ALL-MULTICAST-AABB_s202703_m10",
+            "activity_job_id": "14439101",
+            "ptpx_job_id": "14439201",
+            "archive_job_id": "14439301",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-MULTICAST-AABB_s202703_m10/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-MULTICAST-AABB_s202703_m10/archive.log"
+          },
+          {
+            "benchmark": "ALL-BROADCAST",
+            "seed": 202701,
+            "load": 5,
+            "case_name": "ALL-BROADCAST_n64_s202701_m5_PROP_M16",
+            "source_case_name": "ALL-BROADCAST_n64_s202701_m5_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-BROADCAST_n64_s202701_m5_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/ALL-BROADCAST_n64_s202701_m5_PROP_M16.csv",
+            "result_sha256": "d1d9c76829315595bbd529968893df8076c5971b6d51eddc91db0ce435770701",
+            "tag": "PROP_M16_ALL-BROADCAST_s202701_m5",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_ALL-BROADCAST_s202701_m5",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_ALL-BROADCAST_s202701_m5",
+            "activity_job_id": "14439401",
+            "ptpx_job_id": "14439501",
+            "archive_job_id": "14439601",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-BROADCAST_s202701_m5/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-BROADCAST_s202701_m5/archive.log"
+          },
+          {
+            "benchmark": "ALL-BROADCAST",
+            "seed": 202702,
+            "load": 5,
+            "case_name": "ALL-BROADCAST_n64_s202702_m5_PROP_M16",
+            "source_case_name": "ALL-BROADCAST_n64_s202702_m5_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-BROADCAST_n64_s202702_m5_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/ALL-BROADCAST_n64_s202702_m5_PROP_M16.csv",
+            "result_sha256": "d9993489e40ed921be158e08e6581b1395a41477f188ca79b05026b3b85b07a5",
+            "tag": "PROP_M16_ALL-BROADCAST_s202702_m5",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_ALL-BROADCAST_s202702_m5",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_ALL-BROADCAST_s202702_m5",
+            "activity_job_id": "14439701",
+            "ptpx_job_id": "14439801",
+            "archive_job_id": "14439901",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-BROADCAST_s202702_m5/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-BROADCAST_s202702_m5/archive.log"
+          },
+          {
+            "benchmark": "ALL-BROADCAST",
+            "seed": 202703,
+            "load": 5,
+            "case_name": "ALL-BROADCAST_n64_s202703_m5_PROP_M16",
+            "source_case_name": "ALL-BROADCAST_n64_s202703_m5_PROP_temp64_m16_top64",
+            "case_file": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/cases/ALL-BROADCAST_n64_s202703_m5_PROP_temp64_m16_top64.case",
+            "result_path": "/prjtemp/ghy19/date2027_formal64/20261015_193500_formal64_multicast_inputs_r1/results/PROP_M16/ALL-BROADCAST_n64_s202703_m5_PROP_M16.csv",
+            "result_sha256": "37564d20feaf205974a3fd37ccbd6f31fad64872386c78920b4d977d495d66bb",
+            "tag": "PROP_M16_ALL-BROADCAST_s202703_m5",
+            "activity_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/activity/PROP_M16_ALL-BROADCAST_s202703_m5",
+            "report_dir": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/reports/PROP_M16_ALL-BROADCAST_s202703_m5",
+            "activity_job_id": "14440001",
+            "ptpx_job_id": "14440101",
+            "archive_job_id": "14440201",
+            "ptpx_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-BROADCAST_s202703_m5/ptpx.log",
+            "archive_log": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/logs/PROP_M16_ALL-BROADCAST_s202703_m5/archive.log"
+          }
+        ],
+        "scheduler": {
+          "mode": "bounded_parallel_pipeline",
+          "width": 8,
+          "per_lane_order": "activity -> ptpx -> archive",
+          "updated_reason": "replace overly conservative global serial chain"
+        },
+        "recovery_retry1": "/home/ghy19/Asynchronous_Router_CMR/formal64_power_m16/20261018_m16_8bench_3seed_r2/recovery_retry1.json"
+      }
+    },
+    {
+      "path": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/manifest.json",
+      "content": {
+        "schema": "formal64-mesh-ptpx-batch-v1",
+        "activity_manifest": "/prjtemp/ghy19/date2027_formal64/power_r4/manifest.json",
+        "runner_sha256": "57db546dd2699dd54f1fa08ec69819bf34e8094c7760ac64126376ef8ead4d15",
+        "tcl_sha256": "21820cd4bdf06667f07bdde51ef8a5e228dbb7efe3b6da7b803ec8203eab64ac",
+        "pilot_job_id": "14307201",
+        "jobs": [
+          {
+            "tag": "FM64_TOPO-UR_s202701_m80",
+            "activity_job_id": "14307501",
+            "ptpx_job_id": "14309601",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_TOPO-UR_s202701_m80",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_TOPO-UR_s202701_m80"
+          },
+          {
+            "tag": "FM64_TOPO-UR_s202702_m80",
+            "activity_job_id": "14307601",
+            "ptpx_job_id": "14309701",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_TOPO-UR_s202702_m80",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_TOPO-UR_s202702_m80"
+          },
+          {
+            "tag": "FM64_TOPO-UR_s202703_m80",
+            "activity_job_id": "14307701",
+            "ptpx_job_id": "14309801",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_TOPO-UR_s202703_m80",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_TOPO-UR_s202703_m80"
+          },
+          {
+            "tag": "FM64_TOPO-BC_s202702_m40",
+            "activity_job_id": "14307801",
+            "ptpx_job_id": "14309901",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_TOPO-BC_s202702_m40",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_TOPO-BC_s202702_m40"
+          },
+          {
+            "tag": "FM64_TOPO-BC_s202703_m40",
+            "activity_job_id": "14307901",
+            "ptpx_job_id": "14310001",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_TOPO-BC_s202703_m40",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_TOPO-BC_s202703_m40"
+          },
+          {
+            "tag": "FM64_HOTSPOT10_s202701_m80",
+            "activity_job_id": "14308001",
+            "ptpx_job_id": "14310101",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_HOTSPOT10_s202701_m80",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_HOTSPOT10_s202701_m80"
+          },
+          {
+            "tag": "FM64_HOTSPOT10_s202702_m80",
+            "activity_job_id": "14308101",
+            "ptpx_job_id": "14310201",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_HOTSPOT10_s202702_m80",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_HOTSPOT10_s202702_m80"
+          },
+          {
+            "tag": "FM64_HOTSPOT10_s202703_m80",
+            "activity_job_id": "14308201",
+            "ptpx_job_id": "14310301",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_HOTSPOT10_s202703_m80",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_HOTSPOT10_s202703_m80"
+          },
+          {
+            "tag": "FM64_MULTICAST5-AABB_s202701_m40",
+            "activity_job_id": "14308301",
+            "ptpx_job_id": "14310401",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST5-AABB_s202701_m40",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST5-AABB_s202701_m40"
+          },
+          {
+            "tag": "FM64_MULTICAST5-AABB_s202702_m40",
+            "activity_job_id": "14308401",
+            "ptpx_job_id": "14310501",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST5-AABB_s202702_m40",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST5-AABB_s202702_m40"
+          },
+          {
+            "tag": "FM64_MULTICAST5-AABB_s202703_m40",
+            "activity_job_id": "14308501",
+            "ptpx_job_id": "14310601",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST5-AABB_s202703_m40",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST5-AABB_s202703_m40"
+          },
+          {
+            "tag": "FM64_MULTICAST10-AABB_s202701_m20",
+            "activity_job_id": "14308601",
+            "ptpx_job_id": "14310701",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST10-AABB_s202701_m20",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST10-AABB_s202701_m20"
+          },
+          {
+            "tag": "FM64_MULTICAST10-AABB_s202702_m20",
+            "activity_job_id": "14308701",
+            "ptpx_job_id": "14310801",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST10-AABB_s202702_m20",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST10-AABB_s202702_m20"
+          },
+          {
+            "tag": "FM64_MULTICAST10-AABB_s202703_m20",
+            "activity_job_id": "14308801",
+            "ptpx_job_id": "14310901",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST10-AABB_s202703_m20",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST10-AABB_s202703_m20"
+          },
+          {
+            "tag": "FM64_MULTICAST-STATIC-AABB_s202701_m20",
+            "activity_job_id": "14308901",
+            "ptpx_job_id": "14311001",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST-STATIC-AABB_s202701_m20",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST-STATIC-AABB_s202701_m20"
+          },
+          {
+            "tag": "FM64_MULTICAST-STATIC-AABB_s202702_m20",
+            "activity_job_id": "14309001",
+            "ptpx_job_id": "14311101",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST-STATIC-AABB_s202702_m20",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST-STATIC-AABB_s202702_m20"
+          },
+          {
+            "tag": "FM64_MULTICAST-STATIC-AABB_s202703_m20",
+            "activity_job_id": "14309101",
+            "ptpx_job_id": "14311201",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_MULTICAST-STATIC-AABB_s202703_m20",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_MULTICAST-STATIC-AABB_s202703_m20"
+          },
+          {
+            "tag": "FM64_ALL-MULTICAST-AABB_s202701_m10",
+            "activity_job_id": "14309201",
+            "ptpx_job_id": "14311301",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_ALL-MULTICAST-AABB_s202701_m10",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_ALL-MULTICAST-AABB_s202701_m10"
+          },
+          {
+            "tag": "FM64_ALL-MULTICAST-AABB_s202702_m10",
+            "activity_job_id": "14309301",
+            "ptpx_job_id": "14311401",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_ALL-MULTICAST-AABB_s202702_m10",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_ALL-MULTICAST-AABB_s202702_m10"
+          },
+          {
+            "tag": "FM64_ALL-MULTICAST-AABB_s202703_m10",
+            "activity_job_id": "14309401",
+            "ptpx_job_id": "14311501",
+            "report_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/reports/FM64_ALL-MULTICAST-AABB_s202703_m10",
+            "log_dir": "/prjtemp/ghy19/date2027_formal64/power_ptpx_r1/logs/FM64_ALL-MULTICAST-AABB_s202703_m10"
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "Historical Mesh power is pre-X-first routing; not silently treated as current.",
+    "SDF negative recovery/removal warning remains a limitation."
+  ]
+}

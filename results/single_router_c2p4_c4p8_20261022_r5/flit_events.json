@@ -1,0 +1,272 @@
+[
+  {
+    "config": "async_c2p4",
+    "seed": 1,
+    "flit": 0,
+    "input_ns": 210.05,
+    "output_req_ns": 211.48000000000002,
+    "latency_ns": 1.43,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 1,
+    "flit": 1,
+    "input_ns": 210.326,
+    "output_req_ns": 212.503,
+    "latency_ns": 2.177,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 1,
+    "flit": 2,
+    "input_ns": 210.658,
+    "output_req_ns": 213.551,
+    "latency_ns": 2.8930000000000002,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 1,
+    "flit": 3,
+    "input_ns": 211.002,
+    "output_req_ns": 214.577,
+    "latency_ns": 3.575,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 1,
+    "flit": 4,
+    "input_ns": 211.337,
+    "output_req_ns": 215.62199999999999,
+    "latency_ns": 4.285,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 2,
+    "flit": 0,
+    "input_ns": 210.05,
+    "output_req_ns": 211.48000000000002,
+    "latency_ns": 1.43,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 2,
+    "flit": 1,
+    "input_ns": 210.326,
+    "output_req_ns": 212.503,
+    "latency_ns": 2.177,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 2,
+    "flit": 2,
+    "input_ns": 210.658,
+    "output_req_ns": 213.551,
+    "latency_ns": 2.8930000000000002,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 2,
+    "flit": 3,
+    "input_ns": 211.002,
+    "output_req_ns": 214.577,
+    "latency_ns": 3.575,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 2,
+    "flit": 4,
+    "input_ns": 211.337,
+    "output_req_ns": 215.62199999999999,
+    "latency_ns": 4.285,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 3,
+    "flit": 0,
+    "input_ns": 210.05,
+    "output_req_ns": 211.48000000000002,
+    "latency_ns": 1.43,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 3,
+    "flit": 1,
+    "input_ns": 210.326,
+    "output_req_ns": 212.503,
+    "latency_ns": 2.177,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 3,
+    "flit": 2,
+    "input_ns": 210.658,
+    "output_req_ns": 213.551,
+    "latency_ns": 2.8930000000000002,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 3,
+    "flit": 3,
+    "input_ns": 211.002,
+    "output_req_ns": 214.577,
+    "latency_ns": 3.575,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c2p4",
+    "seed": 3,
+    "flit": 4,
+    "input_ns": 211.337,
+    "output_req_ns": 215.62199999999999,
+    "latency_ns": 4.285,
+    "parent_lane": 3
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 1,
+    "flit": 0,
+    "input_ns": 210.05,
+    "output_req_ns": 211.888,
+    "latency_ns": 1.8379999999999999,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 1,
+    "flit": 1,
+    "input_ns": 210.326,
+    "output_req_ns": 213.016,
+    "latency_ns": 2.69,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 1,
+    "flit": 2,
+    "input_ns": 210.658,
+    "output_req_ns": 214.18599999999998,
+    "latency_ns": 3.528,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 1,
+    "flit": 3,
+    "input_ns": 211.002,
+    "output_req_ns": 215.317,
+    "latency_ns": 4.315,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 1,
+    "flit": 4,
+    "input_ns": 211.337,
+    "output_req_ns": 216.48399999999998,
+    "latency_ns": 5.147,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 2,
+    "flit": 0,
+    "input_ns": 210.05,
+    "output_req_ns": 211.888,
+    "latency_ns": 1.8379999999999999,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 2,
+    "flit": 1,
+    "input_ns": 210.326,
+    "output_req_ns": 213.016,
+    "latency_ns": 2.69,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 2,
+    "flit": 2,
+    "input_ns": 210.658,
+    "output_req_ns": 214.18599999999998,
+    "latency_ns": 3.528,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 2,
+    "flit": 3,
+    "input_ns": 211.002,
+    "output_req_ns": 215.317,
+    "latency_ns": 4.315,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 2,
+    "flit": 4,
+    "input_ns": 211.337,
+    "output_req_ns": 216.48399999999998,
+    "latency_ns": 5.147,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 3,
+    "flit": 0,
+    "input_ns": 210.05,
+    "output_req_ns": 211.888,
+    "latency_ns": 1.8379999999999999,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 3,
+    "flit": 1,
+    "input_ns": 210.326,
+    "output_req_ns": 213.016,
+    "latency_ns": 2.69,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 3,
+    "flit": 2,
+    "input_ns": 210.658,
+    "output_req_ns": 214.18599999999998,
+    "latency_ns": 3.528,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 3,
+    "flit": 3,
+    "input_ns": 211.002,
+    "output_req_ns": 215.317,
+    "latency_ns": 4.315,
+    "parent_lane": 7
+  },
+  {
+    "config": "async_c4p8",
+    "seed": 3,
+    "flit": 4,
+    "input_ns": 211.337,
+    "output_req_ns": 216.48399999999998,
+    "latency_ns": 5.147,
+    "parent_lane": 7
+  }
+]

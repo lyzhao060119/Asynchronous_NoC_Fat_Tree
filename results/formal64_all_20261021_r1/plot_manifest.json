@@ -1,0 +1,15 @@
+{
+  "scan_rows": 2815,
+  "power_rows": 80,
+  "three_seed_scan_points": 900,
+  "power_three_seed_groups": 22,
+  "sync_plotted": false,
+  "warnings": [
+    "Mesh power uses historical pre-X-first netlist.",
+    "PT-063 Library Compiler executable path error appears in inspected PT logs; not power signoff.",
+    "Out-of-range library-table ramps/loads retained in power CSV.",
+    "SDF negative recovery/removal compatibility warnings; not full timing signoff.",
+    "Missing/failed seeds are never averaged as zero.",
+    "Total window energy/event uses offered cohort, not necessarily completed cohort."
+  ]
+}

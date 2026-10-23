@@ -1,0 +1,202 @@
+{
+  "source": "D:\\NoC\\asynchronous_fat_tree_multicast\\results\\formal64_sync_async_power_20261022_r1\\plot_manifest.json",
+  "source_sha256": "c584538ddab7fd3d3728a980b2b63913fe54653219c02452331335b7f60b31af",
+  "means": [
+    {
+      "design": "PROP_M16",
+      "benchmark": "TOPO-UR",
+      "load": 80,
+      "n_seeds": 3,
+      "power_mw_mean": 27.366666666666667,
+      "power_mw_sample_sd": 1.001665280087783,
+      "provisional": true
+    },
+    {
+      "design": "PROP_M16",
+      "benchmark": "TOPO-BC",
+      "load": 40,
+      "n_seeds": 3,
+      "power_mw_mean": 15.833333333333334,
+      "power_mw_sample_sd": 0.802080627701065,
+      "provisional": true
+    },
+    {
+      "design": "PROP_M16",
+      "benchmark": "HOTSPOT10",
+      "load": 80,
+      "n_seeds": 3,
+      "power_mw_mean": 27.066666666666666,
+      "power_mw_sample_sd": 0.7571877794400346,
+      "provisional": true
+    },
+    {
+      "design": "PROP_M16",
+      "benchmark": "MULTICAST5-AABB",
+      "load": 40,
+      "n_seeds": 3,
+      "power_mw_mean": 15.566666666666666,
+      "power_mw_sample_sd": 0.37859388972001856,
+      "provisional": true
+    },
+    {
+      "design": "PROP_M16",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 20,
+      "n_seeds": 3,
+      "power_mw_mean": 9.522,
+      "power_mw_sample_sd": 0.23008911317139777,
+      "provisional": true
+    },
+    {
+      "design": "PROP_M16",
+      "benchmark": "MULTICAST-STATIC-AABB",
+      "load": 20,
+      "n_seeds": 3,
+      "power_mw_mean": 10.4,
+      "power_mw_sample_sd": 0.0,
+      "provisional": true
+    },
+    {
+      "design": "FM64",
+      "benchmark": "TOPO-UR",
+      "load": 80,
+      "n_seeds": 3,
+      "power_mw_mean": 35.0,
+      "power_mw_sample_sd": 1.5524174696260031,
+      "provisional": true
+    },
+    {
+      "design": "FM64",
+      "benchmark": "TOPO-BC",
+      "load": 40,
+      "n_seeds": 3,
+      "power_mw_mean": 24.299999999999997,
+      "power_mw_sample_sd": 1.4000000000000004,
+      "provisional": true
+    },
+    {
+      "design": "FM64",
+      "benchmark": "HOTSPOT10",
+      "load": 80,
+      "n_seeds": 3,
+      "power_mw_mean": 34.63333333333333,
+      "power_mw_sample_sd": 1.159022576714245,
+      "provisional": true
+    },
+    {
+      "design": "FM64",
+      "benchmark": "MULTICAST5-AABB",
+      "load": 40,
+      "n_seeds": 3,
+      "power_mw_mean": 19.3,
+      "power_mw_sample_sd": 0.4358898943540683,
+      "provisional": true
+    },
+    {
+      "design": "FM64",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 20,
+      "n_seeds": 3,
+      "power_mw_mean": 11.333333333333334,
+      "power_mw_sample_sd": 0.3055050463303892,
+      "provisional": true
+    },
+    {
+      "design": "FM64",
+      "benchmark": "MULTICAST-STATIC-AABB",
+      "load": 20,
+      "n_seeds": 3,
+      "power_mw_mean": 12.5,
+      "power_mw_sample_sd": 0.0,
+      "provisional": true
+    },
+    {
+      "design": "SYNC_M16",
+      "benchmark": "TOPO-UR",
+      "load": 80,
+      "n_seeds": 3,
+      "power_mw_mean": 281.23333333333335,
+      "power_mw_sample_sd": 0.3511884584284478,
+      "provisional": true
+    },
+    {
+      "design": "SYNC_M16",
+      "benchmark": "TOPO-BC",
+      "load": 40,
+      "n_seeds": 3,
+      "power_mw_mean": 276.93333333333334,
+      "power_mw_sample_sd": 0.30550504633037195,
+      "provisional": true
+    },
+    {
+      "design": "SYNC_M16",
+      "benchmark": "HOTSPOT10",
+      "load": 80,
+      "n_seeds": 3,
+      "power_mw_mean": 281.1,
+      "power_mw_sample_sd": 0.26457513110645475,
+      "provisional": true
+    },
+    {
+      "design": "SYNC_M16",
+      "benchmark": "MULTICAST5-AABB",
+      "load": 40,
+      "n_seeds": 3,
+      "power_mw_mean": 276.76666666666665,
+      "power_mw_sample_sd": 0.11547005383791858,
+      "provisional": true
+    },
+    {
+      "design": "SYNC_M16",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 20,
+      "n_seeds": 3,
+      "power_mw_mean": 274.56666666666666,
+      "power_mw_sample_sd": 0.0577350269189757,
+      "provisional": true
+    },
+    {
+      "design": "SYNC_M16",
+      "benchmark": "MULTICAST-STATIC-AABB",
+      "load": 20,
+      "n_seeds": 3,
+      "power_mw_mean": 274.8,
+      "power_mw_sample_sd": 0.0,
+      "provisional": true
+    }
+  ],
+  "series": [
+    [
+      "PROP_M16",
+      "M16 (Async)",
+      "#2463A0",
+      ""
+    ],
+    [
+      "FM64",
+      "Mesh (Async, legacy)",
+      "#D77732",
+      ""
+    ],
+    [
+      "SYNC_M16",
+      "M16 (Sync)",
+      "#2463A0",
+      "///"
+    ]
+  ],
+  "ylim_lower_mw": [
+    0,
+    45
+  ],
+  "ylim_upper_mw": [
+    260,
+    290
+  ],
+  "y_scale_within_each_panel": "linear",
+  "linear_plot_preserved": true,
+  "outputs_sha256": {
+    "png": "3491e01ccc274e6e59d826e17c35482e1c3c88a0d96fa8802d16f19d24d1201c",
+    "pdf": "b5fe069399e159276eec26b16a8e047dd811230078488930c7a2f1a8af442442"
+  }
+}

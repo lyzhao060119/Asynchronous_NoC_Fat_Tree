@@ -1,0 +1,9 @@
+{
+  "status": "COMPLETE",
+  "dc_pass": true,
+  "gls_pass": true,
+  "dc_run_id": "20261023_router_latency_r1b_async_c1p2",
+  "dc_job_id": "15010801",
+  "gls_job_id": "15011301",
+  "mean_flit_latency_ns": 0.7725999999999942
+}

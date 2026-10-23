@@ -1,0 +1,1354 @@
+{
+  "scan_results_all_seeds.csv": {
+    "bytes": 3359835,
+    "sha256": "a693022902de20d16d238f3a5ad526308a4979d0bb8a303e29eee35706c550f0"
+  },
+  "power_results_all_seeds.csv": {
+    "bytes": 102308,
+    "sha256": "e10750ec8ca0dcbee97f40aa058a2d9147caf947dc881073a9f52a00793883f7"
+  },
+  "export_gaps.csv": {
+    "bytes": 227,
+    "sha256": "1aeec0566c63250c1735243d5252f893de304148e53b23bb63a531f683fcb669"
+  },
+  "source_manifest.json": {
+    "bytes": 64899,
+    "sha256": "107476de0ad5757a6b130440596950fe912ffc999a679706c4195854cd26381e"
+  },
+  "superseded_scan_records.csv": {
+    "bytes": 366573,
+    "sha256": "448b26a992ff884d8b9035ddbe12c61cae7445580c056b7dd463046d5e3dbde4"
+  },
+  "native_repeated/manifest.json": {
+    "bytes": 36135,
+    "sha256": "5d9ab21f504d6a30baa8b858a38ef150d27e5a4e53bf2395fdb953d38d689be8"
+  },
+  "native_repeated/PROP_M16_MULTICAST10-AABB_s202701_m20_NATIVE.csv": {
+    "bytes": 976,
+    "sha256": "e3f6407c9fa1d6303ddf0062e099572cc1d2a84f32433a45242d4068f6fd54d6"
+  },
+  "native_repeated/PROP_M16_MULTICAST10-AABB_s202701_m20_REPEATED.csv": {
+    "bytes": 1000,
+    "sha256": "97365b9dec384f11db24e001f17a457910b31b3b2287c1bcdb822e0f7f6a4670"
+  },
+  "native_repeated/PROP_M16_MULTICAST10-AABB_s202702_m20_NATIVE.csv": {
+    "bytes": 976,
+    "sha256": "9edab4d115cc1763f1bcd001b18d95f4da19adc9cd0e7a4577d27f75d8cb0682"
+  },
+  "native_repeated/PROP_M16_MULTICAST10-AABB_s202702_m20_REPEATED.csv": {
+    "bytes": 1003,
+    "sha256": "d65cfc27ffe1701ee9720c6d4f6472e1eab002692f5252a6b99d0918e5ea26d8"
+  },
+  "native_repeated/PROP_M16_MULTICAST10-AABB_s202703_m20_NATIVE.csv": {
+    "bytes": 976,
+    "sha256": "539dedcdc2539fbc2c5606b669475c0e70a01c413b83af9e0bd00fec430a193e"
+  },
+  "native_repeated/PROP_M16_MULTICAST10-AABB_s202703_m20_REPEATED.csv": {
+    "bytes": 1000,
+    "sha256": "2bab3aa4c2303b7ac268285066bc87e4e080c1681780920d56fd3a106b0b40c0"
+  },
+  "native_repeated/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_NATIVE.csv": {
+    "bytes": 982,
+    "sha256": "3eff350580c11bfe25a78099c541c3f6895fe6a32edef40a66617f0b9c3eb6cf"
+  },
+  "native_repeated/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_REPEATED.csv": {
+    "bytes": 1012,
+    "sha256": "8d813fca4b7f58fb34275832c60bbff816d33266cffef5b1a38bf3fb227fad03"
+  },
+  "native_repeated/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_NATIVE.csv": {
+    "bytes": 982,
+    "sha256": "8c92c248d5a7af49412fa014dcc7fa7ae2b9f80a6d0377003b5afe42c415c500"
+  },
+  "native_repeated/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_REPEATED.csv": {
+    "bytes": 1011,
+    "sha256": "1135f95ca891f51bde34cb9860f56cea4ae627195bcd6baf73ddba5cb594c3ec"
+  },
+  "native_repeated/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_NATIVE.csv": {
+    "bytes": 982,
+    "sha256": "6c787b1577a267fb3f3c9f7fa061e30eb1d6cc9eb652e7fab8fbcc8bcc177783"
+  },
+  "native_repeated/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_REPEATED.csv": {
+    "bytes": 1012,
+    "sha256": "070700499bcdd01028e3d1b1da6f0da3b7ea4212b559396ea8a522365002fab1"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202701_m80/power.rpt": {
+    "bytes": 1419,
+    "sha256": "09920371cfbfbf86b79056f48c05527fb154f81aa44e85c9cbe0ec24c4ed4e17"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202701_m80/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "44129efac67a6b9ca69f4e0058c0a89c6455a446a0df8effd58679014f748b3c"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202701_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202701_m80/input_hashes.sha256": {
+    "bytes": 707,
+    "sha256": "6276ad29e254e8cc66f2d5dc265059ee22511b0bc1d79b6a3cf9f4cf59b14ba6"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202702_m80/power.rpt": {
+    "bytes": 1419,
+    "sha256": "c28a40a76b55eabfa4b581e1a24f2f8f75532606d168f8485a823a750bbb73dd"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202702_m80/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "bef4ca3c15af0c742cf086800fff0eea0570ce8a3566eba19786ed00e437c690"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202702_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202702_m80/input_hashes.sha256": {
+    "bytes": 707,
+    "sha256": "2c53ae1134d32a2438b81f854479e8187f534be78ecd97e6e2a828b76e51be1d"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202703_m80/power.rpt": {
+    "bytes": 1419,
+    "sha256": "15eb7824a483c97111255211d3aa4afc90a54739bc731621d93085d77c3d73fe"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202703_m80/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "23029294daadc7ad77b817d9a7f17811edb6b261aae1fca8c3300461e3be162e"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202703_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/TOPO-UR_s202703_m80/input_hashes.sha256": {
+    "bytes": 707,
+    "sha256": "388c19374425e1d60556da8107c73dcf180e9b91893e962980d379fb83d34cff"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202701_m40/power.rpt": {
+    "bytes": 1419,
+    "sha256": "18339ad5287e6fde34d5cd6951577bb3343e45f6689c13906a100ec7866adbea"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202701_m40/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "e0a2fe2cebcd9b564f93347192e96a6c925bf6dc91c0720424f97657d869c3c6"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202701_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202701_m40/input_hashes.sha256": {
+    "bytes": 707,
+    "sha256": "95796a9c0f1d4d45c0e882e210165854f7ef3c6f2e0d58f523e0b464be941296"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202702_m40/power.rpt": {
+    "bytes": 1419,
+    "sha256": "dd647468e1c9756f5aba55d84129a1c6d1a2c0cf5e8f78b0e2c5354544219f2d"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202702_m40/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "8f8f3a47eda1b01bc2bae82a9f5ac7cf7192e6fce163be8638cc0b070323a499"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202702_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202702_m40/input_hashes.sha256": {
+    "bytes": 707,
+    "sha256": "55822fc600b9c6223416571d73e1867270e6017ca74af0411c8df2825d0188a4"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202703_m40/power.rpt": {
+    "bytes": 1419,
+    "sha256": "b1dff1849d4cff7aa9417011045d3d91e4ca17235ad11298c21761687738a0d5"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202703_m40/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "03fb9eb444c21673e10bf858199aaff5868643ab152b1f907024d012cdf30d27"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202703_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/TOPO-BC_s202703_m40/input_hashes.sha256": {
+    "bytes": 707,
+    "sha256": "183adefc99d5e677d6bb1b77ecdcd5383c51fc80ab9036aa704bd76b37ae0389"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202701_m80/power.rpt": {
+    "bytes": 1419,
+    "sha256": "180448a053851bac092cb49b3e11e5bbda73c666e45c7785cabb20c812749168"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202701_m80/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "330d0cbb445bb3d7b81a05e1c702cd169822fde8680390507cca8c571593068d"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202701_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202701_m80/input_hashes.sha256": {
+    "bytes": 709,
+    "sha256": "702f201a388a8a79085baafea24771ef52a85cfa7bb834fed79f9e45470ee85a"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202702_m80/power.rpt": {
+    "bytes": 1419,
+    "sha256": "3bf6cace26a91dfaa7bdea5807b3e5be2aac271ac3acc837e015773491685fea"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202702_m80/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "2cf0e86ed38e39c7a912e8a90bb21ca7699ba02507a58e526deecfdaadd4a875"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202702_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202702_m80/input_hashes.sha256": {
+    "bytes": 709,
+    "sha256": "9d3b11d7102e9f37d3fc4cc41b2bc224e16fffa2b443183096d31e6de9ee1da0"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202703_m80/power.rpt": {
+    "bytes": 1419,
+    "sha256": "380ff853b4fa49cda094f8db2d6bb5b140bbff7d0f1ca2b40060ab6c033f4895"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202703_m80/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "d0e82444413f87a132997c3d9e0442c523b739a4f565afae0df3d79096cc8bc0"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202703_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/HOTSPOT10_s202703_m80/input_hashes.sha256": {
+    "bytes": 709,
+    "sha256": "996414ba2b7eff9f3f2dd429491abce1fda2242472efe93e7899474c31d6b899"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202701_m40/power.rpt": {
+    "bytes": 1419,
+    "sha256": "b6d9480feba1a0a5b27dc2806931316fcced26632bdf5e98752d966fb8b85525"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202701_m40/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "54ac622ec812e107bab5bb4f1b7a6edf8e409e072e537474ddad5a7ee1876aa1"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202701_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202701_m40/input_hashes.sha256": {
+    "bytes": 715,
+    "sha256": "567e2a004f859f80083d981b844e653366298d1ea066a6692380ec4adc09bcfd"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202702_m40/power.rpt": {
+    "bytes": 1419,
+    "sha256": "a48c8476eb54336e85632655e89143a948533dcbb4682a6076becc23591b6174"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202702_m40/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "e3ad1f0e45f872f6a8fc86c9da99ef7c32af50d6213b61a9ae1647f09f65e4ab"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202702_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202702_m40/input_hashes.sha256": {
+    "bytes": 715,
+    "sha256": "c5fb01fb1709986f888c2f1a6993dbd994497d36044a995b13b1fdc8ef863326"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202703_m40/power.rpt": {
+    "bytes": 1419,
+    "sha256": "a36e56a2ecb1a7531c5f356f19c0492592ef3b39b215a0078d3fc0b4ffd40b98"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202703_m40/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "bcec46bfe2294e6568d645d69949a87e7ab37902a8422db9257274727efa80da"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202703_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST5-AABB_s202703_m40/input_hashes.sha256": {
+    "bytes": 715,
+    "sha256": "39ffd972f43dffd79294ce1320f287db5a18cd5a5d0528bb1d129d92d75d842d"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202701_m20/power.rpt": {
+    "bytes": 1419,
+    "sha256": "8959a262c0e1a98a69fd1ff756b95ba2ac7e0c3c6ab284b106869c5f694109e2"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202701_m20/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "d60a16eef6ee88ed7b4f677fe037a2ff7e023c8b48afba9ae3a9802387da22f5"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202701_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202701_m20/input_hashes.sha256": {
+    "bytes": 716,
+    "sha256": "7d3b7209e3132c9dbf763004f4f915be2c53c3f36921dda58e166c7dd1e5ffaa"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202702_m20/power.rpt": {
+    "bytes": 1419,
+    "sha256": "6698b17563b40718bc6cdcb3ec7247383180cef70b99a94bd3eb949a5cb4e365"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202702_m20/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "9607f5e2f25eaf3bfceeba473bcb199167983e2a9447c44bc682939acc17a2f2"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202702_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202702_m20/input_hashes.sha256": {
+    "bytes": 716,
+    "sha256": "374f549e2dfd1c863ed5a4925cb2e31887ee79a6a2da522c25068f762f68f701"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202703_m20/power.rpt": {
+    "bytes": 1419,
+    "sha256": "5204f488940b1ea813fafa6125ee7edfbf6fdf49971aac11611d456a6e8b0fbd"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202703_m20/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "e1a70114fe9c6cc49750280be9d4925893bdf919c6e729ecbb07fc49e203710a"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202703_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST10-AABB_s202703_m20/input_hashes.sha256": {
+    "bytes": 716,
+    "sha256": "0b09e068452593d7db98fafcdc581bcd2f3c4af182b20e651287dee8e4311bf1"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202701_m20/power.rpt": {
+    "bytes": 1419,
+    "sha256": "067339606c3a055e70c5dbf5152db66541fbf47de99b46d3931cdffaeca2a293"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202701_m20/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "c1ff118e3ed534adc7a4a9066b84740a26f76103bd2d980588b9e33ca2fdf0cd"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202701_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202701_m20/input_hashes.sha256": {
+    "bytes": 721,
+    "sha256": "44299344520aa52821027e0d8fdafdca40b51171628f051ad0b9c34beaad5c91"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202702_m20/power.rpt": {
+    "bytes": 1419,
+    "sha256": "887b8f9c9407fe3ed02d70f14d4485d2b675ccbf9b5236207dab81ee553d27db"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202702_m20/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "bffb973f76ea656d30ee17bfcf36258d428adcdf8c148aaa11cd3cf87f40de77"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202702_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202702_m20/input_hashes.sha256": {
+    "bytes": 721,
+    "sha256": "dbdbaa2aa39c732996fa26b38196a52afc952bd714d915021c9f25cb39017dc3"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202703_m20/power.rpt": {
+    "bytes": 1419,
+    "sha256": "89b8df8f7577b4596f0825a3dafbc585f59cbbd07d69c9cbdf26a63e4603455e"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202703_m20/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "bc48681d4f09598987511f2bc103b74224c6e2845ae9be4aeb16f1d5c104605c"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202703_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/MULTICAST-STATIC-AABB_s202703_m20/input_hashes.sha256": {
+    "bytes": 721,
+    "sha256": "f4f7766e504cc3a97cb6e0cd4866bd00a06df3e24b90d5465139052db1f67d87"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202701_m10/power.rpt": {
+    "bytes": 1419,
+    "sha256": "8315128a980965e93b85a623e61851c7a3eb60f6eff63f1a1df8237287d01423"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202701_m10/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "beeefed49ac44b09d4093b4b9bbd7c2f197a3bc6dd27ed72bdf70511502b9a98"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202701_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202701_m10/input_hashes.sha256": {
+    "bytes": 718,
+    "sha256": "2b12704a0ea0c3204860bdf1a02c56af47ba65d94542e40f1066c1e579d7fee1"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202702_m10/power.rpt": {
+    "bytes": 1419,
+    "sha256": "45a1012b015e2d881db334fac4fbcb7528dc77c79984e41a2d61a5b71a5b9806"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202702_m10/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "d91144510151134ab106067c776f5f23bd382e61c7d39da3e5cc5ab3b4177593"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202702_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202702_m10/input_hashes.sha256": {
+    "bytes": 718,
+    "sha256": "09b0ecec9be2191fb0ea449234be182a5ce23432255731b2a81d64c34ed4d8a2"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202703_m10/power.rpt": {
+    "bytes": 1419,
+    "sha256": "8c95dd1e736f68d1706e2d96fbe026581cea41c54c016d6634b0030de4f7a98c"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202703_m10/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "2da718be8f4aed317e7a308252041bfe0e4e4ca500eb9ae603c3ab4cc9a3ecf5"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202703_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/ALL-MULTICAST-AABB_s202703_m10/input_hashes.sha256": {
+    "bytes": 718,
+    "sha256": "18e38cddb3cb432d1122d6183787850fa016583ccf9f4a16a8b85f6cc37b5014"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202701_m5/power.rpt": {
+    "bytes": 1420,
+    "sha256": "ca3799e52a68a81c7597c41b3df7d430bfbef601e77da1064b425eaea8ef16d7"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202701_m5/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "4acb8a0568a95b1ffef7195a5aae1c4232b9b5c1211f902c428073eb69dbf96c"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202701_m5/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202701_m5/input_hashes.sha256": {
+    "bytes": 712,
+    "sha256": "b417b871dbc6a90846cdfb239b86c7bd97e093eed723ecc676015776c128c2a0"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202702_m5/power.rpt": {
+    "bytes": 1419,
+    "sha256": "5133fc2b1d685ff5087c141c751be4b0d9d11e8cf24468eb4d04a8b45847f7c9"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202702_m5/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "38d60c4a68b7dea386f54cede2de04203b781d2b28eab5080b96d8897312831e"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202702_m5/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202702_m5/input_hashes.sha256": {
+    "bytes": 712,
+    "sha256": "35c67cf2765a9c586aecc941f03d5d8b91805b9759566980db23e474479e6251"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202703_m5/power.rpt": {
+    "bytes": 1420,
+    "sha256": "843d0690116cbc58dfe49004ce91f032260e78b6c19c6066080d4799addb2b0b"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202703_m5/activity.rpt": {
+    "bytes": 6111,
+    "sha256": "228f919c583d66a7ac7acf2295be9c9d4851856b80a855273918890feaf19920"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202703_m5/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "fc33bba09138348ccf3db9a8f00891079e92f4612d42bdb6a67206e71406c2b8"
+  },
+  "power_reports/PFAT64/ALL-BROADCAST_s202703_m5/input_hashes.sha256": {
+    "bytes": 712,
+    "sha256": "f359acd0941d4a6e4ddbe2a90fc9bc60a2d705176166317fcf3a71a97fb0ed3b"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202701_m80/power.rpt": {
+    "bytes": 1423,
+    "sha256": "b07f69d7113e572abb6bf803e04f30c156b59f643978dc5a7e410d5355933fe9"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202701_m80/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "81cceff01d2221cd9542e3fefbbf20ad613328c30be86f48751051979decd9fd"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202701_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202701_m80/input_hashes.sha256": {
+    "bytes": 735,
+    "sha256": "beb8fe57ae14f930c73e2a5f6a8d9d310e7613aed05f8aa278374d7d2d60c6e1"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202702_m80/power.rpt": {
+    "bytes": 1423,
+    "sha256": "6f42e3529824ec10d493e663106950e5738f089ef01c64550cc5353e5626a4d3"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202702_m80/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "6e27f5fe4a45b26db20e41056f1f7a1430e36ee151507d7749a63081e8202e94"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202702_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202702_m80/input_hashes.sha256": {
+    "bytes": 735,
+    "sha256": "0984260cd05cde3fcb09578113c7a85d2b08c2422cb357c5b3cc71f7f7f7343f"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202703_m80/power.rpt": {
+    "bytes": 1423,
+    "sha256": "4b244697ec23bffdd04770843d6f17e995d39af959f7466af81e1a0ef7dd6c70"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202703_m80/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "d32c801e8c9955faf271b3c559411caaf14c1502f48f2692019fcde4321db7dc"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202703_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-UR_s202703_m80/input_hashes.sha256": {
+    "bytes": 735,
+    "sha256": "262a5c26b333ef10d81ce7ac0b4ac241cdbfcc83b599b271bda9e2bdcb020430"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202701_m40/power.rpt": {
+    "bytes": 1423,
+    "sha256": "0b071b920cc5a55fcaa74de8e98b95154e15652eeea190858f6aa367b066bffd"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202701_m40/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "80e7aa9bc1d14108a8ec245480daefa13d1059fac4593056fb61cbf1ab856440"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202701_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202701_m40/input_hashes.sha256": {
+    "bytes": 735,
+    "sha256": "670ed7731c2f335a608fc5e0e68eb2be88840ea5ab3e9f5f77402648aefac1ff"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202702_m40/power.rpt": {
+    "bytes": 1423,
+    "sha256": "0b19ead871074e98ea9afa3dc249d72fa2b6139eff144e1d55fca197ecb6065e"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202702_m40/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "fccb4b4e42b702622586e7a2118a25466b99d0230b04edf2a79d30780f978924"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202702_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202702_m40/input_hashes.sha256": {
+    "bytes": 735,
+    "sha256": "362be5d95c1db210699771f485779fd6313bb84f73163dae4e8105eb2d5c91a7"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202703_m40/power.rpt": {
+    "bytes": 1423,
+    "sha256": "72066b3235eafc74c190646975a7027a2963c13b03315cd49ab6a64c6b146d19"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202703_m40/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "815715e6eab6a1f4935550a45431b36ed943f9c7e4d2e0d32026b0b8181bd137"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202703_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_TOPO-BC_s202703_m40/input_hashes.sha256": {
+    "bytes": 735,
+    "sha256": "b2aaf029a598732955f0941d3e0a6df0c4dc95d08c07ffa1e52272a4ba0fe444"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202701_m80/power.rpt": {
+    "bytes": 1423,
+    "sha256": "d8c1fea86e9cbaca651d4089e86007d9e652d8e38d985f7f133814dc91917bdd"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202701_m80/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "2fe1444b1ceb4f88af16461b463404d0c989a3d4ba27a7cc89a848c4e119e46a"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202701_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202701_m80/input_hashes.sha256": {
+    "bytes": 737,
+    "sha256": "dff120cf1ed1452b523964eaf44770497cf52144ce9610e8c06048c0822694c4"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202702_m80/power.rpt": {
+    "bytes": 1423,
+    "sha256": "89484519318e165eafdaca142072fe766752d902d6b19dcae32418b119b55648"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202702_m80/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "ab4182112098ad3ac82bb7486f8d0624399ff461b92808cbfd27e5bc5c404fea"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202702_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202702_m80/input_hashes.sha256": {
+    "bytes": 737,
+    "sha256": "313ae223ce362b1d041fec3b01fb4c46e70ec4c733312146f54e96bf7605db50"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202703_m80/power.rpt": {
+    "bytes": 1423,
+    "sha256": "6f20594e8afdc88033eb45624500ebbd45f2e20588aa8875e7c07441ff94b9b0"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202703_m80/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "5a56d8ac28f08cc52050eb86b0312eff276f31883c01b9f44894597b45a3b90a"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202703_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_HOTSPOT10_s202703_m80/input_hashes.sha256": {
+    "bytes": 737,
+    "sha256": "2b7335e0a46b652cb341e3db8dfbc0f9b0ae0b927b82eea8e2c9e5b8f027f6fe"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202701_m40/power.rpt": {
+    "bytes": 1423,
+    "sha256": "6b8c44bb8a4ca3b829c778b48907c9c9ebf4a5d29f116087adbf6d9d17b60993"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202701_m40/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "9e67ef6265ef451405e233a616a37f8a02884d689d01825a9c77c1bdfe67c18b"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202701_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202701_m40/input_hashes.sha256": {
+    "bytes": 743,
+    "sha256": "2a2450e1e57ce67003ecbd6c2d508eefe02eb9603e0c237e6469ec50eb49a986"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202702_m40/power.rpt": {
+    "bytes": 1423,
+    "sha256": "0bd511bc23002b012ac5d0ae4a9e1dae80f620e2a543412e971f2d9183c3b1f7"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202702_m40/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "186de775eb97fa027046d983e34314365659c2dbc47402029bad4d24570e15c3"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202702_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202702_m40/input_hashes.sha256": {
+    "bytes": 743,
+    "sha256": "db67849a46e7db9f83553a913ed5c41e9f17eb557fc3afa28c825f8678e134f9"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202703_m40/power.rpt": {
+    "bytes": 1423,
+    "sha256": "ca64fa7fc76d676433d43789ffbb5ebaddb075fcb0261b54fd8d233974e29e88"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202703_m40/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "0e48bf106461e98b87ffb5cd079ca7929a186d4b96cda29d9bb36239ee9bb9c0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202703_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST5-AABB_s202703_m40/input_hashes.sha256": {
+    "bytes": 743,
+    "sha256": "33a97d310dc70cbb7cea757151d7279d7ec9fd57ee69918dd5963f87d78f5bac"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20/power.rpt": {
+    "bytes": 1423,
+    "sha256": "bde016393142e548ed6f808d11da3fcccda32bde982824596ac094e57d7aa85d"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "232dcbb83c6b380aeb75dd3d778b0c1db49a831dd53671e4052ca93bb6520a58"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20/input_hashes.sha256": {
+    "bytes": 744,
+    "sha256": "b41a231ef6c3dcbdafa21d704cdb7581a27f73702a353f77040569e2cf8c7a2a"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20/power.rpt": {
+    "bytes": 1423,
+    "sha256": "d40a9e4a3fd1535e8e79b046c5f482b78853f33f4d9f50bf46249273c51a277d"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "a4e14069a840bddf1fe78520efccfb02d3bd54330da1995d338fbb44f8821702"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20/input_hashes.sha256": {
+    "bytes": 744,
+    "sha256": "6845fdd30cc666aeca71fb0c4d6950accd92e270db98454d769ddb49d6b29fdd"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20/power.rpt": {
+    "bytes": 1423,
+    "sha256": "02a4ce6bbc1b6cdcbff19c86a4cd9bf5b0c0e6541e5b62b4020c154c55ab798a"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "58b4636e04680d66771a02f997d6cd608682667f615ea929eddee0fd96971cfa"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20/input_hashes.sha256": {
+    "bytes": 744,
+    "sha256": "e9454c6929254cfa5b611b251576b7ae086ae172822838ffb9dbe4a9b7a96b2a"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20/power.rpt": {
+    "bytes": 1423,
+    "sha256": "3f5dfa8627c614a6a06933f28dafd6095f50b6adbd0d3413326d9f3e77057df1"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "d1afceed2a784780b587cb482fdc07f83ba03b7481a9098b5b8c8043581b999b"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202701_m20/input_hashes.sha256": {
+    "bytes": 749,
+    "sha256": "d355002ad84253fb86eea0df10d8302bc74940a4a516104698bfc10c329a0dd4"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20/power.rpt": {
+    "bytes": 1423,
+    "sha256": "ae1fa9a8d17efd5c016ccaeb7ac31c858a6b4eb8ae916ed7b0d30622d8956c65"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "cd4e4c334c1231ae2037a2c2a37d4ba729424fd7c93c861fb6edb7bc43c95c18"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202702_m20/input_hashes.sha256": {
+    "bytes": 749,
+    "sha256": "e93e05a644fdbdaf97d5b301b6a89750b4e4ff888cd462e6f932497d59dcdcc5"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20/power.rpt": {
+    "bytes": 1423,
+    "sha256": "73d5c30232dcabe17a5f5e0239a5a5cafd0eca2fca80bcc4747329bf859154db"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "b1c9c7fa6f8cdbe851d74fbb8a93545ab84164d951811ea2189774c8121a44e6"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST-STATIC-AABB_s202703_m20/input_hashes.sha256": {
+    "bytes": 749,
+    "sha256": "3298283c608599703a45393a99d3e797cde44a810604294e8a264012d640119d"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10/power.rpt": {
+    "bytes": 1423,
+    "sha256": "ad795198157ae2e72fa07b7160a5064c987564d53c3418939edfde01dcc62a74"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "9d78b6871f24cab0f1c6013c244e580463ccd372ab5f18b160c23cf80db7103a"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10/input_hashes.sha256": {
+    "bytes": 746,
+    "sha256": "944cf0b5a23efe228219e6b7892923c7eb27b54929a3093690595a08dcf74b35"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10/power.rpt": {
+    "bytes": 1423,
+    "sha256": "f2c52c6b58f338715339661bdb33ffd8bf7cbee1bfad1b7bbee6a4da7d52781e"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "611a8387d752812d27adc3ebc2e03d867a5c16837e9ed3b45177c4f31a4d4b8b"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10/input_hashes.sha256": {
+    "bytes": 746,
+    "sha256": "8cca3fb2b9921aa9dd079d258de0004bebcf2d32877f0691ba61f93abcbb5949"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10/power.rpt": {
+    "bytes": 1423,
+    "sha256": "8cfd7538d8aaec92ead01049171d67269851b20ec7514774f96c460f065a6300"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "4f3b12e274a286ce3bcbe5316b638f17463e855481b1ab7eba86f39e5e2d4a40"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10/input_hashes.sha256": {
+    "bytes": 746,
+    "sha256": "0b1e7e4663d3185974e5b533342c236820b5aaa8b903e0387ce7196162382bf1"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202701_m5/power.rpt": {
+    "bytes": 1423,
+    "sha256": "001570de9567f28f88059bc5eb6fb7d82b553ee527c4422c5afa261e310388fe"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202701_m5/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "abe6a931b0d493cb6d65113b5b19f7cd97505c95f103b9b92a230a0376a8d4dc"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202701_m5/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202701_m5/input_hashes.sha256": {
+    "bytes": 740,
+    "sha256": "ab4ea53d9845dcbd0a2db034c7ac7d2ed3dbdef5ebecffdf03b20f7cfbf056b5"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202702_m5/power.rpt": {
+    "bytes": 1423,
+    "sha256": "9406982c70dbcac7528fc284296e5080e31882d0a812878d03dcbdc606174e46"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202702_m5/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "da3fca33b019b10ba0ba00d9919abda9c1edaa0e6f144b77fd4a4e0c4d188e7e"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202702_m5/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-BROADCAST_s202702_m5/input_hashes.sha256": {
+    "bytes": 740,
+    "sha256": "1dfd253563a931147839417126294c7c72cb966c3c6903b878ef6f6a93871fe4"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_NATIVE/power.rpt": {
+    "bytes": 1423,
+    "sha256": "63827dc73f74efc9fd09e930788155817ead9ecc37ea5c00dc30f6ce1c319cbd"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_NATIVE/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "b94899c19aff6be59dbe041b730aa631388cab7b065cc706e97894776f1619e5"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_NATIVE/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_NATIVE/input_hashes.sha256": {
+    "bytes": 768,
+    "sha256": "6d03db6a74fadd5a8251bccb43d4d71d16336be55212999f14303471501b8991"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_REPEATED/power.rpt": {
+    "bytes": 1423,
+    "sha256": "d958c8ede843cb357e50a93a631bd0f25aa84d77b6d29cc417bac45fb7a743a8"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_REPEATED/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "cf424612cc8bf64620f305a2b84d487184838249b57dc4db79398a0a1d5b3907"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_REPEATED/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202701_m20_REPEATED/input_hashes.sha256": {
+    "bytes": 770,
+    "sha256": "082a0dd7cef4d18b99a6eaa376118786e5af9ecdb43e9208846f9f9d636b252e"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_NATIVE/power.rpt": {
+    "bytes": 1423,
+    "sha256": "6a18079c9123ee0378e49690f805c8f07ec17f09d14da531089bc2b2b7ca80e2"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_NATIVE/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "5d56e79ffec85c4e1eff2fd54f8d6f64ccc7406058554fecf7b10cdc8e458a91"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_NATIVE/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_NATIVE/input_hashes.sha256": {
+    "bytes": 768,
+    "sha256": "0f64fdd3130210f972036b7e908bd7a98b47bb644a9b7dd7dd9c5a768be8315c"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_REPEATED/power.rpt": {
+    "bytes": 1423,
+    "sha256": "04f0728ff7bacb5712c6c18d79eb6e9157aef31337b271a173625d9dd4d81289"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_REPEATED/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "c08d0dc7ec0645e2121249a167f426150f924e7f283c0219fa42bdc7e0bdd7dd"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_REPEATED/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202702_m20_REPEATED/input_hashes.sha256": {
+    "bytes": 770,
+    "sha256": "7b009eb1ac543ee9512295a427a64f92544ba827197bed0634a258093fde3a20"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_NATIVE/power.rpt": {
+    "bytes": 1423,
+    "sha256": "1f9a3f48063cddb0cf0e86c45aca1508202d2933d066b807ca32e5f9913ff2b5"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_NATIVE/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "8171637df32623d08aa4e9730789c41747ef0d06094f1a25449a0b0241d7f98a"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_NATIVE/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_NATIVE/input_hashes.sha256": {
+    "bytes": 768,
+    "sha256": "6ec3704bc6615864d1b6c16ad84e16411102dcef6716d6e708b5b0399bc40379"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_REPEATED/power.rpt": {
+    "bytes": 1423,
+    "sha256": "ae49e0b2472afe09a250a861748ade06291243c742e5ebbfe3a08de4c4505b9c"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_REPEATED/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "ef6cca6a60c99d018ae5d059f5c62298426d63920dd86fe15ffb6ebe0c90c471"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_REPEATED/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_MULTICAST10-AABB_s202703_m20_REPEATED/input_hashes.sha256": {
+    "bytes": 770,
+    "sha256": "4e9b2a289479a322b54b830bd2227ffdd5e30a8bfac714a79c9fc8bbc5fd91b0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_NATIVE/power.rpt": {
+    "bytes": 1423,
+    "sha256": "3f96ab41802e8fb2e973a3936be3bd1beaa8c34723752126669ed7d9a4b83b7e"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_NATIVE/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "3ece2c741b7477e7325d3db76e9d29e419393c1d3565ad3e39960996b492a718"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_NATIVE/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_NATIVE/input_hashes.sha256": {
+    "bytes": 770,
+    "sha256": "57748c0a123586768187f0216cce0aae1abe80335879181cf286c15d7f9878bd"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_REPEATED/power.rpt": {
+    "bytes": 1423,
+    "sha256": "21137ac1a7d5ffaca1867f18a5700c8a5ff6dd3edaa84340f0d7769cbeb57cbd"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_REPEATED/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "6c8f47694335ae996a9c07f30272e5265fe93c72f5b9b96264ea321acd5b1029"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_REPEATED/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202701_m10_REPEATED/input_hashes.sha256": {
+    "bytes": 772,
+    "sha256": "00e7d1ca754821f1f40c12670b1397097879865cf04504435bf42b9d066b3fd6"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_NATIVE/power.rpt": {
+    "bytes": 1423,
+    "sha256": "01f76ceff87f2ae72418e369d96bf882af7e24afc236b9eed9b21fe75b6fd8fe"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_NATIVE/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "075872eeead3089255a59582a09954c9249b99e19cc2b463fedd853db8c0891e"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_NATIVE/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_NATIVE/input_hashes.sha256": {
+    "bytes": 770,
+    "sha256": "e8ad83dedac6d0ad24cb0f96ea6d6d2e2bf17d4ce2a1c9f3a3070b6e2827c655"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_REPEATED/power.rpt": {
+    "bytes": 1423,
+    "sha256": "145f789d76ec3866d4a3354d9cafaf6485daeb05d12255852216cb0775a99603"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_REPEATED/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "01c2f92b2589c02a8ebc3dd827c24723ae4c17165513e1b1c1fd34ddfcf65fdd"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_REPEATED/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202702_m10_REPEATED/input_hashes.sha256": {
+    "bytes": 772,
+    "sha256": "b1e4a348ad8535ba751f0d702c4c0051a4cbbf744a4dccd3a94b150bd155f2f3"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_NATIVE/power.rpt": {
+    "bytes": 1423,
+    "sha256": "82ffa119b32d0360ac6c73ca8c741c07405c230a1179a27c94a2cfaf2efbdc91"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_NATIVE/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "cd81314fdb6c4b83a8bda68ad1a455ccd929d86e50910ca02d58101e665b81f7"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_NATIVE/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_NATIVE/input_hashes.sha256": {
+    "bytes": 770,
+    "sha256": "5a86685d6d8ea7b3abe6faa889497564ffc808bfd591291ad640491038faadf1"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_REPEATED/power.rpt": {
+    "bytes": 1423,
+    "sha256": "5c846a7383f757b6dc05d1a199a01bee87ffd1cb1d75f24ab6c70d7141d353cb"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_REPEATED/activity.rpt": {
+    "bytes": 6125,
+    "sha256": "934d7899ad9657f314c1625704f71e6a0ad04ddd4e61ed1023d26d257f479d19"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_REPEATED/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "574285361d54858d0b3234ad60fa8d05680d0fee1ad28998aa662c41d2f1bbd0"
+  },
+  "power_reports/PROP_M16/PROP_M16_ALL-MULTICAST-AABB_s202703_m10_REPEATED/input_hashes.sha256": {
+    "bytes": 772,
+    "sha256": "22e6bd015b04b0bb9473a1b48a180ed85eee2bcade354770367bedede5735e34"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202701_m40/power.rpt": {
+    "bytes": 1418,
+    "sha256": "c99ab222eef3465062d33974b576073dee291364068c0256c928b8a4df750d4c"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202701_m40/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "bb5e409f77e7020ccc163a44b697c30111ce1e1d895ada1384d64fca8cafdc8e"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202701_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202701_m40/input_hashes.sha256": {
+    "bytes": 689,
+    "sha256": "2f2dedd3c2347db3d5b3c83e40aaa27cd85d6b18759dea39d0d783908be189ae"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202701_m80/power.rpt": {
+    "bytes": 1418,
+    "sha256": "f485bbb818abb1415b2d78feccaecb6ef97759126ac95384105b4e687ece62ff"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202701_m80/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "9498ec2ca48fb09c4b20ccd043d696ea7e074f6d653fb72dd0b83481fb9445b6"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202701_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202701_m80/input_hashes.sha256": {
+    "bytes": 689,
+    "sha256": "13242825951051d5f11cc053172b9a455b0d8d68070d8294afe0f0702191651c"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202702_m80/power.rpt": {
+    "bytes": 1418,
+    "sha256": "cc14a2bc69b95f993cc4dc2793b1ac89b368f0c7824f5471b132fc357809ebb8"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202702_m80/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "5833afdb777a9773248152020d774095efc38a1874a16038c5335ddb14cac24d"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202702_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "4e6b9fea79352709457bb5e9492689a1f9f233f95b888ced21528ac5475c7aa3"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202702_m80/input_hashes.sha256": {
+    "bytes": 689,
+    "sha256": "bb360179f57dfc0130d8ce54df8c18a4238b69901a6376477abe44f4642b2df7"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202703_m80/power.rpt": {
+    "bytes": 1418,
+    "sha256": "86aff1fd7b382c26216bd6b973c1a8927fdfe94d7f50b9edaa4d5daa781bdc7d"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202703_m80/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "ee928249f028ed30a0c67c154bb435734f936c2de77db6ef17719920bfa4ea59"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202703_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_TOPO-UR_s202703_m80/input_hashes.sha256": {
+    "bytes": 689,
+    "sha256": "74110a4a35f0aabd66f81cb74194ac0c849e266cfeed9bfaf91b1b295920fbda"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202702_m40/power.rpt": {
+    "bytes": 1418,
+    "sha256": "0fed34fc758567f3559df7e65ff2c4c30f5f9fdf42b5cb20e7a82e5529d01624"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202702_m40/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "303d7bcc22e16eaa6b64232eb2b7d38d665b85adc29430ef31d886ca4a2882a4"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202702_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202702_m40/input_hashes.sha256": {
+    "bytes": 689,
+    "sha256": "27c20a5e818093ddd02d5fe1a5ab738d4e2f6d0b69df80895f54753379e14360"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202703_m40/power.rpt": {
+    "bytes": 1418,
+    "sha256": "1246bc0c66fae36466a417f0fa22fcceba83895529f9b4738f38163bb660a70f"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202703_m40/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "325a37b97156e36ababc4c424aba19ac9f921aa6228ad49ec190a70ef918b57f"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202703_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_TOPO-BC_s202703_m40/input_hashes.sha256": {
+    "bytes": 689,
+    "sha256": "f10bb9f2235e6c9b63bc18113e4545844a34ccede121cab833fb13644ae409c4"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202701_m80/power.rpt": {
+    "bytes": 1418,
+    "sha256": "473471d3380c1f7b4539e41c7f560ac5113f6048a75c09fdbe7c1ea4c8c5f18c"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202701_m80/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "a0110efb01bb60fad44b5b3679f090aa0f5155b9940bdbe5842aa51796cebb56"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202701_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202701_m80/input_hashes.sha256": {
+    "bytes": 691,
+    "sha256": "75ee51e350e8a405d59cf3eb30c52769d1efe1c709cce8e77159b00b1656670b"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202702_m80/power.rpt": {
+    "bytes": 1418,
+    "sha256": "8e9fde20f72c43c3a477176f44850749ec1f02cb6fe02cdbad1377e92a972a45"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202702_m80/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "9adbe95814484bfde359a8355a74b88c2bb586dcb23cec02f938d9a8bf0093f8"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202702_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202702_m80/input_hashes.sha256": {
+    "bytes": 691,
+    "sha256": "895107464ae0f69c34b126ee66670b88fb8dab9f1b5796665eb01ba9b5d95d28"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202703_m80/power.rpt": {
+    "bytes": 1418,
+    "sha256": "919a001e99709928517edbf9b52c5defc41ce73835be108590b3c2742110fc3c"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202703_m80/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "130d60711eafdb3cb33cbc910f8a658fcf1a21963514c32b55f7b44b505c45e8"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202703_m80/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_HOTSPOT10_s202703_m80/input_hashes.sha256": {
+    "bytes": 691,
+    "sha256": "5faf3c6f82b43d1d43354525f14519e90a5123cd24afe7a0fca06e857af8d7ad"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202701_m40/power.rpt": {
+    "bytes": 1418,
+    "sha256": "e53b92caae24d9658aa6eb70e0479267762c01b785097b6b422baf728f0f0ac5"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202701_m40/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "114f9e6aac684af693ab5ab6109dfd3ae2cd20811f129152d40adb8a75af0ff4"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202701_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "4e6b9fea79352709457bb5e9492689a1f9f233f95b888ced21528ac5475c7aa3"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202701_m40/input_hashes.sha256": {
+    "bytes": 697,
+    "sha256": "787f60c10ed56b6503ac0ad5ac1e6b9ebb642fcc857c41a685186c2e5e366732"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202702_m40/power.rpt": {
+    "bytes": 1418,
+    "sha256": "b208c02c31a6c8f55b4a7503fe1027c60d17e4caf7a5db47389d38be58827479"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202702_m40/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "717bc18f3622138722ec7fe5c1d6291d79a11812ad1a5abee1b9776939c7da1c"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202702_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202702_m40/input_hashes.sha256": {
+    "bytes": 697,
+    "sha256": "d54fc823bebaf6d1d865deba0692c7f255668d610f9305766b70f6925d792a48"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202703_m40/power.rpt": {
+    "bytes": 1418,
+    "sha256": "abf285cbae9b5a5fc6602df9a8a6aa3427dc50c826122b191f4d41730beec4b2"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202703_m40/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "a24b2f9b8881d87fe78bea651adecd7cd45fe45c40074385f992fafded123b27"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202703_m40/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST5-AABB_s202703_m40/input_hashes.sha256": {
+    "bytes": 697,
+    "sha256": "31928a9d76b4bdf1de7349780f7fd9c40ffbe2bae665d9ebe2828c98f0ee3e42"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202701_m20/power.rpt": {
+    "bytes": 1418,
+    "sha256": "6d12dac461561561589ef242b317c7b9afb4d13e9d09a07511bae975818adb1e"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202701_m20/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "d7e1bac4143647131403dffe5d1654782e2ee25db98e462c3dc1d68233132f77"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202701_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202701_m20/input_hashes.sha256": {
+    "bytes": 698,
+    "sha256": "f5a4285b0d9443142c2b7cfabdde456c093cf78dcbee033bd0e9c79cd60e919e"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202702_m20/power.rpt": {
+    "bytes": 1418,
+    "sha256": "d8c88d385f01e5dc470624db56e869b7d3628ae65f3c8923705f83abf5ce0402"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202702_m20/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "be473c5accb49bb6c66b2928bd6920974b0ea670b265275abce9f17c700bf0b5"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202702_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202702_m20/input_hashes.sha256": {
+    "bytes": 698,
+    "sha256": "3fde1e1a60a53f455eaf557e600e8bb749dfa8a309ce5b3c594879f0bdcd63bc"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202703_m20/power.rpt": {
+    "bytes": 1418,
+    "sha256": "7be50e11f7f29213e12df71f5150c4148c7e9ad2befa3d2223354a2bf38770e1"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202703_m20/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "bf44d80b6ef2a131f0a068d23d74b741ac41f3f7df11d84982bc53fe28717dfd"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202703_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST10-AABB_s202703_m20/input_hashes.sha256": {
+    "bytes": 698,
+    "sha256": "43ee8d435149b94f3545b63ac37e3d6ccf47b15f88bc13a2731ed06d067454f8"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202701_m20/power.rpt": {
+    "bytes": 1418,
+    "sha256": "72c9dff3d1d7fe7441950c8fa3a547ed86df214b1a8028d67f175a86978a153b"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202701_m20/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "2946b1a8e771a6654e48e5248226a2564e7db67b09536d82be78d23c67d2d341"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202701_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202701_m20/input_hashes.sha256": {
+    "bytes": 703,
+    "sha256": "7c68e4cf6cec2d805b43540e4c144e80f848337231e729d224878e6b020da9b5"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202702_m20/power.rpt": {
+    "bytes": 1418,
+    "sha256": "db879411254ca9951f6b2c0d5afbc70f6956115dcc0becfe5aa1fb73b8f046dc"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202702_m20/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "829e2dc31ead433ca2d51688e60edee179b4c56cfd20755d0708f3f0e779e506"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202702_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202702_m20/input_hashes.sha256": {
+    "bytes": 703,
+    "sha256": "fd694fcb7077ef1b776888a92bc5310dd0f4f629ca64dda1d5bf83b27f37166d"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202703_m20/power.rpt": {
+    "bytes": 1418,
+    "sha256": "51085214afbff5b47fdbc22c8b99ce7a2822d861c01f4b969a94c903682990cd"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202703_m20/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "a456f029677179753447092068f202b1b365da99beb781472e40f1139e9ba148"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202703_m20/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_MULTICAST-STATIC-AABB_s202703_m20/input_hashes.sha256": {
+    "bytes": 703,
+    "sha256": "079b5fc2eee1332ee5eff93e75dc2c4c33634bb95f659b4a5c6475fc133bf235"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202701_m10/power.rpt": {
+    "bytes": 1418,
+    "sha256": "35fda1dcf20db2348bdf3d3e5d5d732dc212032c142df89ac7666f6029b6a613"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202701_m10/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "eb26a05178702399f1350e7e375f23eeaf6352ef5c76f3f06fba94f779a77d78"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202701_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202701_m10/input_hashes.sha256": {
+    "bytes": 700,
+    "sha256": "9f3d2ad053417d71532d3052e51d2eccb6f535106f09d449d5c3bcfa7533bbe3"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202702_m10/power.rpt": {
+    "bytes": 1418,
+    "sha256": "b1df409f9248a950f7b355ecf0ca97626ef9d6ba28630e118f139d5ec8b490c2"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202702_m10/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "ec2a0788ff888256f6c219bf87507b58114b46c507a76fd95e0d0258177cc49c"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202702_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202702_m10/input_hashes.sha256": {
+    "bytes": 700,
+    "sha256": "c43e3ea3e985afbfec4e6c755d815cc6d4268be520bf07f6c82f4b1bbd176396"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202703_m10/power.rpt": {
+    "bytes": 1418,
+    "sha256": "79e0448d3ba652249fb8f68c40ad1815b615662787e52f65ac5e563f0c252f41"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202703_m10/activity.rpt": {
+    "bytes": 6108,
+    "sha256": "4ea78d8a21f72bbb00315703e4f808f5bac8d115425a3b87cfddfe16fb688995"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202703_m10/check_power.rpt": {
+    "bytes": 672,
+    "sha256": "63af9f37c5c406b484f4f68e20e6508b094a37521f395061a96b7ef54c81512e"
+  },
+  "power_reports/FM64/FM64_ALL-MULTICAST-AABB_s202703_m10/input_hashes.sha256": {
+    "bytes": 700,
+    "sha256": "afb320296fd9d175d7df7258b8646a4c4be9612c7f9f542b29a3be6551e8e9fa"
+  }
+}
