@@ -10,7 +10,9 @@ module noc64_async_boundary_core #(
 );
   localparam integer FLIT_W = 28;
   localparam integer NUM_PORTS = NUM_CORES + TOP_LANES;
-  localparam integer MAX_INPUT_FLITS = 131072;
+  // Repeated-unicast expansion of 11k F{2,4,8,16} events can approach
+  // 420k injected flits.
+  localparam integer MAX_INPUT_FLITS = 524288;
   // F8 multicast expands 11,000 source packets into 440,000 matched egress
   // flits, so the old 262k scoreboard capacity is insufficient.
   localparam integer MAX_EXPECT_FLITS = 524288;
@@ -121,6 +123,8 @@ module noc64_async_boundary_core #(
   // Wormhole: one in-flight packet per dest.  Hold the unmatched Head until
   // the following identity body/tail names pkt_seq, then bind that Head.
   reg case_has_identity;
+  reg source_repeated_unicast;
+  reg wide_packet_tag;
   reg pending_head_valid [0:NUM_PORTS-1];
   reg [FLIT_W-1:0] pending_head_flit [0:NUM_PORTS-1];
   integer pending_head_slot [0:NUM_PORTS-1];
@@ -152,10 +156,14 @@ module noc64_async_boundary_core #(
   function automatic integer identity_pkt_seq;
     input [FLIT_W-1:0] flit;
     begin
-      if (flit[27] || (flit[8:6] !== IDENTITY_MAGIC))
+      if (flit[27])
         identity_pkt_seq = -1;
-      else
+      else if (wide_packet_tag && (flit[6:4] === 3'b110))
+        identity_pkt_seq = flit[25:9];
+      else if (!wide_packet_tag && (flit[8:6] === IDENTITY_MAGIC))
         identity_pkt_seq = flit[25:12];
+      else
+        identity_pkt_seq = -1;
     end
   endfunction
 
@@ -400,6 +408,8 @@ module noc64_async_boundary_core #(
               n = $sscanf(line, "%s %s %d", tag, word, cyc);
               if (word == "warmup_original_events") warmup_events = cyc;
               else if (word == "measurement_original_events") measurement_events = cyc;
+              else if (word == "source_repeated_unicast") source_repeated_unicast = (cyc != 0);
+              else if (word == "wide_packet_tag") wide_packet_tag = (cyc != 0);
             end else if (tag == "event_map") begin
               n = $sscanf(line, "%s %d %d", tag, pkt, cyc);
               if (n != 3 || pkt < 0 || pkt >= MAX_PKT_SEQ) begin
@@ -437,7 +447,9 @@ module noc64_async_boundary_core #(
               expected_case_line[expected_count] = line_no;
               expected_input_index[expected_count] = -1;
               expected_flit[expected_count] = flit; expected_seen[expected_count] = 1'b0;
-              if (!flit[27] && (flit[8:6] === IDENTITY_MAGIC)) case_has_identity = 1'b1;
+              if (!flit[27] && (((!wide_packet_tag) && (flit[8:6] === IDENTITY_MAGIC)) ||
+                                (wide_packet_tag && (flit[6:4] === 3'b110))))
+                case_has_identity = 1'b1;
               for (p = 0; p < NUM_PORTS; p = p + 1) if (mask_word[p]) begin
                 if (expected_port_count[p] >= MAX_RX_PER_PORT) begin $display("TB_FATAL expected queue overflow p=%0d", p); $finish; end
                 expected_port_index[p][expected_port_count[p]] = expected_count;
@@ -881,6 +893,8 @@ module noc64_async_boundary_core #(
     $display("TB_INFO CASE_HAS_IDENTITY=%0d expected=%0d", case_has_identity, expected_count);
     reset = 1'b1; tb_in_req = '0; tb_in_data = '0; tb_out_ack = '0; input_done = '0;
     running = 1'b0; timed_out = 1'b0; finish_requested = 1'b0; unexpected_flits = 0;
+    source_repeated_unicast = 1'b0;
+    wide_packet_tag = 1'b0;
     measurement_backlog_snapshot = 0;
     csv_dumped = 1'b0;
     #(reset_cycles * case_tick_ns);

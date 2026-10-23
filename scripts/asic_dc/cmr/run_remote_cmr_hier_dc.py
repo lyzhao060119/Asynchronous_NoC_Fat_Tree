@@ -253,6 +253,9 @@ def _child_artifacts_ok(client, cid: str, ref: str):
 
 
 def _prepare() -> dict:
+    if os.environ.get("CMR_SPLIT_BUNDLE"):
+        from prepare_split_dc import prepare
+        return prepare(REPO, os.environ["CMR_SPLIT_BUNDLE"])
     if KIND == "mesh":
         from run_remote_cmr_mesh64_sdf import generate_rtl, shared_input_files
 
@@ -479,6 +482,35 @@ def main() -> None:
         % (ROOT, ROOT, ROOT, ROOT, ROOT),
     )
 
+    verified_resume = set()
+    if resume:
+        # One round trip instead of several SSH channels per completed child.
+        checks = []
+        for index, job in enumerate(prep["jobs"]):
+            cid = child_run_id(PARENT_RUN_ID, index, job["ref"])
+            directory = ROOT + "/outputs/" + cid
+            paths = [directory + "/" + job["ref"] + suffix
+                     for suffix in (".ddc", "_post.v", ".sdf")]
+            check = " && ".join("test -s " + shlex.quote(p) for p in paths)
+            checks.append("if grep -q '^CMR_HIER_CHILD_DC_PASS ' %s 2>/dev/null && %s; then echo VERIFIED:%s; fi" %
+                          (shlex.quote(ROOT + "/logs/dc/" + cid + ".log"), check, cid))
+        probe = (
+            "import pathlib\n"
+            f"root=pathlib.Path({ROOT!r})\n"
+            f"prefix={PARENT_RUN_ID!r}+'_'\n"
+            "for d in (root/'outputs').glob(prefix+'c*'):\n"
+            " log=root/'logs/dc'/(d.name+'.log')\n"
+            " if not log.is_file(): continue\n"
+            " if not any(l.startswith('CMR_HIER_CHILD_DC_PASS ') for l in log.read_text(errors='replace').splitlines()): continue\n"
+            " ddcs=list(d.glob('*.ddc'))\n"
+            " if len(ddcs)!=1: continue\n"
+            " ref=ddcs[0].stem\n"
+            " if all((d/(ref+s)).is_file() and (d/(ref+s)).stat().st_size>0 for s in ('.ddc','_post.v','.sdf')): print('VERIFIED:'+d.name)\n"
+        )
+        client, inventory = remote_run_retry(client, "python3 -c " + shlex.quote(probe))
+        verified_resume.update(line.strip().split(":", 1)[1] for line in inventory.splitlines()
+                               if line.startswith("VERIFIED:"))
+        print("HIER_RESUME_BULK_VERIFIED", len(verified_resume), flush=True)
     child_jids = []
     child_pairs = []
     batch_size = len(prep["jobs"]) if CHILD_BATCH_SIZE <= 0 else CHILD_BATCH_SIZE
@@ -492,7 +524,10 @@ def main() -> None:
         if not resume:
           refuse_overwrite(cid, action="hier-child")
         if not force_child:
-          client, already = _child_artifacts_ok(client, cid, job["ref"])
+          if cid in verified_resume:
+            already = True
+          else:
+            client, already = _child_artifacts_ok(client, cid, job["ref"])
           if already:
             child_pairs.append("%s:%s" % (cid, job["ref"]))
             print("HIER_CHILD_SKIP_EXISTING", job["ref"], cid, flush=True)
@@ -534,7 +569,7 @@ def main() -> None:
                 ROOT,
                 shlex.quote(cid),
                 shlex.quote(job["ref"]),
-                shlex.quote(ROOT + "/" + prep["remote_dut"]),
+                shlex.quote(ROOT + "/" + job.get("remote_dut", prep["remote_dut"])),
                 job["expected_ports"],
                 job["expected_adapters"],
                 shlex.quote(LIBRARY_CORNER),
@@ -551,9 +586,30 @@ def main() -> None:
                 ROOT,
             )
         )
-        sftp = client.open_sftp()
-        atomic_put_bytes(client, sftp, body.encode(), wrapper)
-        sftp.close()
+        for wrapper_attempt in range(6):
+          try:
+            encoded_wrapper = base64.b64encode(body.encode()).decode("ascii")
+            temporary_wrapper = wrapper + ".upload"
+            client, wrapper_output = remote_run_retry(client,
+                "printf %s " + shlex.quote(encoded_wrapper) + " | base64 -d > " +
+                shlex.quote(temporary_wrapper) + " && test $(wc -c < " +
+                shlex.quote(temporary_wrapper) + ") -eq " + str(len(body.encode())) +
+                " && mv -f " + shlex.quote(temporary_wrapper) + " " + shlex.quote(wrapper) +
+                " && echo WRAPPER_UPLOAD_OK")
+            if "WRAPPER_UPLOAD_OK" not in wrapper_output:
+              raise OSError("wrapper command did not confirm delivery")
+            break
+          except (EOFError, OSError) as wrapper_error:
+            print("WRAPPER_UPLOAD_RECONNECT", wrapper_attempt, repr(wrapper_error), flush=True)
+            client = reconnect(client)
+          except Exception as wrapper_error:
+            import paramiko
+            if not isinstance(wrapper_error, paramiko.SSHException):
+              raise
+            print("WRAPPER_UPLOAD_RECONNECT", wrapper_attempt, repr(wrapper_error), flush=True)
+            client = reconnect(client)
+        else:
+          raise RuntimeError("wrapper upload retries exhausted: " + wrapper)
         client, _ = remote_run_retry(client, "chmod +x %s" % wrapper)
         client, wrap_stat = remote_run_retry(
             client,

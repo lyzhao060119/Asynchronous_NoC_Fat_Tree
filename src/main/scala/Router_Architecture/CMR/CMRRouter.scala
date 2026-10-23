@@ -74,27 +74,46 @@ class CMRRouter(
     val outputs = Flipped(new RouterDirGroupedHSIO(childLanes, parentLanes))
   })
 
-  private def inputPort(index: Int): HS_Packet = {
+  if (CMRSplitEmit.cataloguing) {
+    val key = CMRSplitEmit.Key(xCoordinate, yCoordinate, routerLevel, childLanes,
+      parentLanes, useMeshRouting, meshGridSize, meshCoordShift, staticParentLaneMapping)
+    CMRSplitEmit.keys += key
+    val external = Module(new BlackBox {
+      override def desiredName: String = key.name
+      val io = IO(new Bundle {
+        val clock = Input(Clock())
+        val reset = Input(Bool())
+        val io = new Bundle {
+          val inputs = new RouterDirGroupedHSIO(childLanes, parentLanes)
+          val outputs = Flipped(new RouterDirGroupedHSIO(childLanes, parentLanes))
+        }
+      })
+    })
+    external.io.clock := clock
+    external.io.reset := reset.asBool
+    external.io.io <> io
+  } else {
+  def inputPort(index: Int): HS_Packet = {
     val direction = config.dirOfPhys(index)
     val lane = config.laneOfPhys(index)
     if (direction < 4) io.inputs.child(direction)(lane)
     else io.inputs.parent(lane)
   }
 
-  private def outputPort(index: Int): HS_Packet = {
+  def outputPort(index: Int): HS_Packet = {
     val direction = config.dirOfPhys(index)
     val lane = config.laneOfPhys(index)
     if (direction < 4) io.outputs.child(direction)(lane)
     else io.outputs.parent(lane)
   }
 
-  private val InputPortModules = Seq.tabulate(PortCount) { input =>
+  val InputPortModules = Seq.tabulate(PortCount) { input =>
     Module(new IPM(
       config, xCoordinate, yCoordinate, routerLevel, input,
       useMeshRouting, meshGridSize, meshCoordShift
     ))
   }
-  private val OutputPortModules = Seq.tabulate(PortCount) { output =>
+  val OutputPortModules = Seq.tabulate(PortCount) { output =>
     Module(new OPM(config, output))
   }
 
@@ -194,6 +213,7 @@ class CMRRouter(
     port.HS.Req := opm.io.Reqout
     port.Data := opm.io.Dataout
     opm.io.Ackin := port.HS.Ack
+  }
   }
 }
 

@@ -5,6 +5,10 @@ set RUN_ID $::env(CMR_HIER_STITCH_RUN_ID)
 set TOP $::env(CMR_HIER_TOP)
 set RTL_DIR "$PROJECT_DIR/rtl"
 set DUT_V $::env(CMR_HIER_DUT_V)
+if {![file exists $DUT_V] || [file size $DUT_V] == 0} {
+  puts "CMR_NETWORK_DC_FAIL missing_top_rtl=$DUT_V"
+  exit 2
+}
 set CHILD_LIST $::env(CMR_HIER_CHILD_LIST)
 set REPORT_DIR "$PROJECT_DIR/reports/dc/$RUN_ID"
 set OUTPUT_DIR "$PROJECT_DIR/outputs/$RUN_ID"
@@ -95,12 +99,17 @@ foreach pair [split $CHILD_LIST ","] {
   # remove_design accepts the design collection/list directly.  The previous
   # `-designs` form is not a valid DC option and polluted otherwise valid
   # stitch logs with CMD-001 errors.
-  catch { remove_design $ref }
+  set previous [get_designs -quiet $ref]
+  if {[sizeof_collection $previous] > 0} { remove_design $previous }
   read_ddc $ddc
   puts "CMR_HIER_STITCH_LINK ref=$ref ddc=$ddc"
 }
 
 elaborate $TOP -work WORK
+if {[sizeof_collection [get_designs -quiet $TOP]] != 1} {
+  puts "$fail_token top_elaboration_missing=$TOP"
+  exit 2
+}
 current_design $TOP
 set router_ds [get_designs -quiet CMRRouter*]
 if {[sizeof_collection $router_ds] > 0} {

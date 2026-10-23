@@ -63,6 +63,7 @@ def make_flit(
     source: int = 0,
     flit_index: int = 0,
     multicast: bool = False,
+    wide_packet_tag: bool = False,
 ) -> int:
     """Encode a packet flit with the hop-router identity payload.
 
@@ -78,10 +79,19 @@ def make_flit(
         flit |= (x1 & 0x3F) << 14
         flit |= (y1 & 0x3F) << 20
     else:
-        flit |= (pkt_id & 0x3FFF) << 12
-        flit |= (flit_index & 0x7) << 9
-        flit |= IDENTITY_MAGIC << 6
-        flit |= (1 if multicast else 0) << 5
+        if wide_packet_tag:
+            # Repeated-unicast can expand 11k original events beyond the
+            # legacy 14-bit packet tag.  Body ordinal needs only two bits
+            # (body0..body2/tail); reserve 17 bits for pkt_seq and use a
+            # distinct marker so the TB can decode both formats.
+            flit |= (pkt_id & 0x1FFFF) << 9
+            flit |= ((flit_index - 1) & 0x3) << 7
+            flit |= 0b110 << 4
+        else:
+            flit |= (pkt_id & 0x3FFF) << 12
+            flit |= (flit_index & 0x7) << 9
+            flit |= IDENTITY_MAGIC << 6
+            flit |= (1 if multicast else 0) << 5
     flit |= (1 if is_tail else 0) << 26
     flit |= (1 if is_head else 0) << 27
     if flit >= (1 << FLIT_W):
@@ -155,6 +165,7 @@ def materialize(
     top_lanes: int,
     hrep: bool = False,
     source_repeated_unicast: bool = False,
+    wide_packet_tag: bool = False,
     routing: str = "quadtree",
 ) -> dict[str, Any]:
     if hrep and source_repeated_unicast:
@@ -203,6 +214,7 @@ def materialize(
                     source=int(event["source"]),
                     flit_index=idx,
                     multicast=multicast,
+                    wide_packet_tag=wide_packet_tag,
                 )
                 for idx in range(packet_flits)
             ]
@@ -279,6 +291,7 @@ def materialize(
         "top_lanes": top_lanes,
         "hrep": hrep,
         "source_repeated_unicast": source_repeated_unicast,
+        "wide_packet_tag": wide_packet_tag,
         "routing": routing,
         "case_format": case_format,
         "hex_width": hex_width,
@@ -301,7 +314,8 @@ def _meta_lines(case: dict[str, Any], name: str) -> list[str]:
         "meta traffic %s" % header["traffic"],
         "meta packet_length_or_distribution %d_flits" % header["packet_flits"],
         "meta packet_flits %d" % header["packet_flits"],
-        "meta packet_tag_bits %d" % PKT_TAG_BITS,
+        "meta packet_tag_bits %d"
+        % (17 if case["wide_packet_tag"] else PKT_TAG_BITS),
         "meta payload_encoding head_aabb_body_pktseq14_flitindex3",
         "meta receive_identity deferred_head_bound_by_first_body_pktseq",
         "meta load_point %.2f" % header["offered_load"],
@@ -320,6 +334,7 @@ def _meta_lines(case: dict[str, Any], name: str) -> list[str]:
         "meta hrep %d" % (1 if case["hrep"] else 0),
         "meta source_repeated_unicast %d"
         % (1 if case["source_repeated_unicast"] else 0),
+        "meta wide_packet_tag %d" % (1 if case["wide_packet_tag"] else 0),
         "meta format %s" % case["case_format"],
         "meta latency_metric tmax",
         "meta latency_metric_name last_destination_tail_minus_source_header_injection",
@@ -442,6 +457,7 @@ def materialize_path(
     top_lanes: int,
     hrep: bool = False,
     source_repeated_unicast: bool = False,
+    wide_packet_tag: bool = False,
     routing: str = "quadtree",
     design_id: str | None = None,
     sidecars: bool = True,
@@ -452,6 +468,7 @@ def materialize_path(
         top_lanes=top_lanes,
         hrep=hrep,
         source_repeated_unicast=source_repeated_unicast,
+        wide_packet_tag=wide_packet_tag,
         routing=routing,
     )
     suffix = (
