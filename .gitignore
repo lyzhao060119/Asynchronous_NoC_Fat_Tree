@@ -173,3 +173,7 @@ scripts/asic_dc/cmr/*
 /DATE_paper/paper/**/*.log
 /DATE_paper/paper/**/~$*
 /DATE_paper/paper/**/main_pdf_text.txt
+
+# Word recovery and lock files
+/DAC/paper/~$*
+/DAC/paper/~WRL*.tmp
