@@ -1,0 +1,40 @@
+{
+  "batch": "single_router_sync_clock_gating_20261024_r1_gls_r3",
+  "configs": [
+    {
+      "name": "sync_c1p1_ungated",
+      "kind": "sync_thin_1x1",
+      "netlist": "20261024_router_c1p1_ungated_tt_r3",
+      "sync": true,
+      "lanes": 1
+    },
+    {
+      "name": "sync_c1p1_cg",
+      "kind": "sync_thin_1x1",
+      "netlist": "20261024_router_c1p1_cg_tt_r4",
+      "sync": true,
+      "lanes": 1
+    },
+    {
+      "name": "sync_c1p4_ungated",
+      "kind": "sync_fat_1x4",
+      "netlist": "20261024_router_c1p4_ungated_tt_r3",
+      "sync": true,
+      "lanes": 4
+    },
+    {
+      "name": "sync_c1p4_cg",
+      "kind": "sync_fat_1x4",
+      "netlist": "20261024_router_c1p4_cg_tt_r4",
+      "sync": true,
+      "lanes": 4
+    }
+  ],
+  "clock_ns": 1,
+  "corner": "TT0.8V25C",
+  "flit_bits": 28,
+  "latency": "five output-paced low-switching flits; mean output acceptance minus input acceptance",
+  "packet": "one five-flit random-payload packet; 3 seeds; active,guard2,guard5,idle windows",
+  "regression": "two packets separated by 30 cycles; periodically backpressured receiver; data/order/stall stability and post-drain checks",
+  "power": "whole DUT, internal+switching+leakage;50ps slew,5fF load;post-synthesis,no CTS/SPEF"
+}

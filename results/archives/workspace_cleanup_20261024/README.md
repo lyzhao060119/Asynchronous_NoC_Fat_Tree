@@ -1,0 +1,1 @@
+Prior tracked paper and experiment status versions, plus a Word recovery temporary file snapshot, preserved before cleanup. Original experiment run directories are retained. The active Word temporary file remains locally because Word holds it open; it is ignored by Git. ZIP contents verified against SHA-256 manifest. No simulation or synthesis rerun.

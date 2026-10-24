@@ -1,0 +1,28 @@
+{
+  "design": "SYNC_M16",
+  "benchmark": "TOPO-UR",
+  "seed": 202702,
+  "tag": "SYNC_M16_TOPO-UR_s202702_m80",
+  "variant": null,
+  "activity_dir": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202702_m80",
+  "start_ps": 416501,
+  "end_ps": 13084501,
+  "path": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/vcd/SYNC_M16_TOPO-UR_s202702_m80/measurement.vcd",
+  "compressed": false,
+  "bytes": 2099373368,
+  "uncompressed_bytes": 2099373368,
+  "uncompressed_sha256": null,
+  "timescale_ps": 1,
+  "last_timestamp_ps": 13084500,
+  "first_timestamps_ps": [
+    0,
+    416500,
+    416529,
+    416530,
+    416533
+  ],
+  "ends_with_newline": true,
+  "last_line_preview": "$end",
+  "window_coverage_upper_bound": 0.9999999210609409,
+  "status": "BOUNDARY_COVERAGE_OK"
+}

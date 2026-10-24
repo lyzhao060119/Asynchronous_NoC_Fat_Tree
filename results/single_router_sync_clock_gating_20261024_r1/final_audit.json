@@ -1,0 +1,2466 @@
+{
+  "status": "FINAL_AUDIT_PASS",
+  "dc_pass": 4,
+  "gls_pass": 20,
+  "ptpx_runs_pass": 12,
+  "power_windows_pass": 48,
+  "data_flip_checks": [
+    {
+      "config": "sync_c1p1_ungated",
+      "seed": 1,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p1_ungated",
+      "seed": 2,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p1_ungated",
+      "seed": 3,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p1_cg",
+      "seed": 1,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p1_cg",
+      "seed": 2,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p1_cg",
+      "seed": 3,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p4_ungated",
+      "seed": 1,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p4_ungated",
+      "seed": 2,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p4_ungated",
+      "seed": 3,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p4_cg",
+      "seed": 1,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p4_cg",
+      "seed": 2,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    },
+    {
+      "config": "sync_c1p4_cg",
+      "seed": 3,
+      "body_flips_24bits": [
+        11,
+        12
+      ]
+    }
+  ],
+  "savings": [
+    {
+      "geometry": "c1p1",
+      "area_um2_reduction_percent": 9.040673332983918,
+      "packet_energy_pj_reduction_percent": 66.42341684910403,
+      "idle_power_mw_reduction_percent": 82.03818026403266
+    },
+    {
+      "geometry": "c1p4",
+      "area_um2_reduction_percent": 8.530840619658397,
+      "packet_energy_pj_reduction_percent": 70.12730131358727,
+      "idle_power_mw_reduction_percent": 80.49323514300394
+    }
+  ],
+  "files": [
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\c1p1.v",
+      "bytes": 361444,
+      "sha256": "753423ec20cab2ba6b05b0f2df1658794b14049f753bea5793a4685983ad0549"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\c1p4.v",
+      "bytes": 474833,
+      "sha256": "528e197fe8f3e5666d6714d2416077a1a168a9489e86eebd7b9176dfc9d56fb9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\dc_jobs.json",
+      "bytes": 6751,
+      "sha256": "43ddf84231f29e064229d784becf65fb67ca5910d2e98697d750d1a28161f400"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\dc_summary.json",
+      "bytes": 7047,
+      "sha256": "2227a547292d12db271e7ae482e9a2e47b19e061ccb065d74a8cbab2f33a3efc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\experiment_spec.json",
+      "bytes": 1400,
+      "sha256": "839762c5a29d4d22506914f0b152ad64e133735be13aa9b77e60c095055f74fa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\jobs.json",
+      "bytes": 706,
+      "sha256": "b73802294ca44a98adf505b26e4207f0f1eac8bb21fc7fbe9cfa349f723ff926"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\packet_spec.json",
+      "bytes": 1276,
+      "sha256": "f71e494f2924ac92406c8c80a5da63e886a803f47ebff6bcdfd2e1fcba86abd2"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\preflight.json",
+      "bytes": 8223,
+      "sha256": "06562fe8feda9831e9e7f8f995946d3f8d84aa9691c34e1baffa2c3e48b0ac91"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\inputs\\packet_power.tcl",
+      "bytes": 4956,
+      "sha256": "27f7d5d4c1afda4d09b8617517edfcf02d1fd006ffb102dfe4ad883ef56e6263"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\inputs\\run_gls_router_matched_ppa.sh",
+      "bytes": 3967,
+      "sha256": "8d7372e6794628625341c2c6edd374a2552e55fb44bc3ad039fc007521739144"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\inputs\\tb_router_matched_ppa_sync.sv",
+      "bytes": 8364,
+      "sha256": "60dc30911a25375aec8a98f9cb8c8473c8b41c0fef4431c481b15bd1f4e265d2"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\assert_no_gtech.tcl",
+      "bytes": 2421,
+      "sha256": "142161da4b061eeb07e5aca84757f5fa65f2488774c79f35efea5bb107958692"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\dc.log",
+      "bytes": 82266,
+      "sha256": "855887132200328395a26e26d948365626e999a128077d11554d0d3b44f41f1e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\dc.tcl",
+      "bytes": 5720,
+      "sha256": "2a335f5a5fc4a31fff41627eb079b84c0b30efff746592246fbc89e95f3c18cc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\driver.tcl",
+      "bytes": 258,
+      "sha256": "c857850cdaf2aa7cf0c079643f4e23a79574bef3af21e73426b573097719bc9f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\run_dc.sh",
+      "bytes": 689,
+      "sha256": "83020e4d6ece8a65a441d4a833a4f0f59cecf41386da8c01654b94877ffa4f0b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\SyncCmrRouter.v",
+      "bytes": 365616,
+      "sha256": "0a3d158ea6924bf21a24319e18e4deb2e264e68647192c1d1ac563785e527d93"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\sync_cmr_noc64.sdc",
+      "bytes": 1272,
+      "sha256": "d528ab7308fbb1ea0c8411d120f3d0e719f68160888408eee82c61839c92708a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\tech_t28ss.tcl",
+      "bytes": 1790,
+      "sha256": "97ad5f929ba44a53e4559376755d0f1c00500b5bf67d9e80390f950ec00f7314"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_reports_r2\\dc.tcl",
+      "bytes": 5705,
+      "sha256": "8b9220dd9b6525f0f82482d066cba026e6c3d630e7829760c86a4c9ee0ebd533"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_reports_r2\\driver.tcl",
+      "bytes": 269,
+      "sha256": "034c7b6de63623f474e39a9ceec6e6a9ef61a4a604dbfbb88155bb3ca0750113"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_reports_r2\\run_dc.sh",
+      "bytes": 722,
+      "sha256": "ecf7b3498a67397aa437980130eaa783b336a24c5b41633e072de13d9e6bb974"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_reports_r3\\dc.tcl",
+      "bytes": 5686,
+      "sha256": "b489e3fa277e9f1fa52bc4d48818d47e6fd27132c432a37529043a89560915c0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_reports_r3\\driver.tcl",
+      "bytes": 280,
+      "sha256": "6bfa8b4442a2dd1e19f8c852a677fdbda529a1b57cb118ec6d48378f53c758d4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_reports_r3\\run_dc.sh",
+      "bytes": 755,
+      "sha256": "527ce5166f846d4620e1551402e55cc3f9bc9ce330d284dab1f4f063ec089126"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_style_r4\\dc.tcl",
+      "bytes": 5721,
+      "sha256": "9415adfad2d1a1df807d83958d514e32c5612c187b72e99dfc76e32bde65cad6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_style_r4\\driver.tcl",
+      "bytes": 267,
+      "sha256": "6dc13dbb7cccaa0f49b25c8a71a448f0ebb243b1558cfa30690f72467a30064f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg_style_r4\\run_dc.sh",
+      "bytes": 716,
+      "sha256": "364ccb6f43243e68defec0daf8e9eacb4fea600b0c0328bdbad0a1fa35d28990"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\assert_no_gtech.tcl",
+      "bytes": 2421,
+      "sha256": "142161da4b061eeb07e5aca84757f5fa65f2488774c79f35efea5bb107958692"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\dc.log",
+      "bytes": 56372,
+      "sha256": "ee2407583a85aebfc3776a60274e4ffa816c5829259f924c8470bef750bfee50"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\dc.tcl",
+      "bytes": 5541,
+      "sha256": "0d866fc5ee404dfc432c4c8596f0d5fc9d6a9f6ec8f862a9dd1358eaacdf6884"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\driver.tcl",
+      "bytes": 263,
+      "sha256": "f96630b04702817275d8153566e7386b55f1e2b1aab617ed235765baa45e87a5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\run_dc.sh",
+      "bytes": 709,
+      "sha256": "f11106ac93f483761084d4185ba6923c1c9286113c8b3c8f294e328307c02f83"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\SyncCmrRouter.v",
+      "bytes": 365616,
+      "sha256": "0a3d158ea6924bf21a24319e18e4deb2e264e68647192c1d1ac563785e527d93"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\sync_cmr_noc64.sdc",
+      "bytes": 1278,
+      "sha256": "08284ae46e6f603ebcb3f0b75446854f01e6e158221f05651db89aeeefa99e4c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\tech_t28ss.tcl",
+      "bytes": 1790,
+      "sha256": "97ad5f929ba44a53e4559376755d0f1c00500b5bf67d9e80390f950ec00f7314"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated_reports_r2\\dc.tcl",
+      "bytes": 5526,
+      "sha256": "71c6c6f40c617bfe610a5fa95da159962c34d251142cd1f115a805ea347bdb40"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated_reports_r2\\driver.tcl",
+      "bytes": 274,
+      "sha256": "8743a623d88b71abbe3136db8fc303d90dc2bbdf95ad55b350e1aa66b6aef366"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated_reports_r2\\run_dc.sh",
+      "bytes": 742,
+      "sha256": "fcf84d3e5311824854636217afa200674d89153a36241598fc712fed350b6f74"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated_reports_r3\\dc.tcl",
+      "bytes": 5507,
+      "sha256": "1ea9f6203ba7d722585773234e2c263e9c3533f0a3f9ab237087c4d32ccd5d90"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated_reports_r3\\driver.tcl",
+      "bytes": 285,
+      "sha256": "bd96f9501efa86274f86f072aa518f84f8c7bf9066d3812823d34d2b132dacdd"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated_reports_r3\\run_dc.sh",
+      "bytes": 775,
+      "sha256": "638b442cd3dd918cdba8f44251dd738b83f37e9784a6c36725429be401020402"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\assert_no_gtech.tcl",
+      "bytes": 2421,
+      "sha256": "142161da4b061eeb07e5aca84757f5fa65f2488774c79f35efea5bb107958692"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\dc.log",
+      "bytes": 102946,
+      "sha256": "65702d0966df5bb0f16375248d89205bd44db04514949fbe2964296cf67055ad"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\dc.tcl",
+      "bytes": 5720,
+      "sha256": "5a914c053f5784b83f73335a0a7da2a84a7831346c036ddd626dce2e67084cdf"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\driver.tcl",
+      "bytes": 258,
+      "sha256": "357a233bee6576c83f25f4e6c6840763316a3861f42b1e502c23f12eeb35682b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\run_dc.sh",
+      "bytes": 689,
+      "sha256": "e3dc25e92929257e44abdc52ef8c2303fc7e257cd3a3940fc41752a0eacce204"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\SyncCmrRouter.v",
+      "bytes": 480178,
+      "sha256": "2fe2484aa52d48c1adc4f9c896f459fd6544463a78dfe88dbaec8a64d6630fe6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\sync_cmr_noc64.sdc",
+      "bytes": 1272,
+      "sha256": "d528ab7308fbb1ea0c8411d120f3d0e719f68160888408eee82c61839c92708a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\tech_t28ss.tcl",
+      "bytes": 1790,
+      "sha256": "97ad5f929ba44a53e4559376755d0f1c00500b5bf67d9e80390f950ec00f7314"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg_reports_r3\\dc.tcl",
+      "bytes": 5675,
+      "sha256": "6aff558eb122a25da69cd6feee32724bfa9eff7d5d5fab23c28bb4cfcfd3c0b3"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg_reports_r3\\driver.tcl",
+      "bytes": 269,
+      "sha256": "202974a8bc24ae14994f71a275be1eb93b94af0d165b60bdb95bc5633077dc24"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg_reports_r3\\run_dc.sh",
+      "bytes": 722,
+      "sha256": "43a2b29e48234561c53eded99b6916a8d66388439dc4ee037050dba2881bfb23"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg_style_r4\\dc.tcl",
+      "bytes": 5721,
+      "sha256": "966358aa236ef11052cf375c674bf4bfafee7318c7af6bc3b819fd498739f663"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg_style_r4\\driver.tcl",
+      "bytes": 267,
+      "sha256": "4701389232b336fd297833d21bf13fc75a2e23c3c2d55b6bcb6de6db308f8d8d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg_style_r4\\run_dc.sh",
+      "bytes": 716,
+      "sha256": "752e1f9b2b255826af3cb50dbd2bb3dafb6ea0e6b96d23dd182fcb47141795f2"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\assert_no_gtech.tcl",
+      "bytes": 2421,
+      "sha256": "142161da4b061eeb07e5aca84757f5fa65f2488774c79f35efea5bb107958692"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\dc.log",
+      "bytes": 58507,
+      "sha256": "265afaf18ec8db88fddc8d6e634eddd5e66dfacb6aa7e6e6ee50c4de834348b6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\dc.tcl",
+      "bytes": 5541,
+      "sha256": "a398ba49d07913a1281414fa78c44bd55f28193e4d3baeef1246394b3808fb9a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\driver.tcl",
+      "bytes": 263,
+      "sha256": "0e0306b06c3c84f65e6e64cf66a59aa6d436025190e30a498c356b2761a6789a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\run_dc.sh",
+      "bytes": 709,
+      "sha256": "0bf5cbadc2f91a83aef52573272e0c9401695a9b69c0d569b805c85853a0b737"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\SyncCmrRouter.v",
+      "bytes": 480178,
+      "sha256": "2fe2484aa52d48c1adc4f9c896f459fd6544463a78dfe88dbaec8a64d6630fe6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\sync_cmr_noc64.sdc",
+      "bytes": 1278,
+      "sha256": "08284ae46e6f603ebcb3f0b75446854f01e6e158221f05651db89aeeefa99e4c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\tech_t28ss.tcl",
+      "bytes": 1790,
+      "sha256": "97ad5f929ba44a53e4559376755d0f1c00500b5bf67d9e80390f950ec00f7314"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated_reports_r3\\dc.tcl",
+      "bytes": 5496,
+      "sha256": "4f7de8e3fd9f8572a2f1f0f46d2baeb6fe39307736414ad85210f11b43596cf4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated_reports_r3\\driver.tcl",
+      "bytes": 274,
+      "sha256": "15ca704c9e9e034134c2c1e688a20c93e11f7a1f8596d43260235ed580e18062"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated_reports_r3\\run_dc.sh",
+      "bytes": 742,
+      "sha256": "cb83744777e2774212f58fa757c3a63e0d33d73a5319d5acfcba5fe178f64045"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\outputs\\SyncCmrRouter.ddc",
+      "bytes": 1851392,
+      "sha256": "57156d9c9a7002a4a0dc7a7b0548bee63ca67fc85cfb011b82c1ad2feef5eeaf"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\outputs\\SyncCmrRouter.sdc",
+      "bytes": 39563,
+      "sha256": "ed732b72b7e06f2b2ffcef3e11dd6bf2d9178a74bada60aa98ef2d7d5ed85327"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\outputs\\SyncCmrRouter.sdf",
+      "bytes": 12722112,
+      "sha256": "412a11e127715e229763fa15329e609ede09593078a0147dcee0452f926be05a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\outputs\\SyncCmrRouter_post.v",
+      "bytes": 1345613,
+      "sha256": "c62decdf2eb939c8786d9151b7815882fe4276e92e42f1c302b3d9a4cdfc14a5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\all_violators.rpt",
+      "bytes": 40746,
+      "sha256": "f64a1833d9a46378cb4755951aff3103a2a66d61b1232353f07d1bd36a645d86"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\check_design_post.rpt",
+      "bytes": 13466,
+      "sha256": "a5fadb4770a4c7f00901e14ba587a57252d9612285b9b87036d398eda1840039"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\check_design_pre.rpt",
+      "bytes": 25203,
+      "sha256": "d5e61df60f059bbf56ebd273246bc82973b3a46681bfd0837eafa331d92dd0bd"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\clock.rpt",
+      "bytes": 599,
+      "sha256": "0f1d888054732c1e84e38f71b236b3d285cdc9e58522f0f1139bcc948e0146a0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\clock_gating.rpt",
+      "bytes": 2554,
+      "sha256": "e4ab9b6d436fe618b2a6c4a6168544ca815bcd9b8f2fc39bb068debcf587992e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\clock_gating_cells.rpt",
+      "bytes": 68,
+      "sha256": "de5d0c52b4c78ea69267638ecc774b03c36ad489cd9dfd054b46061e3514ec47"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\clock_gating_hold.rpt",
+      "bytes": 59351,
+      "sha256": "17128bf9e06aeb04aba5da3c8f52f1c6d489d620b4ba7db1bdee19cd1733c855"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\clock_gating_setup.rpt",
+      "bytes": 59351,
+      "sha256": "17128bf9e06aeb04aba5da3c8f52f1c6d489d620b4ba7db1bdee19cd1733c855"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\cmr_structure.rpt",
+      "bytes": 292,
+      "sha256": "6dd5d40f3d04e8e3dda577d7fcebe032070d268a352163b3cea57795567a6c0a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\gtech_cell_count.txt",
+      "bytes": 14,
+      "sha256": "73ab2d0e2fe0d821530dd0aa75fb92ff1c5af6f641557a8e3695d8ffbbe94872"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\post_hashes.sha256",
+      "bytes": 492,
+      "sha256": "75ec22fea879981e6cd3502ca5570cf21e71bd6c0e2b6c6d59f5e4f372371d3a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\qor.rpt",
+      "bytes": 2397,
+      "sha256": "5ca468ae6f950ca5249749d1dc736a4feb7f76bf142c16bb9438797b247f6de9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\timing_max.rpt",
+      "bytes": 630757,
+      "sha256": "99dc234e56c56b58b65f909e77ac06f900c63508faf2127f5baaa005989d29d0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\timing_min.rpt",
+      "bytes": 509955,
+      "sha256": "bf098e530abef053e4b35333ca03306e9bc4a9d826d3096e851db899039e2c14"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_ungated\\reports_dc\\unmapped_cell_count.txt",
+      "bytes": 52,
+      "sha256": "f9d4f1b503347ba7b6a5646546ed3a960a27c9b6d0d3d3ca646429ae290569a6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\outputs\\SyncCmrRouter.ddc",
+      "bytes": 1998848,
+      "sha256": "b062769b0fd11dd57fbeac6eba44119f5f8c3bdda948f8327cd7b027f684e9d8"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\outputs\\SyncCmrRouter.sdc",
+      "bytes": 39563,
+      "sha256": "25307a76d75d1d42d415add60cfe7184058c7cec51915450558fa9008e887a6b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\outputs\\SyncCmrRouter.sdf",
+      "bytes": 10363696,
+      "sha256": "6b2de4437420b8107d2f3b57b09a1c7e762fb9492686bfee05237bf2c6f26431"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\outputs\\SyncCmrRouter_post.v",
+      "bytes": 1233868,
+      "sha256": "2c4e803ef9fd8738c677ec5e1fd27041071f538ea764a434a480c89c3ffdc701"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\all_violators.rpt",
+      "bytes": 44762,
+      "sha256": "56024dd01394888d75ffd70e4798bdb87236daacaeda356d83605db146c59e88"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\check_design_post.rpt",
+      "bytes": 13466,
+      "sha256": "a5ba742b88e9545a51407c660cbc5305696dda5838c96e18f30bd8de12f3d6dc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\check_design_pre.rpt",
+      "bytes": 25203,
+      "sha256": "68106ba4e409d3913e3c4d139cdfeabf0b65fa877ecca5f79aa7d4619173a27a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\clock.rpt",
+      "bytes": 599,
+      "sha256": "1e419008d27f6744f829fd3abaa16a2d7e8370412462ad458c1489d87cdb5c22"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\clock_gating.rpt",
+      "bytes": 2554,
+      "sha256": "bf557a4f92fb9e261dfb6dc560eea21f83d293fb4c1afe5a17000a6a6371caf8"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\clock_gating_cells.rpt",
+      "bytes": 30771,
+      "sha256": "ddda885ca381d09a8ef5f35168c583456fd3c1920466a7b9ee95ca52ac934041"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\clock_gating_hold.rpt",
+      "bytes": 65071,
+      "sha256": "50b93b431b9e43d837bd9895342b4daaf85a6375cb28b5ec7277755007791078"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\clock_gating_setup.rpt",
+      "bytes": 65071,
+      "sha256": "50b93b431b9e43d837bd9895342b4daaf85a6375cb28b5ec7277755007791078"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\cmr_structure.rpt",
+      "bytes": 293,
+      "sha256": "4b2e35686747f53754510ac72ce18f36f0117d2f07ff06ae231441d7744a027c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\gtech_cell_count.txt",
+      "bytes": 14,
+      "sha256": "73ab2d0e2fe0d821530dd0aa75fb92ff1c5af6f641557a8e3695d8ffbbe94872"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\post_hashes.sha256",
+      "bytes": 477,
+      "sha256": "20d4ccfaf65c8b6f17d937d3b9c6648c128a99a5b1c3f13348181dce98b692f4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\qor.rpt",
+      "bytes": 2397,
+      "sha256": "74af53b5c1443eaf31cf33ac84c82ba15257854d6393d92fcc43693b5b0f32df"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\timing_max.rpt",
+      "bytes": 297433,
+      "sha256": "ee118e938bfe35a6e7d7e317f2a2d8dcb20c80eef1d2b9803709ceeefcfc0cab"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\timing_min.rpt",
+      "bytes": 822198,
+      "sha256": "6e471ff04b53c59fb0c9295653adeff6254f4f9a1a58c32fbbdfacd3292f1a4d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p4_cg\\reports_dc\\unmapped_cell_count.txt",
+      "bytes": 52,
+      "sha256": "f9d4f1b503347ba7b6a5646546ed3a960a27c9b6d0d3d3ca646429ae290569a6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\outputs\\SyncCmrRouter.ddc",
+      "bytes": 1114112,
+      "sha256": "27cfc12714213a481bdc8b1bc77767ace2633c32d26fbef9322be3ac0f194ffa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\outputs\\SyncCmrRouter.sdc",
+      "bytes": 25127,
+      "sha256": "aa876ff83a4b4d8fb84c44ea309b8a2ac53c4a7ee6c71e9a9260f1ade32da105"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\outputs\\SyncCmrRouter.sdf",
+      "bytes": 7499787,
+      "sha256": "642be6ae7dbc319e55ce6685875299ab376b6037860cde7c86ac2a5cd5bc0baa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\outputs\\SyncCmrRouter_post.v",
+      "bytes": 780294,
+      "sha256": "e937a7aebc07d68dd29675dc3542a47f6af25fda237b1843ff11239c2854870a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\all_violators.rpt",
+      "bytes": 25472,
+      "sha256": "176531bb2d05e47c0c3a2fd1700d5db0e575f5f4fddb31ede5f2f19c06649554"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\check_design_post.rpt",
+      "bytes": 8607,
+      "sha256": "8eb230471eb26c9c3e610fde141daf597e78cba0d6391df03af79854fe4d4c67"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\check_design_pre.rpt",
+      "bytes": 16376,
+      "sha256": "af9a321b7759a2b6f7e01227d36b87be72d9e77ba79d14b13ce7738b379258c8"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\clock.rpt",
+      "bytes": 599,
+      "sha256": "25b3cd627194d91e96e3baa1dfb2399f74f8264dcf47d94b26019e489ff2588e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\clock_gating.rpt",
+      "bytes": 2554,
+      "sha256": "2bb00718395de8c526e0f77ce3c350116062806b88ade16cd36ffdb742cc43fd"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\clock_gating_cells.rpt",
+      "bytes": 68,
+      "sha256": "de5d0c52b4c78ea69267638ecc774b03c36ad489cd9dfd054b46061e3514ec47"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\clock_gating_hold.rpt",
+      "bytes": 36764,
+      "sha256": "e3d5fc63584236fdb6858f5083635f9509a2ce8b6ad54f51f0351be1fad21372"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\clock_gating_setup.rpt",
+      "bytes": 36764,
+      "sha256": "e3d5fc63584236fdb6858f5083635f9509a2ce8b6ad54f51f0351be1fad21372"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\cmr_structure.rpt",
+      "bytes": 291,
+      "sha256": "7f918790e66305da325ec20c64f94f9f743a595ab31f3f388009eee46d9c1a97"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\gtech_cell_count.txt",
+      "bytes": 14,
+      "sha256": "73ab2d0e2fe0d821530dd0aa75fb92ff1c5af6f641557a8e3695d8ffbbe94872"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\post_hashes.sha256",
+      "bytes": 492,
+      "sha256": "eb1f78bf51c15b61eb14569468e8eeebda2446b0759b2a0aae13c0e2da7cd7a3"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\qor.rpt",
+      "bytes": 2397,
+      "sha256": "7e69e2b06d459dc6f0519f12af1e6fb8fb5c5124916a72aad1cecf0693fcaf32"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\timing_max.rpt",
+      "bytes": 469773,
+      "sha256": "038cf2395c54c05c225fbf1b122454e4ac9eca0c019472351c51affb2ccdba72"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\timing_min.rpt",
+      "bytes": 353052,
+      "sha256": "3fdbdd29cc4a4bc80ade6e0f73f15189fbbec6d1dcc11947b957b3e0b3f1045b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_ungated\\reports_dc\\unmapped_cell_count.txt",
+      "bytes": 52,
+      "sha256": "f9d4f1b503347ba7b6a5646546ed3a960a27c9b6d0d3d3ca646429ae290569a6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\outputs\\SyncCmrRouter.ddc",
+      "bytes": 1187840,
+      "sha256": "3b42ff92000370ba9cf3c4a99958b191db6f009cd02264dd65d169d955fbdd55"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\outputs\\SyncCmrRouter.sdc",
+      "bytes": 25127,
+      "sha256": "ba638c54ec97cc3d1ce48057f5b913ebbd9e42b722d40126f72eae1635caef4e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\outputs\\SyncCmrRouter.sdf",
+      "bytes": 6080050,
+      "sha256": "833ad00e0cdde42d090ac80c3df817e47b1602cd05fb0ba501ef1401b2e7a056"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\outputs\\SyncCmrRouter_post.v",
+      "bytes": 711577,
+      "sha256": "c440d53dfcfd5db787442e188d2b3e57169ae17e8bd7e5e298ada37d35a5c946"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\all_violators.rpt",
+      "bytes": 27977,
+      "sha256": "d62ef42d980283bf7676a6624256fb10cae0f08315576cd7c83ba8f47c8aa85a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\check_design_post.rpt",
+      "bytes": 8607,
+      "sha256": "2013d4f4f819c9cd49e0705501b5d0f67df51e1926d159b3115e00ef98cfc983"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\check_design_pre.rpt",
+      "bytes": 16376,
+      "sha256": "ba6e2af7e139434b5d40177265f5e6991b377be4db061a59c208a00b1a7fcc32"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\clock.rpt",
+      "bytes": 599,
+      "sha256": "9f205d76b832ea24403e783c25186367f6ce008257e01fb1c89b0f65177c48c3"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\clock_gating.rpt",
+      "bytes": 2554,
+      "sha256": "01c2a6427642140f7c982864af1d96aee5cebe62562187c71b52363b20040478"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\clock_gating_cells.rpt",
+      "bytes": 18261,
+      "sha256": "d65d9b8fd1242a64594401124bc7413b49b7ac44019502c0b84da06d6bc5b982"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\clock_gating_hold.rpt",
+      "bytes": 40334,
+      "sha256": "6c7df8446a7f881d53fd520747e402232534941c0b5aa440fd23dc9ea9e57a60"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\clock_gating_setup.rpt",
+      "bytes": 40334,
+      "sha256": "6c7df8446a7f881d53fd520747e402232534941c0b5aa440fd23dc9ea9e57a60"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\cmr_structure.rpt",
+      "bytes": 292,
+      "sha256": "f10a79ec045620f42d17aadf0bd7fc7a9e32dcc27f1ecf67dc53e949140ee7d6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\gtech_cell_count.txt",
+      "bytes": 14,
+      "sha256": "73ab2d0e2fe0d821530dd0aa75fb92ff1c5af6f641557a8e3695d8ffbbe94872"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\post_hashes.sha256",
+      "bytes": 477,
+      "sha256": "9e1cca6596b5b8ef6efb4c9be152fc05f7a9b7f12c53f7fdbc916faac0de9484"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\qor.rpt",
+      "bytes": 2397,
+      "sha256": "a3f3422e826c58fd37e49711f7ac46b0a343a961f23d316c6b28ab9acd13f6d1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\timing_max.rpt",
+      "bytes": 272562,
+      "sha256": "6ad6f7b07ad930f01e23c59e7228e407e54ae44df8ede8f4a1cc61d024ff8fc7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\timing_min.rpt",
+      "bytes": 447667,
+      "sha256": "1ae5c353a250c7a4f3d8ff98eb8d04f792bbdd2bd1daa1f02ebe43be517e6e5c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\sync_c1p1_cg\\reports_dc\\unmapped_cell_count.txt",
+      "bytes": 52,
+      "sha256": "f9d4f1b503347ba7b6a5646546ed3a960a27c9b6d0d3d3ca646429ae290569a6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\inputs\\hop_binds\\sync_ports_c1_p1.vi",
+      "bytes": 1925,
+      "sha256": "bd722a1c17fa0e5c201bafa8e680bb7f6dc3ef18a1cdc0d11b035386195eaf78"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1\\inputs\\hop_binds\\sync_ports_c1_p4.vi",
+      "bytes": 2963,
+      "sha256": "4068471e53eec8d8bba94babf49edb358528292d2b3732becd6b66a8c6d55b2b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\experiment_spec.json",
+      "bytes": 1407,
+      "sha256": "9258f31b8141ffe18998ce63916fb9db211793fd90c35f020fecd104646f4b5e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\gls_packets.json",
+      "bytes": 24883,
+      "sha256": "67bd6c99917d7e5d973df10233157162f9d641cf868cf9fdc8b91b66919f6b87"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\jobs.json",
+      "bytes": 741,
+      "sha256": "0357c78802a001e051f7c8e6b48a5c995b0b19a1f4eee0b66b05f2cd6452e0b1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\latency_regression.json",
+      "bytes": 20631,
+      "sha256": "8f3d6d8d24700adc4452136e1c050a4d7c79137c9747251dc0f0cfec15789058"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\packet_spec.json",
+      "bytes": 1283,
+      "sha256": "da713fa43444819db2229977875715efc17bd12e9199faf7c24cc229586a6d83"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power_jobs.json",
+      "bytes": 30169,
+      "sha256": "1dc7037aaa1b76ec7c78443dfafbd4af3c0ce7ef8e4c670371b49a3d1f551d95"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\preflight.json",
+      "bytes": 8230,
+      "sha256": "c59ceb785f819708d97cdb73cfebb50b021c5449211d4d239d60cc99aa1c3e4f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\inputs\\packet_power.tcl",
+      "bytes": 4987,
+      "sha256": "edc8ca751d3e5f5fbdd9e6d718d8bbc80ba52e26a68d88c641e24991be446d38"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\inputs\\run_gls_router_matched_ppa.sh",
+      "bytes": 3967,
+      "sha256": "8d7372e6794628625341c2c6edd374a2552e55fb44bc3ad039fc007521739144"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\inputs\\tb_router_matched_ppa_sync.sv",
+      "bytes": 8374,
+      "sha256": "80cebbcc7b16abe142ba1090ece6ce242b2759ff4578776c92bf9133ff9994c5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\compile.log",
+      "bytes": 22104,
+      "sha256": "265f578f81a8f68ba566f9bfd5ff42230172e933bf0302250f108ccbe38d8ccc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\input_hashes.sha256",
+      "bytes": 660,
+      "sha256": "6d0c331bed7566f9322ee8daefc88361a48c9e856b13aee1d69ef846d8b4d5ed"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\lsf.log",
+      "bytes": 28355,
+      "sha256": "c5f434bb5bf7e5dd0a5b4bee52d5b0ab8e4bd31f694e4c8bdf8369b8c53a73ee"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\sdf_annotate.log",
+      "bytes": 111004,
+      "sha256": "a0adc00a79b65e782acb0426c67f005bdc914bb1e9a09d3cb3d0145a205bccca"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\compile.log",
+      "bytes": 22988,
+      "sha256": "95d6a26714bad2aaf50d316c563d44deaea2b5dd127ab8f25177a5d397d8ca6c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\input_hashes.sha256",
+      "bytes": 680,
+      "sha256": "9086cb8f9bb9daedc740c6c3d27b357f379750d2675b7c1ddb6ce4405b679aa4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\lsf.log",
+      "bytes": 29304,
+      "sha256": "9e79300d5a98cbe1798add224a7f2aaee13a9b9b6465654c880d4db785007376"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\sdf_annotate.log",
+      "bytes": 91672,
+      "sha256": "5ff19296daadd011c552c2f28518cc52730a935c9c638670fffdd62e01c7bdb0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\compile.log",
+      "bytes": 24585,
+      "sha256": "8c1f60b577da8a8ff8488b0a17c4e233320481a19c9519f7565f844fb61f0a98"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\input_hashes.sha256",
+      "bytes": 660,
+      "sha256": "d09db0e84ecae859aaa1a62012419e5e924c88077692a5450d861347da4f5d90"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\lsf.log",
+      "bytes": 30824,
+      "sha256": "6bc53204af26042baa76abdf018b17f28248b162bc8c88273d4c1b5360c79108"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\sdf_annotate.log",
+      "bytes": 196947,
+      "sha256": "ad4080f635d3991d09a36d9c82ab2fad973900de5d5cecc52d8eadc660cab69b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\compile.log",
+      "bytes": 25716,
+      "sha256": "f2e4ed342acb6a608a62952f7f265d0dda55cf7a5b4fbf486f546f417d074db2"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\input_hashes.sha256",
+      "bytes": 680,
+      "sha256": "085ab68dc45bfb0ecdb665d6ef7876780f87d3aa4c4b24feb1613b78ad66645f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\lsf.log",
+      "bytes": 32020,
+      "sha256": "71109816f79672091acf9b587c002adec1b2a438dad1fb6ac7e0e22ea615d760"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\sdf_annotate.log",
+      "bytes": 156918,
+      "sha256": "ee0c72e7daaa988ad1b271f54c5a2c72a0d24fd6c8ea2ae74030d3e5411f853f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\isolated\\hop_events.csv",
+      "bytes": 315,
+      "sha256": "4b41bfa8e38c1e46356c57c0e765d091377eadc7cec3b8aa27e8220f758de48e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\isolated\\run.log",
+      "bytes": 1219,
+      "sha256": "eaf23071ec484c15e19a1d46d9a10a0e7d98b5cc4eb4a521328abef21a782ef4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\isolated\\sdf_annotate.log",
+      "bytes": 156918,
+      "sha256": "ee0c72e7daaa988ad1b271f54c5a2c72a0d24fd6c8ea2ae74030d3e5411f853f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\isolated\\stdout.log",
+      "bytes": 912,
+      "sha256": "c9b4e5349dfc16258245baebbd054bfaa828008d91e12dc3910a69b90e0ff95f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\regression\\hop_events.csv",
+      "bytes": 547,
+      "sha256": "9b676518b7ee2813fb7a38baf9a40644e6ce77a618ac10096584584daf78b869"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\regression\\run.log",
+      "bytes": 1228,
+      "sha256": "02218d3ad117671f6e3ed8cd87644a84d68bc2f51491cdcb05ab23ed135c2604"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\regression\\sdf_annotate.log",
+      "bytes": 156918,
+      "sha256": "ee0c72e7daaa988ad1b271f54c5a2c72a0d24fd6c8ea2ae74030d3e5411f853f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\regression\\stdout.log",
+      "bytes": 915,
+      "sha256": "16fb86d1258c640d956fac0f261b8d56e4508298c5591eee5c75168fefe7921d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed1\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "5ed7f375d96df4b658ac6ae0c87332e95e7740340448f9d17f1aa25c779ff5e7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed1\\hop_ppa.vcd",
+      "bytes": 923754,
+      "sha256": "d8688b00c85430bad6036286647283f013207231fd9012150e5f43a4fdfa031c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed1\\run.log",
+      "bytes": 1210,
+      "sha256": "39da10815caa61252521142fd779f8e037fbce8f2147469ffcf973b45e2fae24"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed1\\sdf_annotate.log",
+      "bytes": 156918,
+      "sha256": "ee0c72e7daaa988ad1b271f54c5a2c72a0d24fd6c8ea2ae74030d3e5411f853f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed1\\stdout.log",
+      "bytes": 912,
+      "sha256": "28b0095e1939c5b381db76d629f4c6bc313d4d3f9a47d76e0cf3530773d9e4ba"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed2\\hop_events.csv",
+      "bytes": 314,
+      "sha256": "ca6c2ba4fa7c89614470a32779f2e0b280494c0d66d8319e86f28ca78a19c3fb"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed2\\hop_ppa.vcd",
+      "bytes": 923572,
+      "sha256": "285e855f86633c0ca297a542e1661003de560a9118e11e19b947b7df372eac77"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed2\\run.log",
+      "bytes": 1210,
+      "sha256": "f774dd9e05fc5c690e1a55c127e8a09f7e1a8e824c5204c5f3585bdfedc62297"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed2\\sdf_annotate.log",
+      "bytes": 156918,
+      "sha256": "ee0c72e7daaa988ad1b271f54c5a2c72a0d24fd6c8ea2ae74030d3e5411f853f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed2\\stdout.log",
+      "bytes": 912,
+      "sha256": "74314ba796f4861db221b595b1049badd9e8e94f6fdf2d791d05d706debe9541"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed3\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "1e102e737dbb5496fc72890fe1e71b1946dd0746e503147aa589950e6ceb409d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed3\\hop_ppa.vcd",
+      "bytes": 923246,
+      "sha256": "85dc340cc56e25683c41795c968cbf3dddce5fa39f3e0d795e9f8d2040025bda"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed3\\run.log",
+      "bytes": 1210,
+      "sha256": "e24128c4472206f018c9229d8fe9ddf228ba9c2878b1b78da99f8dcc0ef13b41"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed3\\sdf_annotate.log",
+      "bytes": 156918,
+      "sha256": "ee0c72e7daaa988ad1b271f54c5a2c72a0d24fd6c8ea2ae74030d3e5411f853f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_ungated\\seed3\\stdout.log",
+      "bytes": 912,
+      "sha256": "68a7224d73a04b9ca3bf96232943efa02a976e7ca1e29d61a4e1b2d6115dac09"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\isolated\\hop_events.csv",
+      "bytes": 315,
+      "sha256": "4b41bfa8e38c1e46356c57c0e765d091377eadc7cec3b8aa27e8220f758de48e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\isolated\\run.log",
+      "bytes": 1199,
+      "sha256": "eaaeb4d47a95ae69b448b8d78de4e3fa16fede35febb569dee98f6d96020324f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\isolated\\sdf_annotate.log",
+      "bytes": 196947,
+      "sha256": "ad4080f635d3991d09a36d9c82ab2fad973900de5d5cecc52d8eadc660cab69b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\isolated\\stdout.log",
+      "bytes": 907,
+      "sha256": "17a71f25636db7d0502213d76ac8570d61b8df9ec6196bf02b5729921dac21d6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\regression\\hop_events.csv",
+      "bytes": 547,
+      "sha256": "9b676518b7ee2813fb7a38baf9a40644e6ce77a618ac10096584584daf78b869"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\regression\\run.log",
+      "bytes": 1208,
+      "sha256": "6e2555ca3a200d7c3267e333eb16ce1fdd7f3f67985f3715e53b11c5ce3c12ff"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\regression\\sdf_annotate.log",
+      "bytes": 196947,
+      "sha256": "ad4080f635d3991d09a36d9c82ab2fad973900de5d5cecc52d8eadc660cab69b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\regression\\stdout.log",
+      "bytes": 910,
+      "sha256": "f270c8b5342a6468c267ddfef32d8560bc92ab4c71788d20ed11f4f9e9976730"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed1\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "5ed7f375d96df4b658ac6ae0c87332e95e7740340448f9d17f1aa25c779ff5e7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed1\\hop_ppa.vcd",
+      "bytes": 915629,
+      "sha256": "3f3f476b2943a35a6bbc8e14e7a42aa3895dfa8c6b444cad997793ff522ef202"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed1\\run.log",
+      "bytes": 1190,
+      "sha256": "5cbf69d824207133ed05e2b924aa64c89faae642d0929b2a4ce4ea43debdfda3"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed1\\sdf_annotate.log",
+      "bytes": 196947,
+      "sha256": "ad4080f635d3991d09a36d9c82ab2fad973900de5d5cecc52d8eadc660cab69b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed1\\stdout.log",
+      "bytes": 907,
+      "sha256": "291315b36756cf8d31cb95d64285cd19fbdec569e967b069b325f4bf53ef0b4b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed2\\hop_events.csv",
+      "bytes": 314,
+      "sha256": "ca6c2ba4fa7c89614470a32779f2e0b280494c0d66d8319e86f28ca78a19c3fb"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed2\\hop_ppa.vcd",
+      "bytes": 915509,
+      "sha256": "de2f8d96ba9191c53d12c6dd7fd9e1dcf4e0c33189d4bb26020808d3872bc5f7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed2\\run.log",
+      "bytes": 1190,
+      "sha256": "126a2d953ccdb52f56b3c22df69482242b74cad1621b6b5f29f52fcf4c2fc9ed"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed2\\sdf_annotate.log",
+      "bytes": 196947,
+      "sha256": "ad4080f635d3991d09a36d9c82ab2fad973900de5d5cecc52d8eadc660cab69b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed2\\stdout.log",
+      "bytes": 907,
+      "sha256": "4e202550d98ef80e60a015dd27ecfe6b9b7719e19d418942c424f22595f18095"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed3\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "1e102e737dbb5496fc72890fe1e71b1946dd0746e503147aa589950e6ceb409d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed3\\hop_ppa.vcd",
+      "bytes": 915083,
+      "sha256": "e7fc609899d94f169e5ac88347dad55cac1cdd511cbb4dfdba7f6e7d6f70e7ef"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed3\\run.log",
+      "bytes": 1190,
+      "sha256": "c9fad422a7677b1d780a4ace80532fad7fda3225e97174b5ecc78b45b3419aae"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed3\\sdf_annotate.log",
+      "bytes": 196947,
+      "sha256": "ad4080f635d3991d09a36d9c82ab2fad973900de5d5cecc52d8eadc660cab69b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p4_cg\\seed3\\stdout.log",
+      "bytes": 907,
+      "sha256": "486aa61cec45e116718b0bcb6cc9b851269d722f6bac0af79d7896ccbffed73b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\isolated\\hop_events.csv",
+      "bytes": 315,
+      "sha256": "3eb850e6140db59b4259afec37d969e79008682ac20a66e0ab0b4ed5586321e9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\isolated\\run.log",
+      "bytes": 1222,
+      "sha256": "b62eeb4c142442244673fd5b9cb969c823519f008b8abdd2fceaa2d0ffe81e7c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\isolated\\sdf_annotate.log",
+      "bytes": 91672,
+      "sha256": "5ff19296daadd011c552c2f28518cc52730a935c9c638670fffdd62e01c7bdb0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\isolated\\stdout.log",
+      "bytes": 914,
+      "sha256": "d2cd1b3f836031998a85f23d26fc6698b9b11b83166d5d55ab08a465fb2f93e1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\regression\\hop_events.csv",
+      "bytes": 547,
+      "sha256": "0fecab17bd9005269f0c1be26d8a86c4e2a982723e5b55fb6a1c5a3f4175e081"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\regression\\run.log",
+      "bytes": 1231,
+      "sha256": "66fe49f8df27bac6b499c000a3a70c81db84218d64214125a70e4c7fdc2ac186"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\regression\\sdf_annotate.log",
+      "bytes": 91672,
+      "sha256": "5ff19296daadd011c552c2f28518cc52730a935c9c638670fffdd62e01c7bdb0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\regression\\stdout.log",
+      "bytes": 917,
+      "sha256": "30090a3f9c6cdf45541a7b78e0300770cbf504a8387c887519790e3aed4885c7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed1\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "c4f32a02e9eebd54ee88c742dfce7eca32cb55c3c359b5de75f8e6e1113ea405"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed1\\hop_ppa.vcd",
+      "bytes": 547927,
+      "sha256": "75e21a090ac5e87a525bcd62c3216beb42cd0cb5b15318f687ba5b8356704531"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed1\\run.log",
+      "bytes": 1213,
+      "sha256": "851e34bbf30b8a5f5deeac238c7e66e6c7e269662d69a965f41ac9ec1e13be49"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed1\\sdf_annotate.log",
+      "bytes": 91672,
+      "sha256": "5ff19296daadd011c552c2f28518cc52730a935c9c638670fffdd62e01c7bdb0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed1\\stdout.log",
+      "bytes": 914,
+      "sha256": "e95a6a48a552104f58b94a190d35533ec98634844af8e83492f6f27bbd447f27"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed2\\hop_events.csv",
+      "bytes": 314,
+      "sha256": "a5f82194a11fd985e7d2149e711836cbff277637eb994170196ee98bc2bffc16"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed2\\hop_ppa.vcd",
+      "bytes": 547569,
+      "sha256": "7bed5f4d644547ef0cbd3c9a28bdae401bddb0dbb7ca009d46e9f73e84600840"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed2\\run.log",
+      "bytes": 1213,
+      "sha256": "63061aba57b0a0fa707c6812eba8879258ea5efc9cf666455fd13529fc1e6987"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed2\\sdf_annotate.log",
+      "bytes": 91672,
+      "sha256": "5ff19296daadd011c552c2f28518cc52730a935c9c638670fffdd62e01c7bdb0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed2\\stdout.log",
+      "bytes": 914,
+      "sha256": "6ee58ba58d6a282bdbdfcf831b0365a173a692f1888c24c3454736e2174d2f45"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed3\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "22fe781e66a8e01f90a04b89a4bb6b038f924c3c8673c6d1b2500c8aa215ce02"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed3\\hop_ppa.vcd",
+      "bytes": 547336,
+      "sha256": "32e196b6721df2abf77127d946e28a8b0493bdb89922c2dd47c9f224b2034f0a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed3\\run.log",
+      "bytes": 1213,
+      "sha256": "873dc4de578cb45d41b2dae8c85da22ea9405139dc4c89b1c39dbd932a0eea22"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed3\\sdf_annotate.log",
+      "bytes": 91672,
+      "sha256": "5ff19296daadd011c552c2f28518cc52730a935c9c638670fffdd62e01c7bdb0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_ungated\\seed3\\stdout.log",
+      "bytes": 914,
+      "sha256": "a24e30ab926899c925aead69d2f40f369f695eb06d5bc289ae9c4e2c21dfce15"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\isolated\\hop_events.csv",
+      "bytes": 315,
+      "sha256": "3eb850e6140db59b4259afec37d969e79008682ac20a66e0ab0b4ed5586321e9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\isolated\\run.log",
+      "bytes": 1202,
+      "sha256": "106180743b0db1ba943be1ccc35db1b3abd3dacfbc90e4252be9cbd7f55d9166"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\isolated\\sdf_annotate.log",
+      "bytes": 111004,
+      "sha256": "a0adc00a79b65e782acb0426c67f005bdc914bb1e9a09d3cb3d0145a205bccca"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\isolated\\stdout.log",
+      "bytes": 909,
+      "sha256": "49a02156feb79d7ac8d964ad4ef521d56a7f08d4e76c4dcbcdfbdcb22e984932"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\regression\\hop_events.csv",
+      "bytes": 547,
+      "sha256": "0fecab17bd9005269f0c1be26d8a86c4e2a982723e5b55fb6a1c5a3f4175e081"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\regression\\run.log",
+      "bytes": 1211,
+      "sha256": "4f4deeb62a026132ac3b6471b3be3b31f178ec6045e67f1b2c88c68245208733"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\regression\\sdf_annotate.log",
+      "bytes": 111004,
+      "sha256": "a0adc00a79b65e782acb0426c67f005bdc914bb1e9a09d3cb3d0145a205bccca"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\regression\\stdout.log",
+      "bytes": 912,
+      "sha256": "f70b7c749f9a015689b2049646c7fbb14950b6c02d3cb93f64f7ca460f2cf3e0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed1\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "c4f32a02e9eebd54ee88c742dfce7eca32cb55c3c359b5de75f8e6e1113ea405"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed1\\hop_ppa.vcd",
+      "bytes": 544844,
+      "sha256": "385df16be19c60bb0df121fb2d4322fcb2d7cdba3649871dc1b07d5c5eef58ad"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed1\\run.log",
+      "bytes": 1193,
+      "sha256": "a72b7182fc37efb5e2b5d5b1030d182e10abf89a77a5d593305606073cffcf73"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed1\\sdf_annotate.log",
+      "bytes": 111004,
+      "sha256": "a0adc00a79b65e782acb0426c67f005bdc914bb1e9a09d3cb3d0145a205bccca"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed1\\stdout.log",
+      "bytes": 909,
+      "sha256": "cef988805bacc978c1bcf7295933c1bdedac7efb39e6864be699b3b535885760"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed2\\hop_events.csv",
+      "bytes": 314,
+      "sha256": "a5f82194a11fd985e7d2149e711836cbff277637eb994170196ee98bc2bffc16"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed2\\hop_ppa.vcd",
+      "bytes": 544445,
+      "sha256": "4f5d962e6d78c5469d2a3124014ec6fccc95158372c7c5b553087395d79623c5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed2\\run.log",
+      "bytes": 1193,
+      "sha256": "b66377d96dfc31eb373afecbfc6e2785240d415da75e2f6408ffd8b602c954cc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed2\\sdf_annotate.log",
+      "bytes": 111004,
+      "sha256": "a0adc00a79b65e782acb0426c67f005bdc914bb1e9a09d3cb3d0145a205bccca"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed2\\stdout.log",
+      "bytes": 909,
+      "sha256": "7ee852a82d4651b6354d005e33bfc2d5ccbe2f60044b0fd2b07e091427eb5078"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed3\\hop_events.csv",
+      "bytes": 318,
+      "sha256": "22fe781e66a8e01f90a04b89a4bb6b038f924c3c8673c6d1b2500c8aa215ce02"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed3\\hop_ppa.vcd",
+      "bytes": 544302,
+      "sha256": "24a01491e02e0d35d84d4d17ac4c7a6596d0a98539346e9afbb85b298389ee6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed3\\run.log",
+      "bytes": 1193,
+      "sha256": "e7acd90af28f7f21ac59107884274fe540243cbb92e2813f22797cebb718abb9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed3\\sdf_annotate.log",
+      "bytes": 111004,
+      "sha256": "a0adc00a79b65e782acb0426c67f005bdc914bb1e9a09d3cb3d0145a205bccca"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\single_router_sync_clock_gating_20261024_r1_gls_r3_sync_c1p1_cg\\seed3\\stdout.log",
+      "bytes": 909,
+      "sha256": "6711d4451fdeedd7e463d4789d263a13e78e7c60f92b52916a75e743ced785f8"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\activity.rpt",
+      "bytes": 6107,
+      "sha256": "0b698cf2f12b5d1bea7016b80fe033bdb085948dbc97af8c4a8963d5db9f4e69"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\activity_guard2.rpt",
+      "bytes": 6107,
+      "sha256": "a1c97c82b1795080cc19dc0a9ee35e260236150d8c66e3c04343ba2d666b3d0e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\activity_guard5.rpt",
+      "bytes": 6107,
+      "sha256": "a1c97c82b1795080cc19dc0a9ee35e260236150d8c66e3c04343ba2d666b3d0e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\activity_idle.rpt",
+      "bytes": 6107,
+      "sha256": "b3080767714870278b7b53821bc9a3d4b2f84a1cb0bde426812b6c9c0185a125"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\input_assumptions.rpt",
+      "bytes": 119168,
+      "sha256": "f9dc9a33ab894ff83cf0772c597002d53e93e2670f449d02f9e0e948671d7389"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\output_assumptions.rpt",
+      "bytes": 84874,
+      "sha256": "1827cc731239fd7d0abd1661e2dfe98dac02663c974b61e041a2ce2fe73ee35a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\power.rpt",
+      "bytes": 1421,
+      "sha256": "3bb2f732e94106dd450945e0adc485ef4a8b45b8dfb3dc13c93efed130c75345"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\power_cells.rpt",
+      "bytes": 15657,
+      "sha256": "eea23e93599e566c47591c39345fcb944f2fc787a65f7dfa016c90c7ae2ed582"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "ba3f12812d832c0ce16642042dcc8e0f96820a50da8d9b7175f7b5370a86d81c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "46fd2ba54a01992c6e119c728be40b61ea5c1632440da5d245a1348b4ed0c2e9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\power_hierarchy.rpt",
+      "bytes": 18550,
+      "sha256": "6c7b7db8c00fe8dcbe423166946132820592027d6c6f678d3475bc548795684e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "0af6b0ed20fe848dff751a28a30b55799b6264292231937e295d9bf6b6f33cb9"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\activity.rpt",
+      "bytes": 6107,
+      "sha256": "624840be16bd923dc57138de46b55c8cdd866ccce4a7cb99c1d9de8b2226b558"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\activity_guard2.rpt",
+      "bytes": 6107,
+      "sha256": "8a7f4cefb4057d3c6392248b00c33c857aadf25ef0f8457ed8feba66c795f4e1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\activity_guard5.rpt",
+      "bytes": 6107,
+      "sha256": "8a7f4cefb4057d3c6392248b00c33c857aadf25ef0f8457ed8feba66c795f4e1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\activity_idle.rpt",
+      "bytes": 6107,
+      "sha256": "4ef43ad9735290b267693d5b7dc4de05a96f7de8b54bfd4503332e0ea172a441"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\input_assumptions.rpt",
+      "bytes": 119168,
+      "sha256": "1893b3af473ee0e96beaea9fc5c1a83bdf101dbb41840c94ab891a5135ee7008"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\output_assumptions.rpt",
+      "bytes": 84874,
+      "sha256": "977982ac593826f6d3eae4e6fa6b3db35b115102cc4d2cb29aaf2171c77b16de"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\power.rpt",
+      "bytes": 1421,
+      "sha256": "87a44a6a5d06cbeffb73c0f4956ec52c1d3f5c05439cf5519b1318c2e9e3d0e5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\power_cells.rpt",
+      "bytes": 15657,
+      "sha256": "3a75c1bae4036e99df6f4272146897b88333678d3eaa93cf6c073b5cd1eee4d5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "3da836f5345814975b153d55401ac1309232133259a72a7930ca0dc7949f2830"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "604886fa352d499ee9819c4c4e1cfbb3d643ca5ea0e11cc59f7c769581b6c308"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\power_hierarchy.rpt",
+      "bytes": 18550,
+      "sha256": "47de1612f9eb1d16182ed68c8172e14e443e27a2cc6b679e23b45134d031d1f5"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "f77ce2d051eb9308bacd3e82f79b9749cd8f6ccddde8baeb2d3767a5d6b4ce2d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\activity.rpt",
+      "bytes": 6107,
+      "sha256": "624840be16bd923dc57138de46b55c8cdd866ccce4a7cb99c1d9de8b2226b558"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\activity_guard2.rpt",
+      "bytes": 6107,
+      "sha256": "8a7f4cefb4057d3c6392248b00c33c857aadf25ef0f8457ed8feba66c795f4e1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\activity_guard5.rpt",
+      "bytes": 6107,
+      "sha256": "8a7f4cefb4057d3c6392248b00c33c857aadf25ef0f8457ed8feba66c795f4e1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\activity_idle.rpt",
+      "bytes": 6107,
+      "sha256": "4ef43ad9735290b267693d5b7dc4de05a96f7de8b54bfd4503332e0ea172a441"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "2906c1ec962f4ee5017f251b14b8a80cc4b166277931dcc1d7682abea42bac26"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\input_assumptions.rpt",
+      "bytes": 119168,
+      "sha256": "82c751ad910295b3ad36a4401c7da12d7a0824c8134af2904c3b92a261faa517"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\output_assumptions.rpt",
+      "bytes": 84874,
+      "sha256": "20d9bc34d5566d177a143c68f6a0a7e6c1447c6132430c12df6a11eb9558da6c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\power.rpt",
+      "bytes": 1421,
+      "sha256": "7d4f9125cb6e79d3a748a6f1aaa247fd57f636b0bccabcfe7cc7681f0ed5550b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\power_cells.rpt",
+      "bytes": 15657,
+      "sha256": "372d99274e0852acb60d201680f2c753107b3b7f60d6d25eb781e6fa043ea2da"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "d6d10f8cd0338801c1f08a94e369482531b93cc1c661d141212e30bf3968b64c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "28c5b8ed7f82f215d92cd3725072c9cd5d8e923bb4a36e2b61bed1158133d71d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\power_hierarchy.rpt",
+      "bytes": 18550,
+      "sha256": "538512ba164a32cc0ece6f2067251def76d5a96602b3082384454ffe8da64780"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "08448de75594ed05214f008272f24dd25ba89657a52123a8d1b46e5b6f5daf5e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed3\\logs\\lsf.log",
+      "bytes": 17231,
+      "sha256": "31d513e718efd4cd54401d17e21f69030a09cca20aa64732a6d1f76c3ee489c1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed2\\logs\\lsf.log",
+      "bytes": 17231,
+      "sha256": "86adbda6b1b080d750885c2ccca045e5fb36d43dbe9a142e1d80ff27b4bd0677"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_ungated\\seed1\\logs\\lsf.log",
+      "bytes": 17201,
+      "sha256": "d10d559bf07bd0d43b1f790c8d675046d96c4aa13f0e0e33c154ab518bd7f35d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\activity.rpt",
+      "bytes": 6111,
+      "sha256": "dfac71a6dfca2a42714dd4ff64282e5f8a91a04d1c832494953d823860fc11ec"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\activity_guard2.rpt",
+      "bytes": 6111,
+      "sha256": "dfac71a6dfca2a42714dd4ff64282e5f8a91a04d1c832494953d823860fc11ec"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\activity_guard5.rpt",
+      "bytes": 6111,
+      "sha256": "35fe3fadd366a5aba35c4cb65c933df3c1db64c1e75d3d12040ac49123caa2aa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\activity_idle.rpt",
+      "bytes": 6111,
+      "sha256": "35fe3fadd366a5aba35c4cb65c933df3c1db64c1e75d3d12040ac49123caa2aa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\input_assumptions.rpt",
+      "bytes": 119168,
+      "sha256": "1893b3af473ee0e96beaea9fc5c1a83bdf101dbb41840c94ab891a5135ee7008"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\output_assumptions.rpt",
+      "bytes": 84874,
+      "sha256": "977982ac593826f6d3eae4e6fa6b3db35b115102cc4d2cb29aaf2171c77b16de"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\power.rpt",
+      "bytes": 1421,
+      "sha256": "f8138c62d1dfa9725b2d6c00598224c776ac522d3bf5da438b22161638c745fc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\power_cells.rpt",
+      "bytes": 15587,
+      "sha256": "c6aa0f9c9f8001e17190351fb4ae9edfd7f3d10dde43e5042d65877b36cc128e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "9fbfb55bfd9b3982c136f70d69f9105a567a715bc2b211144532d1049461de06"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "61c3e4ee51e128f4630cbd1d0c51954e8523d7bdf78db863a778863a293b30e0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\power_hierarchy.rpt",
+      "bytes": 52846,
+      "sha256": "39337a49facea0f39e38074309a321d19dc1324cf6b14f47f0ddf895b4463ce4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "bc7be39285da41393248ed50b7b70db33736dd7311e321e3962f2cdb86c59589"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\activity.rpt",
+      "bytes": 6111,
+      "sha256": "dfac71a6dfca2a42714dd4ff64282e5f8a91a04d1c832494953d823860fc11ec"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\activity_guard2.rpt",
+      "bytes": 6111,
+      "sha256": "dfac71a6dfca2a42714dd4ff64282e5f8a91a04d1c832494953d823860fc11ec"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\activity_guard5.rpt",
+      "bytes": 6111,
+      "sha256": "35fe3fadd366a5aba35c4cb65c933df3c1db64c1e75d3d12040ac49123caa2aa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\activity_idle.rpt",
+      "bytes": 6111,
+      "sha256": "35fe3fadd366a5aba35c4cb65c933df3c1db64c1e75d3d12040ac49123caa2aa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\input_assumptions.rpt",
+      "bytes": 119168,
+      "sha256": "82c751ad910295b3ad36a4401c7da12d7a0824c8134af2904c3b92a261faa517"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\output_assumptions.rpt",
+      "bytes": 84874,
+      "sha256": "20d9bc34d5566d177a143c68f6a0a7e6c1447c6132430c12df6a11eb9558da6c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\power.rpt",
+      "bytes": 1421,
+      "sha256": "59d8b6cc58245755bfc634898bde55e113f8bb9e9324a5a400227c2829fa4327"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\power_cells.rpt",
+      "bytes": 15587,
+      "sha256": "e1320f19a1f04744e832f185001bb01a21942ae7f1046a13ed17d044775afd85"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "59e0c2836a93b384165c0a8dd1ecc3848c273b5d2842d9ac60ae91cb9bf1d691"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "abbaf747fdd2bd7640126c9089671278d60e5d81dfdee71522fb6ca5d08b7843"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\power_hierarchy.rpt",
+      "bytes": 52846,
+      "sha256": "cd7a8a54cd5e8e70702f2adc4479d8de4690918c058d93280cdb3cb2d04030ac"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "262aa6627bf94bf94e1fd7e12ff04bac67919b4d73f3c788655f6e1c0649a1a7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\activity.rpt",
+      "bytes": 6111,
+      "sha256": "dfac71a6dfca2a42714dd4ff64282e5f8a91a04d1c832494953d823860fc11ec"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\activity_guard2.rpt",
+      "bytes": 6111,
+      "sha256": "dfac71a6dfca2a42714dd4ff64282e5f8a91a04d1c832494953d823860fc11ec"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\activity_guard5.rpt",
+      "bytes": 6111,
+      "sha256": "35fe3fadd366a5aba35c4cb65c933df3c1db64c1e75d3d12040ac49123caa2aa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\activity_idle.rpt",
+      "bytes": 6111,
+      "sha256": "35fe3fadd366a5aba35c4cb65c933df3c1db64c1e75d3d12040ac49123caa2aa"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "0de8e8cc03757b65908b9192556ea37241a2a4ff65b2eced49950d85cd5fe32d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\input_assumptions.rpt",
+      "bytes": 119168,
+      "sha256": "1893b3af473ee0e96beaea9fc5c1a83bdf101dbb41840c94ab891a5135ee7008"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\output_assumptions.rpt",
+      "bytes": 84874,
+      "sha256": "20d9bc34d5566d177a143c68f6a0a7e6c1447c6132430c12df6a11eb9558da6c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\power.rpt",
+      "bytes": 1421,
+      "sha256": "78a4c8863ab58799e73b78eba5f6316f479d4043af16b51fae940520ab50e39f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\power_cells.rpt",
+      "bytes": 15587,
+      "sha256": "f4cb085d2ccb226b0a78a0fd073cce42fa4d0e8565c747589c8cecb5cbe39a2b"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "4ff5a204106c4bd52fda3e230244328ce37e27074cec1c3d9d5b287eff2232f6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "01acd0cced0d41ab08d3a2b7ae40e7ca88f29feb4680e90f151b925b45d5139c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\power_hierarchy.rpt",
+      "bytes": 52846,
+      "sha256": "c535c38d173412d87ee846c88592636efc522c1ce6b9204a45d09bb284ceaf09"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "39520b7a05850aba8d8ab792803f75adccc8e4b1e72702292d43f5494edd10a1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed3\\logs\\lsf.log",
+      "bytes": 17111,
+      "sha256": "aa7be01dec3ba9dab6835038135584f841bdba9065f061e466a3bb0e0f85550a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed2\\logs\\lsf.log",
+      "bytes": 17111,
+      "sha256": "a10ca5f12a83bd1ba00484eb1593531ae75b60a22c153dd7a05481918023478f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p4_cg\\seed1\\logs\\lsf.log",
+      "bytes": 17142,
+      "sha256": "af871a31094ec3be3e232698262881bda920a7ea8edb0bf1dd68427f4b178311"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\activity.rpt",
+      "bytes": 6105,
+      "sha256": "053519a0d187735540836acc2d92af0937355ffcf43dbb387498bdfcbcc0b235"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\activity_guard2.rpt",
+      "bytes": 6105,
+      "sha256": "c705e569ab11826932d3ee15e3c3f2be4a79f2e687a8981ae8ee38817556fdb7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\activity_guard5.rpt",
+      "bytes": 6105,
+      "sha256": "c705e569ab11826932d3ee15e3c3f2be4a79f2e687a8981ae8ee38817556fdb7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\activity_idle.rpt",
+      "bytes": 6105,
+      "sha256": "279b67ae734def0512c9c716aa74801d0388927b202c4d81e9aea71a39a0f02c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\input_assumptions.rpt",
+      "bytes": 75590,
+      "sha256": "2b7906ab9f85027911a87376df67d735558f525f0fddc00a97464a0a8931e8f6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\output_assumptions.rpt",
+      "bytes": 53626,
+      "sha256": "a4d14946c4774d6bf3d302162efb736c4b5b2e3ef22a8705206bf415176f93a7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\power.rpt",
+      "bytes": 1421,
+      "sha256": "7423332c14a5a1d116b8ffb7ee817eaf6fc0bf00ca06e405e4ad51591b3a6ba3"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\power_cells.rpt",
+      "bytes": 3022,
+      "sha256": "8fce2a7097d1829c1c1affa1d5d3e8a62bb56b86fe99df4cbcd4f13ac9453f6d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "f7268bca6fa1af627a98b74f9bbf48e4e7378f0c9f176049b00f1144ad35f20e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "993ba2e223693cd1c53c4c11bc9a67e90899eb35ec4360b3e5206abf725ab617"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\power_hierarchy.rpt",
+      "bytes": 11462,
+      "sha256": "4141ea2f1d2ecd9117742f1c2d5826c4366b61451ede5c5451779c124180809a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "a6ab0b3c0701ed4566003ead7355b74080ac943599f777f51d706d57d6eafd5f"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\activity.rpt",
+      "bytes": 6105,
+      "sha256": "053519a0d187735540836acc2d92af0937355ffcf43dbb387498bdfcbcc0b235"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\activity_guard2.rpt",
+      "bytes": 6105,
+      "sha256": "c705e569ab11826932d3ee15e3c3f2be4a79f2e687a8981ae8ee38817556fdb7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\activity_guard5.rpt",
+      "bytes": 6105,
+      "sha256": "c705e569ab11826932d3ee15e3c3f2be4a79f2e687a8981ae8ee38817556fdb7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\activity_idle.rpt",
+      "bytes": 6105,
+      "sha256": "279b67ae734def0512c9c716aa74801d0388927b202c4d81e9aea71a39a0f02c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\input_assumptions.rpt",
+      "bytes": 75590,
+      "sha256": "2b7906ab9f85027911a87376df67d735558f525f0fddc00a97464a0a8931e8f6"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\output_assumptions.rpt",
+      "bytes": 53626,
+      "sha256": "a4d14946c4774d6bf3d302162efb736c4b5b2e3ef22a8705206bf415176f93a7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\power.rpt",
+      "bytes": 1421,
+      "sha256": "b8cb13734edf6dc067aff90573acaaa43fc74d60b094528673a9f62dc6f8f02a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\power_cells.rpt",
+      "bytes": 3022,
+      "sha256": "7991587c9ba14b7df4e10da53d9b768dd5e9e9d7e4e7cccaa0240bdb0ed0c518"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "c725cd3663e9761bc07c146e00ba2d603f23232ea498cd7d6095f2a54f2aeae0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "32399a5ea201ec89f23c7334b8af7fa0db92d35f66aba2e58789efc26bfeee14"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\power_hierarchy.rpt",
+      "bytes": 11462,
+      "sha256": "281f19e4ca63df8ee81eb1c7e4aee8a7c507d7bf07bfabd9f62fc7cc195e7eb8"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "f3aa4c8d63e996725f49157733db8d0369751275b02f2e3b6f7100dd16f62723"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\activity.rpt",
+      "bytes": 6105,
+      "sha256": "c57dc9538822859a2eea3cc5d1a3aea1de6511fc96ea65e9de2ebc09889e57be"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\activity_guard2.rpt",
+      "bytes": 6105,
+      "sha256": "c57dc9538822859a2eea3cc5d1a3aea1de6511fc96ea65e9de2ebc09889e57be"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\activity_guard5.rpt",
+      "bytes": 6105,
+      "sha256": "d943604a47cebe145bca696264846713d411728f422973076a4e286a7d23db61"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\activity_idle.rpt",
+      "bytes": 6105,
+      "sha256": "d943604a47cebe145bca696264846713d411728f422973076a4e286a7d23db61"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "f8740fefe00821c9e6f9edfd471471292a0347bddbf28e3151ff01a0ccb4a0f0"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\input_assumptions.rpt",
+      "bytes": 75590,
+      "sha256": "1c732524888ce728b76273c3f15be69ac371b7e346b77f5fdc3b1cf21652f66c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\output_assumptions.rpt",
+      "bytes": 53626,
+      "sha256": "1d776e2d435c0c2604c29e1514453fa1af85ce24baeb323bbfc9e49e96fe3885"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\power.rpt",
+      "bytes": 1421,
+      "sha256": "2a8ec2861406ca6dbde4e668bc9d6069a9d9502629c61461f2840d42bef6aea2"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\power_cells.rpt",
+      "bytes": 3022,
+      "sha256": "1a14abcb26bc9aeb8c8e0e4b68d5d0d7386ecae386ab71190ec234b9f40977cc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "76f8b1fe21bef62ba37913a1000b6ae5cc6c18d54fddbf296c8bf289e8a5dddc"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "d91833467a7d86339a17aa789d7f8b2cd7b28aeaef1d3bb5975e79bac49c396c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\power_hierarchy.rpt",
+      "bytes": 11462,
+      "sha256": "ed4810724b096743c795924ee0f7b94944ec2c26bfe48cf3824a9dc75c855bff"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "a904ad199e43d870e626be9823d0455392161b33807d6c64dc4ebb4525f1c10d"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed3\\logs\\lsf.log",
+      "bytes": 17182,
+      "sha256": "6121cbea77470c83d4338ba7d6ffc37ca2263179e16e7f4f7bc99313df68da60"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed2\\logs\\lsf.log",
+      "bytes": 17182,
+      "sha256": "b47fab7365205b5cfb0db2d77d2e7f1650a2f0ce705d9179c04dcac16a087425"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_ungated\\seed1\\logs\\lsf.log",
+      "bytes": 17212,
+      "sha256": "08ca07b781fbf5ac8fbc32d46b0370eec669070fc28fee8b2dae4030671b99ed"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\activity.rpt",
+      "bytes": 6107,
+      "sha256": "645367e9465ec5181e4c17a3c6113600037df272441416898533ac1284bd6282"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\activity_guard2.rpt",
+      "bytes": 6107,
+      "sha256": "324ce2a44fa183c137aca6dde3015be12f19304821f3cc94c3daffe996f593be"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\activity_guard5.rpt",
+      "bytes": 6107,
+      "sha256": "324ce2a44fa183c137aca6dde3015be12f19304821f3cc94c3daffe996f593be"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\activity_idle.rpt",
+      "bytes": 6107,
+      "sha256": "324ce2a44fa183c137aca6dde3015be12f19304821f3cc94c3daffe996f593be"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\input_assumptions.rpt",
+      "bytes": 75590,
+      "sha256": "1c732524888ce728b76273c3f15be69ac371b7e346b77f5fdc3b1cf21652f66c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\output_assumptions.rpt",
+      "bytes": 53626,
+      "sha256": "1d776e2d435c0c2604c29e1514453fa1af85ce24baeb323bbfc9e49e96fe3885"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\power.rpt",
+      "bytes": 1421,
+      "sha256": "1274a6d045e7ea46d6c4389c2341ba5b50860ac1b5aeef9ae0976c24218af23c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\power_cells.rpt",
+      "bytes": 3022,
+      "sha256": "172bfb78ccdb3b5b9ada5cd394e80ce9d78c82c229b7ae93d5811d3b5ed9b5fb"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "71615793f035c34e2ab676255c2f10437661432f009ca4f68cb325c13a5a648e"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "3ab0be2cb7279d102889ccd1e34b30bad6497ab92833acc52dde53922f246996"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\power_hierarchy.rpt",
+      "bytes": 31333,
+      "sha256": "8be557de02e5eaf60b66da9cee5ea5e2990a0bd46b7aaf488a980d4c402d23c1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "a7939fdaff0806be3c5477ae7f3fce09bfa9ad493c091e71349bf83145901163"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\activity.rpt",
+      "bytes": 6107,
+      "sha256": "1cabdbdc21eeabbf81869ab3618c81fdf12727bd5d3c57844ef62b5d3a02677c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\activity_guard2.rpt",
+      "bytes": 6107,
+      "sha256": "1cabdbdc21eeabbf81869ab3618c81fdf12727bd5d3c57844ef62b5d3a02677c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\activity_guard5.rpt",
+      "bytes": 6107,
+      "sha256": "2da93a85d197c04cddafea53b80d5617d79e375cb7606084e6ceefb779eb0a41"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\activity_idle.rpt",
+      "bytes": 6107,
+      "sha256": "2da93a85d197c04cddafea53b80d5617d79e375cb7606084e6ceefb779eb0a41"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\input_assumptions.rpt",
+      "bytes": 75590,
+      "sha256": "8af1694cfbf4807764b0b67205ebbbc0b0e077ecfaaca6a24a23584b3aac8a2a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\output_assumptions.rpt",
+      "bytes": 53626,
+      "sha256": "10ba3e8177c916873b78424eff3e20152fe3b574ce6c2e70f64bef4809972281"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\power.rpt",
+      "bytes": 1421,
+      "sha256": "51b79f034f04783d4047bb9f73e6654a10218a78bb2da9007568f7e16c3e5fc7"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\power_cells.rpt",
+      "bytes": 3022,
+      "sha256": "c67370f955c3551e37f661bf9b8e3fff9b34755f6a9ee10104b9a08f0191a8fd"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "91daae004ff3dcc7ef82fc7509252b87b318acfb96e88a73f412affd1c32930c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "684d3cd871c25a74ba064cbf9d814e5c794ac038d2c81c2ea3d0020922543cad"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\power_hierarchy.rpt",
+      "bytes": 31333,
+      "sha256": "56f97f81359384ccdd05b0a7683a57ce9ce468642cc9066e44def6248ade7aad"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "74925cd0fd518c3b3f379e42ef3f88bad8b35d9ea5793ffabc7ca153ee7b8ade"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\activity.rpt",
+      "bytes": 6107,
+      "sha256": "1cabdbdc21eeabbf81869ab3618c81fdf12727bd5d3c57844ef62b5d3a02677c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\activity_guard2.rpt",
+      "bytes": 6107,
+      "sha256": "1cabdbdc21eeabbf81869ab3618c81fdf12727bd5d3c57844ef62b5d3a02677c"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\activity_guard5.rpt",
+      "bytes": 6107,
+      "sha256": "2da93a85d197c04cddafea53b80d5617d79e375cb7606084e6ceefb779eb0a41"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\activity_idle.rpt",
+      "bytes": 6107,
+      "sha256": "2da93a85d197c04cddafea53b80d5617d79e375cb7606084e6ceefb779eb0a41"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\check_power.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\check_power_guard2.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\check_power_guard5.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\check_power_idle.rpt",
+      "bytes": 170,
+      "sha256": "258c2f73cd507b833caa55b3218a901b8321d2884a69b7aa52a67d6e5f3c2f6a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\input_assumptions.rpt",
+      "bytes": 75590,
+      "sha256": "8af1694cfbf4807764b0b67205ebbbc0b0e077ecfaaca6a24a23584b3aac8a2a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\output_assumptions.rpt",
+      "bytes": 53626,
+      "sha256": "10ba3e8177c916873b78424eff3e20152fe3b574ce6c2e70f64bef4809972281"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\power.rpt",
+      "bytes": 1421,
+      "sha256": "85ab9373e0001140deab10f71ca1c9d57f5595c04cb44baf9b1a6a12d2b58260"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\power_cells.rpt",
+      "bytes": 3022,
+      "sha256": "55a5d26ac261c83bca94283c60c9c26addaa61f479d93cce6686639c82b13a42"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\power_guard2.rpt",
+      "bytes": 1421,
+      "sha256": "55b25ddc3604f269533d0fc92c02f437454f12c5636f1b40c413e66e4a21f9a1"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\power_guard5.rpt",
+      "bytes": 1421,
+      "sha256": "f987a05d90e13db90fea566632233f553660cd725c5d896be9a753b3f5239d2a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\power_hierarchy.rpt",
+      "bytes": 31333,
+      "sha256": "333741e385d2b9a4644620d281b073b6f4719318aaeac7a701cde890ca5f5b01"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\power_idle.rpt",
+      "bytes": 1421,
+      "sha256": "becbd14c98814d4e1b8f5a56ba92e03390add9ebcbf2dfac26b431a20073b44a"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed3\\logs\\lsf.log",
+      "bytes": 17068,
+      "sha256": "19edf317b8f0ad8dea1dffea20a60c6e60d1044a9f6e44dbe4e2d9c95b86ed97"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed2\\logs\\lsf.log",
+      "bytes": 17068,
+      "sha256": "a8b5ef9d35ad5c3b1971ecbd8b6d39b45d5577e4975fa9fa15092ae5a35f13f4"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\power\\sync_c1p1_cg\\seed1\\logs\\lsf.log",
+      "bytes": 17068,
+      "sha256": "5d73e2e20233c3c02f73d8b482ff8ff5788b4e1ebd267b0b14676c7eb7190369"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\inputs\\hop_binds\\sync_ports_c1_p1.vi",
+      "bytes": 1925,
+      "sha256": "bd722a1c17fa0e5c201bafa8e680bb7f6dc3ef18a1cdc0d11b035386195eaf78"
+    },
+    {
+      "path": "D:\\NoC\\asynchronous_fat_tree_multicast\\scripts\\asic_dc\\cmr\\results\\single_router_sync_clock_gating_20261024_r1_gls_r3\\inputs\\hop_binds\\sync_ports_c1_p4.vi",
+      "bytes": 2963,
+      "sha256": "4068471e53eec8d8bba94babf49edb358528292d2b3732becd6b66a8c6d55b2b"
+    }
+  ]
+}

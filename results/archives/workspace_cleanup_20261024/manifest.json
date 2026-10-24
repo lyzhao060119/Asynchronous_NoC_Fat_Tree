@@ -1,0 +1,26 @@
+{
+  "source_commit": "346aea9b5511822553c9f7836bb4daf41e509b72",
+  "archive": "previous_versions.zip",
+  "files": [
+    {
+      "path": "previous_commit/DAC/paper/CHAMP_v1.docx",
+      "bytes": 31004,
+      "sha256": "bba31ce03baadf185dd018ed27455e75c16bdec664e01844c8c8b9277713643a"
+    },
+    {
+      "path": "previous_commit/results/m16_1024_hierlink_20261024_r1/status.json",
+      "bytes": 4624,
+      "sha256": "2d95d8128585b5454cc2a37ef9d2ce8fefc1c2210dde7cbd5d1ac44aa8170d5d"
+    },
+    {
+      "path": "previous_commit/results/mesh1024_quadrants_20261023_r1/status.json",
+      "bytes": 2972,
+      "sha256": "a361944990a9cfbe9118d774b045035093c7a761dfe05b288ede23c34266429c"
+    },
+    {
+      "path": "word_recovery/DAC/paper/~WRL0005.tmp",
+      "bytes": 31004,
+      "sha256": "bba31ce03baadf185dd018ed27455e75c16bdec664e01844c8c8b9277713643a"
+    }
+  ]
+}

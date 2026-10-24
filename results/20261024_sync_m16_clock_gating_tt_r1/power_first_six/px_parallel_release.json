@@ -1,0 +1,81 @@
+{
+  "reason": "Use available 32-slot account capacity; each PT remains one core. Do not restart running jobs or alter measurement settings.",
+  "changes": [
+    {
+      "job": "15125401",
+      "dependency": "done(15125301)"
+    },
+    {
+      "job": "15125701",
+      "dependency": "done(15125601)"
+    },
+    {
+      "job": "15126001",
+      "dependency": "done(15125901)"
+    },
+    {
+      "job": "15126301",
+      "dependency": "done(15126201)"
+    },
+    {
+      "job": "15126601",
+      "dependency": "done(15126501)"
+    },
+    {
+      "job": "15126901",
+      "dependency": "done(15126801)"
+    },
+    {
+      "job": "15127201",
+      "dependency": "done(15127101)"
+    },
+    {
+      "job": "15127501",
+      "dependency": "done(15127401)"
+    },
+    {
+      "job": "15127801",
+      "dependency": "done(15127701)"
+    },
+    {
+      "job": "15128101",
+      "dependency": "done(15128001)"
+    },
+    {
+      "job": "15128401",
+      "dependency": "done(15128301)"
+    },
+    {
+      "job": "15128701",
+      "dependency": "done(15128601)"
+    },
+    {
+      "job": "15129001",
+      "dependency": "done(15128901)"
+    },
+    {
+      "job": "15129301",
+      "dependency": "done(15129201)"
+    },
+    {
+      "job": "15129601",
+      "dependency": "done(15129501)"
+    },
+    {
+      "job": "15129901",
+      "dependency": "done(15129801)"
+    },
+    {
+      "job": "15130201",
+      "dependency": "done(15130101)"
+    },
+    {
+      "job": "15130501",
+      "dependency": "done(15130401)"
+    },
+    {
+      "job": "15130801",
+      "dependency": "done(15130701)"
+    }
+  ]
+}

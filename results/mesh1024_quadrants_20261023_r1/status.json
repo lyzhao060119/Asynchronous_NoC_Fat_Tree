@@ -1,5 +1,5 @@
 {
-  "remote_checked_unix": 1792811472.8091161,
+  "remote_checked_unix": 1792814502.2568932,
   "quadrants": [
     {
       "quadrant": 0,
@@ -84,26 +84,26 @@
   ],
   "final": {
     "job": "15084801",
-    "lsf": "RUN",
-    "log": "/home/ghy19/.lsbatch/1792772000.15084801.out",
+    "lsf": "DONE",
+    "log": "/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/logs/final_r4.log",
     "errors": [],
-    "pass": false,
+    "pass": true,
     "uio92": 0,
     "ddc_reads_started": 4,
     "rename_events": 0,
     "opt314": 397503,
-    "last_event": "Writing verilog file '/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/outputs/CMRMeshNoC/CMRMeshNoC_post.v'.",
+    "last_event": "MESH1024_FOUR_BLOCK_PASS top=CMRMeshNoC routers=1024",
     "artifacts": {
       ".ddc": 3365273600,
       "_post.v": 1068807703,
-      ".sdf": 3228073984
+      ".sdf": 8233823864
     },
-    "accepted": false
+    "accepted": true
   },
-  "complete": false,
+  "complete": true,
   "audit": {
     "job": "15090801",
-    "lsf": "PEND",
-    "status": null
+    "lsf": "DONE",
+    "status": "PASS"
   }
 }

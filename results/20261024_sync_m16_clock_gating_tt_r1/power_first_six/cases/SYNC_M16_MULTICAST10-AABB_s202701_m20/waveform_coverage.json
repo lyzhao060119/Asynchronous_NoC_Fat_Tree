@@ -1,0 +1,28 @@
+{
+  "design": "SYNC_M16",
+  "benchmark": "MULTICAST10-AABB",
+  "seed": 202701,
+  "tag": "SYNC_M16_MULTICAST10-AABB_s202701_m20",
+  "variant": null,
+  "activity_dir": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202701_m20",
+  "start_ps": 1735501,
+  "end_ps": 54538501,
+  "path": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/vcd/SYNC_M16_MULTICAST10-AABB_s202701_m20/measurement.vcd",
+  "compressed": false,
+  "bytes": 2660732591,
+  "uncompressed_bytes": 2660732591,
+  "uncompressed_sha256": null,
+  "timescale_ps": 1,
+  "last_timestamp_ps": 54538500,
+  "first_timestamps_ps": [
+    0,
+    1735500,
+    1735529,
+    1736000,
+    1736015
+  ],
+  "ends_with_newline": true,
+  "last_line_preview": "$end",
+  "window_coverage_upper_bound": 0.9999999810616821,
+  "status": "BOUNDARY_COVERAGE_OK"
+}

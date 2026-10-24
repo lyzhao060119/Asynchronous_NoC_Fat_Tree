@@ -1,0 +1,50 @@
+[
+  {
+    "config": "sync_c1p1_ungated",
+    "gating": false,
+    "icg_count": 0,
+    "area_um2": 6749.231938,
+    "isolated_flit_latency_ns": 1.0,
+    "active_power_mw": 4.111,
+    "packet_energy_pj": 20.555,
+    "packet_pj_per_bit": 0.14682142857142857,
+    "guard5_energy_pj": 37.836666666666666,
+    "idle_power_mw": 3.509666666666667
+  },
+  {
+    "config": "sync_c1p1_cg",
+    "gating": true,
+    "icg_count": 65,
+    "area_um2": 6139.055926,
+    "isolated_flit_latency_ns": 1.0,
+    "active_power_mw": 1.3803333333333334,
+    "packet_energy_pj": 6.901666666666666,
+    "packet_pj_per_bit": 0.04929761904761905,
+    "guard5_energy_pj": 10.486666666666666,
+    "idle_power_mw": 0.6304
+  },
+  {
+    "config": "sync_c1p4_ungated",
+    "gating": false,
+    "icg_count": 0,
+    "area_um2": 11483.135891,
+    "isolated_flit_latency_ns": 1.0,
+    "active_power_mw": 6.572333333333334,
+    "packet_energy_pj": 32.861666666666665,
+    "packet_pj_per_bit": 0.23472619047619048,
+    "guard5_energy_pj": 61.38,
+    "idle_power_mw": 5.8389999999999995
+  },
+  {
+    "config": "sync_c1p4_cg",
+    "gating": true,
+    "icg_count": 112,
+    "area_um2": 10503.52787,
+    "isolated_flit_latency_ns": 1.0,
+    "active_power_mw": 1.9633333333333334,
+    "packet_energy_pj": 9.816666666666666,
+    "packet_pj_per_bit": 0.07011904761904762,
+    "guard5_energy_pj": 15.89,
+    "idle_power_mw": 1.139
+  }
+]

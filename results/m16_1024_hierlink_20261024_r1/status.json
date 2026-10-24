@@ -1,12 +1,12 @@
 {
-  "checked_unix": 1792811132.5546901,
+  "checked_unix": 1792834394.4339929,
   "blocks_passed": 17,
   "blocks_expected": 17,
   "objects": [
     {
       "top": "PROPtempTileM16",
       "job": "15104201",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -18,7 +18,7 @@
     {
       "top": "PROPtempTileM16_1",
       "job": "15104301",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -30,7 +30,7 @@
     {
       "top": "PROPtempTileM16_2",
       "job": "15104501",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -42,7 +42,7 @@
     {
       "top": "PROPtempTileM16_3",
       "job": "15104601",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -54,7 +54,7 @@
     {
       "top": "PROPtempTileM16_4",
       "job": "15104701",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -66,7 +66,7 @@
     {
       "top": "PROPtempTileM16_5",
       "job": "15104801",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -78,7 +78,7 @@
     {
       "top": "PROPtempTileM16_6",
       "job": "15104901",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -90,7 +90,7 @@
     {
       "top": "PROPtempTileM16_7",
       "job": "15105001",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -102,7 +102,7 @@
     {
       "top": "PROPtempTileM16_8",
       "job": "15105101",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -114,7 +114,7 @@
     {
       "top": "PROPtempTileM16_9",
       "job": "15105201",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -126,7 +126,7 @@
     {
       "top": "PROPtempTileM16_10",
       "job": "15105301",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -138,7 +138,7 @@
     {
       "top": "PROPtempTileM16_11",
       "job": "15105401",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -150,7 +150,7 @@
     {
       "top": "PROPtempTileM16_12",
       "job": "15105501",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -162,7 +162,7 @@
     {
       "top": "PROPtempTileM16_13",
       "job": "15105601",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -174,7 +174,7 @@
     {
       "top": "PROPtempTileM16_14",
       "job": "15105701",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -186,7 +186,7 @@
     {
       "top": "PROPtempTileM16_15",
       "job": "15105801",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -198,7 +198,7 @@
     {
       "top": "CMRTopMesh",
       "job": "15105901",
-      "state": "DONE",
+      "state": "not_in_bjobs",
       "passed": true,
       "errors": [],
       "artifacts": {
@@ -216,7 +216,7 @@
       "artifacts": {
         ".ddc": 2355929088,
         "_post.v": 647258701,
-        ".sdf": 0
+        ".sdf": 1199300608
       }
     }
   ],

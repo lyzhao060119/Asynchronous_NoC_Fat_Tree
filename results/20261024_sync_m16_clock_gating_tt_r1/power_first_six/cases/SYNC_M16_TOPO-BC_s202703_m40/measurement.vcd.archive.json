@@ -1,0 +1,9 @@
+{
+  "schema": "formal64-power-vcd-archive-v1",
+  "source": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/vcd/SYNC_M16_TOPO-BC_s202703_m40/measurement.vcd",
+  "archive": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/vcd/SYNC_M16_TOPO-BC_s202703_m40/measurement.vcd.gz",
+  "uncompressed_bytes": 2339586687,
+  "archive_bytes": 506180550,
+  "uncompressed_sha256": "c804e51939e7c0ec727498ce811107f071a7839b30cf316a27c0e7d6b4d9d7ee",
+  "roundtrip_sha256": "c804e51939e7c0ec727498ce811107f071a7839b30cf316a27c0e7d6b4d9d7ee"
+}

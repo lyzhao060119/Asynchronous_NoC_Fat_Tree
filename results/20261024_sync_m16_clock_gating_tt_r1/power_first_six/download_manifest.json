@@ -1,0 +1,823 @@
+{
+  "run": "20261024_sync_m16_clock_gating_tt_r1",
+  "files": [
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/six_benchmarks/power_all_seeds.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\power_all_seeds.csv",
+      "bytes": 5328,
+      "sha256": "ee8bdc465bd1136de14f76125f5f59010413deb2f22728ed77e3405faf1fa539"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/six_benchmarks/power_seed_means.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\power_seed_means.csv",
+      "bytes": 491,
+      "sha256": "c40bd1589ab5e0f1718c02f8c39acea1bf3aae30b8b71257bfcb31401b710fb9"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/manifest.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\manifest.json",
+      "bytes": 57186,
+      "sha256": "c4182ca293e64194e4a6767677d92aa918836e3d39d6a995197c38699e356ef9"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/six_benchmarks/final_acceptance.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\final_acceptance.json",
+      "bytes": 388229,
+      "sha256": "b50c9371300b44916c769cb1640b5236cb0aeb61ef4332df2a99484e9ee60d92"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/px_parallel_release.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\px_parallel_release.json",
+      "bytes": 1586,
+      "sha256": "2c105fafbe394b35cae5531a3fed83ba19dd0d671c6a19f229d7f6c6a54d8ae8"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202701_m80/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\power.rpt",
+      "bytes": 1423,
+      "sha256": "73cd7ec095b307b826b19b36e5df4dd07af94081190178b4f97b49b66d886443"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202701_m80/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "a0715d353cb9bd48c123054962a612ff621471e4e2b102cb8cf6e9c5aed9e80d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202701_m80/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202701_m80/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\input_hashes.sha256",
+      "bytes": 716,
+      "sha256": "88a4375c5fcfb18715426474e4b41ac41f183a9df92da60c5d00f31518f9ae57"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202701_m80/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\result.csv",
+      "bytes": 674,
+      "sha256": "95964f409db44b70b990a9e8df6b765285c6b36929428c6ca44ab1f0a7c5ab02"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202701_m80/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\waveform_coverage.json",
+      "bytes": 881,
+      "sha256": "2977bbacfd00027f260b36c87af17fbf7a7e702aa15f6afc0fec343d8aa2038c"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202701_m80/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202701_m80\\measurement.vcd.archive.json",
+      "bytes": 613,
+      "sha256": "624ffc6face70d12c1d677bc039636beaea515e46a8553552375c5d23d5f552d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202702_m80/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\power.rpt",
+      "bytes": 1423,
+      "sha256": "ef9e1b55f34142fcd592da4af2ba6c1a7b84fe9d1f64cd8d7402c5fe219937e8"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202702_m80/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "ec0ff8e2daf078ccf92b386ab869058fb72095172ac03ba28b8795ed09a50928"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202702_m80/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202702_m80/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\input_hashes.sha256",
+      "bytes": 716,
+      "sha256": "971da85dc0377e2d80cce6659c4146b32449f250bc4313bbde833a994499b1b0"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202702_m80/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\result.csv",
+      "bytes": 674,
+      "sha256": "40a0571a92726d0af0891d8e03502f2a99bd185f074ffda833cdc865a1ae2f36"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202702_m80/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\waveform_coverage.json",
+      "bytes": 881,
+      "sha256": "d3497ec62cbc6faa25368997a6ff69e321c79d32fbaede86680f35027e0ca73e"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202702_m80/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202702_m80\\measurement.vcd.archive.json",
+      "bytes": 613,
+      "sha256": "654b2f66c166f044449fac5b7f77bfc9e37c216a5e0de321314e981ec56ac22a"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202703_m80/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\power.rpt",
+      "bytes": 1423,
+      "sha256": "dac21838b272268365c13c5c52b2a9ff5feb3d93a0944b2d477df290cebb527e"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202703_m80/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "df9cef571b86bc93dae42ade6658093ece132467f82d1e9bfbb410a0c2ce74e5"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202703_m80/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-UR_s202703_m80/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\input_hashes.sha256",
+      "bytes": 716,
+      "sha256": "f1f5cd78df552fcf2e714bece8568319a3ff1744dfb2fd50d85cc6b44679fc23"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202703_m80/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\result.csv",
+      "bytes": 674,
+      "sha256": "01df1a8ef903e2fc0473228d1d0dd6d788e8710b96d54311ebe184b3b38848ca"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202703_m80/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\waveform_coverage.json",
+      "bytes": 879,
+      "sha256": "4ba6e50f8deef1ffb228c1fd0fcde5cd1ab5dc5d15587597a7da60d7c672ed69"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-UR_s202703_m80/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-UR_s202703_m80\\measurement.vcd.archive.json",
+      "bytes": 613,
+      "sha256": "904f010000409127c58ae57486aa681d99ee0937d5ee291008b479ccf687debe"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202701_m40/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\power.rpt",
+      "bytes": 1423,
+      "sha256": "93ed912f9c708d5fcc79e6c48b91f19e4dd7320d3faf0c2ed0aa3d10fb7db4c4"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202701_m40/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "3ed335e7bebbb1d0e0d4e059909b909a27ca17734f5d480285adfcc3fa266945"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202701_m40/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202701_m40/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\input_hashes.sha256",
+      "bytes": 716,
+      "sha256": "06ae568388384d2c77c71ec21494eb53c055e11bbb0aa86e1925f3407093f8ee"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202701_m40/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\result.csv",
+      "bytes": 674,
+      "sha256": "d3df9c0d1b484f5520ae2db8ddb9fba5c4488229a44bcc7ad95b5d401748f51e"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202701_m40/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\waveform_coverage.json",
+      "bytes": 880,
+      "sha256": "e008c21ac79b1619bc68c4947b44188db5e833281f8e2f8e87ef05a4070fc5ff"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202701_m40/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202701_m40\\measurement.vcd.archive.json",
+      "bytes": 613,
+      "sha256": "1df071099bccf0fd7d810e368f57cf180c080610bd67b85a897ac6e949ddb36a"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202702_m40/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\power.rpt",
+      "bytes": 1423,
+      "sha256": "437cd05f4ff48cc249de170ce7c121e056510da04dba548614c339af22e85c5d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202702_m40/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "e65eb44840c533bac42e9b344c7e962f8ec0b881e166f23566d24db684bb3176"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202702_m40/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202702_m40/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\input_hashes.sha256",
+      "bytes": 716,
+      "sha256": "929285f59d4785bc66f14f21686217dd99efde4a53d992698e3cbd237f97ce72"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202702_m40/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\result.csv",
+      "bytes": 674,
+      "sha256": "93094b34b6bd101157067440496a566638055006fabec2c9df51c266f14ea3d2"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202702_m40/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\waveform_coverage.json",
+      "bytes": 881,
+      "sha256": "802e9c43444484d0112d46abf388a79fa4a32d2f45d9289bfd3ae9fb8e5564c0"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202702_m40/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202702_m40\\measurement.vcd.archive.json",
+      "bytes": 613,
+      "sha256": "2a136f1b81ba061e36c0d859bfec6ef1eb07d48983d35bca166cd68cb4556b7b"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202703_m40/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\power.rpt",
+      "bytes": 1423,
+      "sha256": "35347766d62ee97e5622ee4277e3a597f52beda04f2597b3c8333fd46eb147a4"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202703_m40/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "6986671e5c86956ef41056774c86bbff1437aadab21b5afa7f96d50305de1c09"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202703_m40/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_TOPO-BC_s202703_m40/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\input_hashes.sha256",
+      "bytes": 716,
+      "sha256": "82178e4b3459eda569eaacee6a3e040b72b21d44721f4cebc7c5de82e6710aab"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202703_m40/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\result.csv",
+      "bytes": 674,
+      "sha256": "e04d7bcdc09eca0de2525c66988a5501ed4906b195eb8811fc1acb8b8a21c1eb"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202703_m40/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\waveform_coverage.json",
+      "bytes": 881,
+      "sha256": "715128c7a4cbc2dd0c3787d0b70a77854e27f96d248e2514285945fa48af0656"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_TOPO-BC_s202703_m40/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_TOPO-BC_s202703_m40\\measurement.vcd.archive.json",
+      "bytes": 613,
+      "sha256": "877f443737c9e3de4b40b3e4b1e669b49f6054c9c63826304890454a8e6dc768"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202701_m80/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\power.rpt",
+      "bytes": 1423,
+      "sha256": "f6142d6a85d7f3a8fa55cec8775172466d7788ea37c31fbee32e499db92ca6f2"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202701_m80/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "110db50b6c28c108c25f03fd44c03b1710cdd45ab222122b0cc48fb4dbd1e4e5"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202701_m80/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202701_m80/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\input_hashes.sha256",
+      "bytes": 718,
+      "sha256": "6798660ed9cc324f11e25c697170b4c5384457d0ff92b6649337308e9041d94d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202701_m80/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\result.csv",
+      "bytes": 678,
+      "sha256": "c0fb6821b070b0ffee6f939afba03f12e55c0eec0af8c24842ff657d3055dce2"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202701_m80/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\waveform_coverage.json",
+      "bytes": 889,
+      "sha256": "c42cf42952fa246f00ae9bba8e33a942851ecb8e027bc08fad976951ede2d207"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202701_m80/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202701_m80\\measurement.vcd.archive.json",
+      "bytes": 617,
+      "sha256": "5cd12d74bc638fa37b93da88f186f7ffbec575270588c9d5c307041b7765a86d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202702_m80/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\power.rpt",
+      "bytes": 1423,
+      "sha256": "0932483b2ba691eadea3486a73b3d1f2a58b4e816fca8d310c11eb78b017bba3"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202702_m80/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "437c04245d0f86e7e7e7efa771224f0c4c77cce39f1c22dcde194d0588d50ee8"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202702_m80/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202702_m80/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\input_hashes.sha256",
+      "bytes": 718,
+      "sha256": "2f0ea9f411447d3e3af8b692a9b81b1be80b89c70a2261544c9b2b1bde1b38db"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202702_m80/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\result.csv",
+      "bytes": 678,
+      "sha256": "d9d9a615ca01b33fd8bd1710cc89834f43aeaac5055a72007256215e55579751"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202702_m80/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\waveform_coverage.json",
+      "bytes": 889,
+      "sha256": "576592351a119d1a78448b99a294a2a4514bcec3412b7849b5d1f9043abe7989"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202702_m80/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202702_m80\\measurement.vcd.archive.json",
+      "bytes": 617,
+      "sha256": "7ff9cd58d23e377f75e171d48c81886b93f7c49a8af6d5c64921a30497790011"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202703_m80/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\power.rpt",
+      "bytes": 1423,
+      "sha256": "201d9ca5de0c5a13034b6fb754ad96afa2f2c51f5c32da4dcb2d00b2152ab1a0"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202703_m80/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "a5d6ff20a8f48587c42202c61e407937864d8876d973a13f70e10cd83485bf1b"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202703_m80/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_HOTSPOT10_s202703_m80/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\input_hashes.sha256",
+      "bytes": 718,
+      "sha256": "7da76a113a850cd16139a2852788f6a7f69fba29315ec73f6606235553833160"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202703_m80/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\result.csv",
+      "bytes": 678,
+      "sha256": "b75b9ce627a1808288de5ecee7cd5dc9b53b5f7f743ff22ac883ab994f21ec1d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202703_m80/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\waveform_coverage.json",
+      "bytes": 889,
+      "sha256": "237233a26c4dd78c4ac14c5f38980ab401d9c063b7e72959b1956fb83f6e5003"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_HOTSPOT10_s202703_m80/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_HOTSPOT10_s202703_m80\\measurement.vcd.archive.json",
+      "bytes": 617,
+      "sha256": "f0cca9ccf01d00fac2711d1a16f01c0158d01b3b1f7d22f44bdce1ef6a0d6f96"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202701_m40/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\power.rpt",
+      "bytes": 1423,
+      "sha256": "fc3bcf86292cdc0017e46bfa95c3d2365128863f5fcd284ed3ea9486614bad16"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202701_m40/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "cfb5ac1a621f262ed928639ab4bcfb70841e1f1526ad6652c086037c2c59ad1a"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202701_m40/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202701_m40/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\input_hashes.sha256",
+      "bytes": 724,
+      "sha256": "ec22513f25ff168c9eb3d907ec99c49dcb0efd08953b22361f6ff1f99c6f3c1b"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202701_m40/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\result.csv",
+      "bytes": 689,
+      "sha256": "77cc1b22b727528e5fbfddbfa9891b79e86e72d68c84484050893290a4f275e3"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202701_m40/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\waveform_coverage.json",
+      "bytes": 913,
+      "sha256": "19bb44f4f4a79078924a01c2b0d5e13c49fabda8ff7f1523672453d8a1784019"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202701_m40/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202701_m40\\measurement.vcd.archive.json",
+      "bytes": 629,
+      "sha256": "5ec14f2b3928d358b81eb73cfafff4e7df829ecefedb081015ae4147a0623cb7"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202702_m40/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\power.rpt",
+      "bytes": 1423,
+      "sha256": "c0da9e6491b4c6b38d32791b20c8701c7fb6698e2897855a31361f7c6f2ade76"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202702_m40/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "27b9d5c76be935860f34dabe1951932b1379c2f80b25c84b470ffe37a299bab9"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202702_m40/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202702_m40/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\input_hashes.sha256",
+      "bytes": 724,
+      "sha256": "c96475d57b46c063ac99236aa8c6ada4314aff5713e7463b4b1a36debb2a33d0"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202702_m40/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\result.csv",
+      "bytes": 689,
+      "sha256": "dee6c886849e7e66f7ca3d81cae7730f6f27bab5f74990a26b2ecc859cd8f3df"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202702_m40/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\waveform_coverage.json",
+      "bytes": 913,
+      "sha256": "f1695f7531883bdc1a4e8578d095785fc683c5d57f8d6fce295edb00badbd911"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202702_m40/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202702_m40\\measurement.vcd.archive.json",
+      "bytes": 629,
+      "sha256": "83f21bb0dd9c98e071e938f78a8b4ffd185d6500800e7e02e0b3423da5673470"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202703_m40/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\power.rpt",
+      "bytes": 1423,
+      "sha256": "9921d2337eafb92928c55277cab37d7601ce06c787f5d5dd03d2c91e3d5b6f6a"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202703_m40/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "c73618d45c15ed0ade4fe1d2170379769ee5fe7a3c1458fbb92a24b81188578f"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202703_m40/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST5-AABB_s202703_m40/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\input_hashes.sha256",
+      "bytes": 724,
+      "sha256": "2c563570d97db3a8f952715efab39415f2e43a3cb3d8642930a301872bcf7fa9"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202703_m40/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\result.csv",
+      "bytes": 689,
+      "sha256": "66601fb43f7274ba32439845ceb89e7fd0395484c092781b200f4a9fb09ba62c"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202703_m40/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\waveform_coverage.json",
+      "bytes": 913,
+      "sha256": "c18aecf2b3eb4ba866628de0e870b6132af3fee1ef81c926809737ad7985dc98"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST5-AABB_s202703_m40/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST5-AABB_s202703_m40\\measurement.vcd.archive.json",
+      "bytes": 629,
+      "sha256": "8ce7f01a3eb54cf98424d45c7e98f30063995b8e21da34c2b0ef34b514aa989d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202701_m20/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\power.rpt",
+      "bytes": 1423,
+      "sha256": "12a11b094cb3b92afd5580d4c217b8777846055c14fff509104e196f7ba3a201"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202701_m20/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "6fcaf67d27e0cf80dbd00baee8558a4ea37c777464d9a5132ba816853b5ae86b"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202701_m20/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202701_m20/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\input_hashes.sha256",
+      "bytes": 725,
+      "sha256": "d9cf76fd7fa61feda7e7ed29a01b38f44791c3692af162d111330cb297a206fc"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202701_m20/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\result.csv",
+      "bytes": 692,
+      "sha256": "98392e209c325ffae83e7b9e7a54b0b2e5abdbe58390b4f845e052ac8f5fe32c"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202701_m20/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\waveform_coverage.json",
+      "bytes": 922,
+      "sha256": "9359a4eb7f9d402fca8365914a779a6ec2ee90b076e3c2a5bb072dbe0bb23970"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202701_m20/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202701_m20\\measurement.vcd.archive.json",
+      "bytes": 631,
+      "sha256": "555e5fb5fb84f04014552ea11b4a423b60375f91208b3c82f24e77933b8a1ca6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202702_m20/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\power.rpt",
+      "bytes": 1423,
+      "sha256": "cce3caac19c9d6030f19f211321ffae390f30ddb58e6bfc97954f4fafc810bb6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202702_m20/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "4185c4d7c0c523f4b0a7329472d027736cdd0126819445e1b3e98fce42894244"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202702_m20/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202702_m20/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\input_hashes.sha256",
+      "bytes": 725,
+      "sha256": "98ed5776d6e15b76242a84e272093c0a093b4e553b9d0693ff82c6f837919966"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202702_m20/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\result.csv",
+      "bytes": 692,
+      "sha256": "a0387ac2262802e63539c1b31809b58c9f38f4916963fcf5682ab5cb12a7d195"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202702_m20/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\waveform_coverage.json",
+      "bytes": 922,
+      "sha256": "508ee4b61106a7fbc5e89de33d748b3392dbc71e719450c30f1cb01b634e6920"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202702_m20/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202702_m20\\measurement.vcd.archive.json",
+      "bytes": 631,
+      "sha256": "093b4af3a05946c6d38a37fb6ef1666c7c2436c3ef768adda3011a6d2518bb16"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202703_m20/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\power.rpt",
+      "bytes": 1423,
+      "sha256": "1c35d7fd702f5436e607944be02e2b8c8cca6a050033600cad590f07a9b52124"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202703_m20/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "8bcf62891b21c238b10a0d2f63dba36c1a64b46d9a44dce41397bb17f94a5bb8"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202703_m20/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST10-AABB_s202703_m20/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\input_hashes.sha256",
+      "bytes": 725,
+      "sha256": "bc169a1b60d6a82f7aa2683724c755809e40e64ee07c30292fbf20769163c583"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202703_m20/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\result.csv",
+      "bytes": 692,
+      "sha256": "a2d842bf7b04b4a61011bf77e60853523895c547c67a7589c46ec749001fa946"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202703_m20/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\waveform_coverage.json",
+      "bytes": 922,
+      "sha256": "3e629218a8e7b2a3d97518b61b4024bd2977febe79b75eb9837c35ce54e4604c"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST10-AABB_s202703_m20/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST10-AABB_s202703_m20\\measurement.vcd.archive.json",
+      "bytes": 631,
+      "sha256": "cf847e547eac39a1157fa283021fce99cc35a4268def251b8cad1a11031f892d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\power.rpt",
+      "bytes": 1423,
+      "sha256": "c2a422cbe6fbebda0461284159b15518c55607daea992e321168bc0c7174b2c0"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "83934dcf7121cd8620ef56c538233cb46d47b72bd38618058fbc1f7c52cbf6ce"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\input_hashes.sha256",
+      "bytes": 730,
+      "sha256": "f43add0e89c5958f72d29bba57e659a9c49b41a3a139638e1a1a93d5dd4cdcad"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\result.csv",
+      "bytes": 704,
+      "sha256": "98a53405a7fac4574e9603548020dfaa4e510903e3c67e78488373137316c61c"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\waveform_coverage.json",
+      "bytes": 942,
+      "sha256": "311b5097b138cf4fb593c6dd42cfc0571e4fbcc9eedc8ce9a92aaf00ba215b0d"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202701_m20\\measurement.vcd.archive.json",
+      "bytes": 641,
+      "sha256": "1dcf30cbb604470b31bbc6fc16bef23c620cf25218a74349552d2e3b037ce8af"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\power.rpt",
+      "bytes": 1423,
+      "sha256": "533722a3c3fbaf82b7a20df082ca5145a6f3c72b0fbf753691bec15ede2528bc"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "350b69245a5865e754e07c0fc73816ecdd620dc50a5ac59a451e5a5f6192bcea"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\input_hashes.sha256",
+      "bytes": 730,
+      "sha256": "c5bc094f8737548fab37fd8e4663b2f2665fb423ae155957b130a6f42ff869c0"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\result.csv",
+      "bytes": 704,
+      "sha256": "7bc3f6ba1866f16248d980034332da69e6df49b4a1b0fff27b439c49116213f1"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\waveform_coverage.json",
+      "bytes": 942,
+      "sha256": "83732b99661f016c96881bede6dbd82f3b6cd90674f9ccb7108b2c262a126d71"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202702_m20\\measurement.vcd.archive.json",
+      "bytes": 641,
+      "sha256": "00bb9f094761a2a139109a4b8fdb595e78f7dcf2b0acd2606d32e0e55b14fa4b"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\power.rpt",
+      "bytes": 1423,
+      "sha256": "dea4d0490d5e75c55f528c94b10f44014099d82ee362bcc1af039569c3643885"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/activity.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\activity.rpt",
+      "bytes": 6129,
+      "sha256": "a55484842e2514a5367ccea1f377ae606707d3064ea74e22aaef5a6335ad6c2b"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/check_power.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\check_power.rpt",
+      "bytes": 672,
+      "sha256": "8de76e3df007329a3406106faf19710932f6b6837f1863b93c43f9fbcda7d9e6"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/reports/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/input_hashes.sha256",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\input_hashes.sha256",
+      "bytes": 730,
+      "sha256": "0d6f631d227f0ebe421237cb403ed4885a45f7d4754b56d82a3552041f9003d2"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/result.csv",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\result.csv",
+      "bytes": 703,
+      "sha256": "20cf2e809b0e86a50f7986dfecf4cec7ca35228ec07c6117103dd64e3b95cd01"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/waveform_coverage.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\waveform_coverage.json",
+      "bytes": 937,
+      "sha256": "34be3668835de7bda34563d702def4a9606b7d24fcc8c2fb327911c2b8aa8483"
+    },
+    {
+      "remote": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/activity/SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20/measurement.vcd.archive.json",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\cases\\SYNC_M16_MULTICAST-STATIC-AABB_s202703_m20\\measurement.vcd.archive.json",
+      "bytes": 641,
+      "sha256": "96765bf2ec17180c9f748b6a45a8ad84d6b60868ce5591585080192675d5d3ca"
+    },
+    {
+      "remote": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20261024_sync_m16_clock_gating_tt_r1/cmr_sync_noc64_structure.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\dc\\cmr_sync_noc64_structure.rpt",
+      "bytes": 207,
+      "sha256": "5184c5533a5e11b53651e7fef69796ebdea65d6bb9f021e6a85b4dca2da43dc8"
+    },
+    {
+      "remote": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20261024_sync_m16_clock_gating_tt_r1/clock_gate_audit_r3/summary.txt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\dc\\clock_gate_audit_r3\\summary.txt",
+      "bytes": 50,
+      "sha256": "64746efc8974a234c0f728e1c2969e67d763fd34953a396322260263fd2be8ea"
+    },
+    {
+      "remote": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20261024_sync_m16_clock_gating_tt_r1/clock_gate_audit_r3/clock_gating_summary.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\dc\\clock_gate_audit_r3\\clock_gating_summary.rpt",
+      "bytes": 2539,
+      "sha256": "1c43cc6c23feb136b9c3bdb8eaf961d793415a9441008b429742d3fb29a600d1"
+    },
+    {
+      "remote": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20261024_sync_m16_clock_gating_tt_r1/clock_gate_audit_r3/clock_gating_setup.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\dc\\clock_gate_audit_r3\\clock_gating_setup.rpt",
+      "bytes": 1084376,
+      "sha256": "c6896b48cd0e2dbcebcbc4abdcaeb429322b8b88ffa5e7098f1be5990c48171b"
+    },
+    {
+      "remote": "/home/ghy19/Asynchronous_Router_CMR/reports/dc/20261024_sync_m16_clock_gating_tt_r1/clock_gate_audit_r3/clock_gating_hold.rpt",
+      "local": "results\\20261024_sync_m16_clock_gating_tt_r1\\power_first_six\\dc\\clock_gate_audit_r3\\clock_gating_hold.rpt",
+      "bytes": 379216,
+      "sha256": "621564b71bfb7607f83d84776c8ab60954e0b4f0c1b1c1946e6f8edd2e9363e9"
+    }
+  ],
+  "bytes": 2120067,
+  "scope": "No VCD, FSDB, DDC, netlist, SDF or full experiment logs downloaded."
+}

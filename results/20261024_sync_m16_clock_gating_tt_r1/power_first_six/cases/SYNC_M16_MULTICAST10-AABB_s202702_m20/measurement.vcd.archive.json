@@ -1,0 +1,9 @@
+{
+  "schema": "formal64-power-vcd-archive-v1",
+  "source": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/vcd/SYNC_M16_MULTICAST10-AABB_s202702_m20/measurement.vcd",
+  "archive": "/prjtemp/ghy19/formal64_power_clock_gating/20261024_sync_m16_clock_gating_tt_r1_resetfix_r2/vcd/SYNC_M16_MULTICAST10-AABB_s202702_m20/measurement.vcd.gz",
+  "uncompressed_bytes": 2656768132,
+  "archive_bytes": 519014196,
+  "uncompressed_sha256": "d05d87b1c418d2a10b4f15c4fbeac0440a36e727bbbccd104a5c3457870f6536",
+  "roundtrip_sha256": "d05d87b1c418d2a10b4f15c4fbeac0440a36e727bbbccd104a5c3457870f6536"
+}

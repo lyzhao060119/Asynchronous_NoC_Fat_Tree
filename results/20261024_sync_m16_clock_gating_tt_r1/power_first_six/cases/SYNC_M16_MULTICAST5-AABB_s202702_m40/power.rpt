@@ -1,0 +1,38 @@
+****************************************
+Report : Time Based Power
+Design : SyncNoC_64nodes
+Version: V-2023.12
+Date   : Sat Oct 24 13:52:01 2026
+****************************************
+
+
+
+  Attributes
+  ----------
+      i  -  Including register clock pin internal power
+      u  -  User defined power group
+
+                        Internal  Switching  Leakage    Total
+Power Group             Power     Power      Power      Power   (     %)  Attrs
+--------------------------------------------------------------------------------
+clock_network              0.0000    0.0000    0.0000    0.0000 ( 0.00%)  i
+register                   0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+combinational           1.646e-03 1.353e-03 6.635e-04 3.663e-03 ( 5.91%)  
+sequential                 0.0563 1.073e-03 9.782e-04    0.0584 (94.09%)  
+memory                     0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+io_pad                     0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+black_box                  0.0000    0.0000    0.0000    0.0000 ( 0.00%)  
+
+  Net Switching Power  = 2.426e-03   ( 3.91%)
+  Cell Internal Power  =    0.0580   (93.44%)
+  Cell Leakage Power   = 1.642e-03   ( 2.65%)
+                         ---------
+Total Power            =    0.0620  (100.00%)
+
+X Transition Power     =    0.0000
+Glitching Power        = 3.232e-05
+
+Peak Power             =    3.6819
+Peak Time              =  2640.002
+
+1

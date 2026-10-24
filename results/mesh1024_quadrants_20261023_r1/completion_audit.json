@@ -1,0 +1,133 @@
+{
+  "status": "PASS",
+  "checked_unix": 1792813892.7813141,
+  "objects": [
+    {
+      "top": "Mesh1024Quadrant0",
+      "routers": 256,
+      "passed": true,
+      "artifacts": [
+        {
+          "name": "Mesh1024Quadrant0.ddc",
+          "size": 794066944,
+          "sha256": "c22d929e16c7bf7d9f0e62156dd351d8dea0b70cd5ed69d06788b0294fb6bbc1"
+        },
+        {
+          "name": "Mesh1024Quadrant0_post.v",
+          "size": 266632690,
+          "sha256": "08f5bbf68b5dcbf32bc97e3456e22cfc282f5216e8860376635d460053c234d1"
+        },
+        {
+          "name": "Mesh1024Quadrant0.sdf",
+          "size": 1954934894,
+          "sha256": "39bf86f12a655d50809ecffbdbbd98d68fa85d05a6b1bd7181f8c8c5cc53164a"
+        }
+      ]
+    },
+    {
+      "top": "Mesh1024Quadrant1",
+      "routers": 256,
+      "passed": true,
+      "artifacts": [
+        {
+          "name": "Mesh1024Quadrant1.ddc",
+          "size": 794632192,
+          "sha256": "f34f653ccd6ec5c38f620641a73ef4e0a968ddf9a3c806c8d725e9df12d9526f"
+        },
+        {
+          "name": "Mesh1024Quadrant1_post.v",
+          "size": 266976504,
+          "sha256": "2acc9c5cc868aab33206a7c00351200c7c00213f90fec52f8dede044ef030889"
+        },
+        {
+          "name": "Mesh1024Quadrant1.sdf",
+          "size": 1963898134,
+          "sha256": "f4f898ce0b73049199708b836bfdc1c3ad18f7ca300d41c17e78679d3b2262ac"
+        }
+      ]
+    },
+    {
+      "top": "Mesh1024Quadrant2",
+      "routers": 256,
+      "passed": true,
+      "artifacts": [
+        {
+          "name": "Mesh1024Quadrant2.ddc",
+          "size": 794820608,
+          "sha256": "e7d9b4ea89103a91f4dd7cff1159477c93de2776a49384d16e1cec208c6e2a1d"
+        },
+        {
+          "name": "Mesh1024Quadrant2_post.v",
+          "size": 266954350,
+          "sha256": "4af47dd6161e088a8ebda169ea5046ed0ffeef730fe71a770dbb5bd5a93be1aa"
+        },
+        {
+          "name": "Mesh1024Quadrant2.sdf",
+          "size": 1963701614,
+          "sha256": "13b84bb1095b963119b6502093aa0f5e876b7a8ff2d77810401fe2e69a40e305"
+        }
+      ]
+    },
+    {
+      "top": "Mesh1024Quadrant3",
+      "routers": 256,
+      "passed": true,
+      "artifacts": [
+        {
+          "name": "Mesh1024Quadrant3.ddc",
+          "size": 795320320,
+          "sha256": "1094c0e4976034c5fb33c4644a8cd017b1d24c29f2ab7781899b009a84c3d0ab"
+        },
+        {
+          "name": "Mesh1024Quadrant3_post.v",
+          "size": 267308616,
+          "sha256": "b58dbe1059e58f9b1cc8d09d2a1ff98eadb9cbb8c19c61166d6fc45ac37ec87d"
+        },
+        {
+          "name": "Mesh1024Quadrant3.sdf",
+          "size": 1973046818,
+          "sha256": "7040230d7709456a21dc63abe74f6664208ac47de6e72022c700f00fedaf0ccc"
+        }
+      ]
+    },
+    {
+      "top": "CMRMeshNoC",
+      "routers": 1024,
+      "passed": true,
+      "artifacts": [
+        {
+          "name": "CMRMeshNoC.ddc",
+          "size": 3365273600,
+          "sha256": "e50293956010a53920897733bf4ae61334d576afe3b3466d7dbc5e16a2fea301"
+        },
+        {
+          "name": "CMRMeshNoC_post.v",
+          "size": 1068807703,
+          "sha256": "74d5b9670565c85feeb0af8e908e14785db0b849b3ba638861a7c2e5d25c45d4"
+        },
+        {
+          "name": "CMRMeshNoC.sdf",
+          "size": 8233823864,
+          "sha256": "a74e4b464554f5f6ae4065c703cae832773fe6becc0b72c53807e4b86bda5113"
+        }
+      ]
+    }
+  ],
+  "partition": {
+    "status": "PASS",
+    "router_instances": 1024,
+    "assignments": 20096,
+    "cross_quadrant_signals": 384,
+    "quadrant_ports": [
+      1730,
+      1730,
+      1730,
+      1730
+    ],
+    "note": "Exact structural partition comparison; not STA or functional simulation signoff"
+  },
+  "source_top_sha256": "ff5d92d0b4cff1f94a8801c36c60e5d70b510d4aaa41b1235fba65d069b650e1",
+  "audit_script_sha256": "50e6ee517087947b2726526bb739ad21e39ea4c1bb145eacf90519d7b21861cc",
+  "corner": "tt0p8v25c",
+  "scope": "Mapped hierarchical assembly and artifact integrity, not STA/SDF simulation signoff"
+}
