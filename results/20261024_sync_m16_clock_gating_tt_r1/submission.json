@@ -1,0 +1,15 @@
+{
+  "run": "20261024_sync_m16_clock_gating_tt_r1",
+  "baseline": "20261015_194000_sync_prop_m16_tt_dc_r1",
+  "source_rtl": "/home/ghy19/Asynchronous_Router_CMR/rtl/sync_prop_temp64_m16/SyncNoC_64nodes.v",
+  "clock_period_ns": 1.0,
+  "policy": "integrated latch-based gating, min width 4, max fanout 32",
+  "scripts_sha256": {
+    "tech_t28ss.tcl": "adcbfe7504578f43a593f36456beff3223f754748313a0ff9f6db5acac862737",
+    "sync_cmr_noc64.sdc": "eefbd2e1a0f94901e857a98dedfff38b24e75fbee2ad4eefa4707ae754b178b8",
+    "assert_no_gtech.tcl": "81d23d34c16ead67059f4a540711f2bdec88760e4290e8028aeda3e41c73d417"
+  },
+  "source_rtl_sha256": "9c36f459c7462097594562efb68321acf4240b5c8f690da0a5547d5201ef39d9",
+  "dc_sha256": "44294bfe37939e9d52474381ad7feb08ba03ef1707a2eedee827954bb5830927",
+  "dc_job": "15106801"
+}

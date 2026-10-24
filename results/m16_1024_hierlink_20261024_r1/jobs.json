@@ -24,5 +24,6 @@
   "mode": "link-only, no compile_ultra",
   "sdf_monitor_interval_seconds": 600,
   "source_audit_job": "15104101",
-  "final_job": "15106001"
+  "final_job": "15106001",
+  "audit_job": "15106201"
 }
