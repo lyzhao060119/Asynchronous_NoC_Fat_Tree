@@ -1,0 +1,109 @@
+{
+  "remote_checked_unix": 1792807850.06325,
+  "quadrants": [
+    {
+      "quadrant": 0,
+      "job": "15084401",
+      "lsf": "",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/logs/q0_r4.log",
+      "ddc_reads_started": 256,
+      "rename_events": 3840,
+      "uio92": 0,
+      "errors": [],
+      "pass": true,
+      "opt314": 99591,
+      "last_event": "MESH_QUADRANT_PASS top=Mesh1024Quadrant0 routers=256",
+      "log_bytes": 22664704,
+      "artifacts": {
+        ".ddc": 794066944,
+        "_post.v": 266632690,
+        ".sdf": 1954934894
+      },
+      "accepted": true
+    },
+    {
+      "quadrant": 1,
+      "job": "15084501",
+      "lsf": "",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/logs/q1_r4.log",
+      "ddc_reads_started": 256,
+      "rename_events": 3840,
+      "uio92": 0,
+      "errors": [],
+      "pass": true,
+      "opt314": 99529,
+      "last_event": "MESH_QUADRANT_PASS top=Mesh1024Quadrant1 routers=256",
+      "log_bytes": 22728063,
+      "artifacts": {
+        ".ddc": 794632192,
+        "_post.v": 266976504,
+        ".sdf": 1963898134
+      },
+      "accepted": true
+    },
+    {
+      "quadrant": 2,
+      "job": "15084601",
+      "lsf": "",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/logs/q2_r4.log",
+      "ddc_reads_started": 256,
+      "rename_events": 3840,
+      "uio92": 0,
+      "errors": [],
+      "pass": true,
+      "opt314": 99384,
+      "last_event": "MESH_QUADRANT_PASS top=Mesh1024Quadrant2 routers=256",
+      "log_bytes": 22701436,
+      "artifacts": {
+        ".ddc": 794820608,
+        "_post.v": 266954350,
+        ".sdf": 1963701614
+      },
+      "accepted": true
+    },
+    {
+      "quadrant": 3,
+      "job": "15084701",
+      "lsf": "",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/logs/q3_r4.log",
+      "ddc_reads_started": 256,
+      "rename_events": 3840,
+      "uio92": 0,
+      "errors": [],
+      "pass": true,
+      "opt314": 99356,
+      "last_event": "MESH_QUADRANT_PASS top=Mesh1024Quadrant3 routers=256",
+      "log_bytes": 22771020,
+      "artifacts": {
+        ".ddc": 795320320,
+        "_post.v": 267308616,
+        ".sdf": 1973046818
+      },
+      "accepted": true
+    }
+  ],
+  "final": {
+    "job": "15084801",
+    "lsf": "RUN",
+    "log": "/home/ghy19/.lsbatch/1792772000.15084801.out",
+    "errors": [],
+    "pass": false,
+    "uio92": 0,
+    "ddc_reads_started": 4,
+    "rename_events": 0,
+    "opt314": 397503,
+    "last_event": "Writing verilog file '/home/ghy19/Asynchronous_Router_CMR/campaigns/mesh1024_quadrants_20261023_r1/outputs/CMRMeshNoC/CMRMeshNoC_post.v'.",
+    "artifacts": {
+      ".ddc": 3365273600,
+      "_post.v": 1068807703,
+      ".sdf": 2837225472
+    },
+    "accepted": false
+  },
+  "complete": false,
+  "audit": {
+    "job": "15090801",
+    "lsf": "PEND",
+    "status": null
+  }
+}

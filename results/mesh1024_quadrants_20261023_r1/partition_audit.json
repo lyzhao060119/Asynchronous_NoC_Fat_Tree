@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "router_instances": 1024,
+  "assignments": 20096,
+  "cross_quadrant_signals": 384,
+  "quadrant_ports": [
+    1730,
+    1730,
+    1730,
+    1730
+  ],
+  "note": "Exact structural partition comparison; not STA or functional simulation signoff"
+}

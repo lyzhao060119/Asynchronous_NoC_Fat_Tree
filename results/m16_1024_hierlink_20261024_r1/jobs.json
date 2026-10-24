@@ -1,0 +1,28 @@
+{
+  "remote": "/home/ghy19/Asynchronous_Router_CMR/campaigns/m16_1024_hierlink_20261024_r1",
+  "base": "/home/ghy19/Asynchronous_Router_CMR/campaigns/20261020_split1024_tt_r1",
+  "parallel_slots": 8,
+  "blocks": {
+    "PROPtempTileM16": "15104201",
+    "PROPtempTileM16_1": "15104301",
+    "PROPtempTileM16_2": "15104501",
+    "PROPtempTileM16_3": "15104601",
+    "PROPtempTileM16_4": "15104701",
+    "PROPtempTileM16_5": "15104801",
+    "PROPtempTileM16_6": "15104901",
+    "PROPtempTileM16_7": "15105001",
+    "PROPtempTileM16_8": "15105101",
+    "PROPtempTileM16_9": "15105201",
+    "PROPtempTileM16_10": "15105301",
+    "PROPtempTileM16_11": "15105401",
+    "PROPtempTileM16_12": "15105501",
+    "PROPtempTileM16_13": "15105601",
+    "PROPtempTileM16_14": "15105701",
+    "PROPtempTileM16_15": "15105801",
+    "CMRTopMesh": "15105901"
+  },
+  "mode": "link-only, no compile_ultra",
+  "sdf_monitor_interval_seconds": 600,
+  "source_audit_job": "15104101",
+  "final_job": "15106001"
+}

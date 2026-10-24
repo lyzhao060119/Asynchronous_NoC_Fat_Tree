@@ -1,0 +1,39 @@
+{
+  "source_sha256": "ff5d92d0b4cff1f94a8801c36c60e5d70b510d4aaa41b1235fba65d069b650e1",
+  "quadrants": [
+    {
+      "quadrant": 0,
+      "routers": 256,
+      "ports": 1730,
+      "assignments": 5024
+    },
+    {
+      "quadrant": 1,
+      "routers": 256,
+      "ports": 1730,
+      "assignments": 5024
+    },
+    {
+      "quadrant": 2,
+      "routers": 256,
+      "ports": 1730,
+      "assignments": 5024
+    },
+    {
+      "quadrant": 3,
+      "routers": 256,
+      "ports": 1730,
+      "assignments": 5024
+    }
+  ],
+  "original_router_instances": 1024,
+  "original_assignments": 20096,
+  "partition_assignments": 20096,
+  "hashes": {
+    "CMRMeshNoC.v": "064fb43e36832ef880b330e4c4a28116a768b265a12d0492c798785628bdd457",
+    "Mesh1024Quadrant0.v": "487067dd64510a914999cb95cc371672faaadb4bd5bb5cf371fe950a2ce12181",
+    "Mesh1024Quadrant1.v": "25e5ffc0e958406d7a312342d95284646e7762cffb1b3420c8843d07e78f0aa6",
+    "Mesh1024Quadrant2.v": "1ee323d6d097daa95182419ae6503e51097350a18e9741011ca25221bb719799",
+    "Mesh1024Quadrant3.v": "4dc49bbcb634f4134000d4d53449e335942d20c9be01846e32d2905df62736fe"
+  }
+}
