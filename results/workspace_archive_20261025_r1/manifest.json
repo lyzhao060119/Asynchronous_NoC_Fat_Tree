@@ -1,0 +1,21 @@
+{
+  "source_commit": "a53209b162a15ecd4612e3196f8c170265fcb1cc",
+  "scope": "Previous committed versions of files updated during workspace cleanup; current files preserved.",
+  "entries": [
+    {
+      "path": "DAC/paper/CHAMP_v1.docx",
+      "bytes": 134654,
+      "sha256": "0ec40c253a65190b9978b0ac5c27b85a5152933958bc68f523c3731beb5024dc"
+    },
+    {
+      "path": "results/formal1024_cases_20261024_r1/scan_jobs.json",
+      "bytes": 54,
+      "sha256": "c9a0e437214304da7c9d0fc785ff3b42bd543aa378806524e91620a032498475"
+    },
+    {
+      "path": "results/m16_1024_hierlink_20261024_r1/status.json",
+      "bytes": 4769,
+      "sha256": "5e136dac11ff5977524dbaa4cdf0bd520c33fb4e8242e15150be046a8a6320df"
+    }
+  ]
+}
