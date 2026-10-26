@@ -1,0 +1,7 @@
+{
+  "job": "15350201",
+  "dependency": "done(15335901)",
+  "remote_root": "/prjtemp/ghy19/formal1024_m16_rcu_eco_20261026_r1",
+  "script": "/prjtemp/ghy19/formal1024_m16_rcu_eco_20261026_r1/scripts/run_target_regression.sh",
+  "target_case": "TOPO-UR_n1024_s202701_m5"
+}

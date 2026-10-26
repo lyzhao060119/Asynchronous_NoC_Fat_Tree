@@ -1,0 +1,9 @@
+{
+  "job": "15351701",
+  "remote_root": "/prjtemp/ghy19/formal1024_m16_rcu_overlay_20261026_r1",
+  "target_case": "TOPO-UR_n1024_s202701_m5",
+  "mode": "baseline_full_plus_16_topmesh_overlay",
+  "status": "REJECTED",
+  "reason": "baseline SDF against ECO post-netlist produced SDFCOM_CFTC Cannot find timing check warnings; strict missing-timing-check gate cannot pass",
+  "terminated_after_proof": true
+}

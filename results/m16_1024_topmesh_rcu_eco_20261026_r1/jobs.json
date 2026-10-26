@@ -1,0 +1,9 @@
+{
+  "job": "15335901",
+  "remote": "/prjtemp/ghy19/m16_1024_topmesh_rcu_eco_20261026_r1",
+  "baseline": "/home/ghy19/Asynchronous_Router_CMR/campaigns/m16_1024_hierlink_20261024_r1",
+  "scope": "TopMesh RCU matched-delay BUFFD0 ECO",
+  "failed_env_job": "15334801",
+  "binding_failed_job": "15335001",
+  "output": "/prjtemp/ghy19/m16_1024_topmesh_rcu_eco_20261026_r1/outputs_r3/PROP_temp1024_m16"
+}

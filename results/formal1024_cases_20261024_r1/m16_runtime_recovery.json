@@ -1,0 +1,9 @@
+{
+  "compile_check_job": "15331901",
+  "runtime": "/prjtemp/ghy19/formal1024_20261024_r1/runtime",
+  "migration_audit": "/prjtemp/ghy19/formal1024_20261024_r1/runtime/migration.json",
+  "reason": "Home quota exceeded while closing fifth small-smoke run.log",
+  "small_passed_before_failure": 4,
+  "failed_case_preserved": true,
+  "goal_confirmed": false
+}

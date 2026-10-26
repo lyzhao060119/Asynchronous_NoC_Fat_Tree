@@ -1,0 +1,7 @@
+{
+  "job": "15351301",
+  "remote": "/prjtemp/ghy19/m16_1024_topmesh_overlay_sdf_20261026_r1",
+  "source_ddc": "/prjtemp/ghy19/m16_1024_topmesh_rcu_eco_20261026_r1/outputs_r3/PROP_temp1024_m16/PROP_temp1024_m16.ddc",
+  "scope": "CMRTopMesh-only SDF pilot",
+  "failed_env_job": "15351101"
+}

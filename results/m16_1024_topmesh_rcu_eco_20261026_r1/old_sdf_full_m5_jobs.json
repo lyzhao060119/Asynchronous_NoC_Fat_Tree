@@ -1,0 +1,18 @@
+{
+  "remote_root": "/prjtemp/ghy19/formal1024_m16_rcu_old_sdf_full_m5_20261026_r1",
+  "jobs": [
+    {
+      "job": "15356601",
+      "case": "TOPO-UR_n1024_s202701_m5"
+    },
+    {
+      "job": "15356701",
+      "case": "MULTICAST10-AABB_n1024_s202701_m5"
+    },
+    {
+      "job": "15356801",
+      "case": "ALL-MULTICAST-AABB_n1024_s202701_m5"
+    }
+  ],
+  "scope": "non-signoff old full SDF plus TopMesh ECO overlay; complete m5 cases"
+}

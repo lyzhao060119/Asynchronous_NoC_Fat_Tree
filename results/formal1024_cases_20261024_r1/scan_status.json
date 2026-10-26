@@ -1,5 +1,5 @@
 {
-  "checked_unix": 1792892430.9308465,
+  "checked_unix": 1792983929.7230146,
   "designs": {
     "Mesh1024": {
       "small_passed": 9,
@@ -15,6 +15,7 @@
         }
       },
       "failures": [],
+      "incomplete_metrics": [],
       "grid_jobs": [
         {
           "benchmark": "TOPO-UR",
@@ -65,16 +66,15 @@
       "halted": false
     },
     "M16_1024": {
-      "small_passed": 0,
+      "small_passed": 9,
       "benchmarks": {},
       "failures": [],
+      "incomplete_metrics": [],
       "grid_jobs": [],
       "halted": false
     }
   },
   "jobs": [
-    "15106001 RUN   1     m16_1024_hierlink",
-    "15106201 PEND   - m16_1024_artifact_audit",
-    "15170001 PEND   - f1024_prepare_M16_1024"
+    "15331901 RUN   1     f1024_M16_compile_check"
   ]
 }
