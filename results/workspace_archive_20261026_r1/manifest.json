@@ -1,0 +1,21 @@
+{
+  "source_commit": "719473b4885b8cdf61b00e69a17282a3f8caa5e4",
+  "scope": "Previous committed versions; current workspace files preserved. Job metadata is not proof of completed experiments.",
+  "entries": [
+    {
+      "path": "DAC/paper/CHAMP_v1.docx",
+      "bytes": 556052,
+      "sha256": "9cccef93f53e29ac770981beb3a1469a176a1be623e04a8f7c7108809c464a47"
+    },
+    {
+      "path": "results/formal1024_cases_20261024_r1/scan_jobs.json",
+      "bytes": 135,
+      "sha256": "af48f26048db2f041f28c20c0d6619926f4c2097e80880b446a50a1273bcee70"
+    },
+    {
+      "path": "results/formal1024_cases_20261024_r1/scan_status.json",
+      "bytes": 1735,
+      "sha256": "54daa7a149a98ecbb051108cb347c7a8071eeea6bc50cf874dfb511051e57dea"
+    }
+  ]
+}
