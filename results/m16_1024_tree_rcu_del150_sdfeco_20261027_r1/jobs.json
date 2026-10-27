@@ -1,0 +1,20 @@
+{
+  "root": "/prjtemp/ghy19/m16_1024_tree_rcu_del150_sdfeco_20261027_r1",
+  "prepare_job": "15391401",
+  "case_jobs": [
+    {
+      "job": "15391601",
+      "case": "TOPO-UR_n1024_s202701_m5"
+    },
+    {
+      "job": "15391701",
+      "case": "MULTICAST10-AABB_n1024_s202701_m5"
+    },
+    {
+      "job": "15391801",
+      "case": "ALL-MULTICAST-AABB_n1024_s202701_m5"
+    }
+  ],
+  "patch_scope": "6144 Tree RCU DEL100 SDF arcs replaced by measured DEL150 arcs",
+  "topmesh": "unchanged"
+}

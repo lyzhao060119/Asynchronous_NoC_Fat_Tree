@@ -1,0 +1,71 @@
+{
+  "scope": "File integrity only; original manifest and result files preserved. Mismatches are unresolved and not evidence of validated results.",
+  "checks": [
+    {
+      "path": "figures\\formal1024_latency.pdf",
+      "expected_sha256": "d28e14e43cddaf7b433cec8d964b16f527d5770f22c42fa55ef991562f606937",
+      "actual_sha256": "d28e14e43cddaf7b433cec8d964b16f527d5770f22c42fa55ef991562f606937",
+      "matches": true
+    },
+    {
+      "path": "figures\\formal1024_latency.png",
+      "expected_sha256": "e56bb9e2764debbf7aa6a3899807f807a628eced8383ce43e74bd2660db0ad90",
+      "actual_sha256": "e56bb9e2764debbf7aa6a3899807f807a628eced8383ce43e74bd2660db0ad90",
+      "matches": true
+    },
+    {
+      "path": "figures\\formal1024_peak_throughput.pdf",
+      "expected_sha256": "52740cd4b5bd88d42274fa8adf2bf694ef096ce89f88a4da49e3d45945708953",
+      "actual_sha256": "52740cd4b5bd88d42274fa8adf2bf694ef096ce89f88a4da49e3d45945708953",
+      "matches": true
+    },
+    {
+      "path": "figures\\formal1024_peak_throughput.png",
+      "expected_sha256": "3952b23890f01b8b0809635b42a0bea8a26647b45b71f70ea0131cea6b9510b1",
+      "actual_sha256": "3952b23890f01b8b0809635b42a0bea8a26647b45b71f70ea0131cea6b9510b1",
+      "matches": true
+    },
+    {
+      "path": "raw\\m16_1024_raw_metrics.csv",
+      "expected_sha256": "eb336d980d67eb530ee82dcb5a3ccc53e9a87a1ca3a32d168d7e7c6d399cefe9",
+      "actual_sha256": "eb336d980d67eb530ee82dcb5a3ccc53e9a87a1ca3a32d168d7e7c6d399cefe9",
+      "matches": true
+    },
+    {
+      "path": "raw\\mesh1024_raw_metrics.csv",
+      "expected_sha256": "f21f477b9f1a7501c14b6ae36ff6fe135dd46a54b16ff22327a04294e4ec7e1b",
+      "actual_sha256": "f21f477b9f1a7501c14b6ae36ff6fe135dd46a54b16ff22327a04294e4ec7e1b",
+      "matches": true
+    },
+    {
+      "path": "raw\\reduction_audit.json",
+      "expected_sha256": "80bce1c293851727ef24a8aeff54bbd92170ce81e46ad0caeb71b7aa2496d9be",
+      "actual_sha256": "80bce1c293851727ef24a8aeff54bbd92170ce81e46ad0caeb71b7aa2496d9be",
+      "matches": true
+    },
+    {
+      "path": "summary\\peak_throughput.csv",
+      "expected_sha256": "d5a78133f577dc91fa3142193e9204edd28d9de34c1081ecde69bc8238a85000",
+      "actual_sha256": "d5a78133f577dc91fa3142193e9204edd28d9de34c1081ecde69bc8238a85000",
+      "matches": true
+    },
+    {
+      "path": "summary\\three_seed_means.csv",
+      "expected_sha256": "fcffb171138d0c24912ff61b1f5fac6c3b139e97f8046c19df85f4c7ddf0ba9f",
+      "actual_sha256": "fcffb171138d0c24912ff61b1f5fac6c3b139e97f8046c19df85f4c7ddf0ba9f",
+      "matches": true
+    },
+    {
+      "path": "figures\\formal1024_latency_overlay.pdf",
+      "expected_sha256": "283c1a9e40d85032f7a427d43b38fc8b905ed2542781edf2d2848c9210775732",
+      "actual_sha256": "6a00fd86d04e35aee81836cefb47d4e8af3f198c6946ee4219b6c5c49364d60e",
+      "matches": false
+    },
+    {
+      "path": "figures\\formal1024_latency_overlay.png",
+      "expected_sha256": "112eaa4691a19e3f98d77bf9756565436b610d3ca156f258182a2b948d45dc07",
+      "actual_sha256": "2a1ad8f8df7b1657ff101909ff8658dc3fa6055c8b0dd71ba9362c176ebaf1bf",
+      "matches": false
+    }
+  ]
+}

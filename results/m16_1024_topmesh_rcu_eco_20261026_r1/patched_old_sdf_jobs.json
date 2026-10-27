@@ -1,0 +1,20 @@
+{
+  "remote_root": "/prjtemp/ghy19/formal1024_m16_rcu_patched_old_sdf_20261026_r1",
+  "prepare_job": "15359101",
+  "case_jobs": [
+    {
+      "job": "15359201",
+      "case": "TOPO-UR_n1024_s202701_m5"
+    },
+    {
+      "job": "15359301",
+      "case": "MULTICAST10-AABB_n1024_s202701_m5"
+    },
+    {
+      "job": "15359401",
+      "case": "ALL-MULTICAST-AABB_n1024_s202701_m5"
+    }
+  ],
+  "patch": "add exact CMRTopMesh BUFFD0 SDF IOPATH delay to 2048 old-netlist RCU DEL150 arcs",
+  "scope": "diagnostic patched old SDF; old netlist; complete m5 cases"
+}

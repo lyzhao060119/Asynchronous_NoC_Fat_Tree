@@ -1,0 +1,22 @@
+﻿{
+    "status":  "PASS",
+    "raw_rows":  540,
+    "mean_rows":  180,
+    "peak_rows":  6,
+    "latency_metric":  "planned injection time to last-destination Tail arrival, including source queueing",
+    "latency_marker":  "filled when all three seeds have delivery_fraction \u003e= 0.99; open otherwise",
+    "peak_metric":  "maximum three-seed mean delivered-copy throughput over the 30 offered loads",
+    "files":  {
+                  "figures\\formal1024_latency.pdf":  "d28e14e43cddaf7b433cec8d964b16f527d5770f22c42fa55ef991562f606937",
+                  "figures\\formal1024_latency.png":  "e56bb9e2764debbf7aa6a3899807f807a628eced8383ce43e74bd2660db0ad90",
+                  "figures\\formal1024_peak_throughput.pdf":  "52740cd4b5bd88d42274fa8adf2bf694ef096ce89f88a4da49e3d45945708953",
+                  "figures\\formal1024_peak_throughput.png":  "3952b23890f01b8b0809635b42a0bea8a26647b45b71f70ea0131cea6b9510b1",
+                  "raw\\m16_1024_raw_metrics.csv":  "eb336d980d67eb530ee82dcb5a3ccc53e9a87a1ca3a32d168d7e7c6d399cefe9",
+                  "raw\\mesh1024_raw_metrics.csv":  "f21f477b9f1a7501c14b6ae36ff6fe135dd46a54b16ff22327a04294e4ec7e1b",
+                  "raw\\reduction_audit.json":  "80bce1c293851727ef24a8aeff54bbd92170ce81e46ad0caeb71b7aa2496d9be",
+                  "summary\\peak_throughput.csv":  "d5a78133f577dc91fa3142193e9204edd28d9de34c1081ecde69bc8238a85000",
+                  "summary\\three_seed_means.csv":  "fcffb171138d0c24912ff61b1f5fac6c3b139e97f8046c19df85f4c7ddf0ba9f",
+                  "figures\\formal1024_latency_overlay.pdf":  "283c1a9e40d85032f7a427d43b38fc8b905ed2542781edf2d2848c9210775732",
+                  "figures\\formal1024_latency_overlay.png":  "112eaa4691a19e3f98d77bf9756565436b610d3ca156f258182a2b948d45dc07"
+              }
+}
