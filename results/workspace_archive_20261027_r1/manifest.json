@@ -1,0 +1,16 @@
+{
+  "source_commit": "521481910d990f4bf6b39f18bc9c116cd1f4d83a",
+  "scope": "Previous committed manuscript and figure; current files preserved. Job metadata does not prove experiment completion.",
+  "entries": [
+    {
+      "path": "DAC/paper/CHAMP_v1.docx",
+      "bytes": 480437,
+      "sha256": "d69afc2a4a46cd27c513ca46ffe7db4c615f7e6bfd1e1e8da48dbc121fa2102e"
+    },
+    {
+      "path": "DAC/paper/figures/Challenge_Solution_v2.svg",
+      "bytes": 111303,
+      "sha256": "933d548ea3b4820969ab87764d6b0bac6e33470470ad2e049e2ebc8c08056cc0"
+    }
+  ]
+}
