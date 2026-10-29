@@ -113,24 +113,25 @@ grep -Eq 'Doing SDF annotation .* Done' "$LOG/run.log" || { echo "E2_CASE_FAIL c
 cp "$SDF_LOG" "$LOG/sdf_annotate.log"
 sha256sum "$LOG/sdf_annotate.log" > "$LOG/sdf_reference.sha256"
 ! grep -Eiq 'Total errors:[[:space:]]*[1-9]|Timing violation|TB_RESULT FAIL|TB_X_FAIL|TB_PROTOCOL_X|TB_UNEXPECTED_FAIL|TB_STALL_FAIL|TB_HARD_TIMEOUT|TB_FATAL|Fatal:' "$SDF_LOG" "$LOG/run.log" "$LOG/stdout.log"
+EXPECTED_INJECTED=${E2_EXPECTED_INJECTED:-55000}
 if [[ "${E2_ALLOW_MULTICAST:-0}" == 1 ]]; then
-  grep -Eq 'TB_RESULT PASS injected=55000 delivered=[1-9][0-9]* missing=0 unexpected=0 timeout=0' "$LOG/run.log" || { echo "E2_CASE_FAIL multicast counts"; exit 5; }
+  grep -Eq "TB_RESULT PASS injected=${EXPECTED_INJECTED} delivered=[1-9][0-9]* missing=0 unexpected=0 timeout=0" "$LOG/run.log" || { echo "E2_CASE_FAIL multicast counts"; exit 5; }
 else
-  grep -Eq 'TB_RESULT PASS injected=55000 delivered=55000 missing=0 unexpected=0 timeout=0' "$LOG/run.log" || { echo "E2_CASE_FAIL counts"; exit 5; }
+  grep -Eq "TB_RESULT PASS injected=${EXPECTED_INJECTED} delivered=${EXPECTED_INJECTED} missing=0 unexpected=0 timeout=0" "$LOG/run.log" || { echo "E2_CASE_FAIL counts"; exit 5; }
 fi
 test -s "$CSV"
 if ! awk -F, '
   NR == 1 { for (i = 1; i <= NF; i++) col[$i] = i; next }
   NR == 2 {
     split("injected_flits delivered_flits missing_expected_flits unexpected_flits timeout_hit warmup_original_events measurement_original_events pass_fail", names, " ")
-    split("55000 0 0 0 1000 10000 PASS", values, " ")
+    split(expected " 0 0 0 1000 10000 PASS", values, " ")
     check[1]="injected_flits"; check[2]="missing_expected_flits"; check[3]="unexpected_flits"; check[4]="timeout_hit"; check[5]="warmup_original_events"; check[6]="measurement_original_events"; check[7]="pass_fail"
     for (i = 1; i <= 7; i++) if (!(check[i] in col) || $(col[check[i]]) != values[i]) exit 1
     if (!("delivered_flits" in col) || $(col["delivered_flits"]) <= 0) exit 1
     next
   }
   END { if (NR != 2) exit 1 }
-' "$CSV"; then
+' expected="$EXPECTED_INJECTED" "$CSV"; then
   echo "E2_CASE_FAIL CSV counts/pass marker" >&2
   exit 6
 fi

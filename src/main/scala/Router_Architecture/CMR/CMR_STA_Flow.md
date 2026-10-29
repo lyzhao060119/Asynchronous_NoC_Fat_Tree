@@ -983,3 +983,7 @@ ReadPhaseSelector `XOR2D1 -> XOR2D2`，不改 latch。最坏请求段降至
 
 相对阶段 1，Body/Tail/cycle 均再缩短约 4 ps。下一阶段若尝试 ReqLatch 器件，
 必须先比较真实 D/E-to-Q 与 setup/hold/脉宽要求；不能仅因 D-to-Q 较大就替换。
+
+### 单 Router 聚合几何对照（2026-10-29）
+
+L1 c1p4、L2 c4p16、L3 c16p16 和 Mesh dir16/local16 的独立实验入口见 [CMR_Wide_Router_Experiment.md](CMR_Wide_Router_Experiment.md)。新64节点树为16/4/1个 Router；不替换 M16 默认拓扑。使用 r3 冻结输入，单体/层次入口统一 LF、禁止提交后覆盖，空映射集合不调用器件命令。面积来自最终映射报告；延迟分别来自单跳和网络严格 SDF。DC PASS、面积结果及局部事件通过均不能替代完整异步 STA 签核。

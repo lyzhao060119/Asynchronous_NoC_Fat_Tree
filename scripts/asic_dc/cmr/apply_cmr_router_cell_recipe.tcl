@@ -7,7 +7,37 @@ proc cmr_router_apply_cell_recipe {report_dir} {
   set xnr [get_cells -hierarchical -quiet -filter {full_name =~ OutputPortModules_*/* && (ref_name == XNR4D0BWP12T30P140 || ref_name == XNR4D2BWP12T30P140)}]
   set oai [get_cells -hierarchical -quiet -filter {full_name =~ OutputPortModules_*/* && (ref_name == OAI221D1BWP12T30P140 || ref_name == OAI221D2BWP12T30P140)}]
   set oai_count [sizeof_collection $oai]
-  cmr_ipm_resize_exact $xnr [expr {2*$n}] XNR4D2BWP12T30P140 opm_click_xnr
+  # Wide OPMs reduce 28/64 requester phases through multiple parity levels.
+  # The old two-XNR4-per-OPM invariant applies only to the original geometries.
+  # Inventory every OPM independently; resize existing gates without changing
+  # their number, connectivity, or polarity.
+  set wide_parity 0
+  set parity_inventory {}
+  foreach_in_collection opm $opms {
+    set base [get_object_name $opm]
+    set eps [get_pins -hierarchical -quiet -filter "full_name =~ ${base}/L1_L4_*/*/E"]
+    set sources [sizeof_collection $eps]
+    set gates [get_cells -hierarchical -quiet -filter "full_name =~ ${base}/* && (ref_name == XNR4D0BWP12T30P140 || ref_name == XNR4D2BWP12T30P140)"]
+    set count [sizeof_collection $gates]
+    if {$sources > 20} {set wide_parity 1}
+    lappend parity_inventory [list $base $sources $count [get_object_name $gates]]
+  }
+  if {$wide_parity} {
+    set bound 0
+    foreach item $parity_inventory {
+      if {[lindex $item 1] < 16 || [lindex $item 2] < 2} {
+        error "wide parity binding invalid: $item"
+      }
+      incr bound [lindex $item 2]
+    }
+    if {$bound != [sizeof_collection $xnr]} {error "wide parity inventory mismatch"}
+    cmr_ipm_resize_exact $xnr $bound XNR4D2BWP12T30P140 opm_wide_parity_xnr
+  } else {
+    cmr_ipm_resize_exact $xnr [expr {2*$n}] XNR4D2BWP12T30P140 opm_click_xnr
+  }
+  set inventory_fd [open "$report_dir/opm_parity_inventory.rpt" w]
+  foreach item $parity_inventory {puts $inventory_fd $item}
+  close $inventory_fd
   # The ReqMerged/RegEnable cone is mapping-dependent across c1p1/c1p2/c1p4
   # Router geometries.  Some ports map to OAI221 while others collapse to a
   # simpler equivalent gate.  Accelerate every OAI221 that DC actually kept;

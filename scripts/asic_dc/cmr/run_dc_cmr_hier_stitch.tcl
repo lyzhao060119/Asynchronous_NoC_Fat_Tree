@@ -127,6 +127,8 @@ set_ungroup [get_designs *] false
 set_boundary_optimization [get_designs *] false
 compile_ultra -no_autoungroup
 check_design > "$REPORT_DIR/check_design_post.rpt"
+redirect "$REPORT_DIR/area.rpt" {report_area -hierarchy}
+redirect "$REPORT_DIR/reference.rpt" {report_reference -hierarchy}
 
 source "$RTL_DIR/assert_no_gtech.tcl"
 set n_gtech [async_assert_no_gtech $REPORT_DIR]
@@ -139,7 +141,7 @@ if {$n_gtech > 0 || $n_unmapped > 0} {
 set router_count [sizeof_collection [get_cells -quiet -filter {ref_name =~ CMRRouter*}]]
 set ipm_count 0
 set opm_count 0
-for {set i 0} {$i < 32} {incr i} {
+for {set i 0} {$i < $expected_ports} {incr i} {
   incr ipm_count [sizeof_collection [get_cells -hierarchical -quiet InputPortModules_$i]]
   incr opm_count [sizeof_collection [get_cells -hierarchical -quiet OutputPortModules_$i]]
 }

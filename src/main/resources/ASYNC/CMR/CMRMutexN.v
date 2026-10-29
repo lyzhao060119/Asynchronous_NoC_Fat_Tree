@@ -89,6 +89,32 @@ module CMRTACSub10(input wire reset, input wire [9:0] req,
         .grant0(left_grant), .grant1(right_grant));
 endmodule
 
+// Exact-width binary TAC extension for the wide-router experiment only.
+// Existing widths keep their original implementations below. No dummy
+// requesters, priority replacement, or combinational grant masks are added.
+module CMRWideTACSub #(parameter WIDTH = 2) (
+    input wire reset, input wire [WIDTH-1:0] req,
+    input wire root_grant, output wire req_up,
+    output wire [WIDTH-1:0] grant
+);
+    generate
+        if (WIDTH == 1) begin : leaf
+            assign req_up = req[0];
+            assign grant[0] = root_grant;
+        end else begin : branch
+            localparam LEFT = WIDTH / 2;
+            localparam RIGHT = WIDTH - LEFT;
+            wire lreq, rreq, lg, rg;
+            CMRWideTACSub #(.WIDTH(LEFT)) l(.reset(reset), .req(req[LEFT-1:0]),
+                .root_grant(lg), .req_up(lreq), .grant(grant[LEFT-1:0]));
+            CMRWideTACSub #(.WIDTH(RIGHT)) r(.reset(reset), .req(req[WIDTH-1:LEFT]),
+                .root_grant(rg), .req_up(rreq), .grant(grant[WIDTH-1:LEFT]));
+            CMRTAC2 n(.reset(reset), .req0(lreq), .req1(rreq),
+                .root_grant(root_grant), .req_up(req_up), .grant0(lg), .grant1(rg));
+        end
+    endgenerate
+endmodule
+
 module CMRMutexN #(parameter WIDTH = 5) (
     input wire reset,
     input wire [WIDTH-1:0] req,
@@ -126,6 +152,14 @@ module CMRMutexN #(parameter WIDTH = 5) (
                 .root_grant(lg), .req_up(lreq), .grant(grant[9:0]));
             CMRTACSub10 r(.reset(reset), .req(req[19:10]),
                 .root_grant(rg), .req_up(rreq), .grant(grant[19:10]));
+            Mutex2 root(.req0(lreq), .req1(rreq), .gnt0(lg), .gnt1(rg));
+        end else if (WIDTH == 28 || WIDTH == 64) begin : wide
+            localparam HALF = WIDTH / 2;
+            wire lreq, rreq, lg, rg;
+            CMRWideTACSub #(.WIDTH(HALF)) l(.reset(reset), .req(req[HALF-1:0]),
+                .root_grant(lg), .req_up(lreq), .grant(grant[HALF-1:0]));
+            CMRWideTACSub #(.WIDTH(HALF)) r(.reset(reset), .req(req[WIDTH-1:HALF]),
+                .root_grant(rg), .req_up(rreq), .grant(grant[WIDTH-1:HALF]));
             Mutex2 root(.req0(lreq), .req1(rreq), .gnt0(lg), .gnt1(rg));
         end else begin : unsupported
             assign grant = {WIDTH{1'b0}};

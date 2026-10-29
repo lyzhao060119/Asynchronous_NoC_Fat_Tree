@@ -158,8 +158,8 @@ module noc64_async_boundary_core #(
     begin
       if (flit[27])
         identity_pkt_seq = -1;
-      else if (wide_packet_tag && (flit[6:4] === 3'b110))
-        identity_pkt_seq = flit[25:9];
+      else if (wide_packet_tag && (flit[8:6] === IDENTITY_MAGIC))
+        identity_pkt_seq = {flit[5:2], flit[25:12]};
       else if (!wide_packet_tag && (flit[8:6] === IDENTITY_MAGIC))
         identity_pkt_seq = flit[25:12];
       else
@@ -193,6 +193,15 @@ module noc64_async_boundary_core #(
           expected_mask[scan][port] = 1'b0;
           expected_seen[scan] = (expected_mask[scan] == {MASK_W{1'b0}});
         end
+      if ((exp_idx < 0) && wide_packet_tag && captured[27]) begin
+        for (scan = 0; scan < expected_count; scan = scan + 1)
+          if (captured === expected_flit[scan])
+            $display("TB_WIDE_HEAD_CANDIDATE port=%0d idx=%0d seen=%0d mask=%h",
+                     port, scan, expected_seen[scan], expected_mask[scan]);
+      end
+      if (exp_idx < 0)
+        $display("TB_MATCH_FAIL_NOW port=%0d slot=%0d flit=%h head=%0d tail=%0d decoded_pkt=%0d",
+                 port, slot, captured, captured[27], captured[26], identity_pkt_seq(captured));
       score_rx_slot(port, slot, exp_idx);
     end
   endtask
@@ -448,7 +457,7 @@ module noc64_async_boundary_core #(
               expected_input_index[expected_count] = -1;
               expected_flit[expected_count] = flit; expected_seen[expected_count] = 1'b0;
               if (!flit[27] && (((!wide_packet_tag) && (flit[8:6] === IDENTITY_MAGIC)) ||
-                                (wide_packet_tag && (flit[6:4] === 3'b110))))
+                                (wide_packet_tag && (flit[8:6] === IDENTITY_MAGIC))))
                 case_has_identity = 1'b1;
               for (p = 0; p < NUM_PORTS; p = p + 1) if (mask_word[p]) begin
                 if (expected_port_count[p] >= MAX_RX_PER_PORT) begin $display("TB_FATAL expected queue overflow p=%0d", p); $finish; end
@@ -572,7 +581,14 @@ module noc64_async_boundary_core #(
         // Concurrent sources share an output, so arrival order is not the case
         // order.  Body/tail carry a unique pkt_seq.  Head is AABB-only and is
         // held until the next identity flit on this port names the packet.
-        if (captured[27]) begin
+        if (captured[27] && wide_packet_tag) begin
+          // Wide-tag cases use unique Body/Tail identities for packet latency,
+          // while Head retains the routing AABB and may be followed by another
+          // packet's Head at a contended output.  Score the complete Head flit
+          // immediately; delaying it until Body would falsely orphan a valid
+          // Head when arbitration interleaves two packet starts.
+          match_first_unseen(port, slot, captured);
+        end else if (captured[27]) begin
           release_pending_head(port);
           pending_head_valid[port] = 1'b1;
           pending_head_flit[port] = captured;

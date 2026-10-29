@@ -152,6 +152,10 @@ set_ungroup [get_designs *] false
 set_boundary_optimization [get_designs *] false
 compile_ultra -no_autoungroup
 compile_ultra -incremental -no_autoungroup
+if {$expected_ports > 24} {
+  # Preserve the expensive mapped input before equivalent-cell recipes.
+  write -hierarchy -format ddc -output "$OUTPUT_DIR/${REF}_mapped_pre_recipe.ddc"
+}
 if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIMING_RECIPE) eq "1"} {
   if {[catch {
     source "$PROJECT_DIR/scripts/dc/apply_cmr_ipm_timing_recipe.tcl"
@@ -164,6 +168,11 @@ if {[info exists ::env(CMR_APPLY_IPM_TIMING_RECIPE)] && $::env(CMR_APPLY_IPM_TIM
   }
 }
 check_design > "$REPORT_DIR/check_design_post.rpt"
+redirect "$REPORT_DIR/area.rpt" {report_area -hierarchy}
+redirect "$REPORT_DIR/reference.rpt" {report_reference -hierarchy}
+# Diagnostic only: asynchronous latency acceptance uses event-referenced
+# paired STA / SDF, not a fictitious global clock or an unconstrained WNS.
+redirect "$REPORT_DIR/timing_diagnostic.rpt" {report_timing -max_paths 20 -input_pins -nets -transition_time -capacitance}
 set opm_buffer_post [get_cells -hierarchical -quiet -filter {full_name =~ *OutputPortModules_*/OPMReqoutBuffer_*/D0 && ref_name == BUFFD0BWP12T30P140}]
 if {[sizeof_collection $opm_buffer_post] != $expected_opm_buffer_pre_count} {
   puts "CMR_HIER_CHILD_DC_FAIL opm_output_buffer_lost ref=$REF actual=[sizeof_collection $opm_buffer_post] expected=$expected_opm_buffer_pre_count"
@@ -183,7 +192,7 @@ if {$n_gtech > 0 || $n_unmapped > 0} {
 # Glob filters on full_name or ref_name after uniquify are not reliable here.
 set ipm_count 0
 set opm_count 0
-for {set i 0} {$i < 32} {incr i} {
+for {set i 0} {$i < $expected_ports} {incr i} {
   if {[sizeof_collection [get_cells -quiet InputPortModules_$i]] == 1} {
     incr ipm_count
   }
@@ -193,7 +202,8 @@ for {set i 0} {$i < 32} {incr i} {
 }
 puts "CMR_HIER_CHILD_PORTS ref=$REF ipm=$ipm_count opm=$opm_count expected=$expected_ports"
 if {$ipm_count != $expected_ports || $opm_count != $expected_ports} {
-  puts "CMR_HIER_CHILD_DC_WARN ports ref=$REF ipm=$ipm_count opm=$opm_count expected=$expected_ports"
+  puts "CMR_HIER_CHILD_DC_FAIL ports ref=$REF ipm=$ipm_count opm=$opm_count expected=$expected_ports"
+  exit 2
 }
 
 write -hierarchy -format ddc -output "$OUTPUT_DIR/${REF}.ddc"

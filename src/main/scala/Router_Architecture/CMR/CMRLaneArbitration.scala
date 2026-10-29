@@ -9,7 +9,7 @@ class CMRMutexN(val width: Int)
     extends BlackBox(Map("WIDTH" -> width))
     with HasBlackBoxResource {
   override def desiredName: String = "CMRMutexN"
-  private val Supported = Set(1, 2, 4, 5, 7, 8, 10, 16, 20)
+  private val Supported = Set(1, 2, 4, 5, 7, 8, 10, 16, 20, 28, 64)
   require(Supported.contains(width), s"unsupported CMR mutex width $width")
   val io = IO(new Bundle {
     val reset = Input(Bool())
@@ -25,7 +25,7 @@ class CMRMutexN(val width: Int)
 
 /** First-level continuous lane selector for one input/direction pair. */
 class ContinuousLaneSelector(val laneCount: Int) extends Module {
-  require(Set(1, 2, 4, 8).contains(laneCount))
+  require(Set(1, 2, 4, 8, 16).contains(laneCount))
   val io = IO(new Bundle {
     val PathEnabled = Input(Bool())
     val OtherGrant = Input(Vec(laneCount, Bool()))
@@ -45,7 +45,7 @@ class ContinuousLaneSelector(val laneCount: Int) extends Module {
   * selected lane until packet completion; it intentionally does not retry. */
 class LaneSelectorCelement(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount)) with HasBlackBoxResource {
-  require(Set(2, 4, 8).contains(laneCount))
+  require(Set(2, 4, 8, 16).contains(laneCount))
   override def desiredName: String = "LaneSelectorCelement"
   val io = IO(new Bundle {
     val reset = Input(Bool())
@@ -68,7 +68,7 @@ class LaneSelector(val laneCount: Int)
       "LANES" -> laneCount,
       "REQUEST_DELAY_UNIT_PS" -> CMRParameters.LaneRequestDelayUnitPs
     )) with HasBlackBoxResource {
-  require(Set(2, 4, 8).contains(laneCount))
+  require(Set(2, 4, 8, 16).contains(laneCount))
   override def desiredName: String = "LaneSelector"
   val io = IO(new Bundle {
     val reset = Input(Bool())
@@ -88,7 +88,7 @@ class LanePhaseAdapter(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount))
     with HasBlackBoxResource {
   override def desiredName: String = "LanePhaseAdapter"
-  require(Set(1, 2, 4, 8).contains(laneCount))
+  require(Set(1, 2, 4, 8, 16).contains(laneCount))
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val Reqin = Input(Bool())
@@ -110,7 +110,7 @@ class LanePhaseAdapterDFF(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount))
     with HasBlackBoxResource {
   override def desiredName: String = "LanePhaseAdapterDFF"
-  require(Set(2, 4, 8).contains(laneCount))
+  require(Set(2, 4, 8, 16).contains(laneCount))
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val LaneSelect = Input(UInt(laneCount.W))
@@ -128,7 +128,7 @@ class WormholeLaneLock(val laneCount: Int)
     extends BlackBox(Map("LANES" -> laneCount))
     with HasBlackBoxResource {
   override def desiredName: String = "WormholeLaneLock"
-  require(Set(1, 2, 4, 8).contains(laneCount))
+  require(Set(1, 2, 4, 8, 16).contains(laneCount))
   val io = IO(new Bundle {
     val reset = Input(Bool())
     val PathEnabled = Input(Bool())

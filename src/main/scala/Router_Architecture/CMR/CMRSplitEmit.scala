@@ -23,7 +23,7 @@ object CMRSplitNetworkEmitMain extends App {
   val kind = args.headOption.getOrElse("mesh1024")
   val root = args.drop(1).headOption.getOrElse(s"generated_cmr/${kind}_split")
   val limit = args.drop(2).headOption.map(_.toInt).getOrElse(Int.MaxValue)
-  require(Set("mesh1024", "m16_1024", "mesh16").contains(kind))
+  require(Set("mesh1024", "m16_1024", "mesh16", "wide_tree64").contains(kind))
   Files.createDirectories(Paths.get(root))
   val digest = java.security.MessageDigest.getInstance("SHA-256")
   val sources = Files.walk(Paths.get("src/main"))
@@ -46,6 +46,7 @@ object CMRSplitNetworkEmitMain extends App {
   cataloguing = true
   try {
     kind match {
+      case "wide_tree64" => emitVerilog(new NoC.CMR.CMRWideTree64, Array("--target-dir", s"$root/top"))
       case "mesh16" => emitVerilog(new NoC.CMR.CMRMeshNoC(4), Array("--target-dir", s"$root/top"))
       case "mesh1024" => emitVerilog(new NoC.CMR.CMRMeshNoC(32), Array("--target-dir", s"$root/top"))
       case "m16_1024" => emitVerilog(new NoC.CMR.PROPtemp1024M16, Array("--target-dir", s"$root/top"))
