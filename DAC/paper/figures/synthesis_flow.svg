@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 549.01 248.63">
+  <defs>
+    <style>
+      .cls-1 {
+        font-family: AdobeSongStd-Light-GBpc-EUC-H, 'Adobe Song Std';
+        font-weight: 300;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        font-family: Arial-BoldMT, Arial;
+        font-weight: 700;
+      }
+
+      .cls-2, .cls-5 {
+        font-size: 16px;
+      }
+
+      .cls-6 {
+        letter-spacing: -.06em;
+      }
+
+      .cls-7 {
+        letter-spacing: -.07em;
+      }
+
+      .cls-3 {
+        font-size: 20px;
+      }
+
+      .cls-8 {
+        fill: none;
+      }
+
+      .cls-8, .cls-9, .cls-10 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 2px;
+      }
+
+      .cls-11 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-9 {
+        fill: #e6e6e6;
+      }
+
+      .cls-12 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-10 {
+        fill: #fceeb2;
+      }
+    </style>
+  </defs>
+  <rect class="cls-9" x="1" y="1" width="547.01" height="25.88"/>
+  <rect class="cls-10" x="7.53" y="53.15" width="178.45" height="50.39" rx="17" ry="17"/>
+  <text class="cls-2" transform="translate(11.84 76.05)"><tspan x="0" y="0">Static </tspan><tspan class="cls-11" x="48.02" y="0">T</tspan><tspan x="57.5" y="0">iming</tspan><tspan class="cls-12" x="100.16" y="0"> </tspan><tspan x="104.02" y="0">Analysis</tspan><tspan x="0" y="19.2" xml:space="preserve">              (S</tspan><tspan class="cls-7" x="78.23" y="19.2">T</tspan><tspan x="86.82" y="19.2">A)</tspan></text>
+  <rect class="cls-10" x="37.22" y="200.24" width="112.02" height="36.88"/>
+  <text class="cls-2" transform="translate(39.75 225.16)"><tspan x="0" y="0">Set Fire Clock</tspan></text>
+  <rect class="cls-10" x="327.44" y="200.04" width="112.91" height="37.28"/>
+  <text class="cls-2" transform="translate(332.28 225.61)"><tspan x="0" y="0">DC Synthesis</tspan></text>
+  <rect class="cls-10" x="173.1" y="200.04" width="127.55" height="37.28"/>
+  <text class="cls-2" transform="translate(177.71 225.36)"><tspan x="0" y="0">Insert delay cell</tspan></text>
+  <polygon class="cls-10" points="294.35 89.69 383.89 133.02 473.43 89.69 383.89 46.37 294.35 89.69"/>
+  <text class="cls-5" transform="translate(349.73 74.35)"><tspan class="cls-4"><tspan x="0" y="0">bundling </tspan></tspan><tspan class="cls-4"><tspan x="0" y="19.2">constraint </tspan></tspan><tspan class="cls-4" x="0" y="38.4">satisfied?</tspan><tspan class="cls-1" x="74.69" y="38.4"></tspan></text>
+  <rect class="cls-10" x="482.88" y="204.22" width="58.6" height="28.92" rx="7.37" ry="7.37"/>
+  <text class="cls-2" transform="translate(492.36 223.45)"><tspan x="0" y="0">Done</tspan></text>
+  <rect class="cls-10" x="167.4" y="140.24" width="128.24" height="33.43"/>
+  <text class="cls-2" transform="translate(173.1 163.4)"><tspan class="cls-6" x="0" y="0">V</tspan><tspan x="9.79" y="0">ariables Reset</tspan></text>
+  <g>
+    <line class="cls-8" x1="90.75" y1="105.62" x2="90.75" y2="192.28"/>
+    <polygon points="84.76 190.53 90.75 200.89 96.73 190.53 84.76 190.53"/>
+  </g>
+  <g>
+    <line class="cls-8" x1="149.24" y1="218.68" x2="164.49" y2="218.68"/>
+    <polygon points="162.74 224.66 173.1 218.68 162.74 212.7 162.74 224.66"/>
+  </g>
+  <g>
+    <line class="cls-8" x1="300.65" y1="218.68" x2="318.83" y2="218.68"/>
+    <polygon points="317.08 224.66 327.44 218.68 317.08 212.7 317.08 224.66"/>
+  </g>
+  <g>
+    <line class="cls-8" x1="383.89" y1="200.04" x2="383.89" y2="141.63"/>
+    <polygon points="389.88 143.39 383.89 133.02 377.91 143.39 389.88 143.39"/>
+  </g>
+  <g>
+    <polyline class="cls-8" points="294.35 89.69 231.52 89.69 231.52 131.63"/>
+    <polygon points="225.53 129.88 231.52 140.24 237.5 129.88 225.53 129.88"/>
+  </g>
+  <g>
+    <polyline class="cls-8" points="473.43 89.69 512 89.69 512 195.98"/>
+    <polygon points="506.02 194.23 512 204.6 517.99 194.23 506.02 194.23"/>
+  </g>
+  <g>
+    <polyline class="cls-8" points="167.4 156.96 114.71 156.96 114.71 191.63"/>
+    <polygon points="108.73 189.88 114.71 200.24 120.7 189.88 108.73 189.88"/>
+  </g>
+  <text class="cls-2" transform="translate(250.18 83.58)"><tspan x="0" y="0">No</tspan></text>
+  <text class="cls-2" transform="translate(480.26 85.05)"><tspan class="cls-6" x="0" y="0">Y</tspan><tspan x="9.79" y="0">es</tspan></text>
+  <rect class="cls-8" x="1" y="1" width="547.01" height="246.63"/>
+  <text class="cls-3" transform="translate(94.81 19.35)"><tspan x="0" y="0">Semi-Automated Delay-Matching Folw</tspan></text>
+</svg>
