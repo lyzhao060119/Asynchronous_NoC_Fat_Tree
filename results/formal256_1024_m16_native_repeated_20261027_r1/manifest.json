@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "metric": "window-completed physical-copy planned-offer-to-tail latency including source queueing",
+  "matched_conditions": {
+    "loads": {
+      "MULTICAST10-AABB": 40,
+      "ALL-MULTICAST-AABB": 20
+    },
+    "seeds": [
+      202701,
+      202702,
+      202703
+    ],
+    "packet_flits": 5
+  },
+  "sources": [
+    {
+      "path": "results\\formal256_native_repeated_latency_64definition_20261022_r1\\latency_summary.csv",
+      "sha256": "db48258eb77ab5a70020ef0945ef0fcf2b020ebbfd565d84f0385b12aff241e3"
+    },
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\latency_summary.csv",
+      "sha256": "e01531696ec65ecdfa683ce587944ffcb5f89c8b735c99f837c7bb3af743beef"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "results\\formal256_1024_m16_native_repeated_20261027_r1\\plotted_data.csv",
+      "sha256": "1290a73f28aed56b5df7cd9054a51c42f2a9f477e90a1518bb8cecc1de35a361",
+      "bytes": 648
+    },
+    {
+      "path": "results\\formal256_1024_m16_native_repeated_20261027_r1\\m16_native_repeated_256_1024.png",
+      "sha256": "ec7f50aa7db90842ff38677d858cd17f266dbcaf0bf19e8b92171616221d4d9a",
+      "bytes": 155880
+    },
+    {
+      "path": "results\\formal256_1024_m16_native_repeated_20261027_r1\\m16_native_repeated_256_1024.pdf",
+      "sha256": "9c397769ab95908087483c64934d6f52bef757cdc44d02bca06cbf561c951ab2",
+      "bytes": 15075
+    }
+  ]
+}

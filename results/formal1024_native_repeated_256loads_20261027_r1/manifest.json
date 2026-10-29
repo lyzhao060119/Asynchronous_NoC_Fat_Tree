@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "metric": "window-completed physical-copy planned-offer-to-tail latency including source queueing",
+  "remote_root": "\\home\\ghy19\\Asynchronous_Router_CMR\\experiments\\formal1024_native_repeated_256loads_20261027_r1",
+  "outputs": [
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\seed_records.csv",
+      "sha256": "ae9fc5a39fd822f207859646a626cd316ae6ab9f942fbe29a7c5cf9854fc6875",
+      "bytes": 4067
+    },
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\latency_summary.csv",
+      "sha256": "e01531696ec65ecdfa683ce587944ffcb5f89c8b735c99f837c7bb3af743beef",
+      "bytes": 950
+    },
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\formal1024_m16_native_repeated_latency.png",
+      "sha256": "95c0a7b85a90ea0b2611d5f6c8c54aa24790a2f2250b54916af3eface941b310",
+      "bytes": 122342
+    },
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\formal1024_m16_native_repeated_latency.pdf",
+      "sha256": "224fb9b9ee94ca379ed556f738af19c929a759ba0ee70866fde0c2f5afb61fc2",
+      "bytes": 14351
+    }
+  ]
+}

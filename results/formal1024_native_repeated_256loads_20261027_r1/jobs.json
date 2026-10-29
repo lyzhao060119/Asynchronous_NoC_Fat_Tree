@@ -1,0 +1,225 @@
+{
+  "root": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1",
+  "loads": {
+    "MULTICAST10-AABB": 40,
+    "ALL-MULTICAST-AABB": 20
+  },
+  "jobs": [
+    {
+      "job_id": "15463201",
+      "design": "Mesh1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202701,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_MULTICAST10-AABB_202701_native.log"
+    },
+    {
+      "job_id": "15463301",
+      "design": "Mesh1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202701,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_MULTICAST10-AABB_202701_repeated.log"
+    },
+    {
+      "job_id": "15463401",
+      "design": "Mesh1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202702,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_MULTICAST10-AABB_202702_native.log"
+    },
+    {
+      "job_id": "15463501",
+      "design": "Mesh1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202702,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_MULTICAST10-AABB_202702_repeated.log"
+    },
+    {
+      "job_id": "15463601",
+      "design": "Mesh1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202703,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_MULTICAST10-AABB_202703_native.log"
+    },
+    {
+      "job_id": "15463701",
+      "design": "Mesh1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202703,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_MULTICAST10-AABB_202703_repeated.log"
+    },
+    {
+      "job_id": "15463801",
+      "design": "Mesh1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202701,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_ALL-MULTICAST-AABB_202701_native.log"
+    },
+    {
+      "job_id": "15463901",
+      "design": "Mesh1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202701,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_ALL-MULTICAST-AABB_202701_repeated.log"
+    },
+    {
+      "job_id": "15464001",
+      "design": "Mesh1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202702,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_ALL-MULTICAST-AABB_202702_native.log"
+    },
+    {
+      "job_id": "15464101",
+      "design": "Mesh1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202702,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_ALL-MULTICAST-AABB_202702_repeated.log"
+    },
+    {
+      "job_id": "15464201",
+      "design": "Mesh1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202703,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_ALL-MULTICAST-AABB_202703_native.log"
+    },
+    {
+      "job_id": "15464301",
+      "design": "Mesh1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202703,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_Mesh1024_ALL-MULTICAST-AABB_202703_repeated.log"
+    },
+    {
+      "job_id": "15464401",
+      "design": "M16_1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202701,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_MULTICAST10-AABB_202701_native.log"
+    },
+    {
+      "job_id": "15464501",
+      "design": "M16_1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202701,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_MULTICAST10-AABB_202701_repeated.log"
+    },
+    {
+      "job_id": "15464601",
+      "design": "M16_1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202702,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_MULTICAST10-AABB_202702_native.log"
+    },
+    {
+      "job_id": "15464701",
+      "design": "M16_1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202702,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_MULTICAST10-AABB_202702_repeated.log"
+    },
+    {
+      "job_id": "15464801",
+      "design": "M16_1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202703,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_MULTICAST10-AABB_202703_native.log"
+    },
+    {
+      "job_id": "15464901",
+      "design": "M16_1024",
+      "benchmark": "MULTICAST10-AABB",
+      "load": 40,
+      "seed": 202703,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_MULTICAST10-AABB_202703_repeated.log"
+    },
+    {
+      "job_id": "15465001",
+      "design": "M16_1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202701,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_ALL-MULTICAST-AABB_202701_native.log"
+    },
+    {
+      "job_id": "15465101",
+      "design": "M16_1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202701,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_ALL-MULTICAST-AABB_202701_repeated.log"
+    },
+    {
+      "job_id": "15465201",
+      "design": "M16_1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202702,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_ALL-MULTICAST-AABB_202702_native.log"
+    },
+    {
+      "job_id": "15465301",
+      "design": "M16_1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202702,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_ALL-MULTICAST-AABB_202702_repeated.log"
+    },
+    {
+      "job_id": "15465401",
+      "design": "M16_1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202703,
+      "mode": "native",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_ALL-MULTICAST-AABB_202703_native.log"
+    },
+    {
+      "job_id": "15465501",
+      "design": "M16_1024",
+      "benchmark": "ALL-MULTICAST-AABB",
+      "load": 20,
+      "seed": 202703,
+      "mode": "repeated",
+      "log": "/home/ghy19/Asynchronous_Router_CMR/experiments/formal1024_native_repeated_256loads_20261027_r1/jobs/f1024_nr256_M16_1024_ALL-MULTICAST-AABB_202703_repeated.log"
+    }
+  ]
+}
