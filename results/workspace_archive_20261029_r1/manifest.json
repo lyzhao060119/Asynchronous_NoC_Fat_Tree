@@ -1,0 +1,16 @@
+{
+  "source_commit": "b4a5303bc8d6223ad55195896f9fb2c5f60c7043",
+  "method": "copy previous tracked versions; current files retained",
+  "files": [
+    {
+      "path": "DAC/paper/CHAMP_v1.docx",
+      "sha256": "54bc58b7a33fab9185955140cd59e7c2cfdbe8fbafa064168ceeeadf3d12763b",
+      "bytes": 487864
+    },
+    {
+      "path": "DAC/paper/figures/Challenge_Solution_v2.svg",
+      "sha256": "beaad9cc6341fba030ae38159004f7500da3f26138ab2d4a69dabf92739fe1a7",
+      "bytes": 111634
+    }
+  ]
+}
