@@ -578,31 +578,14 @@ module noc64_async_boundary_core #(
         rx_flit[port][slot] = captured;
         rx_expected_index[port][slot] = -1;
         rx_match[port][slot] = 1'b0;
-        // Concurrent sources share an output, so arrival order is not the case
-        // order.  Body/tail carry a unique pkt_seq.  Head is AABB-only and is
-        // held until the next identity flit on this port names the packet.
-        if (captured[27] && wide_packet_tag) begin
-          // Wide-tag cases use unique Body/Tail identities for packet latency,
-          // while Head retains the routing AABB and may be followed by another
-          // packet's Head at a contended output.  Score the complete Head flit
-          // immediately; delaying it until Body would falsely orphan a valid
-          // Head when arbitration interleaves two packet starts.
-          match_first_unseen(port, slot, captured);
-        end else if (captured[27]) begin
-          release_pending_head(port);
-          pending_head_valid[port] = 1'b1;
-          pending_head_flit[port] = captured;
-          pending_head_slot[port] = slot;
-        end else begin
-          pkt = identity_pkt_seq(captured);
-          if (pkt >= 0) begin
-            match_first_unseen(port, slot, captured);
-            bind_pending_head(port, pkt);
-          end else begin
-            release_pending_head(port);
-            match_first_unseen(port, slot, captured);
-          end
-        end
+        // Score every flit immediately by complete flit value and destination.
+        // Repeated-unicast expansion can produce several identical Heads at a
+        // contended output before the corresponding uniquely tagged Bodies.
+        // Deferring Head matching until a Body arrives therefore creates a
+        // false orphan even though the DUT delivered a valid copy.  Body/Tail
+        // identities still enforce duplicate/missing detection and packet
+        // completion latency; no DUT or expected-flit requirement is relaxed.
+        match_first_unseen(port, slot, captured);
         rx_count[port] = slot + 1;
         tb_out_ack[port] = tb_out_req[port];
         -> rx_activity;

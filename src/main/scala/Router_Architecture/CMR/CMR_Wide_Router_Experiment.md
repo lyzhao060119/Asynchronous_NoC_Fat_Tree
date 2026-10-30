@@ -142,3 +142,25 @@ balancedtail候选DC 15739101已PASS；严格MAXIMUM-SDF hop 15742801最终DONE�
 `trace_wide_network_routers.py --selected`支持从当前选中的网络候选及其GLS记录绑定网表/SDF/case，使用独立目录和提交记录，125ns诊断上限；保留原fail-fast与100ps采样，监测全部21 Router/672边界。不得复用原网表85ns观察窗来判断当前109.635ns失败，也不得据诊断结束标志宣称case通过。
 
 新候选逐跳诊断15766301完成，确认首错已移至L2(1,1)输出11。L3输入47、输出15和L2(1,1)输入31均完整交付source50/packet129的五flit序列；L2输出11却出现116个同Head捕获事件，无该包Body/Tail，随后L1(2,3)输出1/core53看到43个Head。时间和完整证据见`network_balancedtail_first_router.md`及`network_balancedtail_backtrace.json`。当前L3保护在该路径上有效，不能再将本次整网FAIL说成L3仍重复Head。单体L2先前仅测试parent输出31，不覆盖当前child输出11；后续须探查这个实际输出的IPM/adapter/OPM路径，不能把边界定位直接当作内部器件根因。
+
+L2内部只读诊断15771501完成。实际绑定IPM31 branch2 -> adapter126 lane3 -> OPM11 source27（28来源）。Grant于35.747ns选source27、MG于35.873ns选中，之后稳定且onehot0。Ack D于35.961ns置1；RegEnable于36.245ns上升、36.392ns下降，高脉冲147ps。Ack CP全窗恒1，CDN全窗恒1（复位已释放），Ack Q/sourceAck全窗恒0。实际U6/INVD1直接负载56，SDF fall MAX201ps、rise MAX209ps，脉冲未传到Ack时钟。输出Req36.441ns、下游Ack36.705ns、再次Fire36.815ns、重复Req36.997ns。由此确认当前故障为OPM内部Ack时钟未捕获，adapter/IPM因未收到确认保持Head；本次没有Mutex多高/撤销证据。详见`network_l2_internal_root_cause.md`。保护应配套核对公共Fire驱动和Ack分支、输出重开及Tail捕获，不能只放大末级反相器后忽略上游负载。
+
+## L2采用L3配套保护
+
+用户授权采用相同方式后，`protect_wide_tree64_l2.py submit`从已冻结的L3保护网络DDC出发，提交候选`20261029_wide_router_tt_r4_tree64_l2l3_balanced24_req250_tail150_r1`，DC 15774201已确认RUN。只对4个L2施加同极性Ack INVD24、Fire OA221D4（库无D4时显式D2）、原输出DEL250和原TailCapture DEL150，保留BUFFD0、原始Reqout内部反馈、L3保护及L1器件。属于完整网表等价器件处理/重导出，不修改RTL或重新compile全部逻辑。
+
+L2覆盖不是每OPM固定64来源：每Router的16个child输出各28来源、16个parent输出各16来源，共704状态；4个Router合计128 OPM、2816 Ack/Tail状态。通用Tcl新增auto来源目录，逐项检查端口连续性；审计器另按实际几何核对来源数，不将枚举结果自证为覆盖通过。每个Router独立CSV记录Ack分支、Fire/输出和Tail映射。延迟叶单元目录现在按Router一次收集后局部筛选，避免为每个源反复扫描完整网表；仍逐单元验证替换ref。
+
+`protect_wide_tree64_l2.py watch`等待确切作业终态，检查4份OPM/状态/物理支路覆盖、全量工具Error、DDC/post/SDF哈希后选择候选，自动提交原M5严格网络SDF。未通过任何门槛则停止派发，原失败产物保留。当前状态只是已运行，尚无新候选SDF PASS。
+
+15774201在L2(0,0)/OPM16触发`non-inverter Ack clock ... OAI221D2`并停止，未生成可验收候选、未派发SDF。child输出与parent输出映射不同，不能将L3反相器配方无条件套用全L2。r2从原L3保护DDC重新开始，仅处理4个L2的child OPM0–15（64 OPM、1792 Ack/Tail状态），包括已证实故障的OPM11；parent输出保留原映射且不计为本轮保护通过。新DC 15797701，独立记录`tree64_l2_child_protection_r2_job.json`；审计和原M5严格SDF流程保留，失败r1产物不覆盖。
+
+DC 15797701最终DONE；r2覆盖审计通过64 OPM/1792 Ack及Tail状态/64物理Ack支路，DDC/post/SDF三项SHA核对OK。自动提交严格MAXIMUM-SDF原M5/seed202701作业15799101；当前尚未取得该候选完整case PASS。SDF导出1122709755字节，原大产物仍留远程。
+
+严格M5 15799101最终EXIT：320.412ns首错`port=2 slot=10 flit=8000003`，停止快照判为期望core0的数据到达core2。完整run.log Timing violation=0，annotation errors=0/warnings119825。前一port53首错未先出现，但不能据此宣布该包已完整正确或整体保护完成。新只读边界诊断15799501从同一候选重放，观察上限350ns，保留fail-fast，重新定位新首错的路由路径。`0x8000003`在完整case中有82处匹配，必须结合早期时间及Body标识，不能只凭Head绑定源包。
+
+15799501复现相同首错：source11/packet23（计划299ns，Body0017343/0017543）于319.150ns进入L1(1,0)输入0，320.412ns从本地输出3送core2，目的应为core0。网表结构审计发现stitch同名内部设计冲突：L1(1,0)外层external ref为正确坐标x1_y0，但其IPM/RCU/RouteComputationLogic未全部被uniquify重命名；最终网络的该RouteComputationLogic所有单元/连线与独立child x0_y0完全相同，与独立child x1_y0不同（network_coordinate_collision_audit.json）。这是拼接时错误共用坐标专用逻辑，不是延迟短缺；不能继续以加DEL修复。
+
+新增namespace_wide_children.py：从每个原独立child冻结DDC出发，用工具支持的rename_design -prefix/-update_links/-dont_link_with_original_name为全部内部design加唯一命名空间，保留顶层ref及所有instance/接口；rename前后leaf数量必须一致、所有内部design必须带对应child前缀、link必须成功。独立DDC中应用已确认的L3及L2 child保护，再导出新的namespaced DDC。原DDC及失败网络不覆盖。先验证x1_y0 pilot，再扩展21child及重新stitch；新网络必须额外验证各坐标RCU与对应原child的一致性，不能只用IPM数量/未解析引用为零代替接线语义审计。
+
+pilot 15800501已取得NAMESPACE_CHILD_PASS（1332内部design、9994叶单元），SHA核验OK。全部21 child已提交独立nsprotect候选，以done依赖限制最多4个处理任务。stitch_namespaced_wide64.py等待各child实际终态，逐项扫描工具Error/PASS、SHA和namespace.txt并验证全部设计集合互斥；重新stitch后增加336个RCU的坐标命名空间检查，完成后再派发原严格M5。调度和拼接均用独立记录，不覆盖旧候选。流程问题会影响此前网络面积/功能结论，旧数值只作为失败候选历史，不作为新网络验收依据。
