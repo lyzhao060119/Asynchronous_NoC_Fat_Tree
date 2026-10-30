@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-30",
+  "base_commit": "7294a7202e6da5e28b8e8d5547aed244696a7d59",
+  "initial_sha256": {
+    "DAC/paper/CHAMP_v1.docx": "4460831c723fc709c2d86e30fa2b4148e801d56a6b03a1560fbdec04b286f5ee",
+    "DAC/paper/figures/Challenge_Solution_v2.svg": "ce0c4e7d9c5e332f5f27c732902f21621198c70b2e075705d28199d0c69b9dda",
+    "sim/AsyncNoC/testbench/tb_noc64_async_boundary.sv": "e3163ef11e13dbc43d5c155c2d928dc6dd5c6c2f9c455effd6dd93d7fe30435f",
+    "src/main/scala/Router_Architecture/CMR/CMR_Wide_Router_Experiment.md": "3c7874f4f5c159155c7df315097eaf64e48ba4aa233661eaefc7685a141f894f",
+    "DAC/paper/CHAMP_v1 (2).docx": "81409707ac24cb6ab78feea74c7b2241225ba50ff53942cc653bc048b5c4d26f",
+    "DAC/paper/figures/Multicast_Latency_comparison.svg": "7abdbb87b66f3bbe64df9e89b393cc77b2f1612995c4c9cf81ce9351e6d7f98c",
+    "DAC/paper/figures/formal64_sync_async_power.svg": "8141e38ff3fe1a34d1b7dcf18f00f6edd90adcd7b6c7bd7b6a24a9b89d88634f",
+    "DAC/paper/figures/latency&throughput.svg": "128086b338efa2d849bf9de1f82d2c4d14ff9acaf9dd1014c6eb19c6ed406891",
+    "DAC/paper/figures/router_area_latency_scaling.svg": "d3f289d9d6186631fd088638191dcd2ce59253336c2014f8198225024b8ab51f",
+    "DAC/paper/figures/router_comparison.svg": "f41450d5c1cff62192d3ad234f2fc4c44ca239b9c63d9c154bbd78926ebe4012",
+    "DAC/paper/figures/table2_sync_async_router.svg": "8e34ee971ceede33e1b17d8f823d8143f918860426c0cdcbd6887aa595cb3602",
+    "results/formal64_native_repeated_matchedloads_20261029_r1/latency_summary.csv": "befbdc56084791c1befe1bde5748b4c5472120ee396cfe89f3fcd47093ca1a9f",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/m16_native_repeated_64_256_1024.pdf": "15e8ed42d2d45dfbeef0d3c12abee572352daa58800438d87c08092e73df8a7b",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/m16_native_repeated_64_256_1024.png": "1b52330c08a312e3b968175d5cf0c6db86869325e5d877a3a8b7a8025d4ee3b2",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/manifest.json": "2e41f6cec4a7b61640c12325fe5029db36e9d16e9a010ca82ebf08a0836c526d",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/plotted_data.csv": "5c82179f5c1e809f95ce6f24e72bb5019032c5a511f3e8da01a4d1f9921d4677",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/review.png": "6553c3f3e6df55190100dfb4301e90d7884e88ea270300d04c44557eb8e03699",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/m16_native_repeated_64_256_1024.pdf": "92b6d6b7dd0c89e2554c54fec1bd88f385a105456479538018d66268a15d2a58",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/m16_native_repeated_64_256_1024.png": "7e334a95d2300e7e2bb80429a8db7df8b92b083c0ddc25b2458ff9b36be61b98",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/manifest.json": "5106df8262e5a857253a9c5ee5dd399509a0a6605df29883d8058208acb6cd0e",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/plotted_data.csv": "2e1bd12456d8ff1109a3b63cdb26baaa1d127b8b89b008de1fa71806ff2cfdac"
+  },
+  "archived": {
+    "original": "DAC/paper/CHAMP_v1 (2).docx",
+    "zip": "manuscript_variant.zip",
+    "zip_sha256": "4c6871ddfab6338db625fc6361c7116c336c67a8b8b71f52c7c7232a5ad597d1"
+  },
+  "deleted_temporary": [
+    "results/m16_native_repeated_64_256_1024_20261029_r1/review.png"
+  ],
+  "preserved_file_hashes": "PASS",
+  "experiment_manifest_hashes": "PASS",
+  "svg_xml_parse": "PASS"
+}

@@ -1,0 +1,86 @@
+[
+  [
+    " M",
+    "DAC/paper/CHAMP_v1.docx"
+  ],
+  [
+    " M",
+    "DAC/paper/figures/Challenge_Solution_v2.svg"
+  ],
+  [
+    " M",
+    "sim/AsyncNoC/testbench/tb_noc64_async_boundary.sv"
+  ],
+  [
+    " M",
+    "src/main/scala/Router_Architecture/CMR/CMR_Wide_Router_Experiment.md"
+  ],
+  [
+    "??",
+    "DAC/paper/CHAMP_v1 (2).docx"
+  ],
+  [
+    "??",
+    "DAC/paper/figures/Multicast_Latency_comparison.svg"
+  ],
+  [
+    "??",
+    "DAC/paper/figures/formal64_sync_async_power.svg"
+  ],
+  [
+    "??",
+    "DAC/paper/figures/latency&throughput.svg"
+  ],
+  [
+    "??",
+    "DAC/paper/figures/router_area_latency_scaling.svg"
+  ],
+  [
+    "??",
+    "DAC/paper/figures/router_comparison.svg"
+  ],
+  [
+    "??",
+    "DAC/paper/figures/table2_sync_async_router.svg"
+  ],
+  [
+    "??",
+    "results/formal64_native_repeated_matchedloads_20261029_r1/latency_summary.csv"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/m16_native_repeated_64_256_1024.pdf"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/m16_native_repeated_64_256_1024.png"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/manifest.json"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/plotted_data.csv"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r1/review.png"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/m16_native_repeated_64_256_1024.pdf"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/m16_native_repeated_64_256_1024.png"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/manifest.json"
+  ],
+  [
+    "??",
+    "results/m16_native_repeated_64_256_1024_20261029_r2/plotted_data.csv"
+  ]
+]

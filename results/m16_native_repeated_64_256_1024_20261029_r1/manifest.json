@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "metric": "window-completed physical-copy planned-offer-to-tail latency including source queueing",
+  "note": "64-node loads differ from matched 256/1024 loads and are disclosed on the x-axis",
+  "sources": [
+    {
+      "path": "results\\formal64_native_repeated_latency_20261022_r1\\latency_summary.csv",
+      "sha256": "cf6bfe326f11ea27e523476dd4423efa2748ad495c7350978f2dc54188a10401"
+    },
+    {
+      "path": "results\\formal256_native_repeated_latency_64definition_20261022_r1\\latency_summary.csv",
+      "sha256": "db48258eb77ab5a70020ef0945ef0fcf2b020ebbfd565d84f0385b12aff241e3"
+    },
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\latency_summary.csv",
+      "sha256": "e01531696ec65ecdfa683ce587944ffcb5f89c8b735c99f837c7bb3af743beef"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "results\\m16_native_repeated_64_256_1024_20261029_r1\\plotted_data.csv",
+      "sha256": "5c82179f5c1e809f95ce6f24e72bb5019032c5a511f3e8da01a4d1f9921d4677",
+      "bytes": 942
+    },
+    {
+      "path": "results\\m16_native_repeated_64_256_1024_20261029_r1\\m16_native_repeated_64_256_1024.png",
+      "sha256": "1b52330c08a312e3b968175d5cf0c6db86869325e5d877a3a8b7a8025d4ee3b2",
+      "bytes": 206341
+    },
+    {
+      "path": "results\\m16_native_repeated_64_256_1024_20261029_r1\\m16_native_repeated_64_256_1024.pdf",
+      "sha256": "15e8ed42d2d45dfbeef0d3c12abee572352daa58800438d87c08092e73df8a7b",
+      "bytes": 18379
+    }
+  ]
+}

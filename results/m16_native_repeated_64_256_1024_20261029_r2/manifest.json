@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "metric": "window-completed physical-copy planned-offer-to-tail latency including source queueing",
+  "note": "64/256/1024 use matched offered loads: Multicast10=40 and All-Multicast=20 Mflit/s/port",
+  "sources": [
+    {
+      "path": "results\\formal64_native_repeated_matchedloads_20261029_r1\\latency_summary.csv",
+      "sha256": "befbdc56084791c1befe1bde5748b4c5472120ee396cfe89f3fcd47093ca1a9f"
+    },
+    {
+      "path": "results\\formal256_native_repeated_latency_64definition_20261022_r1\\latency_summary.csv",
+      "sha256": "db48258eb77ab5a70020ef0945ef0fcf2b020ebbfd565d84f0385b12aff241e3"
+    },
+    {
+      "path": "results\\formal1024_native_repeated_256loads_20261027_r1\\latency_summary.csv",
+      "sha256": "e01531696ec65ecdfa683ce587944ffcb5f89c8b735c99f837c7bb3af743beef"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "results\\m16_native_repeated_64_256_1024_20261029_r2\\plotted_data.csv",
+      "sha256": "2e1bd12456d8ff1109a3b63cdb26baaa1d127b8b89b008de1fa71806ff2cfdac",
+      "bytes": 934
+    },
+    {
+      "path": "results\\m16_native_repeated_64_256_1024_20261029_r2\\m16_native_repeated_64_256_1024.png",
+      "sha256": "7e334a95d2300e7e2bb80429a8db7df8b92b083c0ddc25b2458ff9b36be61b98",
+      "bytes": 205541
+    },
+    {
+      "path": "results\\m16_native_repeated_64_256_1024_20261029_r2\\m16_native_repeated_64_256_1024.pdf",
+      "sha256": "92b6d6b7dd0c89e2554c54fec1bd88f385a105456479538018d66268a15d2a58",
+      "bytes": 18365
+    }
+  ]
+}
