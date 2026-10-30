@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 729.39 152.16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-2 {
+        stroke: #000;
+      }
+
+      .cls-3 {
+        font-size: 10px;
+      }
+
+      .cls-3, .cls-4 {
+        font-family: Arial-BoldMT, Arial;
+        font-weight: 700;
+      }
+
+      .cls-4 {
+        font-size: 9px;
+      }
+
+      .cls-2 {
+        fill: #ccc;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+  <rect class="cls-2" x=".89" y=".5" width="134.57" height="151.16"/>
+  <rect class="cls-2" x=".89" y=".5" width="728" height="30"/>
+  <text class="cls-4" transform="translate(153.88 13.37)"><tspan x="0" y="0">TVLSI 2019 [ref]</tspan></text>
+  <text class="cls-4" transform="translate(174.65 23.87)"><tspan x="0" y="0">(CMR)</tspan></text>
+  <text class="cls-4" transform="translate(286.89 13.37)"><tspan x="0" y="0">IEEE Micro</tspan></text>
+  <text class="cls-4" transform="translate(290.38 23.87)"><tspan x="0" y="0">2021 [ref]</tspan></text>
+  <text class="cls-4" transform="translate(411.64 13.37)"><tspan x="0" y="0">JETCAS</tspan></text>
+  <text class="cls-4" transform="translate(409.38 23.87)"><tspan x="0" y="0">2024 [ref]</tspan></text>
+  <text class="cls-4" transform="translate(536.64 13.37)"><tspan x="0" y="0">DATE</tspan></text>
+  <text class="cls-4" transform="translate(528.88 23.87)"><tspan x="0" y="0">2026 [ref]</tspan></text>
+  <text class="cls-4" transform="translate(647.89 13.37)"><tspan x="0" y="0">This work</tspan></text>
+  <text class="cls-4" transform="translate(659.4 23.87)"><tspan x="0" y="0">Thin</tspan></text>
+  <text class="cls-3" transform="translate(25.34 47.9)"><tspan x="0" y="0">Technology / VDD</tspan></text>
+  <text class="cls-4" transform="translate(168.83 45.22)"><tspan x="0" y="0">45 nm / --</tspan></text>
+  <text class="cls-4" transform="translate(283.29 46.09)"><tspan x="0" y="0">40 nm / 1.2 V</tspan></text>
+  <text class="cls-4" transform="translate(409.37 45.22)"><tspan x="0" y="0">40 nm / --</tspan></text>
+  <text class="cls-4" transform="translate(518.6 45.65)"><tspan x="0" y="0">22 nm / 0.85 V</tspan></text>
+  <text class="cls-4" transform="translate(645.28 45.22)"><tspan x="0" y="0">28 nm / 0.8 V</tspan></text>
+  <text class="cls-3" transform="translate(24.61 72.57)"><tspan x="0" y="0">Pipeline structure</tspan></text>
+  <text class="cls-4" transform="translate(164.58 64.45)"><tspan x="0" y="0">MouseTrap</tspan></text>
+  <text class="cls-4" transform="translate(175.09 74.37)"><tspan x="0" y="0">(latch)</tspan></text>
+  <text class="cls-4" transform="translate(286.55 64.75)"><tspan x="0" y="0">MouseTrap</tspan></text>
+  <text class="cls-4" transform="translate(297.05 75.25)"><tspan x="0" y="0">(latch)</tspan></text>
+  <text class="cls-4" transform="translate(405.12 63.87)"><tspan x="0" y="0">MouseTrap</tspan></text>
+  <text class="cls-4" transform="translate(415.62 74.37)"><tspan x="0" y="0">(latch)</tspan></text>
+  <text class="cls-4" transform="translate(537.62 64.3)"><tspan x="0" y="0">Click</tspan></text>
+  <text class="cls-4" transform="translate(528.88 74.8)"><tspan x="0" y="0">(flip-flop)</tspan></text>
+  <text class="cls-4" transform="translate(661.79 63.87)"><tspan x="0" y="0">Click</tspan></text>
+  <text class="cls-4" transform="translate(653.05 74.37)"><tspan x="0" y="0">(flip-flop)</tspan></text>
+  <text class="cls-4" transform="translate(174.82 94.62)"><tspan x="0" y="0">54,083</tspan></text>
+  <text class="cls-4" transform="translate(296.79 95.5)"><tspan x="0" y="0">24,866</tspan></text>
+  <text class="cls-4" transform="translate(415.36 94.62)"><tspan x="0" y="0">33,650</tspan></text>
+  <text class="cls-4" transform="translate(533.36 95.73)"><tspan x="0" y="0">9,902.4</tspan></text>
+  <text class="cls-4" transform="translate(657.53 94.62)"><tspan x="0" y="0">9,990.1</tspan></text>
+  <text class="cls-3" transform="translate(37.08 118.81)"><tspan x="0" y="0">Latency (ns)</tspan></text>
+  <text class="cls-4" transform="translate(159.57 113)"><tspan x="0" y="0">0.693 Header </tspan><tspan x="0" y="10.8">0.636 Body</tspan></text>
+  <text class="cls-4" transform="translate(301.79 120)"><tspan x="0" y="0">0.98</tspan></text>
+  <text class="cls-4" transform="translate(401.3 119.24)"><tspan x="0" y="0">1.934 Header</tspan></text>
+  <text class="cls-4" transform="translate(539.61 120.34)"><tspan x="0" y="0">0.63</tspan></text>
+  <text class="cls-4" transform="translate(663.78 119.24)"><tspan x="0" y="0">0.66</tspan></text>
+  <text class="cls-3" transform="translate(31.32 142.53)"><tspan x="0" y="0">Energy (pJ/bit)</tspan></text>
+  <text class="cls-4" transform="translate(174.82 142.17)"><tspan x="0" y="0">0.1178</tspan></text>
+  <text class="cls-4" transform="translate(301.79 143.15)"><tspan x="0" y="0">0.12</tspan></text>
+  <text class="cls-4" transform="translate(420.36 142.39)"><tspan x="0" y="0">0.17</tspan></text>
+  <text class="cls-4" transform="translate(539.61 143.6)"><tspan x="0" y="0">0.16</tspan></text>
+  <text class="cls-4" transform="translate(661.28 142.39)"><tspan x="0" y="0">0.056</tspan></text>
+  <text class="cls-3" transform="translate(42.85 94.62)"><tspan x="0" y="0">Area (μm</tspan></text>
+  <text class="cls-3" transform="translate(86.2 91.29) scale(.58)"><tspan x="0" y="0">2</tspan></text>
+  <text class="cls-3" transform="translate(89.44 94.62)"><tspan x="0" y="0">)</tspan></text>
+  <rect class="cls-1" x=".89" y=".5" width="728" height="151.16"/>
+  <line class="cls-1" y1="54.74" x2="728" y2="54.74"/>
+  <line class="cls-1" x1=".89" y1="78.98" x2="728.89" y2="78.98"/>
+  <line class="cls-1" x1=".89" y1="103.23" x2="728.89" y2="103.23"/>
+  <line class="cls-1" x1=".89" y1="127.47" x2="728.89" y2="127.47"/>
+  <line class="cls-1" x1="247.34" y1=".5" x2="247.34" y2="151.66"/>
+  <line class="cls-1" x1="372.56" y1=".68" x2="372.56" y2="151.84"/>
+  <line class="cls-1" x1="489.13" y1=".68" x2="489.13" y2="151.84"/>
+  <line class="cls-1" x1="608.98" y1=".5" x2="608.98" y2="151.66"/>
+  <line class="cls-1" x1="135.47" y1=".68" x2="135.47" y2="151.84"/>
+</svg>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296.41 73">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        fill: #ccc;
+      }
+
+      .cls-4 {
+        letter-spacing: 0em;
+      }
+
+      .cls-3 {
+        fill: #ccc;
+      }
+
+      .cls-5 {
+        font-family: Arial-BoldMT, Arial;
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .cls-6 {
+        letter-spacing: .03em;
+      }
+    </style>
+  </defs>
+  <rect class="cls-3" x=".6" y=".5" width="88.84" height="72"/>
+  <rect class="cls-2" x=".6" y=".5" width="295.3" height="24"/>
+  <text class="cls-5" transform="translate(97.15 15.5)"><tspan x="0" y="0">Latency (ns)</tspan></text>
+  <text class="cls-5" transform="translate(167.83 15.61)"><tspan x="0" y="0">Power (mW)</tspan></text>
+  <text class="cls-5" transform="translate(237.66 15.5)"><tspan x="0" y="0">Area (</tspan><tspan class="cls-6" x="25.51" y="0">µ</tspan><tspan class="cls-4" x="31" y="0">m²)</tspan></text>
+  <text class="cls-5" transform="translate(14.1 39.5)"><tspan x="0" y="0">Asynchronous</tspan></text>
+  <text class="cls-5" transform="translate(109.89 39.5)"><tspan x="0" y="0">0.7922</tspan></text>
+  <text class="cls-5" transform="translate(180.07 39.61)"><tspan x="0" y="0">1.6590</tspan></text>
+  <text class="cls-5" transform="translate(240.14 39.5)"><tspan x="0" y="0">17,033.52</tspan></text>
+  <text class="cls-5" transform="translate(5.48 63.5)"><tspan x="0" y="0">Synchronous (CG)</tspan></text>
+  <text class="cls-5" transform="translate(109.89 63.5)"><tspan x="0" y="0">1.0000</tspan></text>
+  <text class="cls-5" transform="translate(180.07 63.61)"><tspan x="0" y="0">1.9633</tspan></text>
+  <text class="cls-5" transform="translate(240.14 63.5)"><tspan x="0" y="0">10,503.53</tspan></text>
+  <line class="cls-1" x1=".6" y1="47.56" x2="295.91" y2="47.56"/>
+  <line class="cls-1" y1="72.5" x2="295.3" y2="72.5"/>
+  <line class="cls-1" x1="295.91" y1="24.5" x2="295.91" y2="72.5"/>
+  <line class="cls-1" x1="159.43" y1=".5" x2="159.43" y2="72.5"/>
+  <line class="cls-1" x1="227.11" y1=".5" x2="227.11" y2="72.5"/>
+  <line class="cls-1" x1="89.45" y1="24.5" x2="89.45" y2=".5"/>
+</svg>
